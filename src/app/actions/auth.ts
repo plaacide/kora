@@ -59,6 +59,13 @@ export async function login(
 
   if (error) return { error: traduireErreur(error.message) };
 
+  // Si un facteur 2FA est vérifié, la session est en aal1 et doit passer aal2.
+  const { data: aal } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
+    redirect("/connexion/2fa");
+  }
+
   redirect("/dashboard");
 }
 

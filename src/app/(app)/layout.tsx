@@ -14,6 +14,13 @@ export default async function AppLayout({
 
   if (!user) redirect("/connexion");
 
+  // Enforcement 2FA: si un facteur est vérifié, exiger aal2.
+  const { data: aal } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
+    redirect("/connexion/2fa");
+  }
+
   const { data: membership } = await supabase
     .from("memberships")
     .select("org_id, organizations(name)")
