@@ -5,6 +5,24 @@
 create extension if not exists pgcrypto with schema extensions;
 
 -- ---------------------------------------------------------------------------
+-- Reset — rend la migration ré-exécutable (sûr: socle initial, aucune donnée).
+-- ---------------------------------------------------------------------------
+drop trigger if exists on_auth_user_created on auth.users;
+drop table if exists public.audit_log cascade;
+drop table if exists public.memberships cascade;
+drop table if exists public.profiles cascade;
+drop table if exists public.organizations cascade;
+drop type if exists public.org_role cascade;
+drop function if exists public.write_audit(uuid, text, text, text, jsonb, uuid) cascade;
+drop function if exists public.verify_audit_chain(uuid) cascade;
+drop function if exists public.audit_log_immutable() cascade;
+drop function if exists public.handle_new_user() cascade;
+drop function if exists public.create_organization(text, text) cascade;
+drop function if exists public.is_org_member(uuid) cascade;
+drop function if exists public.shares_org_with(uuid) cascade;
+drop function if exists public.slugify(text) cascade;
+
+-- ---------------------------------------------------------------------------
 -- Enums
 -- ---------------------------------------------------------------------------
 create type public.org_role as enum ('owner', 'admin', 'member', 'guest');
