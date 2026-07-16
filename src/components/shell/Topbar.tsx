@@ -1,7 +1,21 @@
 import Link from "next/link";
 import { EncryptionBadge } from "@/components/ui/EncryptionBadge";
+import { logout } from "@/app/actions/auth";
 
-export function Topbar() {
+function initials(email: string): string {
+  const name = email.split("@")[0] ?? "";
+  const parts = name.split(/[.\-_]/).filter(Boolean);
+  const letters = (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? parts[0]?.[1] ?? "");
+  return letters.toUpperCase() || "??";
+}
+
+export function Topbar({
+  orgName,
+  userEmail,
+}: {
+  orgName: string;
+  userEmail: string;
+}) {
   return (
     <header className="sticky top-0 z-[60] flex items-center gap-2.5 h-[52px] px-4 bg-[rgba(255,255,255,0.92)] backdrop-blur-md border-b border-line">
       <div className="flex items-center gap-2 pr-3.5 border-r border-line">
@@ -18,7 +32,7 @@ export function Topbar() {
           </span>
         </Link>
         <span className="text-[11px] font-[550] text-ink-secondary bg-chip-neutral-bg rounded-chip px-1.5 py-0.5">
-          Amani Capital
+          {orgName}
         </span>
       </div>
 
@@ -31,9 +45,20 @@ export function Topbar() {
 
       <div className="ml-auto flex items-center gap-4">
         <EncryptionBadge />
-        <span className="grid place-items-center w-[30px] h-[30px] rounded-full bg-primary text-white text-[11.5px] font-[650]">
-          AD
+        <span
+          className="grid place-items-center w-[30px] h-[30px] rounded-full bg-primary text-white text-[11.5px] font-[650]"
+          title={userEmail}
+        >
+          {initials(userEmail)}
         </span>
+        <form action={logout}>
+          <button
+            type="submit"
+            className="text-[12px] font-medium text-ink-secondary hover:text-ink cursor-pointer"
+          >
+            Déconnexion
+          </button>
+        </form>
       </div>
     </header>
   );

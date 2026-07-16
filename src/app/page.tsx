@@ -20,11 +20,11 @@ export default function Home() {
         </div>
         <EncryptionBadge />
         <div className="flex gap-2">
-          <Link href="/dashboard">
-            <Button variant="primary">Voir le dashboard</Button>
+          <Link href="/connexion">
+            <Button variant="primary">Se connecter</Button>
           </Link>
-          <Link href="/kitchen-sink">
-            <Button variant="secondary">Design system</Button>
+          <Link href="/inscription">
+            <Button variant="secondary">Créer un compte</Button>
           </Link>
         </div>
       </div>

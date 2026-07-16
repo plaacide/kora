@@ -1,0 +1,40 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { OrgForm } from "@/components/auth/OrgForm";
+
+export default async function OnboardingPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/connexion");
+
+  const { data: membership } = await supabase
+    .from("memberships")
+    .select("org_id")
+    .limit(1)
+    .maybeSingle();
+
+  if (membership) redirect("/dashboard");
+
+  return (
+    <main className="min-h-screen grid place-items-center px-6">
+      <div className="w-full max-w-sm flex flex-col gap-6">
+        <div className="flex flex-col gap-1.5">
+          <span className="grid place-items-center w-9 h-9 rounded-[10px] bg-gradient-to-br from-primary to-primary-strong text-white font-bold text-[16px]">
+            K
+          </span>
+          <h1 className="text-[22px] font-[650] tracking-[-0.02em] mt-2">
+            Créez votre organisation
+          </h1>
+          <p className="text-[12.5px] text-ink-secondary">
+            Le cadre de travail de votre équipe : deals, data rooms, membres et
+            journal d&apos;audit y seront rattachés.
+          </p>
+        </div>
+        <OrgForm />
+      </div>
+    </main>
+  );
+}
