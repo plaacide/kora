@@ -33,7 +33,7 @@ export default async function DataRoomPage({
 
   const { data: deals } = await supabase
     .from("deals")
-    .select("id, name, readiness_score")
+    .select("id, name, type, readiness_score")
     .order("created_at", { ascending: false });
 
   const deal = params.deal
@@ -190,6 +190,7 @@ export default async function DataRoomPage({
         orgId={orgId}
         dealId={deal.id}
         dealName={deal.name}
+        dealType={deal.type}
         readiness={deal.readiness_score ?? 0}
         folders={folders ?? []}
         documents={docs}

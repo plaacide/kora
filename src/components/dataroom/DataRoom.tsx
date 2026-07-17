@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -11,7 +11,12 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Uploader } from "./Uploader";
 import { createFolder } from "@/app/actions/deals";
-import { renameFolder, deleteFolder, deleteDocument, renameDocument } from "@/app/actions/crud";
+import {
+  renameFolder,
+  deleteFolder,
+  deleteDocument,
+  renameDocument,
+} from "@/app/actions/crud";
 import { PlainError } from "@/components/auth/FormError";
 import type { Level } from "@/lib/permissions";
 import { cn } from "@/lib/cn";
@@ -71,19 +76,28 @@ function ext(name: string): string {
   return e.length <= 4 ? e : "DOC";
 }
 
-/** Teinte d'icône par type — reprend la logique du prototype. */
 function extTone(e: string): string {
   if (["XLS", "XLSX", "CSV"].includes(e))
     return "bg-chip-success-bg text-chip-success-fg";
-  if (["PDF"].includes(e)) return "bg-chip-error-bg text-chip-error-fg";
+  if (e === "PDF") return "bg-chip-error-bg text-chip-error-fg";
   if (["DOC", "DOCX"].includes(e)) return "bg-chip-indigo-bg text-chip-indigo-fg";
   return "bg-chip-neutral-bg text-chip-neutral-fg";
+}
+
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0] ?? "")
+    .join("")
+    .toUpperCase();
 }
 
 export function DataRoom({
   orgId,
   dealId,
   dealName,
+  dealType,
   readiness,
   folders,
   documents,
@@ -94,10 +108,10 @@ export function DataRoom({
   orgId: string;
   dealId: string;
   dealName: string;
+  dealType: string;
   readiness: number;
   folders: FolderRow[];
   documents: DocRow[];
-  /** Les droits sont posés par dossier : tous ses documents les partagent. */
   accessByFolder: Record<string, AccessRow[]>;
   viewsByDoc: Record<string, ViewRow[]>;
   canEdit: boolean;
@@ -113,12 +127,18 @@ export function DataRoom({
     Object.fromEntries(roots.map((f) => [f.id, true])),
   );
   const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
+  const [checked, setChecked] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | undefined>();
   const [newFolderOpen, setNewFolderOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [shared, setShared] = useState(false);
+  const uploadRef = useRef<HTMLButtonElement>(null);
 
   const selectedFolder = folders.find((f) => f.id === selected) ?? null;
+  const parentFolder = selectedFolder?.parent_id
+    ? (folders.find((f) => f.id === selectedFolder.parent_id) ?? null)
+    : null;
   const docs = documents.filter((d) => d.folder_id === selected);
   const doc = documents.find((d) => d.id === selectedDoc) ?? docs[0] ?? null;
   const childrenOf = (id: string | null) =>
@@ -131,11 +151,12 @@ export function DataRoom({
     setError(undefined);
     const fd = new FormData();
     fd.set("deal_id", dealId);
-    if (selectedFolder?.parent_id === null && selected) fd.set("parent_id", selected);
+    if (selectedFolder && !selectedFolder.parent_id) fd.set("parent_id", selectedFolder.id);
     fd.set("name", folderName);
     const res = await createFolder(undefined, fd);
     setBusy(false);
-    if (res?.errorRaw || res?.errorKey) return setError(res.errorRaw ?? res.errorKey);
+    if (res?.errorRaw || res?.errorKey)
+      return setError(res.errorRaw ?? res.errorKey);
     setNewFolderOpen(false);
     setFolderName("");
     router.refresh();
@@ -168,6 +189,25 @@ export function DataRoom({
     router.refresh();
   }
 
+  /** Partager = copier le lien de la visionneuse. Le fichier ne circule pas. */
+  function share() {
+    if (!doc) return;
+    navigator.clipboard.writeText(
+      `${window.location.origin}/visionneuse?doc=${doc.id}`,
+    );
+    setShared(true);
+    setTimeout(() => setShared(false), 2000);
+  }
+
+  function toggleCheck(id: string) {
+    setChecked((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   function renderFolder(f: FolderRow, depth: number) {
     const kids = childrenOf(f.id);
     const active = selected === f.id;
@@ -178,21 +218,17 @@ export function DataRoom({
         <div
           className={cn(
             "group flex items-center gap-1.5 pr-1.5 rounded-btn",
-            active
-              ? "bg-chip-indigo-bg"
-              : "hover:bg-[oklch(0.955_0.004_260)]",
+            active ? "bg-chip-indigo-bg" : "hover:bg-[oklch(0.955_0.004_260)]",
           )}
-          style={{ paddingLeft: 4 + depth * 12 }}
+          style={{ paddingLeft: 4 + depth * 14 }}
         >
           {kids.length > 0 ? (
             <button
               onClick={() => setOpenMap((m) => ({ ...m, [f.id]: !open }))}
-              className="w-3.5 text-[9px] text-ink-muted cursor-pointer"
+              className="w-3 text-[9px] text-ink-muted cursor-pointer"
               aria-expanded={open}
               aria-label={
-                open
-                  ? t("collapse", { name: f.name })
-                  : t("expand", { name: f.name })
+                open ? t("collapse", { name: f.name }) : t("expand", { name: f.name })
               }
             >
               <span
@@ -203,7 +239,7 @@ export function DataRoom({
               </span>
             </button>
           ) : (
-            <span className="w-3.5" />
+            <span className="w-3" />
           )}
 
           <button
@@ -215,17 +251,19 @@ export function DataRoom({
           >
             <Mono
               className={cn(
-                "text-[10.5px] w-6 flex-none",
+                "text-[10.5px] flex-none",
+                depth === 0 ? "w-3.5" : "w-6",
                 active ? "text-chip-indigo-fg" : "text-ink-muted",
               )}
             >
               {f.index_path}
+              {depth === 0 ? "." : ""}
             </Mono>
             <span
               className={cn(
-                "text-[12.5px] truncate",
-                depth === 0 ? "font-semibold" : "font-medium",
-                active ? "text-chip-indigo-fg" : "text-ink",
+                "truncate",
+                depth === 0 ? "text-[12.5px] font-semibold" : "text-[12px] font-medium",
+                active ? "text-chip-indigo-fg" : depth === 0 ? "text-ink" : "text-ink-secondary",
               )}
             >
               {f.name}
@@ -253,28 +291,24 @@ export function DataRoom({
     <>
       <PlainError message={error} />
 
-      <div className="grid grid-cols-1 xl:grid-cols-[248px_1fr_290px] gap-4 items-start">
-        {/* 1 — Arborescence indexée */}
+      <div className="grid grid-cols-1 xl:grid-cols-[236px_1fr_286px] gap-4 items-start">
+        {/* 1 — Arborescence */}
         <aside className="bg-surface border border-line rounded-card shadow-card p-2.5">
-          <div className="px-2 pt-1 pb-2.5">
-            <div className="text-[13px] font-[650]">{dealName}</div>
-            <div className="text-[10.5px] text-ink-secondary mt-0.5">
-              {t("docCount", { count: documents.length })}
+          <div className="flex items-center gap-2 px-1.5 pt-1 pb-3">
+            <span className="grid place-items-center w-[26px] h-[26px] rounded-[7px] bg-chip-amber-bg text-chip-amber-fg text-[10.5px] font-bold flex-none">
+              {initials(dealName)}
+            </span>
+            <div className="min-w-0">
+              <div className="text-[13px] font-[650] truncate">{dealName}</div>
+              <div className="text-[10.5px] text-ink-secondary">
+                {dealType} · {t("docCount", { count: documents.length })}
+              </div>
             </div>
           </div>
 
           {roots.map((f) => renderFolder(f, 0))}
 
-          {canEdit && (
-            <button
-              onClick={() => setNewFolderOpen(true)}
-              className="w-full text-left text-[11.5px] font-medium text-accent px-2 py-2 mt-1 cursor-pointer"
-            >
-              + {t("newFolder")}
-            </button>
-          )}
-
-          <div className="mt-3 mx-2 pt-3 border-t border-separator-soft">
+          <div className="mt-3 mx-1.5 pt-3 border-t border-separator-soft">
             <div className="flex justify-between text-[11px] font-[550] text-ink-secondary mb-1.5">
               <span>{t("readiness")}</span>
               <Mono>{readiness}%</Mono>
@@ -288,11 +322,20 @@ export function DataRoom({
           </div>
         </aside>
 
-        {/* 2 — Documents du dossier */}
+        {/* 2 — Documents */}
         <section className="bg-surface border border-line rounded-card shadow-card overflow-hidden">
-          <div className="px-3.5 py-2.5 border-b border-separator-soft">
+          <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 border-b border-separator-soft">
+            {/* Fil d'Ariane complet : le parent situe le dossier dans l'arbo. */}
             <div className="flex items-center gap-1.5 text-[12px] text-ink-secondary min-w-0">
               <span className="truncate">{dealName}</span>
+              {parentFolder && (
+                <>
+                  <span className="text-[oklch(0.75_0.005_260)]">/</span>
+                  <span className="truncate">
+                    {parentFolder.index_path}. {parentFolder.name}
+                  </span>
+                </>
+              )}
               <span className="text-[oklch(0.75_0.005_260)]">/</span>
               <span className="text-ink font-semibold truncate">
                 {selectedFolder
@@ -300,15 +343,29 @@ export function DataRoom({
                   : "—"}
               </span>
             </div>
-            {/* La consigne du template : c'est elle qui fait du dossier un guide. */}
-            {selectedFolder?.description && (
-              <p className="text-[11.5px] text-ink-muted leading-relaxed mt-1">
-                {selectedFolder.description}
-              </p>
+
+            {canEdit && (
+              <div className="flex gap-2 flex-none">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setNewFolderOpen(true)}
+                >
+                  {t("newFolder")}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => uploadRef.current?.click()}
+                >
+                  {t("dropFiles")}
+                </Button>
+              </div>
             )}
           </div>
 
-          <div className="grid grid-cols-[minmax(160px,1.6fr)_60px_110px_50px_70px] gap-2.5 px-3.5 py-2 text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted bg-bg border-b border-separator-soft">
+          <div className="grid grid-cols-[22px_minmax(150px,1.6fr)_56px_104px_44px_66px] gap-2.5 px-3.5 py-2 text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted bg-bg border-b border-separator-soft">
+            <span />
             <span>{t("colDocument")}</span>
             <span>{t("colVersion")}</span>
             <span>{t("colPermission")}</span>
@@ -323,12 +380,20 @@ export function DataRoom({
                 key={d.id}
                 onClick={() => setSelectedDoc(d.id)}
                 className={cn(
-                  "group grid grid-cols-[minmax(160px,1.6fr)_60px_110px_50px_70px] gap-2.5 items-center px-3.5 py-2.5 border-b border-separator cursor-pointer",
+                  "grid grid-cols-[22px_minmax(150px,1.6fr)_56px_104px_44px_66px] gap-2.5 items-center px-3.5 py-2.5 border-b border-separator cursor-pointer",
                   doc?.id === d.id
                     ? "bg-[oklch(0.965_0.01_270)]"
                     : "hover:bg-[oklch(0.985_0.002_260)]",
                 )}
               >
+                <input
+                  type="checkbox"
+                  checked={checked.has(d.id)}
+                  onChange={() => toggleCheck(d.id)}
+                  onClick={(ev) => ev.stopPropagation()}
+                  aria-label={d.name}
+                  className="w-3.5 h-3.5 cursor-pointer"
+                />
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span
                     className={cn(
@@ -363,14 +428,26 @@ export function DataRoom({
             );
           })}
 
+          {/* Dossier vide = le moment exact où la consigne est utile. */}
           {docs.length === 0 && (
-            <p className="px-3.5 py-6 text-center text-[12px] text-ink-muted">
-              {t("emptyFolder")}
-            </p>
+            <div className="px-5 py-7 text-center">
+              <p className="text-[12.5px] font-semibold text-ink">
+                {t("emptyFolder")}
+              </p>
+              {selectedFolder?.description && (
+                <p className="text-[12px] text-ink-secondary leading-relaxed max-w-md mx-auto mt-1.5">
+                  <span className="font-[650] text-ink">
+                    {t("whatToPut")}
+                  </span>{" "}
+                  {selectedFolder.description}
+                </p>
+              )}
+            </div>
           )}
 
           {canEdit && (
             <Uploader
+              ref={uploadRef}
               orgId={orgId}
               dealId={dealId}
               folderId={selected}
@@ -379,7 +456,7 @@ export function DataRoom({
           )}
         </section>
 
-        {/* 3 — Détail du document */}
+        {/* 3 — Détail */}
         <aside className="bg-surface border border-line rounded-card shadow-card p-4 flex flex-col gap-3.5">
           {doc ? (
             <>
@@ -405,35 +482,38 @@ export function DataRoom({
               </div>
 
               <div className="flex gap-2">
-                <Link
-                  href={`/visionneuse?doc=${doc.id}`}
-                  className="flex-1"
-                >
+                <Link href={`/visionneuse?doc=${doc.id}`} className="flex-1">
                   <Button variant="primary" size="sm" className="w-full">
                     {t("open")}
                   </Button>
                 </Link>
-                {canEdit && (
-                  <>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => rename(doc.id, doc.name, false)}
-                    >
-                      {t("rename")}
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => removeDoc(doc.id)}
-                    >
-                      ✕
-                    </Button>
-                  </>
-                )}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={share}
+                  className="flex-1"
+                >
+                  {shared ? t("copied") : t("share")}
+                </Button>
               </div>
 
-              {/* Qui a accès — vient des permissions réelles */}
+              {canEdit && (
+                <div className="flex gap-2 -mt-1.5">
+                  <button
+                    onClick={() => rename(doc.id, doc.name, false)}
+                    className="text-[11px] font-medium text-ink-secondary hover:text-ink cursor-pointer"
+                  >
+                    {t("rename")}
+                  </button>
+                  <button
+                    onClick={() => removeDoc(doc.id)}
+                    className="text-[11px] font-medium text-ink-muted hover:text-error cursor-pointer ml-auto"
+                  >
+                    {t("deleteDoc")}
+                  </button>
+                </div>
+              )}
+
               <div>
                 <div className="text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted mb-2">
                   {t("access")}
@@ -442,7 +522,7 @@ export function DataRoom({
                   {(accessByFolder[doc.folder_id] ?? []).map((a) => (
                     <div key={a.name} className="flex items-center gap-2">
                       <span className="grid place-items-center w-[26px] h-[26px] rounded-full bg-chip-neutral-bg text-ink-secondary text-[9.5px] font-bold flex-none">
-                        {a.name.slice(0, 2).toUpperCase()}
+                        {initials(a.name)}
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="text-[12px] font-semibold truncate">
@@ -466,7 +546,6 @@ export function DataRoom({
                 </div>
               </div>
 
-              {/* Dernières vues — issues du journal d'audit */}
               <div>
                 <div className="text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted mb-2">
                   {t("lastViews")}
@@ -524,7 +603,7 @@ export function DataRoom({
             autoFocus
           />
           <p className="text-[11.5px] text-ink-muted">
-            {selectedFolder?.parent_id === null && selectedFolder
+            {selectedFolder && !selectedFolder.parent_id
               ? t("folderUnder", { parent: selectedFolder.name })
               : t("folderAtRoot")}
           </p>

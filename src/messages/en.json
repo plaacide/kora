@@ -231,7 +231,12 @@
     "auditLink": "View the log",
     "selectDoc": "Select a document.",
     "expand": "Expand {name}",
-    "collapse": "Collapse {name}"
+    "collapse": "Collapse {name}",
+    "dropFiles": "Upload files",
+    "whatToPut": "What goes here:",
+    "share": "Share",
+    "copied": "Link copied",
+    "deleteDoc": "Delete"
   },
   "invitations": {
     "title": "Invitations & NDA",

@@ -231,7 +231,12 @@
     "auditLink": "Voir le journal",
     "selectDoc": "Sélectionnez un document.",
     "expand": "Développer {name}",
-    "collapse": "Réduire {name}"
+    "collapse": "Réduire {name}",
+    "dropFiles": "Déposer des fichiers",
+    "whatToPut": "À déposer ici :",
+    "share": "Partager",
+    "copied": "Lien copié",
+    "deleteDoc": "Supprimer"
   },
   "invitations": {
     "title": "Invitations & NDA",
