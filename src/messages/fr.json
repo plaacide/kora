@@ -117,17 +117,66 @@
   },
   "dashboard": {
     "greeting": "Bonjour, {name}",
-    "meta": "{date} · {deals} deals actifs · {actions} actions requises",
+    "greetingPlain": "Bonjour",
+    "meta": "{date} · {deals, plural, =0 {aucun deal actif} =1 {1 deal actif} other {# deals actifs}}",
     "inviteInvestor": "Inviter un investisseur",
     "newDeal": "Nouveau deal",
     "kpi": {
       "volume": "Volume en cours",
       "activeDeals": "Deals actifs",
       "avgReadiness": "Readiness moyen",
-      "openQa": "Q&A ouvertes"
+      "documents": "Documents"
     },
-    "socleTitle": "Socle E0 — squelette applicatif",
-    "socleBody": "Shell, design system et tokens en place. Les écrans métier (data room, permissions, audit…) seront branchés aux phases suivantes."
+    "activeDeals": "Deals actifs",
+    "filterAll": "Tous",
+    "filterDd": "En DD",
+    "filterIc": "IC ce mois",
+    "colDeal": "Deal",
+    "colStage": "Étape",
+    "colAmount": "Montant",
+    "colReadiness": "Readiness",
+    "colDocs": "Docs",
+    "noDeals": "Aucun deal à cette étape.",
+    "expiringTitle": "{n, plural, =1 {1 accès expire} other {# accès expirent}} sous 48 h",
+    "expiringBody": "Des droits arrivent à échéance. Prolongez-les avant que l'accès ne se ferme.",
+    "extendAccess": "Prolonger les accès",
+    "recentActivity": "Activité récente",
+    "noActivity": "Aucune activité pour l'instant.",
+    "seeAudit": "Voir le journal complet"
+  },
+  "stages": {
+    "sourcing": "Sourcing",
+    "screening": "Screening",
+    "due_diligence": "Due diligence",
+    "ic": "Comité (IC)",
+    "signed": "Signé",
+    "passed": "Passé"
+  },
+  "audit": {
+    "title": "Audit trail",
+    "subtitle": "Chaque action est horodatée et chaînée par empreinte. Rien ne peut être effacé.",
+    "chainValid": "Chaîne intègre",
+    "chainBroken": "Chaîne rompue",
+    "chainEntries": "{n} entrées vérifiées",
+    "chainBrokenAt": "rupture à l'entrée {id}",
+    "colWhen": "Quand",
+    "colWhat": "Action",
+    "colWho": "Par",
+    "colHash": "Empreinte",
+    "empty": "Aucune entrée pour l'instant.",
+    "explainer": "Chaque entrée contient l'empreinte de la précédente : modifier ou supprimer une ligne casse la chaîne et devient immédiatement détectable. Le journal est en écriture seule — même un administrateur ne peut pas le réécrire.",
+    "actions": {
+      "org_created": "Organisation créée",
+      "deal_created": "Deal créé",
+      "folder_created": "Dossier créé",
+      "document_uploaded": "Document déposé",
+      "document_page_viewed": "Page consultée",
+      "document_downloaded": "Document téléchargé",
+      "permission_set": "Droit modifié",
+      "invitation_created": "Invitation envoyée",
+      "invitation_accepted": "Invitation acceptée",
+      "nda_signed": "NDA signé"
+    }
   },
   "dataroom": {
     "title": "Data room",

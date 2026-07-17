@@ -117,17 +117,66 @@
   },
   "dashboard": {
     "greeting": "Hello, {name}",
-    "meta": "{date} · {deals} active deals · {actions} actions required",
+    "greetingPlain": "Hello",
+    "meta": "{date} · {deals, plural, =0 {no active deals} =1 {1 active deal} other {# active deals}}",
     "inviteInvestor": "Invite an investor",
     "newDeal": "New deal",
     "kpi": {
       "volume": "Volume in progress",
       "activeDeals": "Active deals",
       "avgReadiness": "Average readiness",
-      "openQa": "Open Q&A"
+      "documents": "Documents"
     },
-    "socleTitle": "E0 foundation — application skeleton",
-    "socleBody": "Shell, design system and tokens in place. Business screens (data room, permissions, audit…) will be wired in the next phases."
+    "activeDeals": "Active deals",
+    "filterAll": "All",
+    "filterDd": "In DD",
+    "filterIc": "IC this month",
+    "colDeal": "Deal",
+    "colStage": "Stage",
+    "colAmount": "Amount",
+    "colReadiness": "Readiness",
+    "colDocs": "Docs",
+    "noDeals": "No deal at this stage.",
+    "expiringTitle": "{n, plural, =1 {1 access expires} other {# accesses expire}} within 48h",
+    "expiringBody": "Some rights are about to lapse. Extend them before access closes.",
+    "extendAccess": "Extend access",
+    "recentActivity": "Recent activity",
+    "noActivity": "No activity yet.",
+    "seeAudit": "See full log"
+  },
+  "stages": {
+    "sourcing": "Sourcing",
+    "screening": "Screening",
+    "due_diligence": "Due diligence",
+    "ic": "Committee (IC)",
+    "signed": "Signed",
+    "passed": "Passed"
+  },
+  "audit": {
+    "title": "Audit trail",
+    "subtitle": "Every action is timestamped and hash-chained. Nothing can be erased.",
+    "chainValid": "Chain intact",
+    "chainBroken": "Chain broken",
+    "chainEntries": "{n} entries verified",
+    "chainBrokenAt": "break at entry {id}",
+    "colWhen": "When",
+    "colWhat": "Action",
+    "colWho": "By",
+    "colHash": "Fingerprint",
+    "empty": "No entries yet.",
+    "explainer": "Each entry contains the fingerprint of the previous one: altering or deleting a row breaks the chain and becomes immediately detectable. The log is append-only — even an administrator cannot rewrite it.",
+    "actions": {
+      "org_created": "Organisation created",
+      "deal_created": "Deal created",
+      "folder_created": "Folder created",
+      "document_uploaded": "Document uploaded",
+      "document_page_viewed": "Page viewed",
+      "document_downloaded": "Document downloaded",
+      "permission_set": "Permission changed",
+      "invitation_created": "Invitation sent",
+      "invitation_accepted": "Invitation accepted",
+      "nda_signed": "NDA signed"
+    }
   },
   "dataroom": {
     "title": "Data room",
