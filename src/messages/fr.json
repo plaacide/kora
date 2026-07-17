@@ -112,7 +112,8 @@
       "billing": "Facturation",
       "security": "Sécurité",
       "notifications": "Notifications",
-      "help": "Aide"
+      "help": "Aide",
+      "roadmap": "Roadmap"
     }
   },
   "dashboard": {
@@ -302,5 +303,35 @@
       "rule2": "Au moins une lettre et un chiffre",
       "rule3": "Vérifiée à l'inscription et au changement de mot de passe"
     }
+  },
+  "roadmap": {
+    "badge": "Roadmap publique",
+    "title": "Ce qui existe, ce qui arrive",
+    "subtitle": "Kora est en V0 : le cœur sécurisé fonctionne, le reste est en construction. Cette page dit honnêtement où on en est — et vous laisse peser sur la suite.",
+    "intro": "Votez pour ce qui compte le plus pour vous. Ce sont les votes qui décident de l'ordre de construction, pas nos intuitions.",
+    "suggest": "Suggérer une fonctionnalité",
+    "loginToSuggest": "Se connecter pour suggérer",
+    "loginToVote": "Connectez-vous pour voter",
+    "voteHint": "Voter pour cette fonctionnalité",
+    "community": "Suggestion",
+    "sectionBuilding": "En cours",
+    "sectionPlanned": "Prévu",
+    "plannedHint": "Trié par nombre de votes — le plus demandé passe en premier.",
+    "sectionShipped": "Disponible",
+    "shippedHint": "Testable dès maintenant dans l'application.",
+    "status": {
+      "planned": "Prévu",
+      "in_progress": "En cours",
+      "shipped": "Disponible"
+    },
+    "suggestTitle": "Votre idée en une phrase",
+    "suggestTitlePlaceholder": "Export des Q&A en Excel",
+    "suggestDesc": "Pourquoi c'est utile ? (optionnel)",
+    "suggestDescPlaceholder": "Décrivez le problème que ça résout dans votre travail.",
+    "cancel": "Annuler",
+    "send": "Envoyer",
+    "backToApp": "Retour à l'app",
+    "login": "Se connecter",
+    "disclaimer": "Les échéances sont indicatives et peuvent bouger : elles dépendent de vos retours. Kora est développé par une équipe réduite — nous préférons annoncer peu et livrer, plutôt que promettre large."
   }
 }

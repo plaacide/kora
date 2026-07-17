@@ -112,7 +112,8 @@
       "billing": "Billing",
       "security": "Security",
       "notifications": "Notifications",
-      "help": "Help"
+      "help": "Help",
+      "roadmap": "Roadmap"
     }
   },
   "dashboard": {
@@ -302,5 +303,35 @@
       "rule2": "At least one letter and one digit",
       "rule3": "Enforced at signup and password change"
     }
+  },
+  "roadmap": {
+    "badge": "Public roadmap",
+    "title": "What exists, what's coming",
+    "subtitle": "Kora is at V0: the secure core works, the rest is being built. This page says honestly where we stand — and lets you weigh in on what comes next.",
+    "intro": "Vote for what matters most to you. Votes decide the build order, not our hunches.",
+    "suggest": "Suggest a feature",
+    "loginToSuggest": "Log in to suggest",
+    "loginToVote": "Log in to vote",
+    "voteHint": "Vote for this feature",
+    "community": "Suggestion",
+    "sectionBuilding": "In progress",
+    "sectionPlanned": "Planned",
+    "plannedHint": "Sorted by votes — the most requested ships first.",
+    "sectionShipped": "Available",
+    "shippedHint": "Testable right now in the app.",
+    "status": {
+      "planned": "Planned",
+      "in_progress": "In progress",
+      "shipped": "Available"
+    },
+    "suggestTitle": "Your idea in one sentence",
+    "suggestTitlePlaceholder": "Export Q&A to Excel",
+    "suggestDesc": "Why is it useful? (optional)",
+    "suggestDescPlaceholder": "Describe the problem it solves in your work.",
+    "cancel": "Cancel",
+    "send": "Send",
+    "backToApp": "Back to app",
+    "login": "Log in",
+    "disclaimer": "Timelines are indicative and may shift: they depend on your feedback. Kora is built by a small team — we prefer announcing little and shipping, over promising broadly."
   }
 }
