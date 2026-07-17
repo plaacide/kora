@@ -244,7 +244,12 @@
     "deleteSelected": "Supprimer la sélection",
     "bulkDeleteBody": "{n, plural, =1 {1 document sera définitivement supprimé} other {# documents seront définitivement supprimés}}, avec toutes leurs versions. Le journal d'audit conservera la trace de chaque suppression. Cette action est irréversible.",
     "confirmDelete": "Supprimer définitivement",
-    "deleting": "Suppression…"
+    "deleting": "Suppression…",
+    "templatesTitle": "Modèles",
+    "templateView": "Voir",
+    "templateDownload": "Télécharger",
+    "close": "Fermer",
+    "templatesHint": "Documents types à remplir. Ce sont des modèles vierges : ils ne comptent pas comme pièces fournies."
   },
   "invitations": {
     "title": "Invitations & NDA",

@@ -244,7 +244,12 @@
     "deleteSelected": "Delete selection",
     "bulkDeleteBody": "{n, plural, =1 {1 document will be permanently deleted} other {# documents will be permanently deleted}}, along with all their versions. The audit log will keep a record of each deletion. This cannot be undone.",
     "confirmDelete": "Delete permanently",
-    "deleting": "Deleting…"
+    "deleting": "Deleting…",
+    "templatesTitle": "Templates",
+    "templateView": "View",
+    "templateDownload": "Download",
+    "close": "Close",
+    "templatesHint": "Model documents to fill in. These are blank templates: they don't count as provided items."
   },
   "invitations": {
     "title": "Invitations & NDA",

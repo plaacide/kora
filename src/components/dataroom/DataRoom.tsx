@@ -10,6 +10,10 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Uploader } from "./Uploader";
+import {
+  FolderTemplates,
+  type FolderTemplate,
+} from "./FolderTemplates";
 import { createFolder } from "@/app/actions/deals";
 import {
   renameFolder,
@@ -103,6 +107,7 @@ export function DataRoom({
   documents,
   accessByFolder,
   viewsByDoc,
+  templatesByFolder,
   canEdit,
 }: {
   orgId: string;
@@ -114,6 +119,8 @@ export function DataRoom({
   documents: DocRow[];
   accessByFolder: Record<string, AccessRow[]>;
   viewsByDoc: Record<string, ViewRow[]>;
+  /** Modèles du dossier, rattachés par NOM de dossier. */
+  templatesByFolder: Record<string, FolderTemplate[]>;
   canEdit: boolean;
 }) {
   const t = useTranslations("dataroom");
@@ -144,8 +151,16 @@ export function DataRoom({
   const doc = documents.find((d) => d.id === selectedDoc) ?? docs[0] ?? null;
   const childrenOf = (id: string | null) =>
     folders.filter((f) => f.parent_id === id);
-  const countIn = (id: string) =>
-    documents.filter((d) => d.folder_id === id).length;
+
+  /**
+   * Compte RÉCURSIF : « Corporate » doit afficher tout ce qu'il contient,
+   * sous-dossiers compris. Un dossier parent qui affiche 0 alors que ses
+   * enfants sont pleins ne veut rien dire.
+   */
+  const countIn = (id: string): number => {
+    const own = documents.filter((d) => d.folder_id === id).length;
+    return childrenOf(id).reduce((sum, c) => sum + countIn(c.id), own);
+  };
 
   async function addFolder() {
     setBusy(true);
@@ -486,6 +501,12 @@ export function DataRoom({
               )}
             </div>
           )}
+
+          <FolderTemplates
+            templates={
+              (selectedFolder && templatesByFolder[selectedFolder.name]) || []
+            }
+          />
 
           {canEdit && (
             <Uploader

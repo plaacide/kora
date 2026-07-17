@@ -8,6 +8,7 @@ import {
   type ViewRow,
 } from "@/components/dataroom/DataRoom";
 import { NewDealButton } from "@/components/dataroom/NewDealButton";
+import type { FolderTemplate } from "@/components/dataroom/FolderTemplates";
 import type { Level } from "@/lib/permissions";
 import type { Locale } from "@/i18n/locales";
 
@@ -71,6 +72,7 @@ export default async function DataRoomPage({
     { data: levels },
     { data: accessRows },
     { data: viewEvents },
+    { data: templates },
   ] = await Promise.all([
     supabase
       .from("folders")
@@ -95,7 +97,25 @@ export default async function DataRoomPage({
       .eq("deal_id", deal.id)
       .order("id", { ascending: false })
       .limit(400),
+    supabase
+      .from("folder_templates")
+      .select("id, folder_name, title, description, body")
+      .order("position"),
   ]);
+
+  // Rattachés par nom de dossier : les modèles sont globaux, jamais copiés
+  // dans un deal (un modèle vierge n'est pas une pièce fournie).
+  const templatesByFolder: Record<string, FolderTemplate[]> = {};
+  for (const tpl of (templates ?? []) as Array<
+    FolderTemplate & { folder_name: string }
+  >) {
+    (templatesByFolder[tpl.folder_name] ??= []).push({
+      id: tpl.id,
+      title: tpl.title,
+      description: tpl.description,
+      body: tpl.body,
+    });
+  }
 
   const levelByFolder = new Map<string, Level>(
     (levels ?? []).map((l: { folder_id: string; level: Level }) => [
@@ -196,6 +216,7 @@ export default async function DataRoomPage({
         documents={docs}
         accessByFolder={accessByFolder}
         viewsByDoc={viewsByDoc}
+        templatesByFolder={templatesByFolder}
         canEdit={canEdit}
       />
     </div>
