@@ -33,6 +33,8 @@ export const navGroups: NavGroup[] = [
       { key: "viewer", href: "/visionneuse" },
       { key: "permissions", href: "/permissions" },
       { key: "invitations", href: "/invitations" },
+      { key: "versions", href: "/versions" },
+      { key: "nda", href: "/nda" },
       { key: "audit", href: "/audit" },
     ],
   },

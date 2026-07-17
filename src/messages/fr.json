@@ -113,7 +113,8 @@
       "security": "Sécurité",
       "notifications": "Notifications",
       "help": "Aide",
-      "roadmap": "Roadmap"
+      "roadmap": "Roadmap",
+      "nda": "Accords signés"
     }
   },
   "dashboard": {
@@ -185,7 +186,9 @@
       "document_renamed": "Document renommé",
       "document_moved": "Document déplacé",
       "document_deleted": "Document supprimé",
-      "dataroom_template_applied": "Structure de data room créée"
+      "dataroom_template_applied": "Structure de data room créée",
+      "document_version_added": "Version ajoutée",
+      "document_version_restored": "Version restaurée"
     }
   },
   "dataroom": {
@@ -396,5 +399,36 @@
     "deleteTitle": "Supprimer ce deal ?",
     "deleteBody": "« {name} » et toute sa data room (dossiers, documents, permissions, invitations) seront définitivement supprimés. Le journal d'audit, lui, conservera la trace de cette suppression. Cette action est irréversible.",
     "deleteConfirm": "Supprimer définitivement"
+  },
+  "versions": {
+    "title": "Versions",
+    "subtitle": "Historique complet des documents. Rien n'est écrasé.",
+    "emptyState": "Aucun deal.",
+    "noDocs": "Aucun document dans cette data room.",
+    "documents": "Documents",
+    "versionCount": "{n, plural, =1 {1 version} other {# versions}}",
+    "colVersion": "Version",
+    "colBy": "Déposée par",
+    "colSize": "Taille",
+    "colDate": "Date",
+    "current": "Actuelle",
+    "restore": "Restaurer",
+    "newVersion": "Nouvelle version",
+    "uploading": "Envoi…",
+    "openCurrent": "Ouvrir la version actuelle",
+    "keepAll": "Chaque version est conservée : savoir ce qui a été montré à un investisseur, et quand, fait partie de la preuve.",
+    "empty": "Sélectionnez un document."
+  },
+  "nda": {
+    "title": "Accords signés",
+    "subtitle": "Les NDA signés, avec leur preuve. Consultables à tout moment.",
+    "empty": "Aucun NDA signé pour l'instant.",
+    "mine": "Le vôtre",
+    "signed": "Signé",
+    "signedBy": "Signé par {name}",
+    "signedAt": "Date de signature",
+    "ip": "Adresse IP",
+    "fingerprint": "Empreinte",
+    "proofNote": "Cette empreinte scelle l'identité du signataire, le contenu de l'accord, l'horodatage et l'origine de la connexion. Toute altération la rendrait invalide."
   }
 }

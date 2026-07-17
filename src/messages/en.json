@@ -113,7 +113,8 @@
       "security": "Security",
       "notifications": "Notifications",
       "help": "Help",
-      "roadmap": "Roadmap"
+      "roadmap": "Roadmap",
+      "nda": "Signed agreements"
     }
   },
   "dashboard": {
@@ -185,7 +186,9 @@
       "document_renamed": "Document renamed",
       "document_moved": "Document moved",
       "document_deleted": "Document deleted",
-      "dataroom_template_applied": "Data room structure created"
+      "dataroom_template_applied": "Data room structure created",
+      "document_version_added": "Version added",
+      "document_version_restored": "Version restored"
     }
   },
   "dataroom": {
@@ -396,5 +399,36 @@
     "deleteTitle": "Delete this deal?",
     "deleteBody": "“{name}” and its entire data room (folders, documents, permissions, invitations) will be permanently deleted. The audit log will keep the record of this deletion. This cannot be undone.",
     "deleteConfirm": "Delete permanently"
+  },
+  "versions": {
+    "title": "Versions",
+    "subtitle": "Full document history. Nothing is overwritten.",
+    "emptyState": "No deal yet.",
+    "noDocs": "No documents in this data room.",
+    "documents": "Documents",
+    "versionCount": "{n, plural, =1 {1 version} other {# versions}}",
+    "colVersion": "Version",
+    "colBy": "Uploaded by",
+    "colSize": "Size",
+    "colDate": "Date",
+    "current": "Current",
+    "restore": "Restore",
+    "newVersion": "New version",
+    "uploading": "Uploading…",
+    "openCurrent": "Open current version",
+    "keepAll": "Every version is kept: knowing what was shown to an investor, and when, is part of the proof.",
+    "empty": "Select a document."
+  },
+  "nda": {
+    "title": "Signed agreements",
+    "subtitle": "Signed NDAs with their proof. Available at any time.",
+    "empty": "No NDA signed yet.",
+    "mine": "Yours",
+    "signed": "Signed",
+    "signedBy": "Signed by {name}",
+    "signedAt": "Signature date",
+    "ip": "IP address",
+    "fingerprint": "Fingerprint",
+    "proofNote": "This fingerprint seals the signer's identity, the agreement's content, the timestamp and the connection origin. Any alteration would invalidate it."
   }
 }
