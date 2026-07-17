@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PlainError } from "@/components/auth/FormError";
 import { LEVELS, type Level } from "@/lib/permissions";
+import { cn } from "@/lib/cn";
 
 export function InviteForm({ dealId }: { dealId: string }) {
   const t = useTranslations("invitations");
@@ -21,11 +22,14 @@ export function InviteForm({ dealId }: { dealId: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [link, setLink] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailIssue, setEmailIssue] = useState<string | null>(null);
 
   async function submit() {
     setBusy(true);
     setError(undefined);
     setLink(null);
+    setEmailIssue(null);
 
     const res = await createInvitation({
       dealId,
@@ -36,12 +40,16 @@ export function InviteForm({ dealId }: { dealId: string }) {
     });
     setBusy(false);
 
-    if (!res.ok || !res.token) {
+    if (!res.ok || !res.link) {
       setError(res.error ?? "error");
       return;
     }
 
-    setLink(`${window.location.origin}/invitation/${res.token}`);
+    // L'invitation est valide même si l'email n'est pas parti : on affiche
+    // toujours le lien pour permettre une transmission manuelle.
+    setLink(res.link);
+    setEmailSent(!res.emailSkipped && !res.emailError);
+    setEmailIssue(res.emailError ?? (res.emailSkipped ? "skipped" : null));
     setEmail("");
     router.refresh();
   }
@@ -118,22 +126,38 @@ export function InviteForm({ dealId }: { dealId: string }) {
       </Button>
 
       {link && (
-        <div className="flex flex-col gap-2 bg-chip-indigo-bg rounded-card p-3">
-          <span className="text-[11.5px] font-[650] text-chip-indigo-fg">
-            {t("linkReady")}
+        <div
+          className={cn(
+            "flex flex-col gap-2 rounded-card p-3",
+            emailSent ? "bg-chip-success-bg" : "bg-chip-amber-bg",
+          )}
+        >
+          <span
+            className={cn(
+              "text-[11.5px] font-[650]",
+              emailSent ? "text-chip-success-fg" : "text-chip-amber-fg",
+            )}
+          >
+            {emailSent ? t("emailSent") : t("linkReady")}
           </span>
+
+          {!emailSent && (
+            <span className="text-[10.5px] text-ink-secondary leading-relaxed">
+              {emailIssue === "skipped"
+                ? t("emailNotConfigured")
+                : t("emailFailed", { error: emailIssue ?? "" })}
+            </span>
+          )}
+
           <code className="font-mono text-[10.5px] text-ink-secondary break-all">
             {link}
           </code>
           <button
             onClick={() => navigator.clipboard.writeText(link)}
-            className="self-start text-[11.5px] font-medium text-chip-indigo-fg cursor-pointer underline"
+            className="self-start text-[11.5px] font-medium text-ink cursor-pointer underline"
           >
             {t("copyLink")}
           </button>
-          <span className="text-[10.5px] text-ink-muted">
-            {t("emailPending")}
-          </span>
         </div>
       )}
     </div>
