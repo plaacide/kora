@@ -184,7 +184,8 @@
       "folder_deleted": "Folder deleted",
       "document_renamed": "Document renamed",
       "document_moved": "Document moved",
-      "document_deleted": "Document deleted"
+      "document_deleted": "Document deleted",
+      "dataroom_template_applied": "Data room structure created"
     }
   },
   "dataroom": {
@@ -204,7 +205,28 @@
     "colSize": "Size",
     "emptyFolder": "No documents in this folder.",
     "dropHint": "Drop files here — auto-indexed as {index}.x",
-    "uploading": "Uploading…"
+    "uploading": "Uploading…",
+    "colPermission": "Permission",
+    "colViews": "Views",
+    "colModified": "Modified",
+    "newFolder": "New folder",
+    "folderName": "Folder name",
+    "folderUnder": "Will be created inside “{parent}”.",
+    "folderAtRoot": "Will be created at the root.",
+    "deleteFolder": "Delete folder",
+    "renamePrompt": "New name:",
+    "readiness": "Readiness",
+    "open": "Open",
+    "rename": "Rename",
+    "access": "Access",
+    "noAccess": "Nobody has access to this folder yet.",
+    "expires": "expires",
+    "lastViews": "Last views",
+    "noViews": "No views yet.",
+    "auditTitle": "Full audit trail",
+    "auditBody": "Every opening is timestamped and signed.",
+    "auditLink": "View the log",
+    "selectDoc": "Select a document."
   },
   "invitations": {
     "title": "Invitations & NDA",

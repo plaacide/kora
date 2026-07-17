@@ -184,7 +184,8 @@
       "folder_deleted": "Dossier supprimé",
       "document_renamed": "Document renommé",
       "document_moved": "Document déplacé",
-      "document_deleted": "Document supprimé"
+      "document_deleted": "Document supprimé",
+      "dataroom_template_applied": "Structure de data room créée"
     }
   },
   "dataroom": {
@@ -204,7 +205,28 @@
     "colSize": "Taille",
     "emptyFolder": "Aucun document dans ce dossier.",
     "dropHint": "Glissez des fichiers ici — indexés automatiquement en {index}.x",
-    "uploading": "Envoi en cours…"
+    "uploading": "Envoi en cours…",
+    "colPermission": "Permission",
+    "colViews": "Vues",
+    "colModified": "Modifié",
+    "newFolder": "Nouveau dossier",
+    "folderName": "Nom du dossier",
+    "folderUnder": "Sera créé dans « {parent} ».",
+    "folderAtRoot": "Sera créé à la racine.",
+    "deleteFolder": "Supprimer le dossier",
+    "renamePrompt": "Nouveau nom :",
+    "readiness": "Readiness",
+    "open": "Ouvrir",
+    "rename": "Renommer",
+    "access": "Accès",
+    "noAccess": "Personne n'a encore accès à ce dossier.",
+    "expires": "expire le",
+    "lastViews": "Dernières vues",
+    "noViews": "Aucune consultation pour l'instant.",
+    "auditTitle": "Audit trail complet",
+    "auditBody": "Chaque ouverture est horodatée et signée.",
+    "auditLink": "Voir le journal",
+    "selectDoc": "Sélectionnez un document."
   },
   "invitations": {
     "title": "Invitations & NDA",
