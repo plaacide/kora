@@ -12,7 +12,14 @@ import { FormError } from "@/components/auth/FormError";
 const types = ["VC", "PE", "M&A", "Dette DFI"];
 const currencies = ["XOF", "XAF", "NGN", "KES", "GHS", "USD", "EUR"];
 
-export function NewDealButton() {
+export function NewDealButton({
+  trigger = "primary",
+  triggerLabel,
+}: {
+  /** "dashed" : bouton pleine largeur en pointillés (« + Ajouter » par colonne). */
+  trigger?: "primary" | "dashed";
+  triggerLabel?: string;
+} = {}) {
   const t = useTranslations("dataroom");
   const tc = useTranslations("common");
   const router = useRouter();
@@ -29,9 +36,19 @@ export function NewDealButton() {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setOpen(true)}>
-        {t("newDeal")}
-      </Button>
+      {trigger === "dashed" ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="w-full border-[1.5px] border-dashed border-line rounded-[9px] bg-transparent text-ink-muted text-[11.5px] font-[550] py-2 cursor-pointer hover:border-accent hover:text-accent transition-colors"
+        >
+          {triggerLabel ?? t("newDeal")}
+        </button>
+      ) : (
+        <Button variant="primary" onClick={() => setOpen(true)}>
+          {t("newDeal")}
+        </Button>
+      )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={t("newDeal")}>
         <form action={action} className="flex flex-col gap-4">

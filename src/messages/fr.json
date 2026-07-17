@@ -413,6 +413,13 @@
     "emptyState": "Aucun deal. Créez-en un pour démarrer votre pipeline.",
     "emptyColumn": "Vide",
     "changeStage": "Changer d'étape",
+    "viewKanban": "Kanban",
+    "viewTable": "Table",
+    "addToColumn": "+ Ajouter",
+    "colDeal": "Deal",
+    "colStage": "Étape",
+    "colAmount": "Montant",
+    "colReadiness": "Readiness",
     "hint": "Glissez une carte d'une colonne à l'autre, ou utilisez le sélecteur au bas de chaque carte."
   },
   "deal": {

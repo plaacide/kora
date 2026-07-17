@@ -56,24 +56,24 @@ export default async function PipelinePage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-            {t("title")}
-          </h1>
-          <p className="text-[12.5px] text-ink-secondary mt-0.5">
-            {t("subtitle")}
-          </p>
-        </div>
-        <NewDealButton />
+      <div>
+        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          {t("title")}
+        </h1>
+        <p className="text-[12.5px] text-ink-secondary mt-0.5">
+          {t("subtitle")}
+        </p>
       </div>
 
       {deals.length === 0 ? (
         <Card>
           <CardBody>
-            <p className="text-[12.5px] text-ink-secondary py-3">
-              {t("emptyState")}
-            </p>
+            <div className="flex flex-col items-start gap-3 py-3">
+              <p className="text-[12.5px] text-ink-secondary">
+                {t("emptyState")}
+              </p>
+              <NewDealButton />
+            </div>
           </CardBody>
         </Card>
       ) : (

@@ -9,15 +9,15 @@
 -- transaction — comme le reste.
 -- ---------------------------------------------------------------------------
 
--- Rejouable.
-drop policy if exists milestone_select on public.milestones;
-drop policy if exists ic_note_select on public.ic_notes;
-
+-- L'enum d'abord (idempotent).
 do $$ begin
   create type public.milestone_status as enum ('pending', 'done');
 exception when duplicate_object then null; end $$;
 
 -- --- Jalons ----------------------------------------------------------------
+-- Les tables AVANT tout `drop policy` : `drop policy if exists ... on <table>`
+-- exige que la TABLE existe (le IF EXISTS ne protège que la policy). Créer la
+-- table d'abord rend la migration rejouable sans erreur 42P01.
 create table if not exists public.milestones (
   id         uuid primary key default gen_random_uuid(),
   deal_id    uuid not null references public.deals(id) on delete cascade,
@@ -46,6 +46,10 @@ create index if not exists ic_notes_deal_idx
 
 alter table public.milestones enable row level security;
 alter table public.ic_notes  enable row level security;
+
+-- Rejouable : les tables existent désormais, on peut réinitialiser les policies.
+drop policy if exists milestone_select on public.milestones;
+drop policy if exists ic_note_select on public.ic_notes;
 
 -- Lecture réservée à l'équipe interne (jamais les invités).
 create policy milestone_select on public.milestones
