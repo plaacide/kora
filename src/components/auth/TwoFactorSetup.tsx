@@ -115,6 +115,7 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
           <Button
             variant="primary"
             onClick={verify}
+            loading={busy}
             disabled={busy || code.length < 6}
           >
             {busy ? t("verifying") : t("enable")}

@@ -270,6 +270,7 @@ export function QaBoard({
             <Button
               variant="primary"
               onClick={submitQuestion}
+              loading={busy}
               disabled={busy || question.trim().length < 5}
             >
               {busy ? t("sending") : t("send")}

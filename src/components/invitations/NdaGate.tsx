@@ -88,6 +88,7 @@ export function NdaGate({
       <Button
         variant="primary"
         onClick={sign}
+        loading={busy}
         disabled={!ready || busy}
         className="w-full"
       >

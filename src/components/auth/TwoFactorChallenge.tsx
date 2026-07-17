@@ -71,6 +71,7 @@ export function TwoFactorChallenge() {
         <Button
           variant="primary"
           onClick={verify}
+          loading={busy}
           disabled={busy || code.trim().length < 6}
         >
           {busy ? t("verifying") : t("verify")}

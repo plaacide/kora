@@ -26,7 +26,7 @@ export function ApplyChecklistButton({ dealId }: { dealId: string }) {
   return (
     <div className="flex flex-col gap-2">
       <PlainError message={error} />
-      <Button variant="primary" onClick={apply} disabled={busy}>
+      <Button variant="primary" onClick={apply} loading={busy} disabled={busy}>
         {busy ? t("applying") : t("applyTemplate")}
       </Button>
     </div>
