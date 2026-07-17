@@ -148,6 +148,22 @@
     "dropHint": "Glissez des fichiers ici — indexés automatiquement en {index}.x",
     "uploading": "Envoi en cours…"
   },
+  "permissions": {
+    "title": "Permissions",
+    "subtitle": "Qui accède à quoi. Fermé par défaut, hérité, expirable.",
+    "emptyState": "Aucun deal. Créez-en un depuis la data room pour gérer ses permissions.",
+    "colUser": "Utilisateur",
+    "clickToCycle": "Cliquer pour changer de niveau",
+    "adminAlways": "Les administrateurs ont toujours l'accès complet",
+    "hint": "Cliquez sur un niveau pour le faire évoluer. Un droit posé sur un dossier s'applique à ses sous-dossiers, sauf règle plus précise.",
+    "levels": {
+      "none": "Aucun",
+      "watermark": "Filigrané",
+      "view": "Voir",
+      "download": "Télécharger",
+      "edit": "Éditer"
+    }
+  },
   "viewer": {
     "title": "Visionneuse",
     "subtitle": "Pages filigranées à la volée. Le fichier source ne quitte jamais le serveur.",

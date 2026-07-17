@@ -65,7 +65,8 @@ export async function renderPdfPage(
     viewport,
   }).promise;
 
-  drawWatermark(ctx, canvas.width, canvas.height, watermark);
+  // Filigrane uniquement si demandé (niveau 'watermark').
+  if (watermark) drawWatermark(ctx, canvas.width, canvas.height, watermark);
 
   const png = await canvas.encode("png");
   const pageCount = doc.numPages;

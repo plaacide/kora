@@ -38,7 +38,7 @@ export async function GET(
   const { data: version } = await supabase
     .from("document_versions")
     .select(
-      "id, storage_key, mime_type, documents!document_versions_document_id_fkey!inner(id, name, deal_id, deals!inner(id, org_id))",
+      "id, storage_key, mime_type, documents!document_versions_document_id_fkey!inner(id, name, folder_id, deal_id, deals!inner(id, org_id))",
     )
     .eq("id", versionId)
     .maybeSingle();
@@ -50,13 +50,26 @@ export async function GET(
   const doc = version.documents as unknown as {
     id: string;
     name: string;
+    folder_id: string;
     deal_id: string;
     deals: { id: string; org_id: string };
   };
 
-  // Filigrane : identité du lecteur + date. Rend toute capture traçable.
+  // Niveau effectif (hérité des dossiers parents, expiration prise en compte).
+  // Fermé par défaut : toute erreur ou absence de droit => refus.
+  const { data: level } = await supabase.rpc("my_permission", {
+    p_folder: doc.folder_id,
+  });
+
+  if (!level || level === "none") {
+    return NextResponse.json({ error: "accès refusé" }, { status: 403 });
+  }
+
+  // Seul le niveau 'watermark' impose le filigrane ; 'view' et au-dessus
+  // donnent une page propre (cf. niveaux du prototype).
+  const watermarked = level === "watermark";
   const stamp = new Date().toISOString().slice(0, 10);
-  const watermark = `${user.email} · ${stamp}`;
+  const watermark = watermarked ? `${user.email} · ${stamp}` : "";
 
   const admin = createAdminClient();
   const { data: file, error: dlError } = await admin.storage
@@ -96,7 +109,7 @@ export async function GET(
     p_action: "document.page_viewed",
     p_target_type: "document",
     p_target_id: doc.id,
-    p_metadata: { page: pageNo, name: doc.name },
+    p_metadata: { page: pageNo, name: doc.name, level },
     p_deal: doc.deal_id,
   });
 
@@ -107,6 +120,7 @@ export async function GET(
       // Jamais mis en cache : le filigrane est propre à ce lecteur et à cette date.
       "Cache-Control": "private, no-store, max-age=0",
       "X-Page-Count": String(pageCount),
+      "X-Access-Level": level,
       "Content-Disposition": "inline",
     },
   });
