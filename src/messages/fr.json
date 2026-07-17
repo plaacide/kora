@@ -206,7 +206,10 @@
       "milestone_toggled": "Jalon mis à jour",
       "milestone_deleted": "Jalon supprimé",
       "ic_note_added": "Note d'IC ajoutée",
-      "ic_note_deleted": "Note d'IC supprimée"
+      "ic_note_deleted": "Note d'IC supprimée",
+      "checklist_item_added": "Exigence ajoutée",
+      "checklist_item_updated": "Exigence modifiée",
+      "checklist_item_deleted": "Exigence supprimée"
     }
   },
   "dataroom": {
@@ -537,7 +540,13 @@
       "financier": "Les comptes et la fiscalité. C'est là que se joue la valorisation.",
       "dfi": "Ce qu'un bailleur de développement exigera avant tout décaissement."
     },
-    "scoreExplainer": "Le score n'est pas saisi : il se recalcule à chaque changement de statut. Une pièce « en cours » compte pour moitié — elle n'est pas rien, mais elle ne vaut pas une pièce fournie."
+    "scoreExplainer": "Le score n'est pas saisi : il se recalcule à chaque changement de statut. Une pièce « en cours » compte pour moitié — elle n'est pas rien, mais elle ne vaut pas une pièce fournie.",
+    "addRequirement": "+ Ajouter une exigence",
+    "reqLabelPlaceholder": "Intitulé de l'exigence",
+    "reqDescPlaceholder": "Description (optionnel)",
+    "addBtn": "Ajouter",
+    "editReq": "Modifier",
+    "deleteReq": "Supprimer"
   },
   "readiness": {
     "title": "Readiness Score",

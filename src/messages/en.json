@@ -206,7 +206,10 @@
       "milestone_toggled": "Milestone updated",
       "milestone_deleted": "Milestone deleted",
       "ic_note_added": "IC note added",
-      "ic_note_deleted": "IC note deleted"
+      "ic_note_deleted": "IC note deleted",
+      "checklist_item_added": "Requirement added",
+      "checklist_item_updated": "Requirement updated",
+      "checklist_item_deleted": "Requirement deleted"
     }
   },
   "dataroom": {
@@ -537,7 +540,13 @@
       "financier": "Accounts and tax. This is where valuation is decided.",
       "dfi": "What a development finance institution will require before any disbursement."
     },
-    "scoreExplainer": "The score is not entered: it is recomputed on every status change. An item 'in progress' counts as half — it isn't nothing, but it isn't a delivered document either."
+    "scoreExplainer": "The score is not entered: it is recomputed on every status change. An item 'in progress' counts as half — it isn't nothing, but it isn't a delivered document either.",
+    "addRequirement": "+ Add a requirement",
+    "reqLabelPlaceholder": "Requirement title",
+    "reqDescPlaceholder": "Description (optional)",
+    "addBtn": "Add",
+    "editReq": "Edit",
+    "deleteReq": "Delete"
   },
   "readiness": {
     "title": "Readiness score",

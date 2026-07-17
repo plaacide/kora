@@ -95,6 +95,7 @@ export default async function ChecklistPage() {
 
       <Checklist
         key={deal.id}
+        dealId={deal.id}
         items={list}
         docs={(documents ?? []) as DocOption[]}
         readiness={deal.readiness_score ?? 0}

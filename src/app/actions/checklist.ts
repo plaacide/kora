@@ -39,6 +39,53 @@ export async function linkChecklistDocument(
   return { ok: true };
 }
 
+/** Crée une exigence de DD personnalisée. */
+export async function addChecklistItem(
+  dealId: string,
+  category: string,
+  label: string,
+  description: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("add_checklist_item", {
+    p_deal: dealId,
+    p_category: category,
+    p_label: label,
+    p_description: description,
+  });
+  if (error) return { ok: false, error: error.message };
+  refresh();
+  return { ok: true };
+}
+
+export async function updateChecklistItem(
+  itemId: string,
+  label: string,
+  description: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_checklist_item", {
+    p_item: itemId,
+    p_label: label,
+    p_description: description,
+  });
+  if (error) return { ok: false, error: error.message };
+  refresh();
+  return { ok: true };
+}
+
+export async function deleteChecklistItem(
+  itemId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_checklist_item", {
+    p_item: itemId,
+  });
+  if (error) return { ok: false, error: error.message };
+  refresh();
+  return { ok: true };
+}
+
 /** Applique la checklist à un deal créé avant son existence. */
 export async function applyChecklist(
   dealId: string,

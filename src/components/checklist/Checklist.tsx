@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   setChecklistStatus,
   linkChecklistDocument,
+  addChecklistItem,
+  updateChecklistItem,
+  deleteChecklistItem,
 } from "@/app/actions/checklist";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
@@ -42,58 +45,131 @@ const CATEGORIES: Array<ChecklistItem["category"]> = [
   "dfi",
 ];
 
+/** Même formule que recompute_readiness côté base : « en cours » vaut 0,5. */
+function computeScore(list: ChecklistItem[]): number {
+  if (!list.length) return 0;
+  const pts = list.reduce(
+    (s, i) => s + (i.status === "done" ? 1 : i.status === "in_progress" ? 0.5 : 0),
+    0,
+  );
+  return Math.round((pts / list.length) * 100);
+}
+
 export function Checklist({
+  dealId,
   items,
   docs,
   readiness,
   canEdit,
 }: {
+  dealId: string;
   items: ChecklistItem[];
   docs: DocOption[];
   readiness: number;
   canEdit: boolean;
 }) {
   const t = useTranslations("checklist");
+  const tc = useTranslations("common");
   const router = useRouter();
   const [local, setLocal] = useState(items);
   const [score, setScore] = useState(readiness);
   const [error, setError] = useState<string | undefined>();
   const [, startTransition] = useTransition();
 
-  /** Cycle du prototype : À faire → En cours → Fait → À faire. */
-  function cycle(item: ChecklistItem) {
-    if (!canEdit) return;
-    const next = STATUSES[(STATUSES.indexOf(item.status) + 1) % STATUSES.length];
+  // Après un router.refresh(), le serveur renvoie la liste et le score à jour :
+  // on resynchronise l'état local dessus (source de vérité).
+  useEffect(() => {
+    setLocal(items);
+    setScore(readiness);
+  }, [items, readiness]);
+
+  // Ajout d'exigence : catégorie dont le formulaire est ouvert + champs.
+  const [adding, setAdding] = useState<ChecklistItem["category"] | null>(null);
+  const [newLabel, setNewLabel] = useState("");
+  const [newDesc, setNewDesc] = useState("");
+  // Édition : id de l'exigence en cours d'édition + champs.
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editLabel, setEditLabel] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+
+  function run(
+    optimistic: ChecklistItem[],
+    fn: () => Promise<{ ok: boolean; error?: string }>,
+  ) {
     const previous = local;
-
-    setLocal((prev) =>
-      prev.map((i) => (i.id === item.id ? { ...i, status: next } : i)),
-    );
+    setLocal(optimistic);
+    setScore(computeScore(optimistic));
     setError(undefined);
-
     startTransition(async () => {
-      const res = await setChecklistStatus(item.id, next);
+      const res = await fn();
       if (!res.ok) {
         setLocal(previous);
+        setScore(computeScore(previous));
         setError(res.error);
         return;
       }
-      // Le score renvoyé par la base fait foi, pas un calcul côté client.
-      if (typeof res.readiness === "number") setScore(res.readiness);
       router.refresh();
     });
   }
 
+  /** Cycle du prototype : À faire → En cours → Fait → À faire. */
+  function cycle(item: ChecklistItem) {
+    if (!canEdit) return;
+    const next = STATUSES[(STATUSES.indexOf(item.status) + 1) % STATUSES.length];
+    run(
+      local.map((i) => (i.id === item.id ? { ...i, status: next } : i)),
+      async () => {
+        const res = await setChecklistStatus(item.id, next);
+        return { ok: res.ok, error: res.error };
+      },
+    );
+  }
+
   function link(item: ChecklistItem, docId: string) {
     const value = docId || null;
-    setLocal((prev) =>
-      prev.map((i) => (i.id === item.id ? { ...i, document_id: value } : i)),
+    run(
+      local.map((i) => (i.id === item.id ? { ...i, document_id: value } : i)),
+      () => linkChecklistDocument(item.id, value),
     );
-    startTransition(async () => {
-      const res = await linkChecklistDocument(item.id, value);
-      if (!res.ok) setError(res.error);
-      else router.refresh();
-    });
+  }
+
+  function saveNew(cat: ChecklistItem["category"]) {
+    const label = newLabel.trim();
+    if (label.length < 2) return;
+    setAdding(null);
+    setNewLabel("");
+    setNewDesc("");
+    // Optimiste avec un id temporaire ; le refresh apporte le vrai.
+    const temp: ChecklistItem = {
+      id: `temp-${Math.random().toString(36).slice(2)}`,
+      category: cat,
+      label,
+      description: newDesc.trim(),
+      status: "todo",
+      document_id: null,
+    };
+    run([...local, temp], () =>
+      addChecklistItem(dealId, cat, label, newDesc.trim()),
+    );
+  }
+
+  function saveEdit(item: ChecklistItem) {
+    const label = editLabel.trim();
+    if (label.length < 2) return;
+    setEditing(null);
+    run(
+      local.map((i) =>
+        i.id === item.id ? { ...i, label, description: editDesc.trim() } : i,
+      ),
+      () => updateChecklistItem(item.id, label, editDesc.trim()),
+    );
+  }
+
+  function remove(item: ChecklistItem) {
+    run(
+      local.filter((i) => i.id !== item.id),
+      () => deleteChecklistItem(item.id),
+    );
   }
 
   const done = local.filter((i) => i.status === "done").length;
@@ -102,7 +178,7 @@ export function Checklist({
     <div className="flex flex-col gap-5">
       <PlainError message={error} />
 
-      {/* Le score se recalcule à chaque clic : il mesure, il ne décore pas. */}
+      {/* Le score se recalcule à chaque changement : il mesure, il ne décore pas. */}
       <div className="bg-surface border border-line rounded-card shadow-card p-4">
         <div className="flex items-baseline justify-between">
           <span className="text-[12.5px] font-[550] text-ink-secondary">
@@ -132,16 +208,17 @@ export function Checklist({
 
       {CATEGORIES.map((cat) => {
         const list = local.filter((i) => i.category === cat);
-        if (!list.length) return null;
         const catDone = list.filter((i) => i.status === "done").length;
 
         return (
           <section key={cat} className="flex flex-col gap-2">
             <div className="flex items-baseline gap-2">
               <h2 className="text-[13px] font-[650]">{t(`categories.${cat}`)}</h2>
-              <Mono className="text-[11px] text-ink-muted">
-                {catDone}/{list.length}
-              </Mono>
+              {list.length > 0 && (
+                <Mono className="text-[11px] text-ink-muted">
+                  {catDone}/{list.length}
+                </Mono>
+              )}
             </div>
             <p className="text-[11.5px] text-ink-muted -mt-1">
               {t(`categoryHints.${cat}`)}
@@ -151,11 +228,11 @@ export function Checklist({
               {list.map((i) => (
                 <div
                   key={i.id}
-                  className="flex items-start gap-3 px-4 py-3 border-b border-separator last:border-0"
+                  className="flex items-start gap-3 px-4 py-3 border-b border-separator last:border-0 group"
                 >
                   <button
                     onClick={() => cycle(i)}
-                    disabled={!canEdit}
+                    disabled={!canEdit || editing === i.id}
                     title={canEdit ? t("clickToCycle") : undefined}
                     className={cn(
                       "mt-0.5 flex-none",
@@ -166,37 +243,147 @@ export function Checklist({
                   </button>
 
                   <div className="min-w-0 flex-1">
-                    <div
-                      className={cn(
-                        "text-[12.5px] font-semibold",
-                        i.status === "done" && "text-ink-secondary",
-                      )}
-                    >
-                      {i.label}
-                    </div>
-                    <p className="text-[11.5px] text-ink-muted leading-relaxed mt-0.5">
-                      {i.description}
-                    </p>
+                    {editing === i.id ? (
+                      <div className="flex flex-col gap-1.5">
+                        <input
+                          value={editLabel}
+                          onChange={(e) => setEditLabel(e.target.value)}
+                          autoFocus
+                          className="w-full h-7 px-2 text-[12.5px] bg-bg text-ink rounded-[6px] border border-line focus:border-accent focus:outline-none"
+                        />
+                        <input
+                          value={editDesc}
+                          onChange={(e) => setEditDesc(e.target.value)}
+                          placeholder={t("reqDescPlaceholder")}
+                          className="w-full h-7 px-2 text-[11.5px] bg-bg text-ink-secondary rounded-[6px] border border-line focus:border-accent focus:outline-none"
+                        />
+                        <div className="flex gap-2 mt-0.5">
+                          <button
+                            onClick={() => saveEdit(i)}
+                            className="text-[11px] font-semibold text-accent cursor-pointer"
+                          >
+                            {tc("save")}
+                          </button>
+                          <button
+                            onClick={() => setEditing(null)}
+                            className="text-[11px] text-ink-muted cursor-pointer"
+                          >
+                            {tc("cancel")}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div
+                          className={cn(
+                            "text-[12.5px] font-semibold",
+                            i.status === "done" && "text-ink-secondary",
+                          )}
+                        >
+                          {i.label}
+                        </div>
+                        {i.description && (
+                          <p className="text-[11.5px] text-ink-muted leading-relaxed mt-0.5">
+                            {i.description}
+                          </p>
+                        )}
+                      </>
+                    )}
                   </div>
 
-                  {/* La preuve : quel document satisfait l'exigence. */}
-                  {canEdit && (
-                    <select
-                      value={i.document_id ?? ""}
-                      onChange={(e) => link(i, e.target.value)}
-                      className="h-7 max-w-[180px] px-1.5 text-[11px] bg-surface text-ink-secondary rounded-[6px] border border-line cursor-pointer focus:outline-none flex-none"
-                      aria-label={t("linkDoc")}
-                    >
-                      <option value="">{t("noDoc")}</option>
-                      {docs.map((d) => (
-                        <option key={d.id} value={d.id}>
-                          {d.index_path} {d.name}
-                        </option>
-                      ))}
-                    </select>
+                  {canEdit && editing !== i.id && (
+                    <div className="flex items-center gap-2 flex-none">
+                      {/* La preuve : quel document satisfait l'exigence. */}
+                      <select
+                        value={i.document_id ?? ""}
+                        onChange={(e) => link(i, e.target.value)}
+                        className="h-7 max-w-[160px] px-1.5 text-[11px] bg-surface text-ink-secondary rounded-[6px] border border-line cursor-pointer focus:outline-none"
+                        aria-label={t("linkDoc")}
+                      >
+                        <option value="">{t("noDoc")}</option>
+                        {docs.map((d) => (
+                          <option key={d.id} value={d.id}>
+                            {d.index_path} {d.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={() => {
+                          setEditing(i.id);
+                          setEditLabel(i.label);
+                          setEditDesc(i.description);
+                        }}
+                        aria-label={t("editReq")}
+                        className="text-ink-muted hover:text-ink opacity-0 group-hover:opacity-100 transition-opacity text-[12px]"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        onClick={() => remove(i)}
+                        aria-label={t("deleteReq")}
+                        className="text-ink-muted hover:text-[oklch(0.55_0.17_25)] opacity-0 group-hover:opacity-100 transition-opacity text-[14px] leading-none"
+                      >
+                        ×
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}
+
+              {list.length === 0 && (
+                <p className="text-[11.5px] text-ink-muted px-4 py-3">
+                  {t("noItems")}
+                </p>
+              )}
+
+              {/* Ajout d'exigence personnalisée. */}
+              {canEdit && (
+                <div className="px-4 py-2.5 bg-bg border-t border-separator-soft">
+                  {adding === cat ? (
+                    <div className="flex flex-col gap-1.5">
+                      <input
+                        value={newLabel}
+                        onChange={(e) => setNewLabel(e.target.value)}
+                        autoFocus
+                        placeholder={t("reqLabelPlaceholder")}
+                        className="w-full h-7 px-2 text-[12.5px] bg-surface text-ink rounded-[6px] border border-line focus:border-accent focus:outline-none"
+                      />
+                      <input
+                        value={newDesc}
+                        onChange={(e) => setNewDesc(e.target.value)}
+                        placeholder={t("reqDescPlaceholder")}
+                        className="w-full h-7 px-2 text-[11.5px] bg-surface text-ink-secondary rounded-[6px] border border-line focus:border-accent focus:outline-none"
+                      />
+                      <div className="flex gap-2 mt-0.5">
+                        <button
+                          onClick={() => saveNew(cat)}
+                          disabled={newLabel.trim().length < 2}
+                          className="text-[11.5px] font-semibold text-accent disabled:opacity-40 cursor-pointer disabled:cursor-default"
+                        >
+                          {t("addBtn")}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setAdding(null);
+                            setNewLabel("");
+                            setNewDesc("");
+                          }}
+                          className="text-[11.5px] text-ink-muted cursor-pointer"
+                        >
+                          {tc("cancel")}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setAdding(cat)}
+                      className="text-[11.5px] font-medium text-accent cursor-pointer"
+                    >
+                      {t("addRequirement")}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </section>
         );
