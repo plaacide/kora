@@ -31,6 +31,7 @@ export const navGroups: NavGroup[] = [
       { key: "dealSheet", href: "/deal" },
       { key: "dataRoom", href: "/data-room" },
       { key: "viewer", href: "/visionneuse" },
+      { key: "qa", href: "/qa" },
       { key: "checklist", href: "/checklist" },
       { key: "readiness", href: "/readiness" },
       { key: "permissions", href: "/permissions" },

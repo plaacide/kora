@@ -191,7 +191,11 @@
       "document_version_restored": "Version restaurée",
       "checklist_template_applied": "Checklist créée",
       "checklist_status_changed": "Checklist mise à jour",
-      "checklist_document_linked": "Justificatif rattaché"
+      "checklist_document_linked": "Justificatif rattaché",
+      "qa_question_asked": "Question posée",
+      "qa_answer_saved": "Réponse rédigée",
+      "qa_answer_published": "Réponse publiée",
+      "qa_status_changed": "Statut Q&A changé"
     }
   },
   "dataroom": {
@@ -493,5 +497,32 @@
     "allDone": "Tout est fourni",
     "allDoneBody": "Toutes les pièces attendues sont fournies. Votre data room est complète.",
     "openChecklist": "Ouvrir la checklist"
+  },
+  "qa": {
+    "title": "Q&A",
+    "subtitleInternal": "Questions des investisseurs. Rien n'est visible tant que ce n'est pas publié.",
+    "subtitleGuest": "Posez vos questions à l'équipe. Vous verrez les réponses une fois publiées.",
+    "emptyState": "Aucun deal.",
+    "empty": "Aucune question à ce stade.",
+    "filterAll": "Toutes",
+    "ask": "Poser une question",
+    "export": "Export Excel",
+    "mine": "La vôtre",
+    "cancel": "Annuler",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "questionPlaceholder": "Ex. : quelle est la concentration du chiffre d'affaires sur les 3 premiers clients ?",
+    "askNote": "Votre question est transmise à l'équipe. Elle rédigera une réponse, la fera relire en interne, puis la publiera.",
+    "answerPlaceholder": "Rédigez la réponse. Elle reste invisible à l'investisseur tant qu'elle n'est pas publiée.",
+    "toReview": "Passer en revue interne",
+    "publish": "Publier",
+    "unpublish": "Repasser en brouillon",
+    "answeredBy": "Répondu par {name}",
+    "pendingAnswer": "En attente de réponse de l'équipe.",
+    "status": {
+      "draft": "Brouillon",
+      "internal_review": "Revue interne",
+      "published": "Publiée"
+    }
   }
 }

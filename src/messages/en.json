@@ -191,7 +191,11 @@
       "document_version_restored": "Version restored",
       "checklist_template_applied": "Checklist created",
       "checklist_status_changed": "Checklist updated",
-      "checklist_document_linked": "Evidence linked"
+      "checklist_document_linked": "Evidence linked",
+      "qa_question_asked": "Question asked",
+      "qa_answer_saved": "Answer drafted",
+      "qa_answer_published": "Answer published",
+      "qa_status_changed": "Q&A status changed"
     }
   },
   "dataroom": {
@@ -493,5 +497,32 @@
     "allDone": "Everything provided",
     "allDoneBody": "All expected items are provided. Your data room is complete.",
     "openChecklist": "Open the checklist"
+  },
+  "qa": {
+    "title": "Q&A",
+    "subtitleInternal": "Investor questions. Nothing is visible until published.",
+    "subtitleGuest": "Ask the team your questions. You'll see answers once published.",
+    "emptyState": "No deal yet.",
+    "empty": "No questions at this stage.",
+    "filterAll": "All",
+    "ask": "Ask a question",
+    "export": "Export to Excel",
+    "mine": "Yours",
+    "cancel": "Cancel",
+    "send": "Send",
+    "sending": "Sending…",
+    "questionPlaceholder": "E.g. what is the revenue concentration across the top 3 clients?",
+    "askNote": "Your question goes to the team. They will draft an answer, have it reviewed internally, then publish it.",
+    "answerPlaceholder": "Draft the answer. It stays invisible to the investor until published.",
+    "toReview": "Send to internal review",
+    "publish": "Publish",
+    "unpublish": "Back to draft",
+    "answeredBy": "Answered by {name}",
+    "pendingAnswer": "Awaiting the team's answer.",
+    "status": {
+      "draft": "Draft",
+      "internal_review": "Internal review",
+      "published": "Published"
+    }
   }
 }
