@@ -188,7 +188,10 @@
       "document_deleted": "Document deleted",
       "dataroom_template_applied": "Data room structure created",
       "document_version_added": "Version added",
-      "document_version_restored": "Version restored"
+      "document_version_restored": "Version restored",
+      "checklist_template_applied": "Checklist created",
+      "checklist_status_changed": "Checklist updated",
+      "checklist_document_linked": "Evidence linked"
     }
   },
   "dataroom": {
@@ -440,5 +443,50 @@
     "ip": "IP address",
     "fingerprint": "Fingerprint",
     "proofNote": "This fingerprint seals the signer's identity, the agreement's content, the timestamp and the connection origin. Any alteration would invalidate it."
+  },
+  "checklist": {
+    "title": "DD checklist",
+    "subtitle": "What an investor or DFI will require. Readiness follows from it.",
+    "emptyState": "No deal yet.",
+    "noItems": "The checklist has not been applied to this deal yet.",
+    "applyTemplate": "Apply the OHADA/UEMOA checklist",
+    "applying": "Applying…",
+    "readinessTitle": "Readiness",
+    "progress": "{done} of {total} items provided",
+    "clickToCycle": "Click to change status",
+    "linkDoc": "Supporting document",
+    "noDoc": "No document",
+    "status": {
+      "todo": "To do",
+      "in_progress": "In progress",
+      "done": "Done"
+    },
+    "categories": {
+      "ohada": "OHADA",
+      "financier": "Financial",
+      "dfi": "DFI requirements"
+    },
+    "categoryHints": {
+      "ohada": "Legal existence and governance. No closing is possible without these.",
+      "financier": "Accounts and tax. This is where valuation is decided.",
+      "dfi": "What a development finance institution will require before any disbursement."
+    },
+    "scoreExplainer": "The score is not entered: it is recomputed on every status change. An item 'in progress' counts as half — it isn't nothing, but it isn't a delivered document either."
+  },
+  "readiness": {
+    "title": "Readiness score",
+    "subtitle": "Is your data room ready to be shown?",
+    "emptyState": "No deal yet.",
+    "noChecklist": "No checklist for this deal.",
+    "goChecklist": "Open the checklist",
+    "byCategory": "Completeness by category",
+    "gaugeLabel": "Readiness: {score}%",
+    "verdictReady": "Your data room is presentable. Remaining items can be handled during due diligence.",
+    "verdictAlmost": "Structural items are still missing. Complete them before opening the room to an investor.",
+    "verdictEarly": "Too many items are missing. Opening the room now would make a poor first impression.",
+    "todoTitle": "{n, plural, =1 {1 item to handle} other {# items to handle}}",
+    "allDone": "Everything provided",
+    "allDoneBody": "All expected items are provided. Your data room is complete.",
+    "openChecklist": "Open the checklist"
   }
 }

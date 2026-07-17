@@ -188,7 +188,10 @@
       "document_deleted": "Document supprimé",
       "dataroom_template_applied": "Structure de data room créée",
       "document_version_added": "Version ajoutée",
-      "document_version_restored": "Version restaurée"
+      "document_version_restored": "Version restaurée",
+      "checklist_template_applied": "Checklist créée",
+      "checklist_status_changed": "Checklist mise à jour",
+      "checklist_document_linked": "Justificatif rattaché"
     }
   },
   "dataroom": {
@@ -440,5 +443,50 @@
     "ip": "Adresse IP",
     "fingerprint": "Empreinte",
     "proofNote": "Cette empreinte scelle l'identité du signataire, le contenu de l'accord, l'horodatage et l'origine de la connexion. Toute altération la rendrait invalide."
+  },
+  "checklist": {
+    "title": "Checklist DD",
+    "subtitle": "Les pièces qu'un investisseur ou un DFI exigera. Le readiness en découle.",
+    "emptyState": "Aucun deal.",
+    "noItems": "La checklist n'est pas encore appliquée à ce deal.",
+    "applyTemplate": "Appliquer la checklist OHADA/UEMOA",
+    "applying": "Application…",
+    "readinessTitle": "Readiness",
+    "progress": "{done} sur {total} pièces fournies",
+    "clickToCycle": "Cliquer pour changer le statut",
+    "linkDoc": "Document justificatif",
+    "noDoc": "Aucun document",
+    "status": {
+      "todo": "À faire",
+      "in_progress": "En cours",
+      "done": "Fait"
+    },
+    "categories": {
+      "ohada": "OHADA",
+      "financier": "Financier",
+      "dfi": "Exigences DFI"
+    },
+    "categoryHints": {
+      "ohada": "L'existence légale et la gouvernance. Sans ça, aucun closing n'est possible.",
+      "financier": "Les comptes et la fiscalité. C'est là que se joue la valorisation.",
+      "dfi": "Ce qu'un bailleur de développement exigera avant tout décaissement."
+    },
+    "scoreExplainer": "Le score n'est pas saisi : il se recalcule à chaque changement de statut. Une pièce « en cours » compte pour moitié — elle n'est pas rien, mais elle ne vaut pas une pièce fournie."
+  },
+  "readiness": {
+    "title": "Readiness Score",
+    "subtitle": "Votre data room est-elle prête à être montrée ?",
+    "emptyState": "Aucun deal.",
+    "noChecklist": "Aucune checklist pour ce deal.",
+    "goChecklist": "Ouvrir la checklist",
+    "byCategory": "Complétude par catégorie",
+    "gaugeLabel": "Readiness : {score} %",
+    "verdictReady": "Votre data room est présentable. Les dernières pièces peuvent se traiter en cours de due diligence.",
+    "verdictAlmost": "Il manque encore des pièces structurantes. Complétez-les avant d'ouvrir la room à un investisseur.",
+    "verdictEarly": "Trop de pièces manquent. Ouvrir la room maintenant donnerait une mauvaise première impression.",
+    "todoTitle": "{n, plural, =1 {1 pièce à traiter} other {# pièces à traiter}}",
+    "allDone": "Tout est fourni",
+    "allDoneBody": "Toutes les pièces attendues sont fournies. Votre data room est complète.",
+    "openChecklist": "Ouvrir la checklist"
   }
 }
