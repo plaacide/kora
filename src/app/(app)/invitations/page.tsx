@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { requireInternal } from "@/lib/access";
 import { getCurrentDeal } from "@/lib/current-deal";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
@@ -17,6 +18,7 @@ export default async function InvitationsPage() {
   const t = await getTranslations("invitations");
   const tp = await getTranslations("permissions");
   const supabase = await createClient();
+  await requireInternal(supabase);
 
   const { deal } = await getCurrentDeal(supabase);
 

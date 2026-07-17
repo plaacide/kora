@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { requireInternal } from "@/lib/access";
 import { getCurrentDeal, getDealRole } from "@/lib/current-deal";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
@@ -14,6 +15,7 @@ export default async function DealPage() {
   const ts = await getTranslations("stages");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
+  await requireInternal(supabase);
 
   // La fiche suit le sélecteur de deal : sinon on éditerait un deal que
   // l'utilisateur ne peut pas choisir.

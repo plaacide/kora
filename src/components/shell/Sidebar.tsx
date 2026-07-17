@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { navGroups } from "./nav";
+import { navFor } from "./nav";
 import { DealSwitcher } from "./DealSwitcher";
 import type { DealRef } from "@/lib/current-deal";
 import { cn } from "@/lib/cn";
@@ -11,9 +11,11 @@ import { cn } from "@/lib/cn";
 export function Sidebar({
   deals,
   currentDealId,
+  role,
 }: {
   deals: DealRef[];
   currentDealId: string | null;
+  role: string | null;
 }) {
   const pathname = usePathname();
   const t = useTranslations("shell");
@@ -23,7 +25,7 @@ export function Sidebar({
       aria-label={t("mainNav")}
       className="w-[204px] shrink-0 h-[calc(100vh-52px)] sticky top-[52px] overflow-y-auto border-r border-line bg-surface-2 px-2.5 pt-3.5 pb-8"
     >
-      {navGroups.map((group) => (
+      {navFor(role).map((group) => (
         <div key={group.key} className="mb-4">
           {/* Le groupe « Deal » porte le sélecteur : c'est lui qui décide quel
               deal tous les écrans en dessous affichent. */}

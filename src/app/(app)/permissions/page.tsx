@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { requireInternal } from "@/lib/access";
 import { getCurrentDeal } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
@@ -12,6 +13,7 @@ import type { Level } from "@/lib/permissions";
 export default async function PermissionsPage() {
   const t = await getTranslations("permissions");
   const supabase = await createClient();
+  await requireInternal(supabase);
 
   const { deal } = await getCurrentDeal(supabase);
 

@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { requireInternal } from "@/lib/access";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
@@ -12,6 +13,7 @@ export default async function VersionsPage() {
   const t = await getTranslations("versions");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
+  await requireInternal(supabase);
 
   const { deal } = await getCurrentDeal(supabase);
   const orgId = deal?.org_id;

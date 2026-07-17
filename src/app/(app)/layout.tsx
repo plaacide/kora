@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
-import { getCurrentDeal } from "@/lib/current-deal";
+import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 
 export default async function AppLayout({
   children,
@@ -31,10 +31,27 @@ export default async function AppLayout({
 
   if (!membership) redirect("/onboarding");
 
-  const orgName =
-    (membership.organizations as { name?: string } | null)?.name ?? "—";
-
   const { deal, deals } = await getCurrentDeal(supabase);
+
+  // L'organisation affichée, comme le rôle, est celle DU deal ouvert : un
+  // utilisateur peut appartenir à plusieurs organisations, et afficher le nom
+  // de l'une avec les données de l'autre serait trompeur.
+  const { data: dealOrg } = deal
+    ? await supabase
+        .from("organizations")
+        .select("name")
+        .eq("id", deal.org_id)
+        .maybeSingle()
+    : { data: null };
+
+  const orgName =
+    dealOrg?.name ??
+    (membership.organizations as { name?: string } | null)?.name ??
+    "—";
+
+  const role = deal
+    ? await getDealRole(supabase, deal.org_id)
+    : await getAnyRole(supabase);
 
   return (
     <AppShell
@@ -42,6 +59,7 @@ export default async function AppLayout({
       userEmail={user.email ?? ""}
       deals={deals}
       currentDealId={deal?.id ?? null}
+      role={role}
     >
       {children}
     </AppShell>

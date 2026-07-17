@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { requireInternal } from "@/lib/access";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
@@ -12,6 +13,7 @@ import { ApplyChecklistButton } from "@/components/checklist/ApplyChecklistButto
 export default async function ChecklistPage() {
   const t = await getTranslations("checklist");
   const supabase = await createClient();
+  await requireInternal(supabase);
 
   const { deal } = await getCurrentDeal(supabase);
   const role = deal

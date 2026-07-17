@@ -8,18 +8,20 @@ export function AppShell({
   userEmail,
   deals,
   currentDealId,
+  role,
 }: {
   children: React.ReactNode;
   orgName: string;
   userEmail: string;
   deals: DealRef[];
   currentDealId: string | null;
+  role: string | null;
 }) {
   return (
     <div className="min-h-screen">
       <Topbar orgName={orgName} userEmail={userEmail} />
       <div className="flex">
-        <Sidebar deals={deals} currentDealId={currentDealId} />
+        <Sidebar deals={deals} currentDealId={currentDealId} role={role} />
         <main className="flex-1 min-w-0 px-7 py-6">{children}</main>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { requireInternal } from "@/lib/access";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
@@ -31,6 +32,7 @@ export default async function DashboardPage() {
   const ta = await getTranslations("audit");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
+  await requireInternal(supabase);
 
   const {
     data: { user },

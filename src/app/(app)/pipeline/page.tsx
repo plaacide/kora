@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { requireInternal } from "@/lib/access";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
   PipelineBoard,
@@ -14,6 +15,7 @@ export default async function PipelinePage() {
   const t = await getTranslations("pipeline");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
+  await requireInternal(supabase);
 
   const { data: rows } = await supabase
     .from("deals")
