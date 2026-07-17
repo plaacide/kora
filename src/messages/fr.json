@@ -253,7 +253,11 @@
     "templateView": "Voir",
     "templateDownload": "Télécharger",
     "close": "Fermer",
-    "templatesHint": "Documents types à remplir. Ce sont des modèles vierges : ils ne comptent pas comme pièces fournies."
+    "templatesHint": "Documents types à remplir. Ce sont des modèles vierges : ils ne comptent pas comme pièces fournies.",
+    "folder": "Dossier",
+    "renameFolder": "Renommer le dossier",
+    "renameDoc": "Renommer le document",
+    "docName": "Nom du document"
   },
   "invitations": {
     "title": "Invitations & NDA",

@@ -141,6 +141,11 @@ export function DataRoom({
   const [busy, setBusy] = useState(false);
   const [shared, setShared] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [renaming, setRenaming] = useState<{
+    id: string;
+    isFolder: boolean;
+    value: string;
+  } | null>(null);
   const uploadRef = useRef<HTMLButtonElement>(null);
 
   const selectedFolder = folders.find((f) => f.id === selected) ?? null;
@@ -194,14 +199,23 @@ export function DataRoom({
     router.refresh();
   }
 
-  async function rename(id: string, current: string, isFolder: boolean) {
-    const next = window.prompt(t("renamePrompt"), current);
-    if (!next || next.trim() === current) return;
+  /** Renommage via modale : window.prompt est bloqué dans certains contextes. */
+  function askRename(id: string, current: string, isFolder: boolean) {
+    setRenaming({ id, isFolder, value: current });
+  }
+
+  async function confirmRename() {
+    if (!renaming) return;
+    const value = renaming.value.trim();
+    if (value.length < 2) return;
+    setBusy(true);
     setError(undefined);
-    const res = isFolder
-      ? await renameFolder(id, next.trim())
-      : await renameDocument(id, next.trim());
+    const res = renaming.isFolder
+      ? await renameFolder(renaming.id, value)
+      : await renameDocument(renaming.id, value);
+    setBusy(false);
     if (!res.ok) return setError(res.error);
+    setRenaming(null);
     router.refresh();
   }
 
@@ -430,6 +444,65 @@ export function DataRoom({
             <span className="text-right">{t("colModified")}</span>
           </div>
 
+          {/* Sous-dossiers d'abord : sélectionner « Corporate » doit montrer
+              ce qu'il contient, dossiers compris. Une table vide alors que le
+              dossier a 4 enfants n'a aucun sens. */}
+          {childrenOf(selected).map((f) => (
+            <div
+              key={f.id}
+              onClick={() => {
+                setSelected(f.id);
+                setSelectedDoc(null);
+              }}
+              className="group grid grid-cols-[22px_minmax(150px,1.6fr)_56px_104px_44px_66px] gap-2.5 items-center px-3.5 py-2.5 border-b border-separator cursor-pointer hover:bg-[oklch(0.985_0.002_260)]"
+            >
+              <span />
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="grid place-items-center w-[30px] h-[30px] rounded-[7px] bg-chip-amber-bg text-chip-amber-fg text-[13px] flex-none">
+                  ▸
+                </span>
+                <div className="min-w-0">
+                  <div className="text-[12.5px] font-semibold truncate">
+                    {f.name}
+                  </div>
+                  <Mono className="text-[10.5px] text-ink-muted">
+                    {f.index_path}
+                  </Mono>
+                </div>
+              </div>
+              <span className="text-[11px] text-ink-muted">{t("folder")}</span>
+              <span />
+              {/* Le nombre d'éléments occupe la colonne « vues » : compact,
+                  et aligné avec les lignes de documents. */}
+              <span className="text-[11.5px] text-ink-secondary text-right">
+                {countIn(f.id)}
+              </span>
+              {canEdit && (
+                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100">
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      askRename(f.id, f.name, true);
+                    }}
+                    className="text-[10.5px] font-medium text-ink-secondary hover:text-ink cursor-pointer"
+                  >
+                    {t("rename")}
+                  </button>
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      removeFolder(f.id);
+                    }}
+                    className="text-[10.5px] text-ink-muted hover:text-error cursor-pointer"
+                    title={t("deleteFolder")}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+
           {docs.map((d) => {
             const e = ext(d.name);
             return (
@@ -437,7 +510,7 @@ export function DataRoom({
                 key={d.id}
                 onClick={() => setSelectedDoc(d.id)}
                 className={cn(
-                  "grid grid-cols-[22px_minmax(150px,1.6fr)_56px_104px_44px_66px] gap-2.5 items-center px-3.5 py-2.5 border-b border-separator cursor-pointer",
+                  "group grid grid-cols-[22px_minmax(150px,1.6fr)_56px_104px_44px_66px] gap-2.5 items-center px-3.5 py-2.5 border-b border-separator cursor-pointer",
                   doc?.id === d.id
                     ? "bg-[oklch(0.965_0.01_270)]"
                     : "hover:bg-[oklch(0.985_0.002_260)]",
@@ -478,15 +551,48 @@ export function DataRoom({
                 <span className="text-[11.5px] text-ink-secondary text-right">
                   {d.views}
                 </span>
-                <Mono className="text-[11px] text-right">
-                  {d.modified ?? "—"}
-                </Mono>
+                {/* La date cède la place aux actions au survol : renommer et
+                    supprimer doivent être atteignables depuis la liste. */}
+                <div className="text-right">
+                  <Mono
+                    className={cn(
+                      "text-[11px]",
+                      canEdit && "group-hover:hidden",
+                    )}
+                  >
+                    {d.modified ?? "—"}
+                  </Mono>
+                  {canEdit && (
+                    <div className="hidden group-hover:flex items-center justify-end gap-2">
+                      <button
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          askRename(d.id, d.name, false);
+                        }}
+                        className="text-[10.5px] font-medium text-ink-secondary hover:text-ink cursor-pointer"
+                      >
+                        {t("rename")}
+                      </button>
+                      <button
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          removeDoc(d.id);
+                        }}
+                        className="text-[10.5px] text-ink-muted hover:text-error cursor-pointer"
+                        title={t("deleteDoc")}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
 
-          {/* Dossier vide = le moment exact où la consigne est utile. */}
-          {docs.length === 0 && (
+          {/* Vraiment vide = ni sous-dossier ni fichier. C'est le moment exact
+              où la consigne du template est utile. */}
+          {docs.length === 0 && childrenOf(selected).length === 0 && (
             <div className="px-5 py-7 text-center">
               <p className="text-[12.5px] font-semibold text-ink">
                 {t("emptyFolder")}
@@ -563,7 +669,7 @@ export function DataRoom({
               {canEdit && (
                 <div className="flex gap-2 -mt-1.5">
                   <button
-                    onClick={() => rename(doc.id, doc.name, false)}
+                    onClick={() => askRename(doc.id, doc.name, false)}
                     className="text-[11px] font-medium text-ink-secondary hover:text-ink cursor-pointer"
                   >
                     {t("rename")}
@@ -652,6 +758,35 @@ export function DataRoom({
           )}
         </aside>
       </div>
+
+      <Modal
+        open={Boolean(renaming)}
+        onClose={() => setRenaming(null)}
+        title={renaming?.isFolder ? t("renameFolder") : t("renameDoc")}
+      >
+        <div className="flex flex-col gap-4">
+          <Input
+            label={renaming?.isFolder ? t("folderName") : t("docName")}
+            value={renaming?.value ?? ""}
+            onChange={(e) =>
+              setRenaming((r) => (r ? { ...r, value: e.target.value } : r))
+            }
+            autoFocus
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setRenaming(null)}>
+              {tc("cancel")}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={confirmRename}
+              disabled={busy || (renaming?.value.trim().length ?? 0) < 2}
+            >
+              {tc("save")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal
         open={bulkOpen}

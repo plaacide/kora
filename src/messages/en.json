@@ -253,7 +253,11 @@
     "templateView": "View",
     "templateDownload": "Download",
     "close": "Close",
-    "templatesHint": "Model documents to fill in. These are blank templates: they don't count as provided items."
+    "templatesHint": "Model documents to fill in. These are blank templates: they don't count as provided items.",
+    "folder": "Folder",
+    "renameFolder": "Rename folder",
+    "renameDoc": "Rename document",
+    "docName": "Document name"
   },
   "invitations": {
     "title": "Invitations & NDA",
