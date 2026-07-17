@@ -14,6 +14,13 @@ import type { DealForm } from "@/components/deal/DealEditor";
 import { formatAmount } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
 
+// Mêmes styles que le composant Button (variantes primary/secondary), pour
+// des liens d'action harmonisés avec le reste de l'app.
+const BTN_BASE =
+  "inline-flex items-center justify-center gap-1.5 font-semibold cursor-pointer transition-colors rounded-btn text-[12.5px] px-3.5 py-2";
+const PRIMARY_BTN = `${BTN_BASE} bg-primary text-white border border-transparent shadow-[0_1px_2px_rgba(20,20,60,0.2)] hover:bg-[oklch(0.29_0.06_270)]`;
+const SECONDARY_BTN = `${BTN_BASE} bg-surface text-ink border border-line-strong shadow-card hover:bg-[oklch(0.975_0.003_260)]`;
+
 function initials(name: string): string {
   return name
     .split(/\s+/)
@@ -21,6 +28,11 @@ function initials(name: string): string {
     .map((w) => w[0] ?? "")
     .join("")
     .toUpperCase();
+}
+
+/** next-intl interdit les points dans les clés. */
+function actionKey(action: string): string {
+  return action.replace(/\./g, "_");
 }
 
 function readinessColor(score: number): string {
@@ -40,6 +52,7 @@ export default async function DealPage() {
   const t = await getTranslations("deal");
   const ts = await getTranslations("stages");
   const tp = await getTranslations("permissions");
+  const ta = await getTranslations("audit");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
   await requireInternal(supabase);
@@ -188,7 +201,7 @@ export default async function DealPage() {
   const readiness = deal.readiness_score ?? 0;
 
   return (
-    <div className="flex flex-col gap-5 max-w-[1180px]">
+    <div className="flex flex-col gap-5">
       {/* En-tête : identité + actions. */}
       <div className="flex items-center gap-3.5 flex-wrap">
         <span className="grid place-items-center w-11 h-11 rounded-[11px] bg-[oklch(0.93_0.03_45)] text-[oklch(0.50_0.13_40)] text-[15px] font-bold flex-none">
@@ -204,17 +217,11 @@ export default async function DealPage() {
           <p className="text-[12.5px] text-ink-secondary mt-0.5">{deal.type}</p>
         </div>
         <div className="flex gap-2">
-          <Link
-            href="/roadmap"
-            className="text-[12.5px] font-semibold border border-line bg-surface rounded-[8px] px-3 py-2 text-ink-secondary hover:text-ink transition-colors inline-flex items-center gap-1.5"
-          >
+          <Link href="/roadmap" className={SECONDARY_BTN}>
             {t("syndicate")}
           </Link>
           {canEdit && <EditDealButton deal={form} canDelete={canDelete} />}
-          <Link
-            href="/data-room"
-            className="text-[12.5px] font-semibold bg-accent text-white rounded-[8px] px-3.5 py-2 hover:opacity-90 transition-opacity"
-          >
+          <Link href="/data-room" className={PRIMARY_BTN}>
             {t("openDataRoom")}
           </Link>
         </div>
@@ -311,7 +318,9 @@ export default async function DealPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[12.5px] font-[550] text-ink">
-                    {a.action}
+                    {ta.has(`actions.${actionKey(a.action)}`)
+                      ? ta(`actions.${actionKey(a.action)}`)
+                      : a.action}
                   </div>
                   <div className="text-[11px] text-ink-muted mt-0.5">
                     {(a.actor_email ?? "—").split("@")[0]}

@@ -201,7 +201,12 @@
       "qa_question_asked": "Question posée",
       "qa_answer_saved": "Réponse rédigée",
       "qa_answer_published": "Réponse publiée",
-      "qa_status_changed": "Statut Q&A changé"
+      "qa_status_changed": "Statut Q&A changé",
+      "milestone_added": "Jalon ajouté",
+      "milestone_toggled": "Jalon mis à jour",
+      "milestone_deleted": "Jalon supprimé",
+      "ic_note_added": "Note d'IC ajoutée",
+      "ic_note_deleted": "Note d'IC supprimée"
     }
   },
   "dataroom": {
