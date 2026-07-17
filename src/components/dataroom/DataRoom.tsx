@@ -188,7 +188,12 @@ export function DataRoom({
             <button
               onClick={() => setOpenMap((m) => ({ ...m, [f.id]: !open }))}
               className="w-3.5 text-[9px] text-ink-muted cursor-pointer"
-              aria-label={open ? tc("cancel") : tc("save")}
+              aria-expanded={open}
+              aria-label={
+                open
+                  ? t("collapse", { name: f.name })
+                  : t("expand", { name: f.name })
+              }
             >
               <span
                 className="inline-block transition-transform"

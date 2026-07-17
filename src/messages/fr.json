@@ -226,7 +226,9 @@
     "auditTitle": "Audit trail complet",
     "auditBody": "Chaque ouverture est horodatée et signée.",
     "auditLink": "Voir le journal",
-    "selectDoc": "Sélectionnez un document."
+    "selectDoc": "Sélectionnez un document.",
+    "expand": "Développer {name}",
+    "collapse": "Réduire {name}"
   },
   "invitations": {
     "title": "Invitations & NDA",

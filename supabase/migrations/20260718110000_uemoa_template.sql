@@ -11,6 +11,42 @@
 alter table public.folders
   add column if not exists description text not null default '';
 
+-- ---------------------------------------------------------------------------
+-- Correctif : ne montrer que les expirations À VENIR.
+--
+-- Une règle expirée est ignorée par effective_permission (l'accès retombe sur
+-- l'héritage). Afficher sa date à côté d'un accès actif laissait croire que
+-- l'accès allait se fermer — alors qu'il vient d'ailleurs.
+-- ---------------------------------------------------------------------------
+create or replace function public.deal_folder_access(p_deal uuid)
+returns table (
+  folder_id  uuid,
+  full_name  text,
+  role       public.org_role,
+  level      public.perm_level,
+  expires_at timestamptz
+)
+language sql stable security definer set search_path = public as $$
+  select f.id,
+         coalesce(nullif(p.full_name, ''), split_part(p.email, '@', 1)),
+         m.role,
+         public.effective_permission(m.user_id, f.id),
+         (select min(pe.expires_at) from public.permissions pe
+          where pe.user_id = m.user_id
+            and pe.folder_id = f.id
+            and pe.expires_at > now())
+  from public.folders f
+  join public.deals d on d.id = f.deal_id
+  join public.memberships m on m.org_id = d.org_id
+  join public.profiles p on p.id = m.user_id
+  where f.deal_id = p_deal
+    and public.is_org_internal(d.org_id)
+    and public.effective_permission(m.user_id, f.id) <> 'none'
+  order by f.id, m.role;
+$$;
+
+grant execute on function public.deal_folder_access(uuid) to authenticated;
+
 drop function if exists public.apply_dataroom_template(uuid) cascade;
 
 create or replace function public.apply_dataroom_template(p_deal uuid)

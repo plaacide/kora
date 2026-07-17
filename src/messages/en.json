@@ -226,7 +226,9 @@
     "auditTitle": "Full audit trail",
     "auditBody": "Every opening is timestamped and signed.",
     "auditLink": "View the log",
-    "selectDoc": "Select a document."
+    "selectDoc": "Select a document.",
+    "expand": "Expand {name}",
+    "collapse": "Collapse {name}"
   },
   "invitations": {
     "title": "Invitations & NDA",
