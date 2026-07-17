@@ -475,7 +475,9 @@
     "delete": "Supprimer",
     "deleteTitle": "Supprimer ce deal ?",
     "deleteBody": "« {name} » et toute sa data room (dossiers, documents, permissions, invitations) seront définitivement supprimés. Le journal d'audit, lui, conservera la trace de cette suppression. Cette action est irréversible.",
-    "deleteConfirm": "Supprimer définitivement"
+    "deleteConfirm": "Supprimer définitivement",
+    "prev": "Précédent",
+    "next": "Suivant"
   },
   "versions": {
     "title": "Versions",

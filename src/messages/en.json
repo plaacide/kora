@@ -475,7 +475,9 @@
     "delete": "Delete",
     "deleteTitle": "Delete this deal?",
     "deleteBody": "“{name}” and its entire data room (folders, documents, permissions, invitations) will be permanently deleted. The audit log will keep the record of this deletion. This cannot be undone.",
-    "deleteConfirm": "Delete permanently"
+    "deleteConfirm": "Delete permanently",
+    "prev": "Previous",
+    "next": "Next"
   },
   "versions": {
     "title": "Versions",

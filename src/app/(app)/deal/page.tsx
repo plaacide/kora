@@ -10,6 +10,7 @@ import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { EditDealButton } from "@/components/deal/EditDealButton";
 import { Milestones, type MilestoneItem } from "@/components/deal/Milestones";
 import { IcNotes, type IcNoteItem } from "@/components/deal/IcNotes";
+import { DealHistory, type HistoryItem } from "@/components/deal/DealHistory";
 import type { DealForm } from "@/components/deal/DealEditor";
 import { formatAmount } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
@@ -120,7 +121,7 @@ export default async function DealPage() {
       .select("action, actor_email, metadata, created_at")
       .eq("deal_id", deal.id)
       .order("id", { ascending: false })
-      .limit(8),
+      .limit(50),
     supabase
       .from("milestones")
       .select("id, label, due_date, status")
@@ -172,6 +173,18 @@ export default async function DealPage() {
       author: p?.full_name || p?.email?.split("@")[0] || "—",
       when: timeFmt.format(new Date(n.created_at)),
       mine: n.author_id === user?.id,
+    };
+  });
+
+  const history: HistoryItem[] = (activity ?? []).map((a) => {
+    const meta = a.metadata as Record<string, unknown>;
+    return {
+      label: ta.has(`actions.${actionKey(a.action)}`)
+        ? ta(`actions.${actionKey(a.action)}`)
+        : a.action,
+      actor: (a.actor_email ?? "—").split("@")[0],
+      detail: typeof meta?.name === "string" ? meta.name : null,
+      when: timeFmt.format(new Date(a.created_at)),
     };
   });
 
@@ -303,44 +316,7 @@ export default async function DealPage() {
         {/* Colonne gauche : historique + notes d'IC */}
         <div className="flex flex-col gap-3">
           <Card className="overflow-hidden">
-            <div className="px-4 py-3 border-b border-separator-soft text-[13px] font-[650] flex items-center gap-1.5">
-              {t("dealHistory")}
-              <InfoTooltip text={t("tipHistory")} />
-            </div>
-            {(activity ?? []).map((a, i) => (
-              <div
-                key={i}
-                className="flex gap-3 px-4 py-2.5 border-b border-separator last:border-0"
-              >
-                <div className="flex flex-col items-center flex-none pt-1">
-                  <span className="w-2 h-2 rounded-full bg-accent" />
-                  <span className="w-px flex-1 bg-separator mt-1" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[12.5px] font-[550] text-ink">
-                    {ta.has(`actions.${actionKey(a.action)}`)
-                      ? ta(`actions.${actionKey(a.action)}`)
-                      : a.action}
-                  </div>
-                  <div className="text-[11px] text-ink-muted mt-0.5">
-                    {(a.actor_email ?? "—").split("@")[0]}
-                    {(a.metadata as Record<string, unknown>)?.name
-                      ? ` · ${(a.metadata as Record<string, string>).name}`
-                      : ""}
-                  </div>
-                </div>
-                <Mono className="text-[10.5px] text-ink-muted flex-none">
-                  {timeFmt.format(new Date(a.created_at))}
-                </Mono>
-              </div>
-            ))}
-            {(activity ?? []).length === 0 && (
-              <CardBody>
-                <p className="text-[12px] text-ink-muted text-center py-2">
-                  {t("noActivity")}
-                </p>
-              </CardBody>
-            )}
+            <DealHistory items={history} tip={t("tipHistory")} />
           </Card>
 
           <Card className="overflow-hidden">
