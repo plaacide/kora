@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { folderIndex } from "@/lib/folder-index";
 import { useTranslations } from "next-intl";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
@@ -95,15 +96,6 @@ function initials(name: string): string {
     .map((w) => w[0] ?? "")
     .join("")
     .toUpperCase();
-}
-
-/**
- * Numérotation d'un dossier : « 1. Corporate » à la racine, « 1.2 Statuts »
- * en dessous — la convention des index de data room. Sans le point final, la
- * racine se lisait « 1 Corporate ».
- */
-function folderIndex(indexPath: string): string {
-  return indexPath.includes(".") ? indexPath : `${indexPath}.`;
 }
 
 export function DataRoom({

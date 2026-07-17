@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { setPermission } from "@/app/actions/permissions";
+import { folderIndex } from "@/lib/folder-index";
 import { nextLevel, type Level } from "@/lib/permissions";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
 import { cn } from "@/lib/cn";
@@ -92,7 +93,7 @@ export function PermissionMatrix({
                   key={f.id}
                   className="px-2 py-2 text-[10.5px] font-[650] text-ink-muted whitespace-nowrap"
                 >
-                  <span className="font-mono">{f.index_path}</span>{" "}
+                  <span className="font-mono">{folderIndex(f.index_path)}</span>{" "}
                   <span className="font-sans">{f.name}</span>
                 </th>
               ))}
