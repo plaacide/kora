@@ -6,6 +6,7 @@ import { setPermission } from "@/app/actions/permissions";
 import { folderIndex } from "@/lib/folder-index";
 import { nextLevel, type Level } from "@/lib/permissions";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { cn } from "@/lib/cn";
 
 export interface PermUser {
@@ -42,6 +43,7 @@ export function PermissionMatrix({
   initial: Record<string, Level>; // `${userId}:${folderId}` -> level
 }) {
   const t = useTranslations("permissions");
+  const tt = useTranslations("tips");
   const [grid, setGrid] = useState(initial);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +88,10 @@ export function PermissionMatrix({
           <thead>
             <tr className="bg-bg border-b border-separator-soft">
               <th className="text-left px-3.5 py-2 text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted sticky left-0 bg-bg">
-                {t("colUser")}
+                <span className="inline-flex items-center gap-1.5">
+                  {t("colUser")}
+                  <InfoTooltip text={tt("permLevels")} />
+                </span>
               </th>
               {folders.map((f) => (
                 <th

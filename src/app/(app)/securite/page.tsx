@@ -25,7 +25,12 @@ export default async function SecuritePage() {
       </div>
 
       <Card>
-        <CardHeader>{t("twoFactor.cardTitle")}</CardHeader>
+        <CardHeader>
+          <span className="inline-flex items-center gap-1.5">
+            {t("twoFactor.cardTitle")}
+            <InfoTooltip text={tt("twoFactor")} />
+          </span>
+        </CardHeader>
         <CardBody>
           <TwoFactorSetup initialEnabled={enabled} />
         </CardBody>

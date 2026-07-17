@@ -98,11 +98,12 @@ export default async function AuditPage() {
             />
             <div className="flex flex-col">
               <span
-                className={`text-[11.5px] font-[650] ${
+                className={`text-[11.5px] font-[650] flex items-center gap-1 ${
                   verdict.ok ? "text-chip-success-fg" : "text-chip-error-fg"
                 }`}
               >
                 {verdict.ok ? t("chainValid") : t("chainBroken")}
+                <InfoTooltip text={tt("auditChain")} />
               </span>
               <Mono className="text-[10px] text-ink-muted">
                 {verdict.ok
