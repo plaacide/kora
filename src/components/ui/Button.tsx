@@ -28,19 +28,31 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
+  /** Affiche un spinner et désactive le bouton le temps d'une action. */
+  loading?: boolean;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
-    { className, variant = "secondary", size = "md", ...props },
+    { className, variant = "secondary", size = "md", loading, disabled, children, ...props },
     ref,
   ) {
     return (
       <button
         ref={ref}
+        disabled={disabled || loading}
+        aria-busy={loading || undefined}
         className={cn(base, variants[variant], sizes[size], className)}
         {...props}
-      />
+      >
+        {loading && (
+          <span
+            className="w-3.5 h-3.5 rounded-full border-[1.5px] border-current border-t-transparent animate-spin-slow"
+            aria-hidden
+          />
+        )}
+        {children}
+      </button>
     );
   },
 );

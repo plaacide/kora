@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import "./globals.css";
 
-const instrument = Instrument_Sans({
-  variable: "--font-instrument",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -33,7 +33,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${instrument.variable} ${plexMono.variable} h-full`}
+      className={`${inter.variable} ${plexMono.variable} h-full`}
     >
       <body className="min-h-full antialiased" suppressHydrationWarning>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>

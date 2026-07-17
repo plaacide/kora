@@ -50,7 +50,7 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
@@ -107,4 +107,94 @@
 
 .animate-pulse-dot {
   animation: pulse-dot 2s infinite;
+}
+
+/* --- Micro-animations ---------------------------------------------------- */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -160% 0;
+  }
+  to {
+    background-position: 160% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+/* Entrée de contenu : léger fondu vers le haut. */
+.animate-in {
+  animation: fade-in-up 0.3s ease-out both;
+}
+
+/* Ouverture de modale/popover. */
+.animate-pop {
+  animation: pop-in 0.16s ease-out both;
+}
+
+.animate-spin-slow {
+  animation: spin 0.7s linear infinite;
+}
+
+/* Squelette de chargement : bande lumineuse qui balaie. */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    oklch(0.95 0.004 260) 25%,
+    oklch(0.975 0.003 260) 37%,
+    oklch(0.95 0.004 260) 63%
+  );
+  background-size: 320% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* Accessibilité : on coupe tout mouvement pour qui le demande. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

@@ -1,5 +1,6 @@
 import { Topbar } from "./Topbar";
 import { Sidebar } from "./Sidebar";
+import { PageTransition } from "./PageTransition";
 import type { DealRef } from "@/lib/current-deal";
 
 export function AppShell({
@@ -22,7 +23,9 @@ export function AppShell({
       <Topbar orgName={orgName} userEmail={userEmail} />
       <div className="flex">
         <Sidebar deals={deals} currentDealId={currentDealId} role={role} />
-        <main className="flex-1 min-w-0 px-7 py-6">{children}</main>
+        <main className="flex-1 min-w-0 px-7 py-6">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
     </div>
   );

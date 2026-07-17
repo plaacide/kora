@@ -31,13 +31,13 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[rgba(20,20,40,0.35)]"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[rgba(20,20,40,0.35)] animate-fade-in"
       onClick={onClose}
       role="presentation"
     >
       <div
         className={cn(
-          "w-full max-w-md bg-surface rounded-modal shadow-modal border border-line",
+          "w-full max-w-md bg-surface rounded-modal shadow-modal border border-line animate-pop",
           className,
         )}
         onClick={(e) => e.stopPropagation()}
