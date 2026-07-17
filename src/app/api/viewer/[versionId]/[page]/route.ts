@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { renderPdfPage } from "@/lib/viewer/render";
+import { docKind } from "@/lib/doc-types";
+import { officeToPdf, workerConfigured } from "@/lib/viewer/office";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,22 +82,45 @@ export async function GET(
     return NextResponse.json({ error: "lecture impossible" }, { status: 500 });
   }
 
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const isPdf =
-    version.mime_type === "application/pdf" ||
-    version.storage_key.toLowerCase().endsWith(".pdf");
+  const raw = new Uint8Array(await file.arrayBuffer());
+  const kind = docKind(doc.name, version.mime_type);
 
-  if (!isPdf) {
+  if (kind === "other") {
+    // Archive, vidéo, etc. : aucun aperçu filigrané possible.
     return NextResponse.json(
-      { error: "type non pris en charge par la visionneuse" },
+      { error: "unsupported_format", kind: "other" },
       { status: 415 },
     );
+  }
+
+  // PDF : rendu direct. Bureautique : on passe d'abord par le worker, qui rend
+  // un PDF filigrané ensuite comme n'importe quel autre — le fichier source ne
+  // sort jamais de notre infra.
+  let pdfBytes: Uint8Array<ArrayBufferLike> = raw;
+  if (kind === "office") {
+    if (!workerConfigured()) {
+      // Le worker n'est pas déployé : on le dit honnêtement, sans planter.
+      return NextResponse.json(
+        { error: "office_not_ready", kind: "office" },
+        { status: 415 },
+      );
+    }
+    try {
+      const converted = await officeToPdf(raw, doc.name);
+      if (!converted) throw new Error("no worker");
+      pdfBytes = converted;
+    } catch {
+      return NextResponse.json(
+        { error: "office_conversion_failed", kind: "office" },
+        { status: 502 },
+      );
+    }
   }
 
   let png: Buffer;
   let pageCount: number;
   try {
-    const rendered = await renderPdfPage(bytes, pageNo, watermark);
+    const rendered = await renderPdfPage(pdfBytes, pageNo, watermark);
     png = rendered.png;
     pageCount = rendered.pageCount;
   } catch {

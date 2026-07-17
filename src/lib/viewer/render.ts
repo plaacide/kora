@@ -36,7 +36,7 @@ function drawWatermark(
 
 /** Rend une page PDF en PNG filigrané. */
 export async function renderPdfPage(
-  data: Uint8Array,
+  data: Uint8Array<ArrayBufferLike>,
   pageNo: number,
   watermark: string,
   scale = 1.6,

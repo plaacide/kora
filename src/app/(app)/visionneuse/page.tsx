@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentDeal } from "@/lib/current-deal";
+import { isViewable } from "@/lib/doc-types";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Viewer } from "@/components/viewer/Viewer";
 
@@ -11,22 +13,35 @@ export default async function VisionneusePage({
   const t = await getTranslations("viewer");
   const supabase = await createClient();
   const params = await searchParams;
+  const { deal } = await getCurrentDeal(supabase);
 
-  // Sous RLS : on ne voit que les documents de son organisation.
-  // Par défaut on ouvre un PDF : c'est le seul type que la visionneuse rend
-  // aujourd'hui (les autres formats viendront avec la conversion en amont).
+  // Sous RLS : on ne voit que les documents auxquels on a accès.
   const cols = "id, name, index_path, current_version_id";
-  const { data: docs } = params.doc
-    ? await supabase.from("documents").select(cols).eq("id", params.doc).limit(1)
-    : await supabase
-        .from("documents")
-        .select(cols)
-        .not("current_version_id", "is", null)
-        .ilike("name", "%.pdf")
-        .order("index_path")
-        .limit(1);
+  let doc: {
+    id: string;
+    name: string;
+    index_path: string;
+    current_version_id: string | null;
+  } | undefined;
 
-  const doc = docs?.[0];
+  if (params.doc) {
+    const { data } = await supabase
+      .from("documents")
+      .select(cols)
+      .eq("id", params.doc)
+      .limit(1);
+    doc = data?.[0];
+  } else if (deal) {
+    // Aucun document ciblé : on ouvre le premier document prévisualisable du
+    // deal courant (PDF ou bureautique), pas un document d'un autre deal.
+    const { data } = await supabase
+      .from("documents")
+      .select(cols)
+      .eq("deal_id", deal.id)
+      .not("current_version_id", "is", null)
+      .order("index_path");
+    doc = (data ?? []).find((d) => isViewable(d.name, null));
+  }
 
   if (!doc?.current_version_id) {
     return (

@@ -21,6 +21,17 @@ export function Viewer({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Familles d'états « pas d'image mais ce n'est pas une panne » : le fichier
+  // existe, il n'est simplement pas (encore) prévisualisable.
+  const notice =
+    error === "office_not_ready"
+      ? { title: t("officeNotReady"), hint: t("officeNotReadyHint") }
+      : error === "office_conversion_failed"
+        ? { title: t("officeFailed"), hint: t("officeFailedHint") }
+        : error === "unsupported_format"
+          ? { title: t("unsupported"), hint: t("unsupportedHint") }
+          : null;
+
   const load = useCallback(
     async (n: number) => {
       setLoading(true);
@@ -90,7 +101,20 @@ export function Viewer({
           className="grid place-items-center p-5 bg-bg min-h-[420px] select-none"
           onContextMenu={(e) => e.preventDefault()}
         >
-          {error ? (
+          {notice ? (
+            <div className="flex flex-col items-center gap-2 text-center max-w-sm py-8">
+              <span
+                className="grid place-items-center w-10 h-10 rounded-full bg-chip-indigo-bg text-chip-indigo-fg text-[18px]"
+                aria-hidden
+              >
+                ⧗
+              </span>
+              <p className="text-[13px] font-[650] text-ink">{notice.title}</p>
+              <p className="text-[11.5px] text-ink-secondary leading-relaxed">
+                {notice.hint}
+              </p>
+            </div>
+          ) : error ? (
             <p className="text-[12.5px] text-[oklch(0.48_0.16_25)]">
               {t("renderError")} — {error}
             </p>

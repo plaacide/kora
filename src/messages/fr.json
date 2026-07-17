@@ -335,6 +335,12 @@
     "downloadBlocked": "Téléchargement bloqué",
     "loading": "Chargement de la page…",
     "renderError": "Impossible d'afficher cette page",
+    "officeNotReady": "Aperçu bureautique bientôt disponible",
+    "officeNotReadyHint": "Ce fichier Excel/PowerPoint sera bientôt lisible ici, filigrané. En attendant, demandez une version PDF au responsable du deal.",
+    "officeFailed": "La conversion de ce fichier a échoué",
+    "officeFailedHint": "Réessayez dans un instant. Si le problème persiste, signalez-le au responsable du deal.",
+    "unsupported": "Format sans aperçu",
+    "unsupportedHint": "Ce type de fichier ne peut pas être prévisualisé dans la visionneuse.",
     "prev": "Précédente",
     "next": "Suivante"
   },

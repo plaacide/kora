@@ -335,6 +335,12 @@
     "downloadBlocked": "Download blocked",
     "loading": "Loading page…",
     "renderError": "Cannot display this page",
+    "officeNotReady": "Office preview coming soon",
+    "officeNotReadyHint": "This Excel/PowerPoint file will soon be viewable here, watermarked. In the meantime, ask the deal owner for a PDF version.",
+    "officeFailed": "Converting this file failed",
+    "officeFailedHint": "Try again shortly. If it keeps failing, let the deal owner know.",
+    "unsupported": "No preview for this format",
+    "unsupportedHint": "This file type cannot be previewed in the viewer.",
     "prev": "Previous",
     "next": "Next"
   },
