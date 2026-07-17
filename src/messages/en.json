@@ -176,7 +176,15 @@
       "permission_set": "Permission changed",
       "invitation_created": "Invitation sent",
       "invitation_accepted": "Invitation accepted",
-      "nda_signed": "NDA signed"
+      "nda_signed": "NDA signed",
+      "deal_updated": "Deal updated",
+      "deal_stage_changed": "Stage changed",
+      "deal_deleted": "Deal deleted",
+      "folder_renamed": "Folder renamed",
+      "folder_deleted": "Folder deleted",
+      "document_renamed": "Document renamed",
+      "document_moved": "Document moved",
+      "document_deleted": "Document deleted"
     }
   },
   "dataroom": {
@@ -333,5 +341,36 @@
     "backToApp": "Back to app",
     "login": "Log in",
     "disclaimer": "Timelines are indicative and may shift: they depend on your feedback. Kora is built by a small team — we prefer announcing little and shipping, over promising broadly."
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "subtitle": "Move your deals from one stage to the next. Every change is audited.",
+    "emptyState": "No deal yet. Create one to start your pipeline.",
+    "emptyColumn": "Empty",
+    "changeStage": "Change stage",
+    "hint": "Drag a card between columns, or use the selector at the bottom of each card."
+  },
+  "deal": {
+    "title": "Deal sheet",
+    "subtitle": "Edit the deal, track its progress and open its data room.",
+    "emptyState": "No deal yet. Create one from the pipeline or the data room.",
+    "editCard": "Edit deal",
+    "name": "Deal name",
+    "type": "Type",
+    "stage": "Stage",
+    "currency": "Currency",
+    "amount": "Amount",
+    "readiness": "Readiness",
+    "readinessHint": "Provisional score, entered manually. It will be computed automatically by the due diligence checklist (V1).",
+    "documents": "Documents",
+    "openDataRoom": "Open data room",
+    "timeline": "History",
+    "noActivity": "No activity on this deal.",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "delete": "Delete",
+    "deleteTitle": "Delete this deal?",
+    "deleteBody": "“{name}” and its entire data room (folders, documents, permissions, invitations) will be permanently deleted. The audit log will keep the record of this deletion. This cannot be undone.",
+    "deleteConfirm": "Delete permanently"
   }
 }

@@ -20,11 +20,15 @@ export interface NavGroup {
 export const navGroups: NavGroup[] = [
   {
     key: "overview",
-    items: [{ key: "dashboard", href: "/dashboard" }],
+    items: [
+      { key: "dashboard", href: "/dashboard" },
+      { key: "pipeline", href: "/pipeline" },
+    ],
   },
   {
     key: "deal",
     items: [
+      { key: "dealSheet", href: "/deal" },
       { key: "dataRoom", href: "/data-room" },
       { key: "viewer", href: "/visionneuse" },
       { key: "permissions", href: "/permissions" },

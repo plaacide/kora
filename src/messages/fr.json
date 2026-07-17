@@ -176,7 +176,15 @@
       "permission_set": "Droit modifié",
       "invitation_created": "Invitation envoyée",
       "invitation_accepted": "Invitation acceptée",
-      "nda_signed": "NDA signé"
+      "nda_signed": "NDA signé",
+      "deal_updated": "Deal modifié",
+      "deal_stage_changed": "Étape changée",
+      "deal_deleted": "Deal supprimé",
+      "folder_renamed": "Dossier renommé",
+      "folder_deleted": "Dossier supprimé",
+      "document_renamed": "Document renommé",
+      "document_moved": "Document déplacé",
+      "document_deleted": "Document supprimé"
     }
   },
   "dataroom": {
@@ -333,5 +341,36 @@
     "backToApp": "Retour à l'app",
     "login": "Se connecter",
     "disclaimer": "Les échéances sont indicatives et peuvent bouger : elles dépendent de vos retours. Kora est développé par une équipe réduite — nous préférons annoncer peu et livrer, plutôt que promettre large."
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "subtitle": "Faites avancer vos deals d'une étape à l'autre. Chaque changement est audité.",
+    "emptyState": "Aucun deal. Créez-en un pour démarrer votre pipeline.",
+    "emptyColumn": "Vide",
+    "changeStage": "Changer d'étape",
+    "hint": "Glissez une carte d'une colonne à l'autre, ou utilisez le sélecteur au bas de chaque carte."
+  },
+  "deal": {
+    "title": "Fiche deal",
+    "subtitle": "Modifiez le deal, suivez son avancement et accédez à sa data room.",
+    "emptyState": "Aucun deal. Créez-en un depuis le pipeline ou la data room.",
+    "editCard": "Modifier le deal",
+    "name": "Nom du deal",
+    "type": "Type",
+    "stage": "Étape",
+    "currency": "Devise",
+    "amount": "Montant",
+    "readiness": "Readiness",
+    "readinessHint": "Score provisoire, saisi à la main. Il sera calculé automatiquement par la checklist de due diligence (V1).",
+    "documents": "Documents",
+    "openDataRoom": "Ouvrir la data room",
+    "timeline": "Historique",
+    "noActivity": "Aucune activité sur ce deal.",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer ce deal ?",
+    "deleteBody": "« {name} » et toute sa data room (dossiers, documents, permissions, invitations) seront définitivement supprimés. Le journal d'audit, lui, conservera la trace de cette suppression. Cette action est irréversible.",
+    "deleteConfirm": "Supprimer définitivement"
   }
 }
