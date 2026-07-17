@@ -14,7 +14,8 @@ export interface DealRow {
   stage: string;
   amountLabel: string;
   readiness: number;
-  docCount: number;
+  /** Libellé du prochain jalon (ou null s'il n'y en a pas). */
+  nextMilestone: string | null;
 }
 
 const STAGE_TONE: Record<string, ChipTone> = {
@@ -88,19 +89,19 @@ export function DealsTable({ deals }: { deals: DealRow[] }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-[minmax(180px,1.5fr)_110px_100px_110px_90px] gap-2.5 px-4 py-2 text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted bg-bg border-b border-separator-soft">
+      <div className="grid grid-cols-[minmax(180px,1.5fr)_110px_100px_110px_120px] gap-2.5 px-4 py-2 text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted bg-bg border-b border-separator-soft">
         <span>{t("colDeal")}</span>
         <span>{t("colStage")}</span>
         <span className="text-right">{t("colAmount")}</span>
-        <span>{t("colReadiness")}</span>
-        <span className="text-right">{t("colDocs")}</span>
+        <span className="text-right">{t("colReadiness")}</span>
+        <span>{t("colNextMilestone")}</span>
       </div>
 
       {filtered.map((d) => (
         <Link
           key={d.id}
           href={`/data-room?deal=${d.id}`}
-          className="grid grid-cols-[minmax(180px,1.5fr)_110px_100px_110px_90px] gap-2.5 items-center px-4 py-2.5 border-b border-separator last:border-0 hover:bg-[oklch(0.985_0.002_260)]"
+          className="grid grid-cols-[minmax(180px,1.5fr)_110px_100px_110px_120px] gap-2.5 items-center px-4 py-2.5 border-b border-separator last:border-0 hover:bg-[oklch(0.985_0.002_260)]"
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="grid place-items-center w-[26px] h-[26px] rounded-[7px] bg-chip-indigo-bg text-chip-indigo-fg text-[10.5px] font-bold flex-none">
@@ -124,7 +125,7 @@ export function DealsTable({ deals }: { deals: DealRow[] }) {
             {d.amountLabel}
           </Mono>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2">
             <span className="w-9 h-1 rounded-[2px] bg-separator-soft overflow-hidden">
               <span
                 className={cn("block h-full", readinessColor(d.readiness))}
@@ -134,7 +135,9 @@ export function DealsTable({ deals }: { deals: DealRow[] }) {
             <Mono className="text-[11px] w-7 text-right">{d.readiness}%</Mono>
           </div>
 
-          <Mono className="text-[11.5px] text-right">{d.docCount}</Mono>
+          <span className="text-[11.5px] text-ink-secondary truncate">
+            {d.nextMilestone ?? "—"}
+          </span>
         </Link>
       ))}
 

@@ -57,31 +57,49 @@ export default async function DashboardPage() {
     .eq("id", user?.id ?? "")
     .maybeSingle();
 
-  const [{ data: deals }, { data: docs }, { data: activity }, { data: expiring }] =
-    await Promise.all([
-      supabase
-        .from("deals")
-        .select(
-          "id, name, type, stage, amount, currency, readiness_score, created_at",
-        )
-        .order("created_at", { ascending: false }),
-      supabase.from("documents").select("id, deal_id"),
-      supabase
-        .from("audit_log")
-        .select("action, actor_email, metadata, created_at")
-        .order("id", { ascending: false })
-        .limit(5),
-      // Accès qui expirent sous 48 h — l'alerte du prototype, en vrai.
-      supabase
-        .from("permissions")
-        .select("id, expires_at, profiles(full_name, email)")
-        .not("expires_at", "is", null)
-        .gt("expires_at", new Date().toISOString())
-        .lt(
-          "expires_at",
-          new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        ),
-    ]);
+  const [
+    { data: deals },
+    { data: docs },
+    { data: activity },
+    { data: expiring },
+    { data: milestones },
+    { data: openQa },
+  ] = await Promise.all([
+    supabase
+      .from("deals")
+      .select(
+        "id, name, type, stage, amount, currency, readiness_score, created_at",
+      )
+      .order("created_at", { ascending: false }),
+    supabase.from("documents").select("id, deal_id"),
+    supabase
+      .from("audit_log")
+      .select("action, actor_email, metadata, created_at")
+      .order("id", { ascending: false })
+      .limit(5),
+    // Accès qui expirent sous 48 h — l'alerte du prototype, en vrai.
+    supabase
+      .from("permissions")
+      .select("id, expires_at, profiles(full_name, email)")
+      .not("expires_at", "is", null)
+      .gt("expires_at", new Date().toISOString())
+      .lt(
+        "expires_at",
+        new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+      ),
+    // Jalons à venir. Tolérant : renvoie null tant que la migration n'est pas
+    // appliquée, on retombe alors sur une liste vide.
+    supabase
+      .from("milestones")
+      .select("id, deal_id, label, due_date, status")
+      .eq("status", "pending")
+      .order("due_date", { nullsFirst: false }),
+    // Questions d'investisseurs sans réponse publiée — vraies actions à traiter.
+    supabase
+      .from("qa_questions")
+      .select("id, deal_id, body, answer_status")
+      .neq("answer_status", "published"),
+  ]);
 
   const allDeals = deals ?? [];
   const activeDeals = allDeals.filter((d) => d.stage !== "passed");
@@ -116,6 +134,37 @@ export default async function DashboardPage() {
     (docs ?? []).map(() => new Date().toISOString()),
   );
 
+  const dealName = new Map(allDeals.map((d) => [d.id, d.name]));
+  const shortDate = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
+    day: "numeric",
+    month: "short",
+  });
+
+  // Premier jalon en attente par deal (liste déjà triée par échéance).
+  const nextMilestoneByDeal = new Map<string, string>();
+  for (const m of milestones ?? []) {
+    if (nextMilestoneByDeal.has(m.deal_id)) continue;
+    const due = m.due_date ? ` · ${shortDate.format(new Date(m.due_date))}` : "";
+    nextMilestoneByDeal.set(m.deal_id, `${m.label}${due}`);
+  }
+
+  // « À traiter » : signaux réels — jalons à venir + questions sans réponse.
+  const tasks: Array<{ label: string; sub: string; deal: string; href: string }> =
+    [
+      ...(milestones ?? []).map((m) => ({
+        label: m.label,
+        sub: m.due_date ? shortDate.format(new Date(m.due_date)) : "",
+        deal: dealName.get(m.deal_id) ?? "",
+        href: "/deal",
+      })),
+      ...(openQa ?? []).map((q) => ({
+        label: t("todoAnswerQa"),
+        sub: (q.body ?? "").slice(0, 60),
+        deal: dealName.get(q.deal_id) ?? "",
+        href: "/qa",
+      })),
+    ];
+
   const rows: DealRow[] = activeDeals.map((d) => ({
     id: d.id,
     name: d.name,
@@ -125,7 +174,7 @@ export default async function DashboardPage() {
       ? formatAmount(Number(d.amount), d.currency, locale)
       : "—",
     readiness: d.readiness_score ?? 0,
-    docCount: docCountByDeal.get(d.id) ?? 0,
+    nextMilestone: nextMilestoneByDeal.get(d.id) ?? null,
   }));
 
   const firstName = (profile?.full_name ?? "").split(" ")[0] || "";
@@ -146,6 +195,9 @@ export default async function DashboardPage() {
               date: formatDate(new Date(), locale),
               deals: activeDeals.length,
             })}
+            {tasks.length > 0 && (
+              <> · {t("actionsRequired", { n: tasks.length })}</>
+            )}
           </p>
         </div>
         <div className="flex gap-2">
@@ -246,6 +298,37 @@ export default async function DashboardPage() {
             </div>
           )}
 
+          {/* À traiter : jalons à venir + questions sans réponse. */}
+          <Card className="overflow-hidden">
+            <div className="px-4 py-3 border-b border-separator-soft text-[13px] font-[650]">
+              {t("todoTitle")}
+            </div>
+            {tasks.slice(0, 5).map((task, i) => (
+              <Link
+                key={i}
+                href={task.href}
+                className="flex gap-2.5 px-4 py-2.5 border-b border-separator last:border-0 hover:bg-[oklch(0.985_0.002_260)]"
+              >
+                <span className="w-[14px] h-[14px] rounded-[4px] border-[1.5px] border-[oklch(0.80_0.01_260)] flex-none mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-[12.5px] font-[550] leading-[1.35] truncate">
+                    {task.label}
+                  </div>
+                  <div className="text-[11px] text-ink-muted mt-0.5 truncate">
+                    {[task.sub, task.deal].filter(Boolean).join(" · ")}
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {tasks.length === 0 && (
+              <CardBody>
+                <p className="text-[12px] text-ink-muted text-center py-2">
+                  {t("todoEmpty")}
+                </p>
+              </CardBody>
+            )}
+          </Card>
+
           <Card className="overflow-hidden">
             <div className="px-4 py-3 border-b border-separator-soft text-[13px] font-[650]">
               {t("recentActivity")}
@@ -255,6 +338,9 @@ export default async function DashboardPage() {
                 key={i}
                 className="flex gap-2.5 px-4 py-2.5 border-b border-separator last:border-0"
               >
+                <span className="grid place-items-center w-[22px] h-[22px] rounded-full bg-chip-indigo-bg text-chip-indigo-fg text-[9.5px] font-bold flex-none mt-0.5">
+                  {(a.actor_email ?? "—").slice(0, 2).toUpperCase()}
+                </span>
                 <div className="min-w-0 flex-1">
                   <div className="text-[12px] leading-[1.45] text-ink">
                     <b className="font-semibold">
