@@ -133,6 +133,7 @@ export function DataRoom({
   const [folderName, setFolderName] = useState("");
   const [busy, setBusy] = useState(false);
   const [shared, setShared] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const uploadRef = useRef<HTMLButtonElement>(null);
 
   const selectedFolder = folders.find((f) => f.id === selected) ?? null;
@@ -206,6 +207,24 @@ export function DataRoom({
       else next.add(id);
       return next;
     });
+  }
+
+  /** Suppression groupée : séquentielle, pour que chaque ligne soit auditée. */
+  async function removeChecked() {
+    setBusy(true);
+    setError(undefined);
+    for (const id of checked) {
+      const res = await deleteDocument(id);
+      if (!res.ok) {
+        setError(res.error);
+        break;
+      }
+    }
+    setBusy(false);
+    setChecked(new Set());
+    setBulkOpen(false);
+    setSelectedDoc(null);
+    router.refresh();
   }
 
   function renderFolder(f: FolderRow, depth: number) {
@@ -363,6 +382,29 @@ export function DataRoom({
               </div>
             )}
           </div>
+
+          {/* N'apparaît que s'il y a une sélection : une case à cocher sans
+              action derrière est pire qu'une absence de case. */}
+          {checked.size > 0 && canEdit && (
+            <div className="flex items-center gap-3 px-3.5 py-2 bg-chip-indigo-bg border-b border-separator-soft">
+              <span className="text-[11.5px] font-[650] text-chip-indigo-fg">
+                {t("selected", { n: checked.size })}
+              </span>
+              <button
+                onClick={() => setBulkOpen(true)}
+                disabled={busy}
+                className="text-[11.5px] font-medium text-[oklch(0.48_0.16_25)] cursor-pointer"
+              >
+                {t("deleteSelected")}
+              </button>
+              <button
+                onClick={() => setChecked(new Set())}
+                className="ml-auto text-[11.5px] font-medium text-ink-secondary cursor-pointer"
+              >
+                {tc("cancel")}
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-[22px_minmax(150px,1.6fr)_56px_104px_44px_66px] gap-2.5 px-3.5 py-2 text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted bg-bg border-b border-separator-soft">
             <span />
@@ -589,6 +631,26 @@ export function DataRoom({
           )}
         </aside>
       </div>
+
+      <Modal
+        open={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+        title={t("deleteSelected")}
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-[12.5px] text-ink-secondary leading-relaxed">
+            {t("bulkDeleteBody", { n: checked.size })}
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setBulkOpen(false)}>
+              {tc("cancel")}
+            </Button>
+            <Button variant="danger" onClick={removeChecked} disabled={busy}>
+              {busy ? t("deleting") : t("confirmDelete")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal
         open={newFolderOpen}

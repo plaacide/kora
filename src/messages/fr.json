@@ -236,7 +236,12 @@
     "whatToPut": "À déposer ici :",
     "share": "Partager",
     "copied": "Lien copié",
-    "deleteDoc": "Supprimer"
+    "deleteDoc": "Supprimer",
+    "selected": "{n, plural, =1 {1 document sélectionné} other {# documents sélectionnés}}",
+    "deleteSelected": "Supprimer la sélection",
+    "bulkDeleteBody": "{n, plural, =1 {1 document sera définitivement supprimé} other {# documents seront définitivement supprimés}}, avec toutes leurs versions. Le journal d'audit conservera la trace de chaque suppression. Cette action est irréversible.",
+    "confirmDelete": "Supprimer définitivement",
+    "deleting": "Suppression…"
   },
   "invitations": {
     "title": "Invitations & NDA",

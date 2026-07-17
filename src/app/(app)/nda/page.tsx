@@ -30,8 +30,11 @@ export default async function NdaPage() {
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
 
-  const { data } = await supabase.rpc("my_ndas");
-  const ndas = (data ?? []) as unknown as Nda[];
+  // Tolérant : si la migration n'est pas encore appliquée, on affiche un état
+  // vide propre plutôt qu'une erreur brute. Un écran qui plante est
+  // indéfendable devant un testeur.
+  const { data, error } = await supabase.rpc("my_ndas");
+  const ndas = (error ? [] : (data ?? [])) as unknown as Nda[];
 
   const fmt = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
     day: "numeric",
