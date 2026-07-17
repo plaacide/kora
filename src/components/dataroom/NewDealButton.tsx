@@ -115,7 +115,7 @@ export function NewDealButton({
             >
               {tc("cancel")}
             </Button>
-            <Button type="submit" variant="primary" disabled={pending}>
+            <Button type="submit" variant="primary" loading={pending} disabled={pending}>
               {pending ? t("creating") : t("createDeal")}
             </Button>
           </div>

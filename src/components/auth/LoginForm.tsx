@@ -50,7 +50,7 @@ export function LoginForm() {
           <FieldError messages={state?.fieldErrors?.password} />
         </div>
 
-        <Button type="submit" variant="primary" disabled={pending}>
+        <Button type="submit" variant="primary" loading={pending}>
           {pending ? t("submitting") : t("submit")}
         </Button>
       </form>

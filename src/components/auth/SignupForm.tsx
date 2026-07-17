@@ -76,7 +76,7 @@ export function SignupForm() {
           </select>
         </div>
 
-        <Button type="submit" variant="primary" disabled={pending}>
+        <Button type="submit" variant="primary" loading={pending}>
           {pending ? t("submitting") : t("submit")}
         </Button>
       </form>

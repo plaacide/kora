@@ -120,6 +120,7 @@ export function InviteForm({ dealId }: { dealId: string }) {
       <Button
         variant="primary"
         onClick={submit}
+        loading={busy}
         disabled={busy || email.trim().length < 5}
       >
         {busy ? t("creating") : t("invite")}

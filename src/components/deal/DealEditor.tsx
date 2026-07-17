@@ -176,6 +176,7 @@ export function DealEditor({
         <Button
           variant="primary"
           onClick={save}
+          loading={busy}
           disabled={!dirty || busy || form.name.trim().length < 2}
         >
           {busy ? t("saving") : saved ? t("saved") : tc("save")}
