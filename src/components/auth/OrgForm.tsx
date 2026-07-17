@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { createOrganization } from "@/app/actions/auth";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -10,16 +11,17 @@ const currencies = ["XOF", "XAF", "NGN", "KES", "GHS", "USD", "EUR"];
 
 export function OrgForm() {
   const [state, action, pending] = useActionState(createOrganization, undefined);
+  const t = useTranslations("onboarding");
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <FormError message={state?.error} />
+      <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />
 
       <div>
         <Input
-          label="Nom de l'organisation"
+          label={t("orgName")}
           name="name"
-          placeholder="Amani Capital"
+          placeholder={t("orgNamePlaceholder")}
           autoFocus
         />
         <FieldError messages={state?.fieldErrors?.name} />
@@ -30,7 +32,7 @@ export function OrgForm() {
           htmlFor="currency"
           className="text-[11.5px] font-medium text-ink-secondary"
         >
-          Devise principale
+          {t("currency")}
         </label>
         <select
           id="currency"
@@ -40,14 +42,14 @@ export function OrgForm() {
         >
           {currencies.map((c) => (
             <option key={c} value={c}>
-              {c === "XOF" ? "XOF — Franc CFA (UEMOA)" : c}
+              {c === "XOF" ? t("currencyXof") : c}
             </option>
           ))}
         </select>
       </div>
 
       <Button type="submit" variant="primary" disabled={pending}>
-        {pending ? "Création…" : "Créer l'organisation"}
+        {pending ? t("submitting") : t("submit")}
       </Button>
     </form>
   );

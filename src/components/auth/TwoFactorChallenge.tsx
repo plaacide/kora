@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
-import { FormError } from "./FormError";
+import { PlainError } from "./FormError";
 
 export function TwoFactorChallenge() {
+  const t = useTranslations("security.twoFactor");
   const router = useRouter();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | undefined>();
@@ -24,7 +26,7 @@ export function TwoFactorChallenge() {
     const factor = factors?.totp?.[0];
     if (!factor) {
       setBusy(false);
-      return setError("Aucun facteur 2FA trouvé.");
+      return setError(t("noFactor"));
     }
     const ch = await supabase.auth.mfa.challenge({ factorId: factor.id });
     if (ch.error) {
@@ -37,7 +39,7 @@ export function TwoFactorChallenge() {
       code: code.trim(),
     });
     setBusy(false);
-    if (v.error) return setError("Code incorrect. Réessayez.");
+    if (v.error) return setError(t("codeIncorrect"));
     router.push("/dashboard");
     router.refresh();
   }
@@ -46,15 +48,14 @@ export function TwoFactorChallenge() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          Vérification en deux étapes
+          {t("challengeTitle")}
         </h1>
         <p className="mt-1 text-[12.5px] text-ink-secondary">
-          Saisissez le code à 6 chiffres de votre application
-          d&apos;authentification.
+          {t("challengeSubtitle")}
         </p>
       </div>
       <div className="flex flex-col gap-4">
-        <FormError message={error} />
+        <PlainError message={error} />
         <input
           value={code}
           onChange={(e) => setCode(e.target.value)}
@@ -72,7 +73,7 @@ export function TwoFactorChallenge() {
           onClick={verify}
           disabled={busy || code.trim().length < 6}
         >
-          {busy ? "Vérification…" : "Vérifier"}
+          {busy ? t("verifying") : t("verify")}
         </Button>
       </div>
     </div>

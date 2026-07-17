@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "title": "Kora — Dealroom",
+    "description": "Data room sécurisée et dealroom pour les transactions africaines."
+  },
+  "common": {
+    "appName": "Kora",
+    "tagline": "La data room sécurisée des transactions africaines.",
+    "encrypted": "Chiffré · SOC 2",
+    "encryptedHosting": "Chiffré · SOC 2 · Hébergement UE",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "language": "Langue",
+    "french": "Français",
+    "english": "English"
+  },
+  "home": {
+    "subtitle": "Data room sécurisée pour les transactions africaines. Socle E0 — fondations en place.",
+    "login": "Se connecter",
+    "signup": "Créer un compte"
+  },
+  "auth": {
+    "brandPitch": "Due diligence, Q&A, syndication et reporting LP — chiffré, filigrané, audité de bout en bout.",
+    "signup": {
+      "title": "Créer un compte",
+      "haveAccount": "Déjà inscrit ?",
+      "loginLink": "Se connecter",
+      "fullName": "Nom complet",
+      "email": "Email professionnel",
+      "emailPlaceholder": "prenom@fonds.com",
+      "password": "Mot de passe",
+      "passwordHint": "8 caractères min, avec une lettre et un chiffre.",
+      "submit": "Créer mon compte",
+      "submitting": "Création…"
+    },
+    "login": {
+      "title": "Se connecter",
+      "noAccount": "Pas encore de compte ?",
+      "signupLink": "Créer un compte",
+      "email": "Email",
+      "emailPlaceholder": "prenom@fonds.com",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "submitting": "Connexion…"
+    },
+    "verifyEmail": {
+      "title": "Vérifiez votre email",
+      "body": "Un lien de confirmation vient de vous être envoyé. Cliquez dessus pour activer votre compte, puis connectez-vous.",
+      "back": "Retour à la connexion"
+    },
+    "errors": {
+      "invalidCredentials": "Email ou mot de passe incorrect.",
+      "alreadyRegistered": "Un compte existe déjà avec cet email.",
+      "emailNotConfirmed": "Email non confirmé. Vérifiez votre boîte mail.",
+      "notAuthenticated": "Vous n'êtes pas authentifié."
+    }
+  },
+  "validation": {
+    "nameMin": "Le nom doit faire au moins 2 caractères.",
+    "emailInvalid": "Entrez une adresse email valide.",
+    "passwordMin": "Au moins 8 caractères.",
+    "passwordLetter": "Au moins une lettre.",
+    "passwordDigit": "Au moins un chiffre.",
+    "passwordRequired": "Mot de passe requis.",
+    "orgNameRequired": "Nom de l'organisation requis (2 caractères min)."
+  },
+  "onboarding": {
+    "title": "Créez votre organisation",
+    "subtitle": "Le cadre de travail de votre équipe : deals, data rooms, membres et journal d'audit y seront rattachés.",
+    "orgName": "Nom de l'organisation",
+    "orgNamePlaceholder": "Amani Capital",
+    "currency": "Devise principale",
+    "currencyXof": "XOF — Franc CFA (UEMOA)",
+    "submit": "Créer l'organisation",
+    "submitting": "Création…"
+  },
+  "shell": {
+    "searchPlaceholder": "Rechercher un deal, un document…",
+    "logout": "Déconnexion",
+    "home": "Kora — accueil",
+    "mainNav": "Navigation principale",
+    "groups": {
+      "overview": "Vue d'ensemble",
+      "deal": "Deal · Kalyx Foods",
+      "reporting": "Reporting",
+      "organisation": "Organisation"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "pipeline": "Pipeline",
+      "calendar": "Calendrier",
+      "portfolio": "Portefeuille",
+      "search": "Recherche",
+      "dealSheet": "Fiche deal",
+      "dataRoom": "Data room",
+      "viewer": "Visionneuse",
+      "checklist": "Checklist DD",
+      "qa": "Q&A",
+      "kyc": "KYC / AML",
+      "syndication": "Syndication",
+      "readiness": "Readiness Score",
+      "permissions": "Permissions",
+      "invitations": "Invitations & NDA",
+      "audit": "Audit trail",
+      "versions": "Versions",
+      "kpi": "Collecte KPI",
+      "lpReport": "Rapport LP",
+      "icComparator": "Comparateur IC",
+      "settings": "Paramètres",
+      "billing": "Facturation",
+      "security": "Sécurité",
+      "notifications": "Notifications",
+      "help": "Aide"
+    }
+  },
+  "dashboard": {
+    "greeting": "Bonjour, {name}",
+    "meta": "{date} · {deals} deals actifs · {actions} actions requises",
+    "inviteInvestor": "Inviter un investisseur",
+    "newDeal": "Nouveau deal",
+    "kpi": {
+      "volume": "Volume en cours",
+      "activeDeals": "Deals actifs",
+      "avgReadiness": "Readiness moyen",
+      "openQa": "Q&A ouvertes"
+    },
+    "socleTitle": "Socle E0 — squelette applicatif",
+    "socleBody": "Shell, design system et tokens en place. Les écrans métier (data room, permissions, audit…) seront branchés aux phases suivantes."
+  },
+  "security": {
+    "title": "Sécurité",
+    "subtitle": "Protégez votre compte et l'accès aux data rooms.",
+    "twoFactor": {
+      "cardTitle": "Authentification à deux facteurs (2FA)",
+      "enabled": "Activée",
+      "disabled": "Désactivée",
+      "enabledHint": "Un code d'authentification est requis à chaque connexion.",
+      "disabledHint": "Ajoutez une couche de sécurité par code à usage unique.",
+      "enable": "Activer la 2FA",
+      "disable": "Désactiver",
+      "scanHint": "Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy…), puis saisissez le code à 6 chiffres.",
+      "qrAlt": "QR code 2FA",
+      "manualKey": "Clé manuelle :",
+      "verifying": "Vérification…",
+      "codeIncorrect": "Code incorrect. Réessayez.",
+      "challengeTitle": "Vérification en deux étapes",
+      "challengeSubtitle": "Saisissez le code à 6 chiffres de votre application d'authentification.",
+      "verify": "Vérifier",
+      "noFactor": "Aucun facteur 2FA trouvé."
+    },
+    "password": {
+      "cardTitle": "Politique de mot de passe",
+      "rule1": "8 caractères minimum",
+      "rule2": "Au moins une lettre et un chiffre",
+      "rule3": "Vérifiée à l'inscription et au changement de mot de passe"
+    }
+  }
+}

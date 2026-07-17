@@ -1,37 +1,37 @@
 import * as z from "zod";
 
+// Les messages sont des CLÉS de traduction (namespace `validation`),
+// résolues côté client — les Server Actions ne connaissent pas la locale de rendu.
 export const signupSchema = z.object({
-  full_name: z
-    .string()
-    .trim()
-    .min(2, { error: "Le nom doit faire au moins 2 caractères." }),
-  email: z.email({ error: "Entrez une adresse email valide." }).trim(),
+  full_name: z.string().trim().min(2, { error: "nameMin" }),
+  email: z.email({ error: "emailInvalid" }).trim(),
   password: z
     .string()
-    .min(8, { error: "Au moins 8 caractères." })
-    .regex(/[a-zA-Z]/, { error: "Au moins une lettre." })
-    .regex(/[0-9]/, { error: "Au moins un chiffre." }),
+    .min(8, { error: "passwordMin" })
+    .regex(/[a-zA-Z]/, { error: "passwordLetter" })
+    .regex(/[0-9]/, { error: "passwordDigit" }),
   locale: z.enum(["fr", "en"]).default("fr"),
 });
 
 export const loginSchema = z.object({
-  email: z.email({ error: "Entrez une adresse email valide." }).trim(),
-  password: z.string().min(1, { error: "Mot de passe requis." }),
+  email: z.email({ error: "emailInvalid" }).trim(),
+  password: z.string().min(1, { error: "passwordRequired" }),
 });
 
 export const orgSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, { error: "Nom de l'organisation requis (2 caractères min)." }),
-  currency: z.enum(["XOF", "XAF", "NGN", "KES", "GHS", "USD", "EUR"]).default(
-    "XOF",
-  ),
+  name: z.string().trim().min(2, { error: "orgNameRequired" }),
+  currency: z
+    .enum(["XOF", "XAF", "NGN", "KES", "GHS", "USD", "EUR"])
+    .default("XOF"),
 });
 
 export type AuthState =
   | {
-      error?: string;
+      /** Clé du namespace `auth.errors` */
+      errorKey?: string;
+      /** Message brut non traduisible (renvoyé tel quel par le fournisseur) */
+      errorRaw?: string;
+      /** Clés du namespace `validation`, par champ */
       fieldErrors?: Record<string, string[]>;
     }
   | undefined;

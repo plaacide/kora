@@ -1,29 +1,39 @@
+import { getTranslations, getLocale } from "next-intl/server";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
+import { formatDate } from "@/lib/format";
+import type { Locale } from "@/i18n/locales";
 
-const kpis = [
-  { label: "Volume en cours", value: "42,6 M$", delta: "+18 %" },
-  { label: "Deals actifs", value: "8", delta: "+2" },
-  { label: "Readiness moyen", value: "71 %", delta: "+6 pts" },
-  { label: "Q&A ouvertes", value: "12", delta: "3 en retard" },
-];
+export default async function DashboardPage() {
+  const t = await getTranslations("dashboard");
+  const locale = (await getLocale()) as Locale;
 
-export default function DashboardPage() {
+  const kpis = [
+    { label: t("kpi.volume"), value: "42,6 M$", delta: "+18 %" },
+    { label: t("kpi.activeDeals"), value: "8", delta: "+2" },
+    { label: t("kpi.avgReadiness"), value: "71 %", delta: "+6 pts" },
+    { label: t("kpi.openQa"), value: "12", delta: "3" },
+  ];
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-            Bonjour, Aminata
+            {t("greeting", { name: "Aminata" })}
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">
-            Mercredi 16 juillet · 8 deals actifs · 3 actions requises
+            {t("meta", {
+              date: formatDate(new Date(), locale),
+              deals: 8,
+              actions: 3,
+            })}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary">Inviter un investisseur</Button>
-          <Button variant="primary">Nouveau deal</Button>
+          <Button variant="secondary">{t("inviteInvestor")}</Button>
+          <Button variant="primary">{t("newDeal")}</Button>
         </div>
       </div>
 
@@ -46,13 +56,10 @@ export default function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader>Socle E0 — squelette applicatif</CardHeader>
+        <CardHeader>{t("socleTitle")}</CardHeader>
         <CardBody>
           <p className="text-[12.5px] text-ink-secondary leading-relaxed">
-            Shell, design system et tokens en place. Les écrans métier
-            (data room, permissions, audit…) seront branchés aux phases
-            suivantes, une fois l&apos;authentification et la base de données
-            connectées.
+            {t("socleBody")}
           </p>
         </CardBody>
       </Card>

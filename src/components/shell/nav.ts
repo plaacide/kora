@@ -1,57 +1,59 @@
 export interface NavItem {
-  label: string;
+  /** Clé du namespace `shell.nav` */
+  key: string;
   href: string;
 }
 
 export interface NavGroup {
-  title: string;
+  /** Clé du namespace `shell.groups` */
+  key: string;
   items: NavItem[];
 }
 
 export const navGroups: NavGroup[] = [
   {
-    title: "Vue d'ensemble",
+    key: "overview",
     items: [
-      { label: "Dashboard", href: "/dashboard" },
-      { label: "Pipeline", href: "/pipeline" },
-      { label: "Calendrier", href: "/calendrier" },
-      { label: "Portefeuille", href: "/portefeuille" },
-      { label: "Recherche", href: "/recherche" },
+      { key: "dashboard", href: "/dashboard" },
+      { key: "pipeline", href: "/pipeline" },
+      { key: "calendar", href: "/calendrier" },
+      { key: "portfolio", href: "/portefeuille" },
+      { key: "search", href: "/recherche" },
     ],
   },
   {
-    title: "Deal · Kalyx Foods",
+    key: "deal",
     items: [
-      { label: "Fiche deal", href: "/deal" },
-      { label: "Data room", href: "/data-room" },
-      { label: "Visionneuse", href: "/visionneuse" },
-      { label: "Checklist DD", href: "/checklist" },
-      { label: "Q&A", href: "/qa" },
-      { label: "KYC / AML", href: "/kyc" },
-      { label: "Syndication", href: "/syndication" },
-      { label: "Readiness Score", href: "/readiness" },
-      { label: "Permissions", href: "/permissions" },
-      { label: "Invitations & NDA", href: "/invitations" },
-      { label: "Audit trail", href: "/audit" },
-      { label: "Versions", href: "/versions" },
+      { key: "dealSheet", href: "/deal" },
+      { key: "dataRoom", href: "/data-room" },
+      { key: "viewer", href: "/visionneuse" },
+      { key: "checklist", href: "/checklist" },
+      { key: "qa", href: "/qa" },
+      { key: "kyc", href: "/kyc" },
+      { key: "syndication", href: "/syndication" },
+      { key: "readiness", href: "/readiness" },
+      { key: "permissions", href: "/permissions" },
+      { key: "invitations", href: "/invitations" },
+      { key: "audit", href: "/audit" },
+      { key: "versions", href: "/versions" },
     ],
   },
   {
-    title: "Reporting",
+    key: "reporting",
     items: [
-      { label: "Collecte KPI", href: "/kpi" },
-      { label: "Rapport LP", href: "/rapport-lp" },
-      { label: "Comparateur IC", href: "/comparateur" },
+      { key: "kpi", href: "/kpi" },
+      { key: "lpReport", href: "/rapport-lp" },
+      { key: "icComparator", href: "/comparateur" },
     ],
   },
   {
-    title: "Organisation",
+    key: "organisation",
     items: [
-      { label: "Paramètres", href: "/parametres" },
-      { label: "Facturation", href: "/facturation" },
-      { label: "Sécurité", href: "/securite" },
-      { label: "Notifications", href: "/notifications" },
-      { label: "Aide", href: "/aide" },
+      { key: "settings", href: "/parametres" },
+      { key: "billing", href: "/facturation" },
+      { key: "security", href: "/securite" },
+      { key: "notifications", href: "/notifications" },
+      { key: "help", href: "/aide" },
     ],
   },
 ];

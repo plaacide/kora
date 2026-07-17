@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import "./globals.css";
 
 const instrument = Instrument_Sans({
@@ -15,25 +17,26 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Kora — Dealroom",
-  description:
-    "Data room sécurisée et dealroom pour les transactions africaines.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("meta");
+  return { title: t("title"), description: t("description") };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
     <html
-      lang="fr"
+      lang={locale}
       suppressHydrationWarning
       className={`${instrument.variable} ${plexMono.variable} h-full`}
     >
       <body className="min-h-full antialiased" suppressHydrationWarning>
-        {children}
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

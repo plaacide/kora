@@ -1,6 +1,11 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 
 export function EncryptionBadge({ className }: { className?: string }) {
+  const t = useTranslations("common");
+
   return (
     <span
       className={cn(
@@ -9,7 +14,7 @@ export function EncryptionBadge({ className }: { className?: string }) {
       )}
     >
       <span className="w-1.5 h-1.5 rounded-full bg-success" aria-hidden />
-      Chiffré · SOC 2
+      {t("encrypted")}
     </span>
   );
 }

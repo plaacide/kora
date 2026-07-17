@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "title": "Kora — Dealroom",
+    "description": "Secure data room and dealroom for African transactions."
+  },
+  "common": {
+    "appName": "Kora",
+    "tagline": "The secure data room for African transactions.",
+    "encrypted": "Encrypted · SOC 2",
+    "encryptedHosting": "Encrypted · SOC 2 · EU hosting",
+    "cancel": "Cancel",
+    "save": "Save",
+    "language": "Language",
+    "french": "Français",
+    "english": "English"
+  },
+  "home": {
+    "subtitle": "Secure data room for African transactions. E0 foundation — groundwork in place.",
+    "login": "Log in",
+    "signup": "Create an account"
+  },
+  "auth": {
+    "brandPitch": "Due diligence, Q&A, syndication and LP reporting — encrypted, watermarked, audited end to end.",
+    "signup": {
+      "title": "Create an account",
+      "haveAccount": "Already registered?",
+      "loginLink": "Log in",
+      "fullName": "Full name",
+      "email": "Work email",
+      "emailPlaceholder": "name@fund.com",
+      "password": "Password",
+      "passwordHint": "8 characters min, with a letter and a digit.",
+      "submit": "Create my account",
+      "submitting": "Creating…"
+    },
+    "login": {
+      "title": "Log in",
+      "noAccount": "No account yet?",
+      "signupLink": "Create an account",
+      "email": "Email",
+      "emailPlaceholder": "name@fund.com",
+      "password": "Password",
+      "submit": "Log in",
+      "submitting": "Logging in…"
+    },
+    "verifyEmail": {
+      "title": "Check your email",
+      "body": "A confirmation link has just been sent to you. Click it to activate your account, then log in.",
+      "back": "Back to login"
+    },
+    "errors": {
+      "invalidCredentials": "Incorrect email or password.",
+      "alreadyRegistered": "An account already exists with this email.",
+      "emailNotConfirmed": "Email not confirmed. Check your inbox.",
+      "notAuthenticated": "You are not authenticated."
+    }
+  },
+  "validation": {
+    "nameMin": "Name must be at least 2 characters.",
+    "emailInvalid": "Enter a valid email address.",
+    "passwordMin": "At least 8 characters.",
+    "passwordLetter": "At least one letter.",
+    "passwordDigit": "At least one digit.",
+    "passwordRequired": "Password required.",
+    "orgNameRequired": "Organisation name required (2 characters min)."
+  },
+  "onboarding": {
+    "title": "Create your organisation",
+    "subtitle": "Your team's workspace: deals, data rooms, members and the audit log will all be attached to it.",
+    "orgName": "Organisation name",
+    "orgNamePlaceholder": "Amani Capital",
+    "currency": "Primary currency",
+    "currencyXof": "XOF — CFA Franc (WAEMU)",
+    "submit": "Create organisation",
+    "submitting": "Creating…"
+  },
+  "shell": {
+    "searchPlaceholder": "Search a deal, a document…",
+    "logout": "Log out",
+    "home": "Kora — home",
+    "mainNav": "Main navigation",
+    "groups": {
+      "overview": "Overview",
+      "deal": "Deal · Kalyx Foods",
+      "reporting": "Reporting",
+      "organisation": "Organisation"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "pipeline": "Pipeline",
+      "calendar": "Calendar",
+      "portfolio": "Portfolio",
+      "search": "Search",
+      "dealSheet": "Deal sheet",
+      "dataRoom": "Data room",
+      "viewer": "Viewer",
+      "checklist": "DD checklist",
+      "qa": "Q&A",
+      "kyc": "KYC / AML",
+      "syndication": "Syndication",
+      "readiness": "Readiness score",
+      "permissions": "Permissions",
+      "invitations": "Invitations & NDA",
+      "audit": "Audit trail",
+      "versions": "Versions",
+      "kpi": "KPI collection",
+      "lpReport": "LP report",
+      "icComparator": "IC comparator",
+      "settings": "Settings",
+      "billing": "Billing",
+      "security": "Security",
+      "notifications": "Notifications",
+      "help": "Help"
+    }
+  },
+  "dashboard": {
+    "greeting": "Hello, {name}",
+    "meta": "{date} · {deals} active deals · {actions} actions required",
+    "inviteInvestor": "Invite an investor",
+    "newDeal": "New deal",
+    "kpi": {
+      "volume": "Volume in progress",
+      "activeDeals": "Active deals",
+      "avgReadiness": "Average readiness",
+      "openQa": "Open Q&A"
+    },
+    "socleTitle": "E0 foundation — application skeleton",
+    "socleBody": "Shell, design system and tokens in place. Business screens (data room, permissions, audit…) will be wired in the next phases."
+  },
+  "security": {
+    "title": "Security",
+    "subtitle": "Protect your account and access to data rooms.",
+    "twoFactor": {
+      "cardTitle": "Two-factor authentication (2FA)",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enabledHint": "An authentication code is required at every login.",
+      "disabledHint": "Add a layer of security with one-time codes.",
+      "enable": "Enable 2FA",
+      "disable": "Disable",
+      "scanHint": "Scan this QR code with your authenticator app (Google Authenticator, Authy…), then enter the 6-digit code.",
+      "qrAlt": "2FA QR code",
+      "manualKey": "Manual key:",
+      "verifying": "Verifying…",
+      "codeIncorrect": "Incorrect code. Try again.",
+      "challengeTitle": "Two-step verification",
+      "challengeSubtitle": "Enter the 6-digit code from your authenticator app.",
+      "verify": "Verify",
+      "noFactor": "No 2FA factor found."
+    },
+    "password": {
+      "cardTitle": "Password policy",
+      "rule1": "8 characters minimum",
+      "rule2": "At least one letter and one digit",
+      "rule3": "Enforced at signup and password change"
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { login } from "@/app/actions/auth";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -9,38 +10,39 @@ import { FormError, FieldError } from "./FormError";
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined);
+  const t = useTranslations("auth.login");
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          Se connecter
+          {t("title")}
         </h1>
         <p className="mt-1 text-[12.5px] text-ink-secondary">
-          Pas encore de compte ?{" "}
+          {t("noAccount")}{" "}
           <Link href="/inscription" className="font-medium">
-            Créer un compte
+            {t("signupLink")}
           </Link>
         </p>
       </div>
 
       <form action={action} className="flex flex-col gap-4">
-        <FormError message={state?.error} />
+        <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />
 
         <div>
           <Input
-            label="Email"
+            label={t("email")}
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="prenom@fonds.com"
+            placeholder={t("emailPlaceholder")}
           />
           <FieldError messages={state?.fieldErrors?.email} />
         </div>
 
         <div>
           <Input
-            label="Mot de passe"
+            label={t("password")}
             name="password"
             type="password"
             autoComplete="current-password"
@@ -49,7 +51,7 @@ export function LoginForm() {
         </div>
 
         <Button type="submit" variant="primary" disabled={pending}>
-          {pending ? "Connexion…" : "Se connecter"}
+          {pending ? t("submitting") : t("submit")}
         </Button>
       </form>
     </div>

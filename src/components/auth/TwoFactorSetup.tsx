@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
-import { FormError } from "./FormError";
+import { PlainError } from "./FormError";
 
 export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) {
+  const t = useTranslations("security.twoFactor");
+  const tc = useTranslations("common");
   const [enabled, setEnabled] = useState(initialEnabled);
   const [qr, setQr] = useState<string | null>(null);
   const [factorId, setFactorId] = useState<string | null>(null);
@@ -46,7 +49,7 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
       code: code.trim(),
     });
     setBusy(false);
-    if (v.error) return setError("Code incorrect. Réessayez.");
+    if (v.error) return setError(t("codeIncorrect"));
     setEnabled(true);
     setQr(null);
     setFactorId(null);
@@ -69,13 +72,13 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
     return (
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
-          <Chip tone="success">Activée</Chip>
+          <Chip tone="success">{t("enabled")}</Chip>
           <span className="text-[12.5px] text-ink-secondary">
-            Un code d&apos;authentification est requis à chaque connexion.
+            {t("enabledHint")}
           </span>
         </div>
         <Button variant="ghost" onClick={disable} disabled={busy}>
-          Désactiver
+          {t("disable")}
         </Button>
       </div>
     );
@@ -85,23 +88,21 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
     return (
       <div className="flex flex-col gap-4 max-w-sm">
         <p className="text-[12.5px] text-ink-secondary leading-relaxed">
-          Scannez ce QR code avec votre application d&apos;authentification
-          (Google Authenticator, Authy…), puis saisissez le code à 6 chiffres.
+          {t("scanHint")}
         </p>
-        {/* Supabase renvoie un SVG en data-URI */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={qr}
-          alt="QR code 2FA"
+          alt={t("qrAlt")}
           className="w-44 h-44 border border-line rounded-card bg-surface p-2"
         />
         <div className="text-[11px] text-ink-muted">
-          Clé manuelle :{" "}
+          {t("manualKey")}{" "}
           <code className="font-mono text-ink-secondary break-all">
             {secret}
           </code>
         </div>
-        <FormError message={error} />
+        <PlainError message={error} />
         <input
           value={code}
           onChange={(e) => setCode(e.target.value)}
@@ -111,8 +112,12 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
           className="h-9 px-3 text-[15px] font-mono tracking-[0.3em] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none"
         />
         <div className="flex gap-2">
-          <Button variant="primary" onClick={verify} disabled={busy || code.length < 6}>
-            {busy ? "Vérification…" : "Activer la 2FA"}
+          <Button
+            variant="primary"
+            onClick={verify}
+            disabled={busy || code.length < 6}
+          >
+            {busy ? t("verifying") : t("enable")}
           </Button>
           <Button
             variant="ghost"
@@ -122,7 +127,7 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
             }}
             disabled={busy}
           >
-            Annuler
+            {tc("cancel")}
           </Button>
         </div>
       </div>
@@ -132,15 +137,15 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-center gap-2.5">
-        <Chip tone="neutral">Désactivée</Chip>
+        <Chip tone="neutral">{t("disabled")}</Chip>
         <span className="text-[12.5px] text-ink-secondary">
-          Ajoutez une couche de sécurité par code à usage unique.
+          {t("disabledHint")}
         </span>
       </div>
       <div className="flex flex-col items-end gap-1">
-        <FormError message={error} />
+        <PlainError message={error} />
         <Button variant="primary" onClick={startEnroll} disabled={busy}>
-          Activer la 2FA
+          {t("enable")}
         </Button>
       </div>
     </div>

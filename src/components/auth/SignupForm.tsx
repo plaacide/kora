@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 import { signup } from "@/app/actions/auth";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -9,47 +10,50 @@ import { FormError, FieldError } from "./FormError";
 
 export function SignupForm() {
   const [state, action, pending] = useActionState(signup, undefined);
+  const t = useTranslations("auth.signup");
+  const tc = useTranslations("common");
+  const locale = useLocale();
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          Créer un compte
+          {t("title")}
         </h1>
         <p className="mt-1 text-[12.5px] text-ink-secondary">
-          Déjà inscrit ?{" "}
+          {t("haveAccount")}{" "}
           <Link href="/connexion" className="font-medium">
-            Se connecter
+            {t("loginLink")}
           </Link>
         </p>
       </div>
 
       <form action={action} className="flex flex-col gap-4">
-        <FormError message={state?.error} />
+        <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />
 
         <div>
-          <Input label="Nom complet" name="full_name" autoComplete="name" />
+          <Input label={t("fullName")} name="full_name" autoComplete="name" />
           <FieldError messages={state?.fieldErrors?.full_name} />
         </div>
 
         <div>
           <Input
-            label="Email professionnel"
+            label={t("email")}
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="prenom@fonds.com"
+            placeholder={t("emailPlaceholder")}
           />
           <FieldError messages={state?.fieldErrors?.email} />
         </div>
 
         <div>
           <Input
-            label="Mot de passe"
+            label={t("password")}
             name="password"
             type="password"
             autoComplete="new-password"
-            hint="8 caractères min, avec une lettre et un chiffre."
+            hint={t("passwordHint")}
           />
           <FieldError messages={state?.fieldErrors?.password} />
         </div>
@@ -59,21 +63,21 @@ export function SignupForm() {
             htmlFor="locale"
             className="text-[11.5px] font-medium text-ink-secondary"
           >
-            Langue
+            {tc("language")}
           </label>
           <select
             id="locale"
             name="locale"
-            defaultValue="fr"
+            defaultValue={locale}
             className="h-8 px-2.5 text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none"
           >
-            <option value="fr">Français</option>
-            <option value="en">English</option>
+            <option value="fr">{tc("french")}</option>
+            <option value="en">{tc("english")}</option>
           </select>
         </div>
 
         <Button type="submit" variant="primary" disabled={pending}>
-          {pending ? "Création…" : "Créer mon compte"}
+          {pending ? t("submitting") : t("submit")}
         </Button>
       </form>
     </div>

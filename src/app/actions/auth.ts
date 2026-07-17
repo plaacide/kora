@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
 import {
   signupSchema,
   loginSchema,
@@ -20,9 +22,7 @@ export async function signup(
     locale: formData.get("locale") ?? "fr",
   });
 
-  if (!parsed.success) {
-    return { fieldErrors: z_flatten(parsed.error) };
-  }
+  if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
 
   const { full_name, email, password, locale } = parsed.data;
   const supabase = await createClient();
@@ -33,10 +33,12 @@ export async function signup(
     options: { data: { full_name, locale } },
   });
 
-  if (error) return { error: traduireErreur(error.message) };
+  if (error) return mapError(error.message);
 
-  // Confirmation email désactivée → session immédiate → onboarding.
-  // Confirmation activée → pas de session → page de vérification.
+  // La langue choisie à l'inscription pilote l'UI immédiatement.
+  const store = await cookies();
+  store.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 60 * 60 * 24 * 365 });
+
   if (data.session) redirect("/onboarding");
   redirect("/verifier-email");
 }
@@ -50,16 +52,32 @@ export async function login(
     password: formData.get("password"),
   });
 
-  if (!parsed.success) {
-    return { fieldErrors: z_flatten(parsed.error) };
-  }
+  if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
-  if (error) return { error: traduireErreur(error.message) };
+  if (error) return mapError(error.message);
 
-  // Si un facteur 2FA est vérifié, la session est en aal1 et doit passer aal2.
+  // Aligne l'UI sur la langue enregistrée dans le profil.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("locale")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (isLocale(profile?.locale)) {
+      const store = await cookies();
+      store.set(LOCALE_COOKIE, profile.locale, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
+  }
+
   const { data: aal } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
@@ -84,9 +102,7 @@ export async function createOrganization(
     currency: formData.get("currency") ?? "XOF",
   });
 
-  if (!parsed.success) {
-    return { fieldErrors: z_flatten(parsed.error) };
-  }
+  if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
 
   const supabase = await createClient();
   const {
@@ -99,14 +115,30 @@ export async function createOrganization(
     p_currency: parsed.data.currency,
   });
 
-  if (error) return { error: traduireErreur(error.message) };
+  if (error) return mapError(error.message);
 
   redirect("/dashboard");
 }
 
+/** Change la langue de l'UI et la persiste sur le profil si connecté. */
+export async function setLocale(locale: string): Promise<void> {
+  if (!isLocale(locale)) return;
+
+  const store = await cookies();
+  store.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 60 * 60 * 24 * 365 });
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await supabase.from("profiles").update({ locale }).eq("id", user.id);
+  }
+}
+
 // --- helpers ---------------------------------------------------------------
 
-function z_flatten(error: {
+function flattenIssues(error: {
   issues: { path: PropertyKey[]; message: string }[];
 }): Record<string, string[]> {
   const out: Record<string, string[]> = {};
@@ -117,13 +149,14 @@ function z_flatten(error: {
   return out;
 }
 
-function traduireErreur(message: string): string {
+function mapError(message: string): AuthState {
   const m = message.toLowerCase();
   if (m.includes("invalid login credentials"))
-    return "Email ou mot de passe incorrect.";
+    return { errorKey: "invalidCredentials" };
   if (m.includes("already registered") || m.includes("already been registered"))
-    return "Un compte existe déjà avec cet email.";
+    return { errorKey: "alreadyRegistered" };
   if (m.includes("email not confirmed"))
-    return "Email non confirmé. Vérifiez votre boîte mail.";
-  return message;
+    return { errorKey: "emailNotConfirmed" };
+  if (m.includes("non authentifié")) return { errorKey: "notAuthenticated" };
+  return { errorRaw: message };
 }
