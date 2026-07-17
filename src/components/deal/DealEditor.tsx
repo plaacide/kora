@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { PlainError } from "@/components/auth/FormError";
-import { STAGES } from "@/components/pipeline/PipelineBoard";
+import { STAGES } from "@/lib/stages";
 
 const TYPES = ["VC", "PE", "M&A", "Dette DFI"];
 const CURRENCIES = ["XOF", "XAF", "NGN", "KES", "GHS", "USD", "EUR"];

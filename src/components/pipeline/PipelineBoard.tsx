@@ -7,17 +7,7 @@ import { setDealStage } from "@/app/actions/crud";
 import { Mono } from "@/components/ui/Table";
 import { PlainError } from "@/components/auth/FormError";
 import { cn } from "@/lib/cn";
-
-export const STAGES = [
-  "sourcing",
-  "screening",
-  "due_diligence",
-  "ic",
-  "signed",
-  "passed",
-] as const;
-
-export type Stage = (typeof STAGES)[number];
+import { STAGES, type Stage } from "@/lib/stages";
 
 export interface PipelineDeal {
   id: string;
@@ -25,6 +15,7 @@ export interface PipelineDeal {
   type: string;
   stage: Stage;
   amount: number | null;
+  currency: string;
   amountLabel: string;
   readiness: number;
 }

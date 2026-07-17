@@ -3,10 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
   PipelineBoard,
-  STAGES,
   type PipelineDeal,
-  type Stage,
 } from "@/components/pipeline/PipelineBoard";
+import { STAGES, type Stage } from "@/lib/stages";
 import { NewDealButton } from "@/components/dataroom/NewDealButton";
 import { formatAmount } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
@@ -16,39 +15,41 @@ export default async function PipelinePage() {
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("organizations(default_currency)")
-    .limit(1)
-    .maybeSingle();
-  const currency =
-    (membership?.organizations as unknown as { default_currency?: string } | null)
-      ?.default_currency ?? "XOF";
-
   const { data: rows } = await supabase
     .from("deals")
-    .select("id, name, type, stage, amount, readiness_score")
+    .select("id, name, type, stage, amount, currency, readiness_score")
     .order("created_at", { ascending: false });
 
+  // Chaque deal a SA devise : un fonds mène des opérations en FCFA, USD, NGN…
   const deals: PipelineDeal[] = (rows ?? []).map((d) => ({
     id: d.id,
     name: d.name,
     type: d.type,
     stage: d.stage as Stage,
     amount: d.amount ? Number(d.amount) : null,
+    currency: d.currency,
     amountLabel: d.amount
-      ? formatAmount(Number(d.amount), currency, locale)
+      ? formatAmount(Number(d.amount), d.currency, locale)
       : "—",
     readiness: d.readiness_score ?? 0,
   }));
 
-  // Total engagé par colonne — ce que regarde un gérant de fonds en premier.
+  // Total par colonne, ventilé PAR DEVISE : additionner des FCFA et des USD
+  // donnerait un nombre qui ne veut rien dire.
   const totals: Record<string, string> = {};
   for (const s of STAGES) {
-    const sum = deals
-      .filter((d) => d.stage === s)
-      .reduce((acc, d) => acc + (d.amount ?? 0), 0);
-    totals[s] = sum ? formatAmount(sum, currency, locale) : "—";
+    const byCurrency = new Map<string, number>();
+    for (const d of deals.filter((x) => x.stage === s && x.amount)) {
+      byCurrency.set(
+        d.currency,
+        (byCurrency.get(d.currency) ?? 0) + (d.amount ?? 0),
+      );
+    }
+    totals[s] = byCurrency.size
+      ? [...byCurrency.entries()]
+          .map(([cur, sum]) => formatAmount(sum, cur, locale))
+          .join(" · ")
+      : "—";
   }
 
   return (

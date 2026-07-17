@@ -57,7 +57,9 @@ export default async function DashboardPage() {
     await Promise.all([
       supabase
         .from("deals")
-        .select("id, name, type, stage, amount, readiness_score, created_at")
+        .select(
+          "id, name, type, stage, amount, currency, readiness_score, created_at",
+        )
         .order("created_at", { ascending: false }),
       supabase.from("documents").select("id, deal_id"),
       supabase
@@ -84,7 +86,20 @@ export default async function DashboardPage() {
     docCountByDeal.set(d.deal_id, (docCountByDeal.get(d.deal_id) ?? 0) + 1);
   }
 
-  const volume = activeDeals.reduce((sum, d) => sum + Number(d.amount ?? 0), 0);
+  // Volume ventilé par devise : additionner FCFA et USD produirait un chiffre
+  // faux. On affiche chaque devise séparément.
+  const volumeByCurrency = new Map<string, number>();
+  for (const d of activeDeals) {
+    if (!d.amount) continue;
+    volumeByCurrency.set(
+      d.currency,
+      (volumeByCurrency.get(d.currency) ?? 0) + Number(d.amount),
+    );
+  }
+  const volumeLabels = [...volumeByCurrency.entries()].map(([cur, sum]) =>
+    formatAmount(sum, cur, locale),
+  );
+
   const avgReadiness = activeDeals.length
     ? Math.round(
         activeDeals.reduce((s, d) => s + (d.readiness_score ?? 0), 0) /
@@ -103,7 +118,7 @@ export default async function DashboardPage() {
     type: d.type,
     stage: d.stage,
     amountLabel: d.amount
-      ? formatAmount(Number(d.amount), currency, locale)
+      ? formatAmount(Number(d.amount), d.currency, locale)
       : "—",
     readiness: d.readiness_score ?? 0,
     docCount: docCountByDeal.get(d.id) ?? 0,
@@ -146,10 +161,19 @@ export default async function DashboardPage() {
                 {t("kpi.volume")}
               </span>
             </div>
-            <div className="flex items-end justify-between gap-2 mt-2">
-              <span className="font-mono text-[19px] tracking-[-0.03em]">
-                {volume ? formatAmount(volume, currency, locale) : "—"}
-              </span>
+            <div className="flex flex-col gap-0.5 mt-2">
+              {volumeLabels.length ? (
+                volumeLabels.map((label) => (
+                  <span
+                    key={label}
+                    className="font-mono text-[19px] tracking-[-0.03em] leading-tight"
+                  >
+                    {label}
+                  </span>
+                ))
+              ) : (
+                <span className="font-mono text-[19px]">—</span>
+              )}
             </div>
           </CardBody>
         </Card>
