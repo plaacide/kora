@@ -1,0 +1,26 @@
+# Déploiement Fly.io — image unique Kora (Next.js + LibreOffice).
+# Région cdg (Paris) : au plus près de la résidence UE promise.
+#
+# Démarrage : `fly launch --no-deploy` (crée l'app), puis `fly deploy`.
+# Secrets (jamais dans ce fichier) : `fly secrets set NEXT_PUBLIC_SUPABASE_URL=... ...`
+
+app = "kora"
+primary_region = "cdg"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Scale-to-zero : la machine s'arrête quand personne ne consulte, et se
+  # rallume à la première requête. Coût quasi nul hors usage.
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  # LibreOffice a besoin d'un peu de RAM pour convertir de gros classeurs.
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

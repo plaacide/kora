@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { renderPdfPage } from "@/lib/viewer/render";
 import { docKind } from "@/lib/doc-types";
-import { officeToPdf, workerConfigured } from "@/lib/viewer/office";
+import { officeToPdf, officeConversionAvailable } from "@/lib/viewer/office";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -98,8 +98,9 @@ export async function GET(
   // sort jamais de notre infra.
   let pdfBytes: Uint8Array<ArrayBufferLike> = raw;
   if (kind === "office") {
-    if (!workerConfigured()) {
-      // Le worker n'est pas déployé : on le dit honnêtement, sans planter.
+    if (!(await officeConversionAvailable())) {
+      // LibreOffice absent ici (ex. dev sans install, ou serverless) : on le
+      // dit honnêtement, sans planter.
       return NextResponse.json(
         { error: "office_not_ready", kind: "office" },
         { status: 415 },
@@ -107,7 +108,7 @@ export async function GET(
     }
     try {
       const converted = await officeToPdf(raw, doc.name);
-      if (!converted) throw new Error("no worker");
+      if (!converted) throw new Error("conversion indisponible");
       pdfBytes = converted;
     } catch {
       return NextResponse.json(

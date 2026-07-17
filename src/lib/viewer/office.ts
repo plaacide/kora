@@ -1,15 +1,37 @@
 import "server-only";
+import { execFile } from "node:child_process";
+import { mkdtemp, readFile, writeFile, rm, readdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { randomUUID } from "node:crypto";
 
 /**
- * Client du worker de conversion bureautique.
+ * Conversion bureautique -> PDF via LibreOffice headless, EN PROCESS.
  *
- * Le worker (dossier /worker) convertit xlsx/pptx/docx en PDF sur notre
- * infrastructure. Il est optionnel : sans `DOC_WORKER_URL`, la visionneuse
- * affiche un état honnête plutôt que de planter.
+ * Kora est livré comme une image Docker unique contenant Next.js et
+ * LibreOffice (`soffice` sur le PATH). La conversion se fait donc localement :
+ * pas de service distant, pas de jeton. Le fichier ne quitte jamais le
+ * conteneur, et c'est toujours un PDF filigrané qui est servi.
+ *
+ * Là où `soffice` est absent (dev local sans LibreOffice, ou déploiement
+ * serverless type Vercel), les fonctions dégradent proprement : la visionneuse
+ * affiche « aperçu bureautique bientôt disponible » au lieu de planter.
  */
 
-export function workerConfigured(): boolean {
-  return Boolean(process.env.DOC_WORKER_URL && process.env.DOC_WORKER_TOKEN);
+// La détection est coûteuse (spawn) : on la mémorise pour la durée du process.
+let availability: Promise<boolean> | null = null;
+
+function detectSoffice(): Promise<boolean> {
+  return new Promise((resolve) => {
+    execFile("soffice", ["--version"], { timeout: 10_000 }, (err) => {
+      resolve(!err);
+    });
+  });
+}
+
+export function officeConversionAvailable(): Promise<boolean> {
+  if (!availability) availability = detectSoffice();
+  return availability;
 }
 
 function extOf(name: string): string {
@@ -17,32 +39,55 @@ function extOf(name: string): string {
   return i < 0 ? "" : name.slice(i + 1).toLowerCase();
 }
 
+function runSoffice(inputPath: string, workDir: string): Promise<void> {
+  // Profil LibreOffice jetable par appel : deux conversions simultanées ne
+  // partagent aucun état, ce qui évite le blocage de soffice sur un profil
+  // déjà verrouillé.
+  const profile = join(workDir, "profile");
+  return new Promise((resolve, reject) => {
+    execFile(
+      "soffice",
+      [
+        "--headless",
+        "--nologo",
+        "--nofirststartwizard",
+        `-env:UserInstallation=file://${profile}`,
+        "--convert-to",
+        "pdf",
+        "--outdir",
+        workDir,
+        inputPath,
+      ],
+      { timeout: 120_000 },
+      (err) => (err ? reject(err) : resolve()),
+    );
+  });
+}
+
 /**
- * Convertit des octets bureautiques en PDF. Renvoie null si le worker n'est
- * pas configuré ; lève une erreur si la conversion échoue.
+ * Convertit des octets bureautiques en PDF. Renvoie null si LibreOffice n'est
+ * pas disponible ; lève une erreur si la conversion elle-même échoue.
  */
 export async function officeToPdf(
   bytes: Uint8Array,
   fileName: string,
 ): Promise<Uint8Array | null> {
-  const base = process.env.DOC_WORKER_URL;
-  const token = process.env.DOC_WORKER_TOKEN;
-  if (!base || !token) return null;
+  if (!(await officeConversionAvailable())) return null;
 
-  const ext = extOf(fileName);
-  const res = await fetch(`${base.replace(/\/$/, "")}/convert?ext=${ext}`, {
-    method: "POST",
-    headers: {
-      "X-Worker-Token": token,
-      "Content-Type": "application/octet-stream",
-    },
-    body: bytes as unknown as BodyInit,
-    // La conversion LibreOffice peut être lente à froid (scale-to-zero).
-    signal: AbortSignal.timeout(130_000),
-  });
+  const workDir = await mkdtemp(join(tmpdir(), "kora-conv-"));
+  try {
+    const ext = extOf(fileName) || "bin";
+    const inputPath = join(workDir, `${randomUUID()}.${ext}`);
+    await writeFile(inputPath, bytes);
 
-  if (!res.ok) {
-    throw new Error(`worker ${res.status}`);
+    await runSoffice(inputPath, workDir);
+
+    // LibreOffice nomme la sortie <base>.pdf ; on la retrouve sans supposer
+    // le nom exact.
+    const produced = (await readdir(workDir)).find((f) => f.endsWith(".pdf"));
+    if (!produced) throw new Error("no_output");
+    return await readFile(join(workDir, produced));
+  } finally {
+    await rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
-  return new Uint8Array(await res.arrayBuffer());
 }

@@ -5,6 +5,9 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  // Sortie autonome : un serveur Node minimal, embarqué tel quel dans l'image
+  // Docker (Next.js + LibreOffice dans un seul conteneur).
+  output: "standalone",
   turbopack: {
     root: path.resolve(__dirname),
   },
