@@ -131,8 +131,10 @@ export function DataRoom({
 
   const roots = useMemo(() => folders.filter((f) => !f.parent_id), [folders]);
   const [selected, setSelected] = useState<string | null>(roots[0]?.id ?? null);
+  // Seul le premier dossier racine est déroulé : avec 6+ catégories (chacune
+  // avec ses sous-dossiers), tout ouvrir rendait l'arbre trop long.
   const [openMap, setOpenMap] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(roots.map((f) => [f.id, true])),
+    Object.fromEntries(roots.map((f, i) => [f.id, i === 0])),
   );
   const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
   const [checked, setChecked] = useState<Set<string>>(new Set());
