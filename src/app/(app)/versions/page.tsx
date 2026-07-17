@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
   VersionList,
@@ -7,29 +8,17 @@ import {
 } from "@/components/versions/VersionList";
 import type { Locale } from "@/i18n/locales";
 
-export default async function VersionsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ deal?: string }>;
-}) {
+export default async function VersionsPage() {
   const t = await getTranslations("versions");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
-  const params = await searchParams;
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("org_id, role")
-    .limit(1)
-    .maybeSingle();
-  const orgId = membership?.org_id as string | undefined;
-  const canEdit = ["owner", "admin", "member"].includes(membership?.role ?? "");
-
-  const { data: deals } = await supabase
-    .from("deals")
-    .select("id, name")
-    .order("created_at", { ascending: false });
-  const deal = params.deal ? deals?.find((d) => d.id === params.deal) : deals?.[0];
+  const { deal } = await getCurrentDeal(supabase);
+  const orgId = deal?.org_id;
+  const role = deal
+    ? await getDealRole(supabase, deal.org_id)
+    : await getAnyRole(supabase);
+  const canEdit = ["owner", "admin", "member"].includes(role ?? "");
 
   if (!deal || !orgId) {
     return (
@@ -114,6 +103,7 @@ export default async function VersionsPage({
         </Card>
       ) : (
         <VersionList
+          key={deal.id}
           docs={docs}
           orgId={orgId}
           dealId={deal.id}

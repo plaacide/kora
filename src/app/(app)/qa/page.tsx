@@ -1,33 +1,20 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import { QaBoard, type QaItem } from "@/components/qa/QaBoard";
 import type { Locale } from "@/i18n/locales";
 
-export default async function QaPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ deal?: string }>;
-}) {
+export default async function QaPage() {
   const t = await getTranslations("qa");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
-  const params = await searchParams;
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("role")
-    .limit(1)
-    .maybeSingle();
-  const isInternal = ["owner", "admin", "member"].includes(
-    membership?.role ?? "",
-  );
-
-  const { data: deals } = await supabase
-    .from("deals")
-    .select("id, name")
-    .order("created_at", { ascending: false });
-  const deal = params.deal ? deals?.find((d) => d.id === params.deal) : deals?.[0];
+  const { deal } = await getCurrentDeal(supabase);
+  const role = deal
+    ? await getDealRole(supabase, deal.org_id)
+    : await getAnyRole(supabase);
+  const isInternal = ["owner", "admin", "member"].includes(role ?? "");
 
   if (!deal) {
     return (
@@ -91,6 +78,7 @@ export default async function QaPage({
       </div>
 
       <QaBoard
+        key={deal.id}
         dealId={deal.id}
         dealName={deal.name}
         items={items}

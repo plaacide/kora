@@ -97,6 +97,15 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
+/**
+ * Numérotation d'un dossier : « 1. Corporate » à la racine, « 1.2 Statuts »
+ * en dessous — la convention des index de data room. Sans le point final, la
+ * racine se lisait « 1 Corporate ».
+ */
+function folderIndex(indexPath: string): string {
+  return indexPath.includes(".") ? indexPath : `${indexPath}.`;
+}
+
 export function DataRoom({
   orgId,
   dealId,
@@ -304,8 +313,7 @@ export function DataRoom({
                 active ? "text-chip-indigo-fg" : "text-ink-muted",
               )}
             >
-              {f.index_path}
-              {depth === 0 ? "." : ""}
+              {folderIndex(f.index_path)}
             </Mono>
             <span
               className={cn(
@@ -380,14 +388,14 @@ export function DataRoom({
                 <>
                   <span className="text-[oklch(0.75_0.005_260)]">/</span>
                   <span className="truncate">
-                    {parentFolder.index_path}. {parentFolder.name}
+                    {folderIndex(parentFolder.index_path)} {parentFolder.name}
                   </span>
                 </>
               )}
               <span className="text-[oklch(0.75_0.005_260)]">/</span>
               <span className="text-ink font-semibold truncate">
                 {selectedFolder
-                  ? `${selectedFolder.index_path} ${selectedFolder.name}`
+                  ? `${folderIndex(selectedFolder.index_path)} ${selectedFolder.name}`
                   : "—"}
               </span>
             </div>
@@ -466,7 +474,7 @@ export function DataRoom({
                     {f.name}
                   </div>
                   <Mono className="text-[10.5px] text-ink-muted">
-                    {f.index_path}
+                    {folderIndex(f.index_path)}
                   </Mono>
                 </div>
               </div>

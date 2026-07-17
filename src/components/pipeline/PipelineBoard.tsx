@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { setDealStage } from "@/app/actions/crud";
+import { setCurrentDeal } from "@/app/actions/deal-context";
 import { Mono } from "@/components/ui/Table";
 import { PlainError } from "@/components/auth/FormError";
 import { cn } from "@/lib/cn";
@@ -43,6 +44,7 @@ export function PipelineBoard({
   const [over, setOver] = useState<Stage | null>(null);
   const [error, setError] = useState<string | undefined>();
   const [, startTransition] = useTransition();
+  const router = useRouter();
 
   function move(dealId: string, stage: Stage) {
     const deal = local.find((d) => d.id === dealId);
@@ -116,7 +118,14 @@ export function PipelineBoard({
                     dragging === d.id && "opacity-50",
                   )}
                 >
-                  <Link href={`/deal?id=${d.id}`} className="flex flex-col gap-1.5">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await setCurrentDeal(d.id);
+                      router.push("/deal");
+                    }}
+                    className="flex flex-col gap-1.5 text-left w-full"
+                  >
                     <div className="flex items-center gap-2">
                       <span className="grid place-items-center w-[22px] h-[22px] rounded-[6px] bg-chip-indigo-bg text-chip-indigo-fg text-[9px] font-bold flex-none">
                         {initials(d.name)}
@@ -139,7 +148,7 @@ export function PipelineBoard({
                         {d.readiness}%
                       </Mono>
                     </div>
-                  </Link>
+                  </button>
 
                   {/* Le glisser-déposer ne marche pas au doigt : on garde un
                       sélecteur, indispensable sur mobile (public cible). */}

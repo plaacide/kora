@@ -32,9 +32,14 @@ export default async function DashboardPage() {
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: membership } = await supabase
     .from("memberships")
     .select("org_id, organizations(name, default_currency)")
+    .eq("user_id", user?.id ?? "")
     .limit(1)
     .maybeSingle();
 
@@ -44,9 +49,6 @@ export default async function DashboardPage() {
   } | null;
   const currency = org?.default_currency ?? "XOF";
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name")

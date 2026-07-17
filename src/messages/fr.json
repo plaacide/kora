@@ -83,9 +83,10 @@
     "mainNav": "Navigation principale",
     "groups": {
       "overview": "Vue d'ensemble",
-      "deal": "Deal · Kalyx Foods",
+      "deal": "Deal",
       "reporting": "Reporting",
-      "organisation": "Organisation"
+      "organisation": "Organisation",
+      "dealEmpty": "Aucun deal"
     },
     "nav": {
       "dashboard": "Dashboard",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentDeal, getDealRole } from "@/lib/current-deal";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
@@ -8,25 +9,24 @@ import { DealEditor, type DealForm } from "@/components/deal/DealEditor";
 import { formatAmount } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
 
-export default async function DealPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ id?: string }>;
-}) {
+export default async function DealPage() {
   const t = await getTranslations("deal");
   const ts = await getTranslations("stages");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
-  const params = await searchParams;
 
-  const cols = "id, name, type, currency, amount, stage, readiness_score, created_at";
-  const { data: deals } = params.id
-    ? await supabase.from("deals").select(cols).eq("id", params.id).limit(1)
-    : await supabase
+  // La fiche suit le sélecteur de deal : sinon on éditerait un deal que
+  // l'utilisateur ne peut pas choisir.
+  const { deal: current } = await getCurrentDeal(supabase);
+  const { data: deals } = current
+    ? await supabase
         .from("deals")
-        .select(cols)
-        .order("created_at", { ascending: false })
-        .limit(1);
+        .select(
+          "id, name, org_id, type, currency, amount, stage, readiness_score, created_at",
+        )
+        .eq("id", current.id)
+        .limit(1)
+    : { data: null };
 
   const deal = deals?.[0];
 
@@ -49,12 +49,8 @@ export default async function DealPage({
 
   // Seuls owner/admin suppriment : la RPC le vérifie aussi côté serveur,
   // ici on évite juste d'afficher un bouton voué à l'échec.
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("role")
-    .limit(1)
-    .maybeSingle();
-  const canDelete = ["owner", "admin"].includes(membership?.role ?? "");
+  const role = await getDealRole(supabase, deal.org_id);
+  const canDelete = ["owner", "admin"].includes(role ?? "");
 
   const [{ count: docCount }, { data: activity }] = await Promise.all([
     supabase
@@ -132,7 +128,7 @@ export default async function DealPage({
               {docCount ?? 0}
             </div>
             <Link
-              href={`/data-room?deal=${deal.id}`}
+              href="/data-room"
               className="text-[11.5px] font-medium text-accent"
             >
               {t("openDataRoom")} →
@@ -145,7 +141,11 @@ export default async function DealPage({
         <Card>
           <CardHeader>{t("editCard")}</CardHeader>
           <CardBody>
-            <DealEditor deal={form} canDelete={canDelete} />
+            {/* `key` : le formulaire garde son état React d'un rendu à l'autre.
+                Sans remontage, changer de deal laissait les valeurs du deal
+                précédent dans les champs — et Save les écrivait sur le
+                nouveau deal. */}
+            <DealEditor key={deal.id} deal={form} canDelete={canDelete} />
           </CardBody>
         </Card>
 

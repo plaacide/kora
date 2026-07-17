@@ -32,9 +32,14 @@ export default async function AuditPage() {
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: membership } = await supabase
     .from("memberships")
     .select("org_id")
+    .eq("user_id", user?.id ?? "")
     .limit(1)
     .maybeSingle();
   const orgId = membership?.org_id as string | undefined;

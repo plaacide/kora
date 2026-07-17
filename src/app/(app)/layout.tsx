@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
+import { getCurrentDeal } from "@/lib/current-deal";
 
 export default async function AppLayout({
   children,
@@ -24,6 +25,7 @@ export default async function AppLayout({
   const { data: membership } = await supabase
     .from("memberships")
     .select("org_id, organizations(name)")
+    .eq("user_id", user?.id ?? "")
     .limit(1)
     .maybeSingle();
 
@@ -32,8 +34,15 @@ export default async function AppLayout({
   const orgName =
     (membership.organizations as { name?: string } | null)?.name ?? "—";
 
+  const { deal, deals } = await getCurrentDeal(supabase);
+
   return (
-    <AppShell orgName={orgName} userEmail={user.email ?? ""}>
+    <AppShell
+      orgName={orgName}
+      userEmail={user.email ?? ""}
+      deals={deals}
+      currentDealId={deal?.id ?? null}
+    >
       {children}
     </AppShell>
   );

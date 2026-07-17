@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
   Checklist,
@@ -8,27 +9,15 @@ import {
 } from "@/components/checklist/Checklist";
 import { ApplyChecklistButton } from "@/components/checklist/ApplyChecklistButton";
 
-export default async function ChecklistPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ deal?: string }>;
-}) {
+export default async function ChecklistPage() {
   const t = await getTranslations("checklist");
   const supabase = await createClient();
-  const params = await searchParams;
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("role")
-    .limit(1)
-    .maybeSingle();
-  const canEdit = ["owner", "admin", "member"].includes(membership?.role ?? "");
-
-  const { data: deals } = await supabase
-    .from("deals")
-    .select("id, name, readiness_score")
-    .order("created_at", { ascending: false });
-  const deal = params.deal ? deals?.find((d) => d.id === params.deal) : deals?.[0];
+  const { deal } = await getCurrentDeal(supabase);
+  const role = deal
+    ? await getDealRole(supabase, deal.org_id)
+    : await getAnyRole(supabase);
+  const canEdit = ["owner", "admin", "member"].includes(role ?? "");
 
   if (!deal) {
     return (
@@ -101,6 +90,7 @@ export default async function ChecklistPage({
       </div>
 
       <Checklist
+        key={deal.id}
         items={list}
         docs={(documents ?? []) as DocOption[]}
         readiness={deal.readiness_score ?? 0}

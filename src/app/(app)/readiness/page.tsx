@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentDeal } from "@/lib/current-deal";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
@@ -15,21 +16,12 @@ function barColor(pct: number): string {
   return "bg-[oklch(0.60_0.13_155)]";
 }
 
-export default async function ReadinessPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ deal?: string }>;
-}) {
+export default async function ReadinessPage() {
   const t = await getTranslations("readiness");
   const tc = await getTranslations("checklist");
   const supabase = await createClient();
-  const params = await searchParams;
 
-  const { data: deals } = await supabase
-    .from("deals")
-    .select("id, name, readiness_score")
-    .order("created_at", { ascending: false });
-  const deal = params.deal ? deals?.find((d) => d.id === params.deal) : deals?.[0];
+  const { deal } = await getCurrentDeal(supabase);
 
   if (!deal) {
     return (

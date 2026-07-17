@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentDeal } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
   PermissionMatrix,
@@ -12,12 +13,7 @@ export default async function PermissionsPage() {
   const t = await getTranslations("permissions");
   const supabase = await createClient();
 
-  const { data: deals } = await supabase
-    .from("deals")
-    .select("id, name")
-    .order("created_at", { ascending: false })
-    .limit(1);
-  const deal = deals?.[0];
+  const { deal } = await getCurrentDeal(supabase);
 
   if (!deal) {
     return (
@@ -90,6 +86,7 @@ export default async function PermissionsPage() {
       </div>
 
       <PermissionMatrix
+        key={deal.id}
         dealId={deal.id}
         users={users}
         folders={(folders ?? []) as PermFolder[]}
