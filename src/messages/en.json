@@ -129,6 +129,25 @@
     "socleTitle": "E0 foundation — application skeleton",
     "socleBody": "Shell, design system and tokens in place. Business screens (data room, permissions, audit…) will be wired in the next phases."
   },
+  "dataroom": {
+    "title": "Data room",
+    "subtitle": "Documents auto-indexed, encrypted and traced.",
+    "emptyState": "No deal yet. Create one: Kora automatically generates the data room structure (Corporate, Financial, Legal, HR, IP, Compliance).",
+    "newDeal": "New deal",
+    "createDeal": "Create deal",
+    "creating": "Creating…",
+    "dealName": "Deal name",
+    "dealType": "Type",
+    "dealCurrency": "Currency",
+    "dealAmount": "Amount",
+    "docCount": "{count, plural, =0 {no documents} =1 {1 document} other {# documents}}",
+    "colDocument": "Document",
+    "colVersion": "Version",
+    "colSize": "Size",
+    "emptyFolder": "No documents in this folder.",
+    "dropHint": "Drop files here — auto-indexed as {index}.x",
+    "uploading": "Uploading…"
+  },
   "security": {
     "title": "Security",
     "subtitle": "Protect your account and access to data rooms.",

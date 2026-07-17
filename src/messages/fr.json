@@ -129,6 +129,25 @@
     "socleTitle": "Socle E0 — squelette applicatif",
     "socleBody": "Shell, design system et tokens en place. Les écrans métier (data room, permissions, audit…) seront branchés aux phases suivantes."
   },
+  "dataroom": {
+    "title": "Data room",
+    "subtitle": "Documents indexés automatiquement, chiffrés et tracés.",
+    "emptyState": "Aucun deal pour l'instant. Créez-en un : Kora génère automatiquement l'arborescence de data room (Corporate, Financier, Juridique, RH, PI, Conformité).",
+    "newDeal": "Nouveau deal",
+    "createDeal": "Créer le deal",
+    "creating": "Création…",
+    "dealName": "Nom du deal",
+    "dealType": "Type",
+    "dealCurrency": "Devise",
+    "dealAmount": "Montant",
+    "docCount": "{count, plural, =0 {aucun document} =1 {1 document} other {# documents}}",
+    "colDocument": "Document",
+    "colVersion": "Version",
+    "colSize": "Taille",
+    "emptyFolder": "Aucun document dans ce dossier.",
+    "dropHint": "Glissez des fichiers ici — indexés automatiquement en {index}.x",
+    "uploading": "Envoi en cours…"
+  },
   "security": {
     "title": "Sécurité",
     "subtitle": "Protégez votre compte et l'accès aux data rooms.",
