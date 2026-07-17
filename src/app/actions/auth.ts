@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { rateLimit, clientIp } from "@/lib/security/rate-limit";
 import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
 import {
   signupSchema,
@@ -23,6 +24,12 @@ export async function signup(
   });
 
   if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
+
+  // 5 créations de compte / heure / IP.
+  const ip = await clientIp();
+  if (!rateLimit(`signup:${ip}`, 5, 60 * 60 * 1000).ok) {
+    return { errorKey: "tooManyAttempts" };
+  }
 
   const { full_name, email, password, locale } = parsed.data;
   const supabase = await createClient();
@@ -53,6 +60,12 @@ export async function login(
   });
 
   if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
+
+  // 10 tentatives / 10 min / IP — anti brute-force naïf (cf. rate-limit.ts).
+  const ip = await clientIp();
+  if (!rateLimit(`login:${ip}`, 10, 10 * 60 * 1000).ok) {
+    return { errorKey: "tooManyAttempts" };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
@@ -158,5 +171,8 @@ function mapError(message: string): AuthState {
   if (m.includes("email not confirmed"))
     return { errorKey: "emailNotConfirmed" };
   if (m.includes("non authentifié")) return { errorKey: "notAuthenticated" };
+  // Limites appliquées par Supabase Auth (la protection qui fait foi).
+  if (m.includes("rate limit") || m.includes("too many"))
+    return { errorKey: "rateLimited" };
   return { errorRaw: message };
 }

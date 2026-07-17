@@ -52,7 +52,9 @@
       "invalidCredentials": "Incorrect email or password.",
       "alreadyRegistered": "An account already exists with this email.",
       "emailNotConfirmed": "Email not confirmed. Check your inbox.",
-      "notAuthenticated": "You are not authenticated."
+      "notAuthenticated": "You are not authenticated.",
+      "tooManyAttempts": "Too many attempts. Try again in a few minutes.",
+      "rateLimited": "Too many attempts. Try again in a few minutes."
     }
   },
   "validation": {
