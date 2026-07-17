@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { requireInternal } from "@/lib/access";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
@@ -30,6 +31,7 @@ const TONE: Record<string, ChipTone> = {
 
 export default async function AuditPage() {
   const t = await getTranslations("audit");
+  const tt = await getTranslations("tips");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
   await requireInternal(supabase);
@@ -73,7 +75,7 @@ export default async function AuditPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-            {t("title")}
+            {t("title")}{" "}<InfoTooltip text={tt("audit")} />
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">
             {t("subtitle")}

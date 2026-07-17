@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { requireInternal } from "@/lib/access";
 import { Card, CardBody } from "@/components/ui/Card";
 import {
@@ -13,6 +14,7 @@ import type { Locale } from "@/i18n/locales";
 
 export default async function PipelinePage() {
   const t = await getTranslations("pipeline");
+  const tt = await getTranslations("tips");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
   await requireInternal(supabase);
@@ -58,7 +60,7 @@ export default async function PipelinePage() {
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("pipeline")} />
         </h1>
         <p className="text-[12.5px] text-ink-secondary mt-0.5">
           {t("subtitle")}

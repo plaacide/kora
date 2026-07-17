@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Chip } from "@/components/ui/Chip";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { cn } from "@/lib/cn";
 
 export function Viewer({
@@ -15,6 +16,7 @@ export function Viewer({
   docIndex: string;
 }) {
   const t = useTranslations("viewer");
+  const tt = useTranslations("tips");
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
   const [src, setSrc] = useState<string | null>(null);
@@ -92,8 +94,14 @@ export function Viewer({
             </div>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Chip tone="amber">{t("watermarked")}</Chip>
-            <Chip tone="success">{t("downloadBlocked")}</Chip>
+            <span className="inline-flex items-center gap-1">
+              <Chip tone="amber">{t("watermarked")}</Chip>
+              <InfoTooltip text={tt("watermark")} />
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Chip tone="success">{t("downloadBlocked")}</Chip>
+              <InfoTooltip text={tt("downloadBlocked")} />
+            </span>
           </div>
         </div>
 

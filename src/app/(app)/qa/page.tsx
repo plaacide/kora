@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import { QaBoard, type QaItem } from "@/components/qa/QaBoard";
@@ -7,6 +8,7 @@ import type { Locale } from "@/i18n/locales";
 
 export default async function QaPage() {
   const t = await getTranslations("qa");
+  const tt = await getTranslations("tips");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
 
@@ -20,7 +22,7 @@ export default async function QaPage() {
     return (
       <div className="flex flex-col gap-6 max-w-2xl">
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("qa")} />
         </h1>
         <Card>
           <CardBody>
@@ -70,7 +72,7 @@ export default async function QaPage() {
     <div className="flex flex-col gap-5 max-w-4xl">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("qa")} />
         </h1>
         <p className="text-[12.5px] text-ink-secondary mt-0.5">
           {deal.name} · {isInternal ? t("subtitleInternal") : t("subtitleGuest")}

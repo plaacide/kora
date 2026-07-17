@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { getCurrentDeal } from "@/lib/current-deal";
 import { isViewable } from "@/lib/doc-types";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -11,6 +12,7 @@ export default async function VisionneusePage({
   searchParams: Promise<{ doc?: string }>;
 }) {
   const t = await getTranslations("viewer");
+  const tt = await getTranslations("tips");
   const supabase = await createClient();
   const params = await searchParams;
   const { deal } = await getCurrentDeal(supabase);
@@ -48,7 +50,7 @@ export default async function VisionneusePage({
       <div className="flex flex-col gap-6 max-w-2xl">
         <div>
           <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-            {t("title")}
+            {t("title")}{" "}<InfoTooltip text={tt("viewer")} />
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">
             {t("subtitle")}
@@ -69,7 +71,7 @@ export default async function VisionneusePage({
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("viewer")} />
         </h1>
         <p className="text-[12.5px] text-ink-secondary mt-0.5">
           {t("subtitle")}

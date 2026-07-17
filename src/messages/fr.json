@@ -574,5 +574,29 @@
       "internal_review": "Revue interne",
       "published": "Publiée"
     }
+  },
+  "tips": {
+    "dashboard": "Vue d'ensemble de votre activité : deals actifs, tâches à traiter et dernières actions de l'équipe.",
+    "pipeline": "Vos deals rangés par étape, de la détection au closing. Glissez une carte pour la faire avancer.",
+    "stage": "L'étape du deal dans votre processus d'investissement : Sourcing, Screening, Due diligence, Comité, Signé, Écarté.",
+    "deal": "La fiche d'un deal : montant, readiness, jalons, équipe, notes d'IC et historique.",
+    "dataRoom": "L'espace documentaire du deal : dossiers, fichiers, versions et droits d'accès, le tout tracé.",
+    "viewer": "Lecture des documents page par page, filigranées à la volée. Le fichier source ne quitte jamais le serveur.",
+    "watermark": "Le filigrane (email + date du lecteur) est incrusté dans l'image de la page : impossible à retirer, il dissuade les fuites.",
+    "downloadBlocked": "Selon le niveau d'accès, le téléchargement du fichier d'origine est bloqué — seule la lecture filigranée est permise.",
+    "permissions": "Qui accède à quoi, dossier par dossier. Fermé par défaut, hérité des dossiers parents, avec expiration possible.",
+    "permLevels": "Du plus restreint au plus large : Aucun, Filigrané (lecture marquée), Voir, Télécharger, Éditer.",
+    "invitations": "Faites entrer un investisseur externe, sous NDA, avec des droits limités et une date d'expiration.",
+    "nda": "Accord de confidentialité signé en ligne avant tout accès. Sa signature est horodatée et journalisée comme preuve.",
+    "ndaProof": "Preuve de signature : identité, date, adresse IP et empreinte du texte signé — opposable en cas de litige.",
+    "versions": "L'historique des versions de chaque document. Chaque dépôt crée une nouvelle version sans écraser la précédente.",
+    "audit": "Journal inviolable de toutes les actions. Chaque entrée est horodatée et chaînée par empreinte à la précédente.",
+    "auditChain": "Les entrées sont liées par hachage : modifier ou supprimer une ligne casserait la chaîne, ce qui se détecte.",
+    "checklist": "La liste de contrôle de due diligence. Cocher les éléments fait monter le score de readiness du deal.",
+    "readiness": "Score de préparation à la due diligence : plus il est haut, plus le dossier est complet et présentable à un investisseur.",
+    "qa": "Les questions des investisseurs et vos réponses. Une réponse n'est visible qu'une fois publiée.",
+    "security": "Protégez votre compte : authentification à deux facteurs et politique de mot de passe.",
+    "twoFactor": "Un second code, en plus du mot de passe, à chaque connexion — via une application d'authentification.",
+    "roadmap": "Ce qui reste à construire, et quand. Vos testeurs peuvent suggérer et voter des fonctionnalités."
   }
 }

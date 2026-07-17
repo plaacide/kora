@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal } from "@/lib/current-deal";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
@@ -19,6 +20,7 @@ function barColor(pct: number): string {
 
 export default async function ReadinessPage() {
   const t = await getTranslations("readiness");
+  const tt = await getTranslations("tips");
   const tc = await getTranslations("checklist");
   const supabase = await createClient();
   await requireInternal(supabase);
@@ -29,7 +31,7 @@ export default async function ReadinessPage() {
     return (
       <div className="flex flex-col gap-6 max-w-2xl">
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("readiness")} />
         </h1>
         <Card>
           <CardBody>
@@ -58,7 +60,7 @@ export default async function ReadinessPage() {
     return (
       <div className="flex flex-col gap-6 max-w-2xl">
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("readiness")} />
         </h1>
         <Card>
           <CardBody>
@@ -88,7 +90,7 @@ export default async function ReadinessPage() {
     <div className="flex flex-col gap-5 max-w-4xl">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("readiness")} />
         </h1>
         <p className="text-[12.5px] text-ink-secondary mt-0.5">
           {deal.name} · {t("subtitle")}

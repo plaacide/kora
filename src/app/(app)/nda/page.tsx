@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
@@ -26,6 +27,7 @@ interface Nda {
  */
 export default async function NdaPage() {
   const t = await getTranslations("nda");
+  const tt = await getTranslations("tips");
   const ti = await getTranslations("invitations");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
@@ -48,7 +50,7 @@ export default async function NdaPage() {
     <div className="flex flex-col gap-5 max-w-3xl">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("ndaProof")} />
         </h1>
         <p className="text-[12.5px] text-ink-secondary mt-0.5">
           {t("subtitle")}

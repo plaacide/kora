@@ -574,5 +574,29 @@
       "internal_review": "Internal review",
       "published": "Published"
     }
+  },
+  "tips": {
+    "dashboard": "An overview of your activity: active deals, tasks to handle and the team's latest actions.",
+    "pipeline": "Your deals arranged by stage, from sourcing to closing. Drag a card to move it forward.",
+    "stage": "The deal's stage in your investment process: Sourcing, Screening, Due diligence, Committee, Signed, Passed.",
+    "deal": "A deal's sheet: amount, readiness, milestones, team, IC notes and history.",
+    "dataRoom": "The deal's document space: folders, files, versions and access rights, all traced.",
+    "viewer": "Read documents page by page, watermarked on the fly. The source file never leaves the server.",
+    "watermark": "The watermark (viewer's email + date) is baked into the page image: impossible to remove, it deters leaks.",
+    "downloadBlocked": "Depending on the access level, downloading the original file is blocked — only watermarked reading is allowed.",
+    "permissions": "Who accesses what, folder by folder. Closed by default, inherited from parent folders, with optional expiry.",
+    "permLevels": "From most restricted to broadest: None, Watermarked, View, Download, Edit.",
+    "invitations": "Bring an external investor in, under NDA, with limited rights and an expiry date.",
+    "nda": "A confidentiality agreement e-signed before any access. Its signing is timestamped and logged as proof.",
+    "ndaProof": "Proof of signature: identity, date, IP address and a fingerprint of the signed text — enforceable in a dispute.",
+    "versions": "Each document's version history. Every upload creates a new version without overwriting the previous one.",
+    "audit": "A tamper-proof log of every action. Each entry is timestamped and hash-chained to the previous one.",
+    "auditChain": "Entries are linked by hash: altering or deleting a line would break the chain, which is detectable.",
+    "checklist": "The due-diligence checklist. Ticking items raises the deal's readiness score.",
+    "readiness": "Due-diligence readiness score: the higher it is, the more complete and investor-ready the deal is.",
+    "qa": "Investors' questions and your answers. An answer is only visible once published.",
+    "security": "Protect your account: two-factor authentication and password policy.",
+    "twoFactor": "A second code, on top of your password, at every sign-in — via an authenticator app.",
+    "roadmap": "What's left to build, and when. Your testers can suggest and vote on features."
   }
 }

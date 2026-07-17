@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -12,6 +13,7 @@ import { ApplyChecklistButton } from "@/components/checklist/ApplyChecklistButto
 
 export default async function ChecklistPage() {
   const t = await getTranslations("checklist");
+  const tt = await getTranslations("tips");
   const supabase = await createClient();
   await requireInternal(supabase);
 
@@ -25,7 +27,7 @@ export default async function ChecklistPage() {
     return (
       <div className="flex flex-col gap-6 max-w-2xl">
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("checklist")} />
         </h1>
         <Card>
           <CardBody>
@@ -60,7 +62,7 @@ export default async function ChecklistPage() {
       <div className="flex flex-col gap-6 max-w-2xl">
         <div>
           <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-            {t("title")}
+            {t("title")}{" "}<InfoTooltip text={tt("checklist")} />
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">
             {deal.name} · {t("subtitle")}
@@ -84,7 +86,7 @@ export default async function ChecklistPage() {
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {t("title")}{" "}<InfoTooltip text={tt("checklist")} />
         </h1>
         <p className="text-[12.5px] text-ink-secondary mt-0.5">
           {deal.name} · {t("subtitle")}
