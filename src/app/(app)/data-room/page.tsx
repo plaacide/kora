@@ -74,7 +74,7 @@ export default async function DataRoomPage({
   ] = await Promise.all([
     supabase
       .from("folders")
-      .select("id, parent_id, name, index_path")
+      .select("id, parent_id, name, index_path, description")
       .eq("deal_id", deal.id)
       .order("index_path"),
     supabase

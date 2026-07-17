@@ -21,6 +21,8 @@ export interface FolderRow {
   parent_id: string | null;
   name: string;
   index_path: string;
+  /** Consigne du template : ce qu'on attend dans ce dossier. */
+  description: string;
 }
 
 export interface DocRow {
@@ -283,7 +285,7 @@ export function DataRoom({
 
         {/* 2 — Documents du dossier */}
         <section className="bg-surface border border-line rounded-card shadow-card overflow-hidden">
-          <div className="flex items-center gap-2 px-3.5 py-2.5 border-b border-separator-soft">
+          <div className="px-3.5 py-2.5 border-b border-separator-soft">
             <div className="flex items-center gap-1.5 text-[12px] text-ink-secondary min-w-0">
               <span className="truncate">{dealName}</span>
               <span className="text-[oklch(0.75_0.005_260)]">/</span>
@@ -293,6 +295,12 @@ export function DataRoom({
                   : "—"}
               </span>
             </div>
+            {/* La consigne du template : c'est elle qui fait du dossier un guide. */}
+            {selectedFolder?.description && (
+              <p className="text-[11.5px] text-ink-muted leading-relaxed mt-1">
+                {selectedFolder.description}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-[minmax(160px,1.6fr)_60px_110px_50px_70px] gap-2.5 px-3.5 py-2 text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted bg-bg border-b border-separator-soft">
