@@ -69,7 +69,8 @@ begin
   values (
     p_deal, lower(trim(p_email)), p_nda_required,
     p_level::public.perm_level, p_expires, auth.uid(),
-    case when p_nda_required then 'nda_pending' else 'sent' end
+    -- Cast explicite : un CASE renvoie du text, la colonne est un enum.
+    (case when p_nda_required then 'nda_pending' else 'sent' end)::public.invitation_status
   )
   returning * into v_inv;
 
