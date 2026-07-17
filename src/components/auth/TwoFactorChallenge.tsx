@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/Button";
 import { FormError } from "./FormError";
 
 export function TwoFactorChallenge() {
-  const supabase = createClient();
   const router = useRouter();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | undefined>();
@@ -16,6 +15,7 @@ export function TwoFactorChallenge() {
   async function verify() {
     setError(undefined);
     setBusy(true);
+    const supabase = createClient();
     const { data: factors, error: fErr } = await supabase.auth.mfa.listFactors();
     if (fErr) {
       setBusy(false);

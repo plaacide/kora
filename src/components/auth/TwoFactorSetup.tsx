@@ -7,7 +7,6 @@ import { Chip } from "@/components/ui/Chip";
 import { FormError } from "./FormError";
 
 export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) {
-  const supabase = createClient();
   const [enabled, setEnabled] = useState(initialEnabled);
   const [qr, setQr] = useState<string | null>(null);
   const [factorId, setFactorId] = useState<string | null>(null);
@@ -19,6 +18,7 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
   async function startEnroll() {
     setError(undefined);
     setBusy(true);
+    const supabase = createClient();
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
       friendlyName: `Kora TOTP ${Date.now()}`,
@@ -34,6 +34,7 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
     if (!factorId) return;
     setError(undefined);
     setBusy(true);
+    const supabase = createClient();
     const ch = await supabase.auth.mfa.challenge({ factorId });
     if (ch.error) {
       setBusy(false);
@@ -55,6 +56,7 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
 
   async function disable() {
     setBusy(true);
+    const supabase = createClient();
     const { data } = await supabase.auth.mfa.listFactors();
     for (const f of data?.totp ?? []) {
       await supabase.auth.mfa.unenroll({ factorId: f.id });
