@@ -148,6 +148,18 @@
     "dropHint": "Glissez des fichiers ici — indexés automatiquement en {index}.x",
     "uploading": "Envoi en cours…"
   },
+  "viewer": {
+    "title": "Visionneuse",
+    "subtitle": "Pages filigranées à la volée. Le fichier source ne quitte jamais le serveur.",
+    "emptyState": "Aucun document PDF à afficher. Déposez-en un dans la data room.",
+    "pageOf": "page {page} / {total}",
+    "watermarked": "Filigrané",
+    "downloadBlocked": "Téléchargement bloqué",
+    "loading": "Chargement de la page…",
+    "renderError": "Impossible d'afficher cette page",
+    "prev": "Précédente",
+    "next": "Suivante"
+  },
   "security": {
     "title": "Sécurité",
     "subtitle": "Protégez votre compte et l'accès aux data rooms.",

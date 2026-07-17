@@ -148,6 +148,18 @@
     "dropHint": "Drop files here — auto-indexed as {index}.x",
     "uploading": "Uploading…"
   },
+  "viewer": {
+    "title": "Viewer",
+    "subtitle": "Pages watermarked on the fly. The source file never leaves the server.",
+    "emptyState": "No PDF document to display. Drop one in the data room.",
+    "pageOf": "page {page} / {total}",
+    "watermarked": "Watermarked",
+    "downloadBlocked": "Download blocked",
+    "loading": "Loading page…",
+    "renderError": "Cannot display this page",
+    "prev": "Previous",
+    "next": "Next"
+  },
   "security": {
     "title": "Security",
     "subtitle": "Protect your account and access to data rooms.",
