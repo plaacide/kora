@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { setPermission, LEVELS, type Level } from "@/app/actions/permissions";
+import { setPermission } from "@/app/actions/permissions";
+import { nextLevel, type Level } from "@/lib/permissions";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
 import { cn } from "@/lib/cn";
 
@@ -50,7 +51,7 @@ export function PermissionMatrix({
 
   function bump(userId: string, folderId: string) {
     const current = levelOf(userId, folderId);
-    const next = LEVELS[(LEVELS.indexOf(current) + 1) % LEVELS.length];
+    const next = nextLevel(current);
     const key = `${userId}:${folderId}`;
 
     // Optimiste : on affiche tout de suite, on corrige si le serveur refuse.

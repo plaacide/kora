@@ -6,7 +6,7 @@ import {
   type PermUser,
   type PermFolder,
 } from "@/components/permissions/PermissionMatrix";
-import type { Level } from "@/app/actions/permissions";
+import type { Level } from "@/lib/permissions";
 
 export default async function PermissionsPage() {
   const t = await getTranslations("permissions");
