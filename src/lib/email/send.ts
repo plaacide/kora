@@ -29,6 +29,19 @@ export async function sendEmail(message: EmailMessage): Promise<SendResult> {
   // qui ne peut écrire qu'au propriétaire du compte.
   const from = process.env.EMAIL_FROM ?? "Sanza <onboarding@resend.dev>";
 
+  // Garde-fou bruyant : avec l'adresse de test, TOUT envoi à un tiers échoue —
+  // invitations comprises. Le défaut est autrement invisible en production
+  // (l'invitation est créée, l'écran affiche un succès) et ne se découvre
+  // qu'au moment où un investisseur signale n'avoir jamais rien reçu.
+  if (from.includes("resend.dev")) {
+    console.error(
+      "[email] EMAIL_FROM utilise l'adresse de test Resend (%s) : seuls les " +
+        "envois vers le propriétaire du compte aboutiront. Configurer " +
+        "EMAIL_FROM sur le domaine vérifié, ex. « Sanza <noreply@sanza.africa> ».",
+      from,
+    );
+  }
+
   try {
     const resend = new Resend(key);
     const { error } = await resend.emails.send({
