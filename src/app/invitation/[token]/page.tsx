@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { NdaGate } from "@/components/invitations/NdaGate";
+import { SanzaLogo } from "@/components/ui/SanzaLogo";
 import { Button } from "@/components/ui/Button";
 
 /** Page publique : l'invité y arrive avant même d'avoir un compte. */
@@ -29,9 +30,7 @@ export default async function InvitationPage({
   const shell = (children: React.ReactNode) => (
     <main className="min-h-screen grid place-items-center px-6">
       <div className="w-full max-w-md flex flex-col gap-6">
-        <span className="grid place-items-center w-9 h-9 rounded-[10px] bg-gradient-to-br from-primary to-primary-strong text-white font-bold text-[16px]">
-          K
-        </span>
+        <SanzaLogo size={24} />
         {children}
       </div>
     </main>

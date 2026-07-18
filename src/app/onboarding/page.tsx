@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { OrgForm } from "@/components/auth/OrgForm";
+import { SanzaLogo } from "@/components/ui/SanzaLogo";
 
 export default async function OnboardingPage() {
   const supabase = await createClient();
@@ -25,9 +26,7 @@ export default async function OnboardingPage() {
     <main className="min-h-screen grid place-items-center px-6">
       <div className="w-full max-w-sm flex flex-col gap-6">
         <div className="flex flex-col gap-1.5">
-          <span className="grid place-items-center w-9 h-9 rounded-[10px] bg-gradient-to-br from-primary to-primary-strong text-white font-bold text-[16px]">
-            K
-          </span>
+          <SanzaLogo size={26} />
           <h1 className="text-[22px] font-[650] tracking-[-0.02em] mt-2">
             {t("title")}
           </h1>

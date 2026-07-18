@@ -1,29 +1,38 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: oklch(0.985 0.002 260);
-  --color-surface: #ffffff;
-  --color-surface-2: oklch(0.99 0.001 260);
+  /* --- Marque Sanza -------------------------------------------------------
+   * Encre (sombre), Vibration (orange, réservé CTA + logo), Craie (fonds
+   * chauds clairs), Brume (texte secondaire). L'orange n'habille JAMAIS une
+   * surface décorative : uniquement boutons primaires, liens et logo.
+   */
+  --color-bg: #f7f5f0; /* craie très clair */
+  --color-surface: #ffffff; /* papier */
+  --color-surface-2: #fbfaf7;
 
-  --color-ink: oklch(0.24 0.015 260);
-  --color-ink-secondary: oklch(0.55 0.01 260);
-  --color-ink-muted: oklch(0.62 0.01 260);
-  --color-ink-placeholder: oklch(0.68 0.01 260);
+  --color-encre: #171a2c; /* fonds sombres (sidebar, panneau connexion) */
+  --color-encre-2: #22263c; /* survol/actif sur sombre */
 
-  --color-primary: oklch(0.32 0.06 270);
-  --color-primary-strong: oklch(0.50 0.17 270);
-  --color-accent: oklch(0.55 0.17 270);
-  --color-link: oklch(0.45 0.15 270);
-  --color-link-hover: oklch(0.35 0.15 270);
+  --color-ink: #171a2c;
+  --color-ink-secondary: #4a4e63;
+  --color-ink-muted: #8b8fa3; /* brume */
+  --color-ink-placeholder: #a8abb8;
+
+  --color-primary: #e85c2b; /* vibration — CTA */
+  --color-primary-strong: #d14e20; /* survol CTA */
+  --color-accent: #e85c2b;
+  --color-vibration-soft: #f08a5e; /* échos sur fond sombre */
+  --color-link: #e85c2b;
+  --color-link-hover: #171a2c;
 
   --color-success: oklch(0.60 0.13 155);
   --color-warm: oklch(0.60 0.17 40);
   --color-error: oklch(0.56 0.19 25);
 
-  --color-line: oklch(0.925 0.004 260);
-  --color-line-strong: oklch(0.90 0.004 260);
-  --color-separator: oklch(0.955 0.003 260);
-  --color-separator-soft: oklch(0.945 0.003 260);
+  --color-line: #e8e5dc; /* bordure */
+  --color-line-strong: #dad6cb;
+  --color-separator: #efebe2;
+  --color-separator-soft: #f1ede4;
 
   --color-chip-success-bg: oklch(0.96 0.02 155);
   --color-chip-success-fg: oklch(0.42 0.1 155);
@@ -75,14 +84,14 @@
     color: var(--color-link-hover);
   }
   ::selection {
-    background: oklch(0.55 0.17 270 / 0.18);
+    background: rgba(232, 92, 43, 0.18);
   }
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
   ::-webkit-scrollbar-thumb {
-    background: oklch(0.91 0.005 260);
+    background: #dad6cb;
     border-radius: 8px;
   }
   input::placeholder,
@@ -107,6 +116,26 @@
 
 .animate-pulse-dot {
   animation: pulse-dot 2s infinite;
+}
+
+/* Logo Sanza : le dernier « a » vibre (échos orange décalés). */
+@keyframes sz-vib {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(0.1em);
+  }
+  40% {
+    transform: translateX(0.03em);
+  }
+  60% {
+    transform: translateX(0.07em);
+  }
+  80% {
+    transform: translateX(0.02em);
+  }
 }
 
 /* --- Micro-animations ---------------------------------------------------- */

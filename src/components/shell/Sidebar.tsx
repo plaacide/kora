@@ -23,7 +23,7 @@ export function Sidebar({
   return (
     <nav
       aria-label={t("mainNav")}
-      className="w-[204px] shrink-0 h-[calc(100vh-52px)] sticky top-[52px] overflow-y-auto border-r border-line bg-surface-2 px-2.5 pt-3.5 pb-8"
+      className="w-[204px] shrink-0 h-[calc(100vh-52px)] sticky top-[52px] overflow-y-auto border-r border-[#22263c] bg-encre px-2.5 pt-3.5 pb-8"
     >
       {navFor(role).map((group) => (
         <div key={group.key} className="mb-4">
@@ -32,7 +32,7 @@ export function Sidebar({
           {group.key === "deal" ? (
             <DealSwitcher deals={deals} currentId={currentDealId} />
           ) : (
-            <div className="px-2.5 pb-1.5 text-[10px] font-bold uppercase tracking-[0.07em] text-ink-muted">
+            <div className="px-2.5 pb-1.5 text-[10px] font-bold uppercase tracking-[0.07em] text-[#6f7488]">
               {t(`groups.${group.key}`)}
             </div>
           )}
@@ -48,8 +48,8 @@ export function Sidebar({
                     className={cn(
                       "block rounded-btn px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
                       active
-                        ? "bg-chip-indigo-bg text-chip-indigo-fg"
-                        : "text-ink-secondary hover:bg-[oklch(0.955_0.004_260)] hover:text-ink",
+                        ? "bg-[rgba(232,92,43,0.14)] text-vibration-soft"
+                        : "text-[#b8bcca] hover:bg-encre-2 hover:text-white",
                     )}
                   >
                     {t(`nav.${item.key}`)}

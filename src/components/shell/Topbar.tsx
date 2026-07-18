@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { SanzaLogo } from "@/components/ui/SanzaLogo";
 import { EncryptionBadge } from "@/components/ui/EncryptionBadge";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { logout } from "@/app/actions/auth";
@@ -23,17 +24,8 @@ export async function Topbar({
   return (
     <header className="sticky top-0 z-[60] flex items-center gap-2.5 h-[52px] px-4 bg-[rgba(255,255,255,0.92)] backdrop-blur-md border-b border-line">
       <div className="flex items-center gap-2 pr-3.5 border-r border-line">
-        <Link
-          href="/dashboard"
-          className="flex items-center gap-2"
-          aria-label={t("home")}
-        >
-          <span className="grid place-items-center w-6 h-6 rounded-[6px] bg-gradient-to-br from-primary to-primary-strong text-white font-bold text-[12px]">
-            K
-          </span>
-          <span className="text-[14px] font-[650] tracking-[-0.01em] text-ink">
-            Sanza
-          </span>
+        <Link href="/dashboard" aria-label={t("home")}>
+          <SanzaLogo size={19} />
         </Link>
         <span className="text-[11px] font-[550] text-ink-secondary bg-chip-neutral-bg rounded-chip px-1.5 py-0.5">
           {orgName}
@@ -51,7 +43,7 @@ export async function Topbar({
         <EncryptionBadge />
         <LocaleSwitcher />
         <span
-          className="grid place-items-center w-[30px] h-[30px] rounded-full bg-primary text-white text-[11.5px] font-[650]"
+          className="grid place-items-center w-[30px] h-[30px] rounded-full bg-encre text-white text-[11.5px] font-[650]"
           title={userEmail}
         >
           {initials(userEmail)}

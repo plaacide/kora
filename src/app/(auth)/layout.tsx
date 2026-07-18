@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { SanzaLogo } from "@/components/ui/SanzaLogo";
 
 export default async function AuthLayout({
   children,
@@ -11,14 +12,9 @@ export default async function AuthLayout({
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col justify-between p-10 bg-gradient-to-br from-primary to-primary-strong text-white">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="grid place-items-center w-8 h-8 rounded-[8px] bg-white/15 font-bold text-[15px]">
-            K
-          </span>
-          <span className="text-[17px] font-[650] tracking-[-0.01em]">
-            {tc("appName")}
-          </span>
+      <div className="hidden lg:flex flex-col justify-between p-10 bg-encre text-white">
+        <Link href="/" aria-label={tc("appName")}>
+          <SanzaLogo size={26} dark animate />
         </Link>
         <div className="max-w-sm">
           <h2 className="text-[24px] font-[650] leading-tight tracking-[-0.02em]">

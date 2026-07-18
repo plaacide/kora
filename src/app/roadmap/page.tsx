@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SanzaLogo } from "@/components/ui/SanzaLogo";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -44,13 +45,8 @@ export default async function RoadmapPage() {
   return (
     <main className="min-h-screen">
       <header className="sticky top-0 z-[60] flex items-center gap-3 h-[52px] px-6 bg-[rgba(255,255,255,0.92)] backdrop-blur-md border-b border-line">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="grid place-items-center w-6 h-6 rounded-[6px] bg-gradient-to-br from-primary to-primary-strong text-white font-bold text-[12px]">
-            K
-          </span>
-          <span className="text-[14px] font-[650] tracking-[-0.01em] text-ink">
-            Sanza
-          </span>
+        <Link href="/" aria-label="Sanza">
+          <SanzaLogo size={19} />
         </Link>
         <span className="text-[11px] font-[550] text-ink-secondary bg-chip-neutral-bg rounded-chip px-1.5 py-0.5">
           {t("badge")}

@@ -19,7 +19,7 @@ import type { Locale } from "@/i18n/locales";
 // des liens d'action harmonisés avec le reste de l'app.
 const BTN_BASE =
   "inline-flex items-center justify-center gap-1.5 font-semibold cursor-pointer transition-colors rounded-btn text-[12.5px] px-3.5 py-2";
-const PRIMARY_BTN = `${BTN_BASE} bg-primary text-white border border-transparent shadow-[0_1px_2px_rgba(20,20,60,0.2)] hover:bg-[oklch(0.29_0.06_270)]`;
+const PRIMARY_BTN = `${BTN_BASE} bg-primary text-white border border-transparent shadow-[0_1px_2px_rgba(20,20,60,0.2)] hover:bg-primary-strong`;
 const SECONDARY_BTN = `${BTN_BASE} bg-surface text-ink border border-line-strong shadow-card hover:bg-[oklch(0.975_0.003_260)]`;
 
 function initials(name: string): string {
