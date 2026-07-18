@@ -42,6 +42,29 @@ expression (ternaire).
 Un `CASE` renvoie du `text` : caster explicitement (`::public.mon_enum`),
 sinon erreur 42804.
 
+## package-lock : le régénérer avec le npm de l'IMAGE, pas celui du Mac
+
+Le Mac tourne sur Node 26 / npm 11 ; l'image Docker sur `node:22` / npm 10.
+Les deux ne dédupliquent pas pareil : npm 11 omet l'entrée imbriquée
+`next-intl/node_modules/@swc/helpers@0.5.23` que npm 10 exige. Résultat, le
+build casse en production avec :
+
+> `npm ci` can only install packages when your package.json and
+> package-lock.json are in sync. Missing: @swc/helpers@0.5.23 from lock file
+
+**En local on ne voit rien** : `npm run build` utilise le `node_modules` déjà
+installé, alors que le Dockerfile utilise `npm ci`, qui est strict.
+
+Si `npm install` est relancé sur le Mac, il réécrit le lock et recasse le
+build. Régénérer alors le lock avec le npm de l'image :
+
+```bash
+docker run --rm -v "$PWD":/app -w /app node:22-bookworm-slim \
+  npm install --package-lock-only
+```
+
+(sans Docker en local : le faire sur le serveur, il en a un.)
+
 ## Turbopack : bindings natifs
 
 `@napi-rs/canvas` et `pdfjs-dist` doivent figurer dans
