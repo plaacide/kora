@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { originFromHeaders } from "@/lib/app-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +22,10 @@ export const dynamic = "force-dynamic";
  * qui porte notre domaine.
  */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  // PAS `new URL(request.url).origin` : derrière le proxy, il vaut
+  // http://0.0.0.0:8080 et la redirection tombe dans le vide (cf. app-origin).
+  const origin = originFromHeaders(request.headers);
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next") ?? "/dashboard";

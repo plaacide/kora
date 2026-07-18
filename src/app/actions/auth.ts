@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, clientIp } from "@/lib/security/rate-limit";
 import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
 import { headers } from "next/headers";
+import { originFromHeaders } from "@/lib/app-origin";
 import {
   signupSchema,
   loginSchema,
@@ -16,17 +17,9 @@ import {
   type AuthState,
 } from "@/lib/validation/auth";
 
-/**
- * Origine publique de l'application, pour construire le lien de retour d'un
- * e-mail. Lue dans les en-têtes plutôt que codée en dur : l'app tourne derrière
- * un reverse proxy et doit fonctionner aussi bien en local qu'en production.
- */
+/** Origine publique, pour composer le lien de retour envoyé par e-mail. */
 async function appOrigin(): Promise<string> {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
-  const proto =
-    h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
+  return originFromHeaders(await headers());
 }
 
 export async function signup(

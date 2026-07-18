@@ -81,6 +81,24 @@ Corollaire : ne pas écrire `catch {}` muet dans une route. Ces deux `catch`
 renvoyaient un 500 générique, et le diagnostic a demandé de rejouer le rendu à
 la main dans le conteneur. Journaliser l'erreur.
 
+## Derrière le proxy : `request.url` ne porte PAS le domaine public
+
+L'application écoute sur `0.0.0.0:8080` dans le conteneur, et c'est cette
+adresse que porte l'URL de la requête. Une redirection construite sur
+`new URL(request.url).origin` envoie donc l'utilisateur vers
+`https://0.0.0.0:8080` — injoignable.
+
+**En local on ne voit rien** : l'origine est déjà `http://localhost:3000`.
+Constaté en production sur `/auth/confirm`, où un lien de réinitialisation
+expiré renvoyait dans le vide.
+
+Toujours passer par `originFromHeaders()` (`src/lib/app-origin.ts`), qui lit
+`x-forwarded-host` / `x-forwarded-proto`. Pour tester en local :
+
+```bash
+curl -H "x-forwarded-host: app.sanza.africa" -H "x-forwarded-proto: https" ...
+```
+
 ## Turbopack : bindings natifs
 
 `@napi-rs/canvas` et `pdfjs-dist` doivent figurer dans
