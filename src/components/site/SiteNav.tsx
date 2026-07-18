@@ -7,29 +7,21 @@ import { cn } from "@/lib/cn";
 
 const LIENS = [
   { href: "#produit", label: "Produit" },
-  { href: "#beta", label: "La bêta" },
+  { href: "#investisseurs", label: "Investisseurs" },
+  { href: "#fondateurs", label: "Fondateurs" },
   { href: "#tarifs", label: "Tarifs" },
 ];
 
 /**
  * Barre de navigation du site public.
  *
- * Transparente sur le héros sombre, puis fond translucide flouté dès qu'on
- * défile : sans ce basculement, les liens blancs deviennent illisibles dès
- * que la section claire passe dessous.
+ * Claire et collante, comme la maquette : fond craie translucide, flou, texte
+ * Encre. Le héros sombre défile DESSOUS, ce qui donne le contraste sans avoir
+ * à inverser les couleurs au défilement.
  */
 export function SiteNav() {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Le menu mobile ouvert bloque le défilement derrière lui.
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -40,50 +32,43 @@ export function SiteNav() {
   }, [open]);
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        scrolled
-          ? "bg-[rgba(23,26,44,0.82)] backdrop-blur-md border-b border-white/10"
-          : "bg-transparent",
-      )}
-    >
-      <div className="mx-auto max-w-[1140px] px-5 h-[68px] flex items-center gap-6">
+    <header className="sticky top-0 z-50 bg-[rgba(247,245,240,0.92)] backdrop-blur-[10px] border-b border-line">
+      <div className="mx-auto max-w-[1180px] px-5 md:px-8 py-4 flex items-center justify-between gap-4">
         <Link href="/" aria-label="Sanza" className="shrink-0">
-          <SanzaLogo size={26} dark />
+          <SanzaLogo size={24} />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 ml-2">
+        <nav className="hidden md:flex items-center gap-7">
           {LIENS.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-[13px] font-medium text-white/70 hover:text-white transition-colors"
+              className="text-[14px] font-[550] text-ink-secondary hover:text-ink transition-colors"
             >
               {l.label}
             </a>
           ))}
-        </nav>
-
-        <div className="ml-auto hidden md:flex items-center gap-3">
           <Link
             href="/connexion"
-            className="text-[13px] font-medium text-white/70 hover:text-white transition-colors"
+            className="text-[14px] font-[600] text-ink hover:text-primary transition-colors"
           >
             Se connecter
           </Link>
-          <Link href="/inscription" className="sz-cta text-[13px] px-4 py-2">
-            Référencer ma startup
+          <Link
+            href="/inscription"
+            data-analytics="signup_founder_click"
+            className="sz-cta text-[14px] px-5 py-2.5"
+          >
+            Créer un compte
           </Link>
-        </div>
+        </nav>
 
-        {/* Cible tactile de 44px minimum, comme demandé pour le mobile. */}
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          className="ml-auto md:hidden grid place-items-center w-11 h-11 -mr-2 text-white"
+          className="md:hidden grid place-items-center w-11 h-11 -mr-2 text-ink"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
             {open ? (
@@ -103,26 +88,31 @@ export function SiteNav() {
       </div>
 
       {open && (
-        <div className="md:hidden bg-encre border-t border-white/10 px-5 py-4 flex flex-col gap-1">
+        <div className={cn("md:hidden border-t border-line bg-bg px-5 py-3 flex flex-col")}>
           {LIENS.map((l) => (
             <a
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="py-3 text-[15px] font-medium text-white/80"
+              className="py-3 text-[15px] font-[550] text-ink-secondary"
             >
               {l.label}
             </a>
           ))}
-          <Link href="/connexion" onClick={() => setOpen(false)} className="py-3 text-[15px] font-medium text-white/80">
+          <Link
+            href="/connexion"
+            onClick={() => setOpen(false)}
+            className="py-3 text-[15px] font-[600] text-ink"
+          >
             Se connecter
           </Link>
           <Link
             href="/inscription"
             onClick={() => setOpen(false)}
-            className="sz-cta mt-2 text-[15px] px-4 py-3 text-center"
+            data-analytics="signup_founder_click"
+            className="sz-cta mt-2 mb-1 text-[15px] py-3 text-center"
           >
-            Référencer ma startup
+            Créer un compte
           </Link>
         </div>
       )}
