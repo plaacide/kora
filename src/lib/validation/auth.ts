@@ -19,6 +19,26 @@ export const loginSchema = z.object({
   password: z.string().min(1, { error: "passwordRequired" }),
 });
 
+export const resetRequestSchema = z.object({
+  email: z.email({ error: "emailInvalid" }).trim(),
+});
+
+// Mêmes exigences qu'à l'inscription : un mot de passe réinitialisé ne doit
+// pas être plus faible que celui qu'il remplace.
+export const newPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { error: "passwordMin" })
+      .regex(/[a-zA-Z]/, { error: "passwordLetter" })
+      .regex(/[0-9]/, { error: "passwordDigit" }),
+    confirm: z.string(),
+  })
+  .refine((v) => v.password === v.confirm, {
+    error: "passwordMismatch",
+    path: ["confirm"],
+  });
+
 export const orgSchema = z.object({
   name: z.string().trim().min(2, { error: "orgNameRequired" }),
   currency: z
@@ -34,5 +54,7 @@ export type AuthState =
       errorRaw?: string;
       /** Clés du namespace `validation`, par champ */
       fieldErrors?: Record<string, string[]>;
+      /** Demande de réinitialisation acceptée (succès volontairement muet). */
+      sent?: boolean;
     }
   | undefined;

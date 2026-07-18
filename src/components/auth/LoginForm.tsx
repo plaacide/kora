@@ -48,6 +48,14 @@ export function LoginForm() {
             autoComplete="current-password"
           />
           <FieldError messages={state?.fieldErrors?.password} />
+          <div className="mt-1.5 text-right">
+            <Link
+              href="/mot-de-passe-oublie"
+              className="text-[11.5px] font-medium text-link hover:text-link-hover"
+            >
+              {t("forgot")}
+            </Link>
+          </div>
         </div>
 
         <Button type="submit" variant="primary" loading={pending}>

@@ -41,7 +41,8 @@
       "emailPlaceholder": "prenom@fonds.com",
       "password": "Mot de passe",
       "submit": "Se connecter",
-      "submitting": "Connexion…"
+      "submitting": "Connexion…",
+      "forgot": "Oublié ?"
     },
     "verifyEmail": {
       "title": "Vérifiez votre email",
@@ -54,7 +55,37 @@
       "emailNotConfirmed": "Email non confirmé. Vérifiez votre boîte mail.",
       "notAuthenticated": "Vous n'êtes pas authentifié.",
       "tooManyAttempts": "Trop de tentatives. Réessayez dans quelques minutes.",
-      "rateLimited": "Trop de tentatives. Réessayez dans quelques minutes."
+      "rateLimited": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "resetLinkExpired": "Ce lien a expiré. Demandez-en un nouveau.",
+      "passwordSameAsOld": "Ce mot de passe est identique au précédent. Choisissez-en un autre.",
+      "passwordTooWeak": "Mot de passe trop faible. Utilisez au moins 8 caractères, avec une lettre et un chiffre."
+    },
+    "forgot": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Indiquez votre adresse : nous vous envoyons un lien pour en choisir un nouveau.",
+      "email": "Email",
+      "emailPlaceholder": "prenom@fonds.com",
+      "submit": "Envoyer le lien",
+      "submitting": "Envoi…",
+      "backToLogin": "Retour à la connexion",
+      "sentTitle": "Vérifiez votre boîte mail",
+      "sentBody": "Si un compte existe pour cette adresse, un lien de réinitialisation vient d'être envoyé. Il est valable une heure.",
+      "sentHint": "Rien reçu ? Regardez dans les indésirables, puis réessayez dans quelques minutes.",
+      "linkExpired": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
+      "panelTitle": "Ça arrive à tout le monde.",
+      "panelBody": "Un lien, un nouveau mot de passe, et vous retrouvez vos deals."
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un mot de passe que vous n'utilisez nulle part ailleurs.",
+      "password": "Nouveau mot de passe",
+      "passwordHint": "8 caractères minimum, avec au moins une lettre et un chiffre.",
+      "confirm": "Confirmez le mot de passe",
+      "submit": "Enregistrer et se connecter",
+      "submitting": "Enregistrement…",
+      "backToLogin": "Retour à la connexion",
+      "panelTitle": "Presque terminé.",
+      "panelBody": "Une fois enregistré, vous serez connecté directement."
     }
   },
   "validation": {
@@ -64,7 +95,8 @@
     "passwordLetter": "Au moins une lettre.",
     "passwordDigit": "Au moins un chiffre.",
     "passwordRequired": "Mot de passe requis.",
-    "orgNameRequired": "Nom de l'organisation requis (2 caractères min)."
+    "orgNameRequired": "Nom de l'organisation requis (2 caractères min).",
+    "passwordMismatch": "Les deux mots de passe ne correspondent pas."
   },
   "onboarding": {
     "title": "Créez votre organisation",

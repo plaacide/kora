@@ -6,12 +6,28 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, clientIp } from "@/lib/security/rate-limit";
 import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
+import { headers } from "next/headers";
 import {
   signupSchema,
   loginSchema,
   orgSchema,
+  resetRequestSchema,
+  newPasswordSchema,
   type AuthState,
 } from "@/lib/validation/auth";
+
+/**
+ * Origine publique de l'application, pour construire le lien de retour d'un
+ * e-mail. Lue dans les en-têtes plutôt que codée en dur : l'app tourne derrière
+ * un reverse proxy et doit fonctionner aussi bien en local qu'en production.
+ */
+async function appOrigin(): Promise<string> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+  const proto =
+    h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  return `${proto}://${host}`;
+}
 
 export async function signup(
   _prev: AuthState,
@@ -113,6 +129,75 @@ export async function login(
   redirect("/dashboard");
 }
 
+/**
+ * Demande un lien de réinitialisation.
+ *
+ * Renvoie TOUJOURS le même succès, que l'adresse existe ou non. Répondre
+ * « compte inconnu » transformerait ce formulaire en énumérateur de clients :
+ * il suffirait d'essayer des adresses pour savoir quels fonds et quelles
+ * startups sont sur Sanza. C'est exactement le genre d'information qu'un
+ * concurrent paierait.
+ */
+export async function requestPasswordReset(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const parsed = resetRequestSchema.safeParse({ email: formData.get("email") });
+  if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
+
+  // 5 demandes / 15 min / IP : l'envoi d'e-mails est coûteux et un formulaire
+  // ouvert sans compte est une cible de choix pour inonder des boîtes tierces.
+  const ip = await clientIp();
+  if (!rateLimit(`reset:${ip}`, 5, 15 * 60 * 1000).ok) {
+    return { errorKey: "tooManyAttempts" };
+  }
+
+  const supabase = await createClient();
+  const origin = await appOrigin();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    parsed.data.email,
+    { redirectTo: `${origin}/auth/confirm?next=/reinitialiser` },
+  );
+
+  // Une erreur de quota doit remonter : sans ça, l'utilisateur attendrait un
+  // e-mail qui ne partira jamais.
+  if (error && /rate limit|too many/i.test(error.message)) {
+    return { errorKey: "rateLimited" };
+  }
+  if (error) console.error("[auth] envoi du lien de réinitialisation", error);
+
+  return { sent: true };
+}
+
+/**
+ * Pose le nouveau mot de passe. Suppose une session de récupération ouverte
+ * par /auth/confirm — sans elle, Supabase refuse la mise à jour.
+ */
+export async function updatePassword(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const parsed = newPasswordSchema.safeParse({
+    password: formData.get("password"),
+    confirm: formData.get("confirm"),
+  });
+  if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { errorKey: "resetLinkExpired" };
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+  if (error) return mapError(error.message);
+
+  redirect("/dashboard");
+}
+
 export async function logout(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
@@ -184,6 +269,13 @@ function mapError(message: string): AuthState {
   if (m.includes("email not confirmed"))
     return { errorKey: "emailNotConfirmed" };
   if (m.includes("non authentifié")) return { errorKey: "notAuthenticated" };
+  // Supabase refuse un mot de passe identique au précédent. Sans cette
+  // correspondance, le message remonterait en anglais, brut, à un utilisateur
+  // francophone — constaté en testant la réinitialisation.
+  if (m.includes("should be different"))
+    return { errorKey: "passwordSameAsOld" };
+  if (m.includes("weak password") || m.includes("password should be at least"))
+    return { errorKey: "passwordTooWeak" };
   // Limites appliquées par Supabase Auth (la protection qui fait foi).
   if (m.includes("rate limit") || m.includes("too many"))
     return { errorKey: "rateLimited" };

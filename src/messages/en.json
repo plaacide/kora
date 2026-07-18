@@ -41,7 +41,8 @@
       "emailPlaceholder": "name@fund.com",
       "password": "Password",
       "submit": "Log in",
-      "submitting": "Logging in…"
+      "submitting": "Logging in…",
+      "forgot": "Forgot?"
     },
     "verifyEmail": {
       "title": "Check your email",
@@ -54,7 +55,37 @@
       "emailNotConfirmed": "Email not confirmed. Check your inbox.",
       "notAuthenticated": "You are not authenticated.",
       "tooManyAttempts": "Too many attempts. Try again in a few minutes.",
-      "rateLimited": "Too many attempts. Try again in a few minutes."
+      "rateLimited": "Too many attempts. Try again in a few minutes.",
+      "resetLinkExpired": "This link has expired. Please request a new one.",
+      "passwordSameAsOld": "This password is the same as your previous one. Please choose another.",
+      "passwordTooWeak": "Password too weak. Use at least 8 characters, with a letter and a digit."
+    },
+    "forgot": {
+      "title": "Forgot your password",
+      "subtitle": "Enter your address and we'll send you a link to choose a new one.",
+      "email": "Email",
+      "emailPlaceholder": "first@fund.com",
+      "submit": "Send the link",
+      "submitting": "Sending…",
+      "backToLogin": "Back to sign in",
+      "sentTitle": "Check your inbox",
+      "sentBody": "If an account exists for this address, a reset link has just been sent. It is valid for one hour.",
+      "sentHint": "Nothing received? Check your spam folder, then try again in a few minutes.",
+      "linkExpired": "This link has expired or was already used. Please request a new one.",
+      "panelTitle": "It happens to everyone.",
+      "panelBody": "One link, a new password, and you're back to your deals."
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Choose a password you don't use anywhere else.",
+      "password": "New password",
+      "passwordHint": "At least 8 characters, with one letter and one digit.",
+      "confirm": "Confirm password",
+      "submit": "Save and sign in",
+      "submitting": "Saving…",
+      "backToLogin": "Back to sign in",
+      "panelTitle": "Almost done.",
+      "panelBody": "Once saved, you'll be signed in straight away."
     }
   },
   "validation": {
@@ -64,7 +95,8 @@
     "passwordLetter": "At least one letter.",
     "passwordDigit": "At least one digit.",
     "passwordRequired": "Password required.",
-    "orgNameRequired": "Organisation name required (2 characters min)."
+    "orgNameRequired": "Organisation name required (2 characters min).",
+    "passwordMismatch": "The two passwords do not match."
   },
   "onboarding": {
     "title": "Create your organisation",
