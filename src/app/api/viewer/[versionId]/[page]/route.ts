@@ -14,8 +14,13 @@ import {
   metaKey,
 } from "@/lib/viewer/derived";
 
-// Échelle de rendu : elle entre dans la clé de cache des pages.
-const SCALE = 1.6;
+/**
+ * Échelles de rendu autorisées. Liste fermée volontairement : l'échelle entre
+ * dans la clé de cache, et une valeur libre laisserait n'importe qui remplir
+ * le stockage avec des variantes d'une même page.
+ */
+const SCALE_FULL = 1.6;
+const SCALE_THUMB = 0.22;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,11 +38,17 @@ export const dynamic = "force-dynamic";
  * financier.
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   ctx: { params: Promise<{ versionId: string; page: string }> },
 ) {
   const { versionId, page } = await ctx.params;
   const pageNo = Number.parseInt(page, 10) || 1;
+
+  // `?s=thumb` : vignette de la bande latérale. Même contrôle d'accès, même
+  // filigrane — une vignette lisible reste une fuite si elle échappe aux
+  // règles.
+  const thumb = new URL(request.url).searchParams.get("s") === "thumb";
+  const SCALE = thumb ? SCALE_THUMB : SCALE_FULL;
 
   const result = await resolveVersionAccess(versionId);
   if (!result.ok) {
@@ -86,7 +97,7 @@ export async function GET(
       readDerivedJson<{ pageCount: number }>(admin, metaKey(versionId)),
     ]);
     if (hit && meta?.pageCount) {
-      await auditPage(admin, userId, doc, pageNo, level);
+      await auditPage(admin, userId, doc, pageNo, level, thumb);
       return pngResponse(hit, meta.pageCount, level, true);
     }
   }
@@ -164,22 +175,29 @@ export async function GET(
     ]);
   }
 
-  await auditPage(admin, userId, doc, pageNo, level);
+  await auditPage(admin, userId, doc, pageNo, level, thumb);
   return pngResponse(new Uint8Array(png), pageCount, level, false);
 }
 
-/** Chaque page ouverte est journalisée (audit chaîné), cache ou non. */
+/**
+ * Chaque page servie est journalisée (audit chaîné), cache ou non.
+ *
+ * Les vignettes ont leur propre action : une bande de 13 vignettes n'est pas
+ * 13 pages lues, et l'écrire ainsi rendrait le journal trompeur pour qui
+ * l'auditera. Elles restent tracées — c'est bien du contenu servi.
+ */
 function auditPage(
   admin: ReturnType<typeof createAdminClient>,
   userId: string,
   doc: { id: string; name: string; deal_id: string; deals: { org_id: string } },
   pageNo: number,
   level: string,
+  thumb: boolean,
 ) {
   return admin.rpc("write_audit_as", {
     p_actor: userId,
     p_org: doc.deals.org_id,
-    p_action: "document.page_viewed",
+    p_action: thumb ? "document.thumbnail_viewed" : "document.page_viewed",
     p_target_type: "document",
     p_target_id: doc.id,
     p_metadata: { page: pageNo, name: doc.name, level },

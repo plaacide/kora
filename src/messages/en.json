@@ -210,7 +210,8 @@
       "ic_note_deleted": "IC note deleted",
       "checklist_item_added": "Requirement added",
       "checklist_item_updated": "Requirement updated",
-      "checklist_item_deleted": "Requirement deleted"
+      "checklist_item_deleted": "Requirement deleted",
+      "document_thumbnail_viewed": "Preview viewed"
     }
   },
   "dataroom": {
@@ -365,7 +366,9 @@
     "sheetTruncated": "Showing the first {rows} rows of {total}. The rest of the workbook is not loaded.",
     "cellCount": "{rows} rows × {cols} columns",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "goToPage": "Go to page {page}",
+    "thumbAlt": "Preview of page {page}"
   },
   "security": {
     "title": "Security",

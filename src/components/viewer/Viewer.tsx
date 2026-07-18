@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { Chip } from "@/components/ui/Chip";
@@ -8,6 +8,7 @@ import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { cn } from "@/lib/cn";
 import { useExpanded, expandedShellClass } from "./useExpanded";
 import { ExpandButton } from "./ExpandButton";
+import { PageImage } from "./PageImage";
 
 export function Viewer({
   versionId,
@@ -21,11 +22,45 @@ export function Viewer({
   const t = useTranslations("viewer");
   const tt = useTranslations("tips");
   const { expanded, toggle } = useExpanded();
-  const [page, setPage] = useState(1);
-  const [pageCount, setPageCount] = useState(1);
-  const [src, setSrc] = useState<string | null>(null);
+  const [pageCount, setPageCount] = useState(0);
+  const [current, setCurrent] = useState(1);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+
+  // Le nombre de pages n'est connu qu'après un premier rendu : on interroge la
+  // page 1 en vignette, la moins chère à produire.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/viewer/${versionId}/1?s=thumb`);
+        if (cancelled) return;
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          setError(body.error ?? `HTTP ${res.status}`);
+          return;
+        }
+        setPageCount(Number(res.headers.get("X-Page-Count") ?? "1") || 1);
+      } catch {
+        if (!cancelled) setError("network");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [versionId]);
+
+  const handleCount = useCallback((n: number) => {
+    setPageCount((c) => (c === n ? c : n));
+  }, []);
+
+  const handleVisible = useCallback((p: number) => setCurrent(p), []);
+
+  const goTo = (p: number) => {
+    const el = pageRefs.current.get(p);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // Familles d'états « pas d'image mais ce n'est pas une panne » : le fichier
   // existe, il n'est simplement pas (encore) prévisualisable.
@@ -38,36 +73,7 @@ export function Viewer({
           ? { title: t("unsupported"), hint: t("unsupportedHint") }
           : null;
 
-  const load = useCallback(
-    async (n: number) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/viewer/${versionId}/${n}`);
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          setError(body.error ?? `HTTP ${res.status}`);
-          setLoading(false);
-          return;
-        }
-        const count = Number(res.headers.get("X-Page-Count") ?? "1");
-        setPageCount(count || 1);
-        const blob = await res.blob();
-        setSrc((old) => {
-          if (old) URL.revokeObjectURL(old);
-          return URL.createObjectURL(blob);
-        });
-      } catch {
-        setError("network");
-      }
-      setLoading(false);
-    },
-    [versionId],
-  );
-
-  useEffect(() => {
-    load(page);
-  }, [page, load]);
+  const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
 
   const panel = (
     <div
@@ -76,25 +82,37 @@ export function Viewer({
         expanded && "fixed inset-0 z-50 bg-bg p-4 overflow-hidden",
       )}
     >
-      {/* Vignettes */}
+      {/* Bande de vignettes : de vraies pages miniatures, pas des carrés
+          numérotés — on reconnaît une page à son allure, pas à son numéro. */}
       <aside
         className={cn(
           "flex flex-col gap-2",
-          expanded && "overflow-y-auto max-h-full",
+          expanded ? "overflow-y-auto max-h-full" : "max-h-[70vh] overflow-y-auto",
         )}
       >
-        {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+        {pages.map((n) => (
           <button
             key={n}
-            onClick={() => setPage(n)}
+            onClick={() => goTo(n)}
+            aria-label={t("goToPage", { page: n })}
+            aria-current={n === current}
             className={cn(
-              "aspect-[3/4] rounded-[8px] border text-[11px] font-mono grid place-items-center transition-colors",
-              n === page
-                ? "border-accent border-2 text-chip-indigo-fg bg-chip-indigo-bg"
-                : "border-line bg-surface text-ink-muted hover:border-line-strong",
+              "relative block w-full rounded-[6px] overflow-hidden border bg-surface transition-colors cursor-pointer",
+              n === current
+                ? "border-accent border-2"
+                : "border-line hover:border-line-strong",
             )}
           >
-            {n}
+            <PageImage
+              versionId={versionId}
+              page={n}
+              thumb
+              alt={t("thumbAlt", { page: n })}
+              className="min-h-[64px] aspect-[3/4]"
+            />
+            <span className="absolute bottom-0 right-0 px-1 font-mono text-[9px] bg-surface/85 text-ink-muted rounded-tl-[4px]">
+              {n}
+            </span>
           </button>
         ))}
       </aside>
@@ -109,7 +127,8 @@ export function Viewer({
           <div className="min-w-0">
             <div className="text-[13px] font-[650] truncate">{docName}</div>
             <div className="font-mono text-[10.5px] text-ink-muted">
-              {docIndex} · {t("pageOf", { page, total: pageCount })}
+              {docIndex} ·{" "}
+              {t("pageOf", { page: current, total: pageCount || 1 })}
             </div>
           </div>
           <div className="ml-auto flex items-center gap-2">
@@ -125,15 +144,18 @@ export function Viewer({
           </div>
         </div>
 
+        {/* Défilement continu : toutes les pages à la suite, comme dans un
+            lecteur PDF. Chacune se charge à l'approche. */}
         <div
+          ref={scrollRef}
           className={cn(
-            "grid place-items-center p-5 bg-bg select-none",
-            expanded ? "flex-1 min-h-0 overflow-auto" : "min-h-[420px]",
+            "bg-bg select-none overflow-y-auto",
+            expanded ? "flex-1 min-h-0" : "max-h-[70vh] min-h-[420px]",
           )}
           onContextMenu={(e) => e.preventDefault()}
         >
           {notice ? (
-            <div className="flex flex-col items-center gap-2 text-center max-w-sm py-8">
+            <div className="flex flex-col items-center gap-2 text-center max-w-sm py-16 mx-auto">
               <span
                 className="grid place-items-center w-10 h-10 rounded-full bg-chip-indigo-bg text-chip-indigo-fg text-[18px]"
                 aria-hidden
@@ -146,45 +168,34 @@ export function Viewer({
               </p>
             </div>
           ) : error ? (
-            <p className="text-[12.5px] text-[oklch(0.48_0.16_25)]">
+            <p className="text-[12.5px] text-[oklch(0.48_0.16_25)] p-6">
               {t("renderError")} — {error}
             </p>
-          ) : loading ? (
-            <p className="text-[12px] text-ink-muted">{t("loading")}</p>
-          ) : src ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={src}
-              alt={`${docName} — page ${page}`}
-              draggable={false}
-              className={cn(
-                "shadow-card rounded-[4px]",
-                // En plein écran, la page occupe la hauteur disponible ; sinon
-                // elle s'ajuste à la largeur de la carte.
-                expanded ? "max-h-full w-auto max-w-full" : "max-w-full",
-              )}
-            />
-          ) : null}
-        </div>
-
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-separator-soft">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
-            className="text-[12px] font-medium text-ink-secondary disabled:opacity-40 hover:text-ink cursor-pointer disabled:cursor-default"
-          >
-            ← {t("prev")}
-          </button>
-          <span className="font-mono text-[11px] text-ink-muted">
-            {page} / {pageCount}
-          </span>
-          <button
-            onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-            disabled={page >= pageCount}
-            className="text-[12px] font-medium text-ink-secondary disabled:opacity-40 hover:text-ink cursor-pointer disabled:cursor-default"
-          >
-            {t("next")} →
-          </button>
+          ) : pageCount === 0 ? (
+            <p className="text-[12px] text-ink-muted p-6">{t("loading")}</p>
+          ) : (
+            <div className="flex flex-col items-center gap-4 p-5">
+              {pages.map((n) => (
+                <div
+                  key={n}
+                  ref={(el) => {
+                    if (el) pageRefs.current.set(n, el);
+                    else pageRefs.current.delete(n);
+                  }}
+                  className="w-full max-w-[900px] shadow-card rounded-[4px] overflow-hidden bg-surface"
+                >
+                  <PageImage
+                    versionId={versionId}
+                    page={n}
+                    alt={`${docName} — page ${n}`}
+                    className="min-h-[300px]"
+                    onPageCount={handleCount}
+                    onVisible={handleVisible}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

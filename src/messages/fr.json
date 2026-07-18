@@ -210,7 +210,8 @@
       "ic_note_deleted": "Note d'IC supprimée",
       "checklist_item_added": "Exigence ajoutée",
       "checklist_item_updated": "Exigence modifiée",
-      "checklist_item_deleted": "Exigence supprimée"
+      "checklist_item_deleted": "Exigence supprimée",
+      "document_thumbnail_viewed": "Aperçu consulté"
     }
   },
   "dataroom": {
@@ -365,7 +366,9 @@
     "sheetTruncated": "Affichage limité aux {rows} premières lignes sur {total}. Le reste du classeur n'est pas chargé.",
     "cellCount": "{rows} lignes × {cols} colonnes",
     "expand": "Agrandir",
-    "collapse": "Réduire"
+    "collapse": "Réduire",
+    "goToPage": "Aller à la page {page}",
+    "thumbAlt": "Aperçu de la page {page}"
   },
   "security": {
     "title": "Sécurité",
