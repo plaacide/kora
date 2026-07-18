@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Uploader } from "./Uploader";
+import { DocPreview } from "./DocPreview";
 import {
   FolderTemplates,
   type FolderTemplate,
@@ -631,16 +632,10 @@ export function DataRoom({
         <aside className="bg-surface border border-line rounded-card shadow-card p-4 flex flex-col gap-3.5">
           {doc ? (
             <>
-              <div className="grid place-items-center aspect-[16/10] rounded-[8px] bg-[oklch(0.965_0.003_260)] border border-separator-soft">
-                <span
-                  className={cn(
-                    "grid place-items-center w-[52px] h-[52px] rounded-[10px] font-mono text-[13px] font-semibold",
-                    extTone(ext(doc.name)),
-                  )}
-                >
-                  {ext(doc.name)}
-                </span>
-              </div>
+              {/* Aperçu réel du document plutôt qu'une pastille d'extension :
+                  le lecteur sait déjà ce qu'il a cliqué, ce qu'il veut voir
+                  c'est le contenu. */}
+              <DocPreview versionId={doc.version_id} name={doc.name} />
 
               <div>
                 <div className="text-[13px] font-[650] break-words">

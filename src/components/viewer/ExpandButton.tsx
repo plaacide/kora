@@ -23,7 +23,7 @@ export function ExpandButton({
       title={label}
       aria-label={label}
       aria-pressed={expanded}
-      className="grid place-items-center w-7 h-7 rounded-[6px] border border-line text-ink-secondary hover:text-ink hover:border-line-strong transition-colors cursor-pointer shrink-0"
+      className="inline-flex items-center gap-1.5 h-7 px-2 rounded-[6px] border border-line text-[11.5px] font-medium text-ink-secondary hover:text-ink hover:border-line-strong transition-colors cursor-pointer shrink-0"
     >
       <svg
         width="13"
@@ -54,6 +54,13 @@ export function ExpandButton({
           </>
         )}
       </svg>
+      {/* Libellé visible : une icône seule laisse chercher comment sortir du
+          plein écran. On rappelle Échap une fois agrandi, pour qu'aucun
+          lecteur ne se sente enfermé. */}
+      <span>{label}</span>
+      {expanded && (
+        <span className="font-mono text-[10px] text-ink-muted">Échap</span>
+      )}
     </button>
   );
 }

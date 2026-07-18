@@ -80,14 +80,19 @@ export default async function VisionneusePage({
       </div>
       {/* Un tableur se lit en grille, pas en pages rendues : une image d'un
           modèle financier est illisible. Voir src/lib/doc-types.ts. */}
+      {/* `key` sur la version : changer de document remonte la visionneuse
+          avec un état neuf, plutôt que de la réinitialiser à la main dans un
+          effet — ce qui provoquait des rendus en cascade. */}
       {isSheet(doc.name, null) ? (
         <SheetView
+          key={doc.current_version_id}
           versionId={doc.current_version_id}
           docName={doc.name}
           docIndex={doc.index_path}
         />
       ) : (
         <Viewer
+          key={doc.current_version_id}
           versionId={doc.current_version_id}
           docName={doc.name}
           docIndex={doc.index_path}

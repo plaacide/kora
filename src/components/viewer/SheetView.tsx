@@ -76,10 +76,12 @@ export function SheetView({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Pas de remise à zéro de l'état ici : le composant est monté avec une `key`
+  // liée à la version (cf. visionneuse/page.tsx), donc changer de document le
+  // remonte avec un état neuf. Remettre à zéro dans le corps de l'effet
+  // déclencherait des rendus en cascade.
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
     (async () => {
       try {
         const res = await fetch(`/api/sheet/${versionId}`);

@@ -54,11 +54,23 @@ export function useExpanded() {
 }
 
 /**
+ * Plan de superposition du panneau agrandi.
+ *
+ * Doit passer AU-DESSUS de la barre supérieure (`z-[60]`), sinon celle-ci
+ * recouvre la barre d'outils du document et le bouton de sortie devient
+ * inatteignable — on se retrouve enfermé en plein écran.
+ *
+ * Doit rester SOUS les infobulles et les modales (`z-[100]`), pour que les
+ * bulles d'aide de la barre d'outils restent lisibles une fois agrandi.
+ */
+export const EXPANDED_Z = "z-[70]";
+
+/**
  * Classes du conteneur selon l'état. En plein écran on retire l'arrondi et
  * l'ombre : la carte devient la page.
  */
 export function expandedShellClass(expanded: boolean): string {
   return expanded
-    ? "fixed inset-0 z-50 flex flex-col rounded-none border-0 shadow-none"
+    ? `fixed inset-0 ${EXPANDED_Z} flex flex-col rounded-none border-0 shadow-none`
     : "";
 }

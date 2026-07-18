@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Chip } from "@/components/ui/Chip";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { cn } from "@/lib/cn";
-import { useExpanded, expandedShellClass } from "./useExpanded";
+import { useExpanded, EXPANDED_Z } from "./useExpanded";
 import { ExpandButton } from "./ExpandButton";
 import { PageImage } from "./PageImage";
 
@@ -79,7 +79,7 @@ export function Viewer({
     <div
       className={cn(
         "grid grid-cols-[92px_1fr] gap-4 items-start",
-        expanded && "fixed inset-0 z-50 bg-bg p-4 overflow-hidden",
+        expanded && `fixed inset-0 ${EXPANDED_Z} bg-bg p-4 overflow-hidden`,
       )}
     >
       {/* Bande de vignettes : de vraies pages miniatures, pas des carrés
