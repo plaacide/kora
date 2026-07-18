@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { navFor } from "./nav";
+import { NavIcon } from "./NavIcon";
 import { DealSwitcher } from "./DealSwitcher";
 import type { DealRef } from "@/lib/current-deal";
 import { cn } from "@/lib/cn";
@@ -46,13 +47,14 @@ export function Sidebar({
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "block rounded-btn px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
+                      "flex items-center gap-2.5 rounded-btn px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
                       active
                         ? "bg-[rgba(232,92,43,0.14)] text-vibration-soft"
                         : "text-[#b8bcca] hover:bg-encre-2 hover:text-white",
                     )}
                   >
-                    {t(`nav.${item.key}`)}
+                    <NavIcon name={item.key} />
+                    <span className="truncate">{t(`nav.${item.key}`)}</span>
                   </Link>
                 </li>
               );

@@ -12,7 +12,7 @@ export default async function MotDePasseOubliePage({
 
   return (
     <AuthSplit
-      arcsCorner="bottom-right"
+      arcsCorner="top-left"
       panel={
         <div>
           <h2 className="text-[24px] font-[650] leading-tight tracking-[-0.02em]">
