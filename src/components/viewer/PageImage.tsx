@@ -15,6 +15,7 @@ export function PageImage({
   versionId,
   page,
   thumb = false,
+  eager = false,
   alt,
   className,
   onPageCount,
@@ -23,6 +24,14 @@ export function PageImage({
   versionId: string;
   page: number;
   thumb?: boolean;
+  /**
+   * Charge sans attendre l'observateur. Réservé aux premières pages : elles
+   * sont de toute façon à l'écran, ça évite un aller-retour d'observation
+   * avant le premier pixel — et surtout, l'affichage ne dépend plus
+   * entièrement d'un mécanisme qui ne se déclenche pas dans un document
+   * masqué (onglet en arrière-plan, rendu hors écran).
+   */
+  eager?: boolean;
   alt: string;
   className?: string;
   onPageCount?: (n: number) => void;
@@ -57,6 +66,8 @@ export function PageImage({
       }
     };
 
+    if (eager) load();
+
     // rootMargin : on précharge un écran avant l'entrée dans le champ.
     const io = new IntersectionObserver(
       (entries) => {
@@ -71,8 +82,28 @@ export function PageImage({
       { rootMargin: "600px 0px", threshold: [0, 0.51] },
     );
     io.observe(el);
-    return () => io.disconnect();
-  }, [versionId, page, thumb, onPageCount, onVisible]);
+
+    // Filet de sécurité : un observateur d'intersection ne se déclenche pas
+    // dans un document masqué (onglet en arrière-plan, rendu hors écran), et
+    // le lecteur resterait alors devant un squelette. On mesure donc nous-
+    // mêmes, une fois.
+    //
+    // La mesure est indispensable : déclencher `load()` sans condition
+    // chargerait les 80 pages d'un mémorandum et annulerait tout l'intérêt du
+    // chargement paresseux.
+    const secours = window.setTimeout(() => {
+      if (started.current) return;
+      const r = el.getBoundingClientRect();
+      const marge = 600;
+      const visible = r.bottom > -marge && r.top < window.innerHeight + marge;
+      if (visible) load();
+    }, 1200);
+
+    return () => {
+      io.disconnect();
+      window.clearTimeout(secours);
+    };
+  }, [versionId, page, thumb, eager, onPageCount, onVisible]);
 
   // Libération de l'URL d'objet quand l'image disparaît : sans ça, feuilleter
   // un long document fait grossir la mémoire de l'onglet sans limite.

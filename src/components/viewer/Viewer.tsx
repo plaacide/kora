@@ -107,6 +107,7 @@ export function Viewer({
               versionId={versionId}
               page={n}
               thumb
+              eager={n <= 4}
               alt={t("thumbAlt", { page: n })}
               className="min-h-[64px] aspect-[3/4]"
             />
@@ -187,6 +188,7 @@ export function Viewer({
                   <PageImage
                     versionId={versionId}
                     page={n}
+                    eager={n === 1}
                     alt={`${docName} — page ${n}`}
                     className="min-h-[300px]"
                     onPageCount={handleCount}
