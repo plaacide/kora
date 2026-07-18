@@ -635,7 +635,14 @@ export function DataRoom({
               {/* Aperçu réel du document plutôt qu'une pastille d'extension :
                   le lecteur sait déjà ce qu'il a cliqué, ce qu'il veut voir
                   c'est le contenu. */}
-              <DocPreview versionId={doc.version_id} name={doc.name} />
+              {/* `key` sur la version : changer de document remonte l'aperçu
+                  avec un état neuf, plutôt que de laisser l'image précédente
+                  visible le temps du chargement. */}
+              <DocPreview
+                key={doc.version_id ?? doc.id}
+                versionId={doc.version_id}
+                name={doc.name}
+              />
 
               <div>
                 <div className="text-[13px] font-[650] break-words">

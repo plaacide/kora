@@ -46,6 +46,13 @@ export function PageImage({
     const el = ref.current;
     if (!el) return;
 
+    // Le garde anti-double-chargement doit être RELÂCHÉ quand la cible change.
+    // Sans ça, sélectionner un autre document laissait `started` à true : le
+    // chargement était court-circuité et l'aperçu du fichier précédent restait
+    // affiché — un bug d'autant plus trompeur qu'il montre un vrai document,
+    // simplement pas le bon.
+    started.current = false;
+
     const load = async () => {
       if (started.current) return;
       started.current = true;
