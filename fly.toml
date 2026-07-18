@@ -1,3 +1,7 @@
+# ALTERNATIVE — non utilisée : la cible de production est Coolify auto-hébergé
+# (voir docs/DEPLOY.md). Ce fichier est conservé parce que le Dockerfile est
+# portable : basculer sur Fly.io ne demanderait aucune réécriture.
+#
 # Déploiement Fly.io — image unique Sanza (Next.js + LibreOffice).
 # Région cdg (Paris) : au plus près de la résidence UE promise.
 #

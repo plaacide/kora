@@ -1,41 +1,85 @@
-# Mise en production — Sanza
+# Mise en production — Sanza (Coolify, auto-hébergé)
 
-Cible : image Docker unique (Next.js + LibreOffice) sur **Fly.io**, région
-`cdg` (Paris), domaine **sanza.africa**, base **Supabase**.
+Cible : image Docker unique (Next.js + LibreOffice) déployée par **Coolify**
+sur un **VPS que vous possédez**, domaine **sanza.africa**, base **Supabase**.
+
+Le `Dockerfile` est portable : le même fichier fonctionne sur Coolify, Fly,
+Railway ou Cloud Run. Changer d'hébergeur plus tard ne demande aucune
+réécriture — c'est tout l'intérêt d'avoir conteneurisé.
 
 > ⚠️ Aucun secret ne doit transiter par un chat, un ticket ou un commit.
-> Les clés se copient **depuis leur source vers la commande/le champ**, rien d'autre.
+> Les clés se copient **depuis leur source vers le champ**, rien d'autre.
+
+> ⚠️ En auto-hébergé, **le serveur est votre responsabilité** : mises à jour de
+> sécurité, sauvegardes, disponibilité. C'est le prix du zéro lock-in.
 
 ---
 
-## 0. Prérequis (une seule fois)
+## 0. Le VPS
+
+**Dimensionnement.** LibreOffice est gourmand pendant une conversion. Viser
+**4 Go de RAM / 2 vCPU** minimum (2 Go passe, mais sans marge).
+
+| Hébergeur | Modèle indicatif | Note |
+|---|---|---|
+| Hetzner | CX22 (4 Go / 2 vCPU) | le moins cher, DC allemands (UE) |
+| Scaleway | DEV1-M | français, cohérent avec l'argument souveraineté |
+| OVHcloud | VPS Value | français |
+
+Système : **Ubuntu 24.04 LTS**.
+
+### Durcissement minimal (à faire avant tout le reste)
 
 ```bash
-# macOS
-brew install flyctl
-flyctl auth login          # ouvre le navigateur
+# 1. Connexion par clé SSH uniquement (jamais par mot de passe)
+ssh-copy-id root@<IP_DU_VPS>
+sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
+
+# 2. Pare-feu : n'ouvrir que SSH, HTTP, HTTPS
+sudo ufw allow OpenSSH && sudo ufw allow 80 && sudo ufw allow 443
+sudo ufw enable
+
+# 3. Correctifs de sécurité automatiques
+sudo apt update && sudo apt install -y unattended-upgrades
+sudo dpkg-reconfigure -plow unattended-upgrades
 ```
 
 ---
 
-## 1. Appliquer les migrations en attente
+## 1. Installer Coolify
 
-Dans Supabase → **SQL Editor**, exécuter dans cet ordre :
+```bash
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | sudo bash
+```
+
+Puis ouvrir `http://<IP_DU_VPS>:8000` et **créer le compte admin
+immédiatement** (la première inscription devient administrateur — ne pas
+laisser l'instance ouverte sans compte).
+
+Dans Coolify → *Settings*, renseigner un domaine pour l'interface et activer
+les mises à jour automatiques.
+
+---
+
+## 2. Appliquer les migrations en attente
+
+Dans Supabase → **SQL Editor**, dans cet ordre :
 
 1. `supabase/migrations/20260719160000_checklist_custom.sql` — DD personnalisable
 2. `supabase/migrations/20260719180000_personas.sql` — onboarding investisseur/fondateur
 
-Vérification rapide (SQL editor) :
+Vérification :
 
 ```sql
 select column_name from information_schema.columns
-where table_name = 'profiles' and column_name = 'account_type';   -- doit renvoyer 1 ligne
-select proname from pg_proc where proname = 'add_checklist_item'; -- doit renvoyer 1 ligne
+where table_name = 'profiles' and column_name = 'account_type';   -- 1 ligne
+select proname from pg_proc where proname = 'add_checklist_item'; -- 1 ligne
 ```
 
 ---
 
-## 2. Configurer Supabase pour la production
+## 3. Configurer Supabase pour la production
 
 **Authentication → URL Configuration**
 - *Site URL* : `https://sanza.africa`
@@ -44,102 +88,90 @@ select proname from pg_proc where proname = 'add_checklist_item'; -- doit renvoy
 Sans ça, les liens de confirmation et d'invitation pointent vers `localhost`.
 
 **Authentication → Sign In / Providers → Email**
-- Pour la phase de test : décocher **Confirm email** (l'inscription ouvre
-  directement la session et enchaîne sur l'onboarding par persona).
+- Phase de test : décocher **Confirm email** (l'inscription ouvre la session
+  et enchaîne directement sur l'onboarding par persona).
 - Avant ouverture publique : réactiver, une fois le SMTP ci-dessous en place.
 
-**Authentication → Emails → SMTP Settings** (indispensable en production —
-le SMTP par défaut de Supabase est fortement limité et non destiné à la prod)
+**Authentication → Emails → SMTP Settings** (le SMTP par défaut de Supabase
+est fortement limité et non destiné à la production)
 - Host `smtp.resend.com` · Port `465` · Username `resend`
-- Password : **clé API Resend** (copiée depuis Resend)
-- Sender : `noreply@sanza.africa` **après** avoir vérifié le domaine dans
-  Resend (Domains → Add Domain → poser les DNS SPF/DKIM chez Namecheap).
+- Password : **clé API Resend**
+- Sender : `noreply@sanza.africa`, **après** vérification du domaine dans
+  Resend (Domains → Add Domain → poser les DNS SPF/DKIM chez Namecheap)
 
 **Authentication → Rate Limits** : relever la limite d'emails une fois le
 SMTP personnalisé actif.
 
 ---
 
-## 3. Créer l'app Fly
+## 4. Créer l'application dans Coolify
 
-```bash
-cd <racine du repo>
-flyctl launch --no-deploy      # détecte fly.toml ; ne pas laisser créer de Postgres
-```
+1. *+ New* → **Application** → source **Git** (dépôt privé : ajouter la clé de
+   déploiement que Coolify propose) ou **Dockerfile**.
+2. **Build Pack : `Dockerfile`** (ne pas laisser Nixpacks : l'image doit être
+   la nôtre, avec LibreOffice).
+3. **Port exposé : `8080`** (cf. `EXPOSE`/`PORT` du Dockerfile).
 
----
+### Variables — le point à ne pas rater
 
-## 4. Poser les secrets runtime
+Dans *Environment Variables*, Coolify distingue les variables de **build** et
+de **runtime**. Next **inline les `NEXT_PUBLIC_*` dans le bundle au moment du
+build** : elles doivent donc être cochées **« Build Variable »**, sinon
+l'application se construira sans savoir joindre Supabase.
 
-```bash
-flyctl secrets set \
-  SUPABASE_SERVICE_ROLE_KEY='...' \
-  RESEND_API_KEY='...' \
-  EMAIL_FROM='Sanza <noreply@sanza.africa>'
-```
+| Variable | Type | Remarque |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | **Build** ✅ | non secrète |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Build** ✅ | non secrète (visible côté navigateur) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Runtime | **serveur uniquement — jamais de préfixe `NEXT_PUBLIC_`** |
+| `RESEND_API_KEY` | Runtime | secret |
+| `EMAIL_FROM` | Runtime | `Sanza <noreply@sanza.africa>` |
 
-`SUPABASE_SERVICE_ROLE_KEY` est **serveur uniquement** : jamais de préfixe
-`NEXT_PUBLIC_`, jamais exposé au navigateur.
-
----
-
-## 5. Déployer
-
-Les variables `NEXT_PUBLIC_*` sont **inlinées dans le bundle au build** : elles
-doivent être fournies en `--build-arg` (elles ne sont pas secrètes, l'URL et la
-clé publishable sont de toute façon visibles côté navigateur).
-
-```bash
-flyctl deploy \
-  --build-arg NEXT_PUBLIC_SUPABASE_URL='https://<projet>.supabase.co' \
-  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY='<clé publishable>'
-```
-
-Le premier build est long (~5-10 min) : l'image installe LibreOffice.
+Puis **Deploy**. Le premier build est long (~5-10 min) : l'image installe
+LibreOffice.
 
 ---
 
-## 6. Brancher le domaine
-
-```bash
-flyctl certs add sanza.africa
-flyctl ips list          # note les IP v4 / v6
-```
+## 5. Brancher le domaine
 
 Chez **Namecheap** (Domain List → Manage → Advanced DNS) :
 
 | Type | Host | Value |
 |---|---|---|
-| A | `@` | IPv4 renvoyée par `flyctl ips list` |
-| AAAA | `@` | IPv6 renvoyée par `flyctl ips list` |
+| A | `@` | IP du VPS |
+| A | `www` | IP du VPS |
 
-Puis `flyctl certs show sanza.africa` jusqu'à obtenir le certificat (HTTPS
-automatique). Propagation DNS : quelques minutes à quelques heures.
+Dans Coolify → application → *Domains* : saisir `https://sanza.africa`.
+Coolify (Traefik) obtient et renouvelle le certificat **Let's Encrypt**
+automatiquement. Propagation DNS : quelques minutes à quelques heures.
 
 ---
 
-## 7. Vérifications après déploiement
+## 6. Vérifications après déploiement
 
 - [ ] `https://sanza.africa` répond, HTTPS valide
 - [ ] Connexion avec un compte existant
 - [ ] Inscription : le choix Investisseur/Fondateur route vers le bon onboarding
 - [ ] Data room : dépôt d'un fichier, puis lecture dans la visionneuse
 - [ ] **Conversion Office** : ouvrir un `.xlsx`/`.pptx` — doit s'afficher
-      converti et filigrané (c'est ce que le conteneur apporte)
-- [ ] Invitation : l'email part et le lien pointe vers `https://sanza.africa/...`
-- [ ] Journal d'audit : la chaîne est intègre
-
-```bash
-flyctl logs          # en cas de souci
-flyctl status
-```
+      converti et filigrané. *C'est le test qui prouve l'intérêt du conteneur :
+      cette conversion ne peut pas fonctionner en local.*
+- [ ] Invitation : l'email part, le lien pointe vers `https://sanza.africa/...`
+- [ ] Journal d'audit : chaîne intègre
 
 ---
 
-## Notes d'exploitation
+## Exploitation (votre charge, désormais)
 
-- **Scale-to-zero** : la machine s'arrête sans trafic et se rallume à la
-  première requête (démarrage à froid plus long à cause de LibreOffice).
-  Pour supprimer les cold starts : `min_machines_running = 1` dans `fly.toml`.
-- **Swap 512 Mo** : filet contre l'OOM pendant une conversion LibreOffice.
-- **Rollback** : `flyctl releases` puis `flyctl deploy --image <release>`.
+- **Sauvegardes.** Les documents et la base vivent chez **Supabase** — activer
+  les backups côté Supabase (plan Pro). Le VPS lui-même est *stateless* :
+  s'il brûle, on le recrée et on redéploie. Ne rien stocker de précieux dessus.
+- **Mises à jour.** `unattended-upgrades` couvre l'OS ; Coolify se met à jour
+  depuis son interface. À vérifier une fois par mois.
+- **Supervision.** Coolify affiche logs et état des conteneurs. Pour être
+  prévenu d'une panne, brancher un moniteur externe gratuit (UptimeRobot,
+  BetterStack) sur `https://sanza.africa`.
+- **Rollback.** Coolify garde l'historique des déploiements : *Deployments* →
+  redéployer une version antérieure.
+- **Redémarrage.** Pas de scale-to-zero ici : le conteneur tourne en continu,
+  donc pas de démarrage à froid (avantage réel face à Fly pour la visionneuse).
