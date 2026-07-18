@@ -296,3 +296,86 @@
 /* La grille garde ses couleurs propres en thème sombre : un classeur repeint
    en sombre devient illisible, et les couleurs de fond du classeur (souvent
    porteuses de sens) jureraient avec un fond foncé. */
+
+/* ---------------------------------------------------------------------------
+   Site public (sanza.africa). Surface distincte du dashboard, mêmes tokens.
+   Courbe unique pour toutes les transitions : une page où chaque élément a sa
+   propre inertie paraît bricolée.
+--------------------------------------------------------------------------- */
+.sz-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sz-reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* CTA primaire : orange réservé aux appels à l'action et au logo. */
+.sz-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 9px;
+  padding: 0.7rem 1.15rem;
+  /* Cible tactile : 44px est le minimum confortable au pouce, et la spec
+     mobile l'exige. Sans ce plancher, le CTA du héros tombait à 43px. */
+  min-height: 44px;
+  transition:
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sz-cta:hover {
+  background: var(--color-primary-strong);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(232, 92, 43, 0.28);
+}
+.sz-cta:active {
+  transform: scale(0.98);
+}
+
+/* Carte de pilier : la bordure prend une teinte orange au survol. */
+.sz-card {
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-surface);
+  transition:
+    border-color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sz-card:hover {
+  border-color: rgba(232, 92, 43, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(23, 26, 44, 0.07);
+}
+
+/* Arcs du héros : respiration très lente, à la limite du perceptible. */
+@keyframes sz-pulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.35; }
+}
+.sz-arcs-pulse {
+  animation: sz-pulse 6s ease-in-out infinite;
+}
+
+/* Toute animation coupée pour qui le demande — y compris la révélation, qui
+   sinon laisserait la page vide. */
+@media (prefers-reduced-motion: reduce) {
+  .sz-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .sz-arcs-pulse {
+    animation: none;
+  }
+}

@@ -54,8 +54,11 @@ export function FounderOnboarding() {
   const [error, setError] = useState<string | undefined>();
   const [pending, start] = useTransition();
 
-  // Readiness indicatif, recalculé à chaque champ (miroir de la RPC).
-  const readiness = Math.min(
+  // Complétude de la FICHE, recalculée à chaque champ (miroir de `save_startup`).
+  // À ne pas confondre avec le readiness du deal, qui mesure la checklist DD et
+  // vaut 0 tant qu'aucune exigence n'est cochée : afficher les deux sous le même
+  // nom faisait chuter le score de 90 % à 0 % entre l'onboarding et le dashboard.
+  const completude = Math.min(
     100,
     (name.trim() ? 15 : 0) +
       (country ? 10 : 0) +
@@ -133,7 +136,7 @@ export function FounderOnboarding() {
     <OnboardingShell step={2} total={2}>
       <h1 className="text-[22px] font-[650] tracking-[-0.02em]">Votre levée</h1>
       <p className="text-[12.5px] text-ink-secondary mt-1">
-        Alimente votre score de readiness — visible des investisseurs.
+        Ces montants figurent sur votre fiche, visible des investisseurs.
       </p>
 
       <PlainError message={error} />
@@ -151,25 +154,25 @@ export function FounderOnboarding() {
         </div>
       </div>
 
-      {/* Zone d'upload pitch deck (visuelle — le dépôt réel se fera dans la data room). */}
-      <div className="mt-4 border-[1.5px] border-dashed border-[#c9cbd6] rounded-[10px] p-5 text-center hover:border-primary transition-colors">
-        <span className="inline-grid place-items-center w-8 h-8 rounded-[8px] bg-[rgba(232,92,43,0.10)] text-primary text-[15px]">↑</span>
-        <p className="text-[12px] text-ink-secondary mt-2">
-          Déposez votre pitch deck <span className="text-ink-muted">— ajoutera +18 pts à votre readiness</span>
-        </p>
-      </div>
+      {/* Pas de zone de dépôt ici : l'upload vit dans la data room, qui n'existe
+          qu'une fois l'organisation créée (étape suivante). Une zone en pointillés
+          qui n'accepte rien, et qui promettait « +18 pts », faisait une promesse
+          que l'écran ne pouvait pas tenir. */}
 
-      {/* Encart score. */}
+      {/* Complétude de la fiche — délibérément PAS appelée « readiness » : ce mot
+          désigne partout ailleurs le score de la checklist DD. */}
       <div className="mt-4 bg-bg border border-line rounded-[10px] p-3.5">
         <div className="flex items-center justify-between text-[12px] font-[550]">
-          <span>Readiness</span>
-          <span className="font-mono">{readiness}%</span>
+          <span>Fiche complétée</span>
+          <span className="font-mono">{completude}%</span>
         </div>
         <span className="block h-1.5 rounded-full bg-line overflow-hidden mt-2">
-          <span className={cn("block h-full bg-primary transition-all")} style={{ width: `${readiness}%` }} />
+          <span className={cn("block h-full bg-primary transition-all")} style={{ width: `${completude}%` }} />
         </span>
         <p className="text-[11px] text-ink-muted mt-2">
-          Complétez la data room après l&apos;inscription pour dépasser 80.
+          Votre score de readiness, lui, se construit dans la checklist de due
+          diligence — il part de 0 et monte à mesure que vous cochez les
+          exigences.
         </p>
       </div>
 

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="16" fill="#171A2C"></rect>
+  <g font-family="&#39;Instrument Sans&#39;,ui-sans-serif,system-ui,sans-serif" font-weight="700" font-size="40" text-anchor="middle">
+    <text x="36" y="46" fill="#F08A5E" opacity="0.5">a</text>
+    <text x="31" y="46" fill="#FFFFFF">a</text>
+  </g>
+</svg>
