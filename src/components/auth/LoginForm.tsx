@@ -8,12 +8,27 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
 
-export function LoginForm() {
+export function LoginForm({ notice }: { notice?: string } = {}) {
   const [state, action, pending] = useActionState(login, undefined);
   const t = useTranslations("auth.login");
 
+  // Message porté par l'URL après un aller-retour par e-mail. Sans lui, un
+  // lien périmé ou ouvert depuis un autre appareil ramenait à un formulaire
+  // de connexion muet, sans dire ce qui venait de se passer.
+  const noticeText =
+    notice === "lien_invalide"
+      ? t("notices.invalidLink")
+      : notice === "session_absente"
+        ? t("notices.confirmedSignIn")
+        : null;
+
   return (
     <div className="flex flex-col gap-6">
+      {noticeText && (
+        <p className="text-[12px] text-chip-amber-fg bg-chip-amber-bg rounded-[8px] px-3 py-2">
+          {noticeText}
+        </p>
+      )}
       <div>
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
           {t("title")}

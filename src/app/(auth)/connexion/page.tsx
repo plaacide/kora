@@ -10,7 +10,13 @@ function Badge({ icon, label }: { icon: React.ReactNode; label: string }) {
   );
 }
 
-export default function ConnexionPage() {
+export default async function ConnexionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erreur?: string }>;
+}) {
+  const { erreur } = await searchParams;
+
   return (
     <AuthSplit
       arcsCorner="top-left"
@@ -40,7 +46,7 @@ export default function ConnexionPage() {
         </div>
       }
     >
-      <LoginForm />
+      <LoginForm notice={erreur} />
     </AuthSplit>
   );
 }

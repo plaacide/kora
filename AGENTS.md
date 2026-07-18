@@ -99,6 +99,43 @@ Toujours passer par `originFromHeaders()` (`src/lib/app-origin.ts`), qui lit
 curl -H "x-forwarded-host: app.sanza.africa" -H "x-forwarded-proto: https" ...
 ```
 
+## Gabarits d'e-mail Supabase : `{{ .ConfirmationURL }}` ne marche PAS ici
+
+Nos routes d'échange de jeton (`/auth/confirm`) attendent le **flux serveur** :
+`?token_hash=…&type=…`. Or `{{ .ConfirmationURL }}`, la variable par défaut des
+gabarits Supabase, produit un lien vers `/auth/v1/verify?token=…` — un autre
+mécanisme, qui n'expose jamais `token_hash`. La route reçoit donc une URL sans
+paramètres et répond `?erreur=lien_invalide`.
+
+Le lien doit être construit à la main dans le gabarit :
+
+```
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reinitialiser
+```
+
+**Aucun test local ne le révèle** : fabriquer un jeton par l'API admin et
+appeler la route directement passe les bons paramètres — c'est le gabarit, et
+lui seul, qui est en défaut. Il faut envoyer un vrai e-mail et lire le lien.
+Sans attendre le clic du fondateur, l'API Resend permet de le relire :
+
+```bash
+curl -s "https://api.resend.com/emails/$ID" -H "Authorization: Bearer $RESEND_API_KEY"
+```
+
+Corollaire : le sujet (`Subject heading`) se sauvegarde séparément du corps ;
+vérifier les deux.
+
+## Resend : le domaine vérifié est la RACINE, pas `send.`
+
+Resend affiche des enregistrements sur `send.sanza.africa` (MX de rebond +
+SPF), ce qui laisse croire que c'est là l'identité d'envoi. C'est faux : le
+domaine vérifié est `sanza.africa`, et une adresse `@send.sanza.africa` est
+rejetée en **403 « domain is not verified »**. Côté Supabase, cela remonte en
+`500 Error sending recovery email`, sans aucune trace dans les journaux Resend
+puisque le message est refusé dès la remise.
+
+Expéditeur correct : `noreply@sanza.africa`.
+
 ## Turbopack : bindings natifs
 
 `@napi-rs/canvas` et `pdfjs-dist` doivent figurer dans

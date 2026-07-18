@@ -42,7 +42,11 @@
       "password": "Mot de passe",
       "submit": "Se connecter",
       "submitting": "Connexion…",
-      "forgot": "Oublié ?"
+      "forgot": "Oublié ?",
+      "notices": {
+        "invalidLink": "Ce lien n'est plus valide. Connectez-vous, ou demandez-en un nouveau.",
+        "confirmedSignIn": "Votre adresse est confirmée. Connectez-vous pour continuer."
+      }
     },
     "verifyEmail": {
       "title": "Vérifiez votre email",

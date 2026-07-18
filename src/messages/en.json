@@ -42,7 +42,11 @@
       "password": "Password",
       "submit": "Log in",
       "submitting": "Logging in…",
-      "forgot": "Forgot?"
+      "forgot": "Forgot?",
+      "notices": {
+        "invalidLink": "This link is no longer valid. Sign in, or request a new one.",
+        "confirmedSignIn": "Your address is confirmed. Sign in to continue."
+      }
     },
     "verifyEmail": {
       "title": "Check your email",
