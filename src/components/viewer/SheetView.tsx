@@ -1,14 +1,29 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { Chip } from "@/components/ui/Chip";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { cn } from "@/lib/cn";
 
+interface Cell {
+  v: string;
+  b?: true;
+  i?: true;
+  u?: true;
+  fg?: string;
+  bg?: string;
+  a?: "left" | "center" | "right";
+  n?: true;
+  cs?: number;
+  rs?: number;
+  h?: true;
+}
+
 interface SheetData {
   name: string;
-  rows: string[][];
+  rows: Cell[][];
+  widths: number[];
   truncated: boolean;
   totalRows: number;
   totalCols: number;
@@ -30,14 +45,6 @@ function columnLabel(i: number): string {
     n = Math.floor((n - 1) / 26);
   }
   return out;
-}
-
-// Alignement à droite des valeurs numériques, comme le ferait Excel. Heuristique
-// assumée : on ne reçoit que du texte déjà formaté, pas les types d'origine.
-const NUMERIC = /^[-+(]?[\d\s ]*[\d][\d\s .,]*\)?\s*[%€$]?$/;
-
-function isNumeric(v: string): boolean {
-  return v !== "" && NUMERIC.test(v.trim());
 }
 
 export function SheetView({
@@ -87,6 +94,19 @@ export function SheetView({
     [sheet],
   );
 
+  // Largeur de la gouttière des numéros de ligne.
+  const GUTTER = 44;
+
+  // En `table-layout: fixed`, un tableau de largeur `auto` s'étire jusqu'à son
+  // conteneur et redistribue l'espace entre les colonnes : les largeurs du
+  // classeur seraient ignorées. On impose donc la somme exacte.
+  const tableWidth = useMemo(() => {
+    if (!sheet) return undefined;
+    let w = GUTTER;
+    for (let c = 0; c < colCount; c++) w += sheet.widths[c] ?? 100;
+    return w;
+  }, [sheet, colCount]);
+
   const notice =
     error === "office_not_ready"
       ? { title: t("officeNotReady"), hint: t("officeNotReadyHint") }
@@ -101,10 +121,12 @@ export function SheetView({
           <div className="text-[13px] font-[650] truncate">{docName}</div>
           <div className="font-mono text-[10.5px] text-ink-muted">
             {docIndex}
-            {sheet ? ` · ${t("cellCount", {
-              rows: sheet.totalRows,
-              cols: sheet.totalCols,
-            })}` : ""}
+            {/* On décrit ce qui est AFFICHÉ, pas l'étendue déclarée par le
+                classeur : annoncer 97 lignes au-dessus d'une grille qui en
+                montre 103 n'a aucun sens pour le lecteur. */}
+            {sheet
+              ? ` · ${t("cellCount", { rows: sheet.rows.length, cols: colCount })}`
+              : ""}
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -121,7 +143,8 @@ export function SheetView({
         </div>
       </div>
 
-      {/* Onglets de feuilles */}
+      {/* Onglets de feuilles, en bas comme dans Excel serait plus fidèle, mais
+          en haut ils restent visibles sans faire défiler toute la grille. */}
       {data && data.sheets.length > 1 && (
         <div className="flex items-center gap-1 px-3 py-1.5 border-b border-separator-soft overflow-x-auto">
           {data.sheets.map((s, i) => (
@@ -162,20 +185,22 @@ export function SheetView({
         ) : loading ? (
           <p className="text-[12px] text-ink-muted p-6">{t("loadingSheet")}</p>
         ) : sheet && sheet.rows.length > 0 ? (
-          <div className="overflow-auto max-h-[70vh]">
-            <table className="border-collapse text-[11.5px] font-mono select-text">
+          <div className="overflow-auto max-h-[70vh] sz-sheet">
+            <table
+              className="border-collapse text-[11.5px] select-text table-fixed"
+              style={{ width: tableWidth }}
+            >
+              <colgroup>
+                <col style={{ width: GUTTER }} />
+                {Array.from({ length: colCount }, (_, c) => (
+                  <col key={c} style={{ width: sheet.widths[c] ?? 100 }} />
+                ))}
+              </colgroup>
               <thead>
                 <tr>
-                  <th
-                    className="sticky top-0 left-0 z-20 bg-surface border-b border-r border-line w-12 min-w-12"
-                    aria-label=""
-                  />
+                  <th className="sz-corner" aria-label="" />
                   {Array.from({ length: colCount }, (_, c) => (
-                    <th
-                      key={c}
-                      scope="col"
-                      className="sticky top-0 z-10 bg-surface border-b border-r border-line px-2 py-1 text-[10px] font-[550] text-ink-muted text-center min-w-[90px]"
-                    >
+                    <th key={c} scope="col" className="sz-colhead">
                       {columnLabel(c)}
                     </th>
                   ))}
@@ -183,27 +208,33 @@ export function SheetView({
               </thead>
               <tbody>
                 {sheet.rows.map((row, r) => (
-                  <tr key={r} className="even:bg-surface">
-                    <th
-                      scope="row"
-                      className="sticky left-0 z-10 bg-surface border-b border-r border-line px-2 py-1 text-[10px] font-[550] text-ink-muted text-right"
-                    >
+                  <tr key={r}>
+                    <th scope="row" className="sz-rowhead">
                       {r + 1}
                     </th>
-                    {Array.from({ length: colCount }, (_, c) => {
-                      const v = row[c] ?? "";
+                    {row.map((cell, c) => {
+                      // Cellule recouverte par une fusion : le <td> maître
+                      // porte déjà le contenu, on n'en émet pas de second.
+                      if (cell.h) return null;
+                      const style: CSSProperties = {};
+                      if (cell.fg) style.color = cell.fg;
+                      if (cell.bg) style.backgroundColor = cell.bg;
+                      if (cell.b) style.fontWeight = 700;
+                      if (cell.i) style.fontStyle = "italic";
+                      if (cell.u) style.textDecoration = "underline";
+                      // Alignement explicite du classeur ; à défaut, les
+                      // nombres à droite comme le fait Excel.
+                      style.textAlign = cell.a ?? (cell.n ? "right" : "left");
                       return (
                         <td
                           key={c}
-                          className={cn(
-                            "border-b border-r border-line px-2 py-1 whitespace-nowrap max-w-[320px] overflow-hidden text-ellipsis",
-                            isNumeric(v)
-                              ? "text-right tabular-nums"
-                              : "text-left",
-                          )}
-                          title={v.length > 40 ? v : undefined}
+                          className="sz-cell"
+                          style={style}
+                          colSpan={cell.cs}
+                          rowSpan={cell.rs}
+                          title={cell.v.length > 40 ? cell.v : undefined}
                         >
-                          {v}
+                          {cell.v}
                         </td>
                       );
                     })}

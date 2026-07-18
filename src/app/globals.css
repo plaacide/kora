@@ -227,3 +227,72 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Grille de tableur (visionneuse).
+   Objectif : que le lecteur retrouve son classeur, pas une interface Sanza.
+   D'où des filets gris et des en-têtes neutres plutôt que les tokens de
+   marque, et une police proportionnelle — Excel n'est pas en monospace.
+--------------------------------------------------------------------------- */
+.sz-sheet {
+  --sz-grid: #d0d0d0;
+  --sz-head-bg: #f2f2f2;
+  --sz-head-fg: #5a5a5a;
+  background: #ffffff;
+}
+
+.sz-sheet table {
+  font-family: var(--font-sans);
+  color: #1a1a1a;
+}
+
+.sz-sheet .sz-cell {
+  border-right: 1px solid var(--sz-grid);
+  border-bottom: 1px solid var(--sz-grid);
+  padding: 2px 6px;
+  /* Excel aligne le contenu en bas de cellule par défaut. */
+  vertical-align: bottom;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* En-têtes de colonnes et de lignes : figés, comme les volets d'Excel. */
+.sz-sheet .sz-colhead,
+.sz-sheet .sz-rowhead,
+.sz-sheet .sz-corner {
+  background: var(--sz-head-bg);
+  color: var(--sz-head-fg);
+  font-size: 10px;
+  font-weight: 550;
+  border-right: 1px solid var(--sz-grid);
+  border-bottom: 1px solid var(--sz-grid);
+  padding: 2px 6px;
+}
+
+.sz-sheet .sz-colhead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  text-align: center;
+}
+
+.sz-sheet .sz-rowhead {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* L'angle doit passer AU-DESSUS des deux barres figées. */
+.sz-sheet .sz-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 20;
+}
+
+/* La grille garde ses couleurs propres en thème sombre : un classeur repeint
+   en sombre devient illisible, et les couleurs de fond du classeur (souvent
+   porteuses de sens) jureraient avec un fond foncé. */
