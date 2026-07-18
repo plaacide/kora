@@ -8,6 +8,10 @@
 app = "sanza"
 primary_region = "cdg"
 
+# Filet contre l'OOM : une conversion LibreOffice d'un gros classeur peut
+# faire un pic mémoire au-delà du 1 Go de la VM.
+swap_size_mb = 512
+
 [build]
   dockerfile = "Dockerfile"
 

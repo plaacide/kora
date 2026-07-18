@@ -34,6 +34,9 @@ ENV NODE_ENV=production
 # LibreOffice a besoin d'un HOME inscriptible pour son profil.
 ENV HOME=/tmp
 ENV PORT=8080
+# Écoute sur toutes les interfaces : sans ça, le conteneur peut n'accepter que
+# les connexions locales et l'hébergeur voit l'app comme morte.
+ENV HOSTNAME=0.0.0.0
 
 # LibreOffice + polices. --no-install-recommends : ni GUI ni dictionnaires.
 RUN apt-get update && apt-get install -y --no-install-recommends \
