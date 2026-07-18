@@ -65,6 +65,22 @@ docker run --rm -v "$PWD":/app -w /app node:22-bookworm-slim \
 
 (sans Docker en local : le faire sur le serveur, il en a un.)
 
+## Sortie standalone : les imports construits à l'exécution ne sont pas tracés
+
+`pdfjs` charge son worker par un chemin calculé au runtime. Le traceur de Next
+ne le voit pas, donc `pdf.worker.mjs` n'atterrit pas dans `.next/standalone`.
+En conteneur, **tout** rendu du viewer échoue alors sur :
+
+> Setting up fake worker failed: Cannot find module
+> '/app/node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs'
+
+**En local on ne voit rien** : le `node_modules` complet est présent. D'où
+`outputFileTracingIncludes` dans `next.config.ts` (worker + `standard_fonts`).
+
+Corollaire : ne pas écrire `catch {}` muet dans une route. Ces deux `catch`
+renvoyaient un 500 générique, et le diagnostic a demandé de rejouer le rendu à
+la main dans le conteneur. Journaliser l'erreur.
+
 ## Turbopack : bindings natifs
 
 `@napi-rs/canvas` et `pdfjs-dist` doivent figurer dans

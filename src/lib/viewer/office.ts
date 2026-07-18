@@ -86,7 +86,11 @@ export async function officeToPdf(
     // le nom exact.
     const produced = (await readdir(workDir)).find((f) => f.endsWith(".pdf"));
     if (!produced) throw new Error("no_output");
-    return await readFile(join(workDir, produced));
+    // `readFile` renvoie un Buffer. C'est bien une sous-classe d'Uint8Array,
+    // mais pdfjs le refuse explicitement (« Please provide binary data as
+    // Uint8Array, rather than Buffer ») : on recopie la vue.
+    const pdf = await readFile(join(workDir, produced));
+    return new Uint8Array(pdf.buffer, pdf.byteOffset, pdf.byteLength);
   } finally {
     await rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
