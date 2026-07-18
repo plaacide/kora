@@ -110,7 +110,10 @@ export async function GET(
       const converted = await officeToPdf(raw, doc.name);
       if (!converted) throw new Error("conversion indisponible");
       pdfBytes = converted;
-    } catch {
+    } catch (err) {
+      // Journaliser : sans ça, un échec en production ne laisse aucune trace et
+      // le diagnostic passe par une reproduction manuelle dans le conteneur.
+      console.error("[viewer] conversion bureautique échouée", doc.name, err);
       return NextResponse.json(
         { error: "office_conversion_failed", kind: "office" },
         { status: 502 },
@@ -124,7 +127,8 @@ export async function GET(
     const rendered = await renderPdfPage(pdfBytes, pageNo, watermark);
     png = rendered.png;
     pageCount = rendered.pageCount;
-  } catch {
+  } catch (err) {
+    console.error("[viewer] rendu échoué", doc.name, "page", pageNo, err);
     return NextResponse.json({ error: "rendu impossible" }, { status: 500 });
   }
 
