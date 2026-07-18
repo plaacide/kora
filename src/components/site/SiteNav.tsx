@@ -7,8 +7,9 @@ import { cn } from "@/lib/cn";
 
 const LIENS = [
   { href: "#produit", label: "Produit" },
-  { href: "#investisseurs", label: "Investisseurs" },
   { href: "#fondateurs", label: "Fondateurs" },
+  { href: "#sae", label: "Accompagnateurs" },
+  { href: "#investisseurs", label: "Investisseurs" },
   { href: "#tarifs", label: "Tarifs" },
 ];
 
