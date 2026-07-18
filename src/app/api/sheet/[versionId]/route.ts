@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveVersionAccess } from "@/lib/viewer/access";
-import { readWorkbook } from "@/lib/viewer/sheet";
+import { readWorkbook, type WorkbookData } from "@/lib/viewer/sheet";
 import { docKind } from "@/lib/doc-types";
+import { readDerivedJson, writeDerivedJson, sheetKey } from "@/lib/viewer/derived";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,29 +41,45 @@ export async function GET(
   }
 
   const admin = createAdminClient();
-  const { data: file, error: dlError } = await admin.storage
-    .from("documents")
-    .download(storageKey);
 
-  if (dlError || !file) {
-    return NextResponse.json({ error: "lecture impossible" }, { status: 500 });
-  }
+  // Une version de document est immuable : son extraction l'est aussi. On ne
+  // reparse donc le classeur qu'une fois, pas à chaque ouverture.
+  const cacheKey = sheetKey(versionId);
+  const cached = await readDerivedJson<WorkbookData>(admin, cacheKey);
 
-  let workbook;
-  try {
-    workbook = await readWorkbook(
-      new Uint8Array(await file.arrayBuffer()),
-      doc.name,
-    );
-  } catch (err) {
-    // Journaliser : un catch muet ici, et le prochain diagnostic se fera
-    // encore à la main dans le conteneur (cf. AGENTS.md).
-    console.error("[sheet] lecture échouée", doc.name, err);
-    const reason = err instanceof Error ? err.message : "";
-    return NextResponse.json(
-      { error: reason === "office_not_ready" ? "office_not_ready" : "sheet_read_failed" },
-      { status: reason === "office_not_ready" ? 415 : 502 },
-    );
+  let workbook: WorkbookData;
+  if (cached) {
+    workbook = cached;
+  } else {
+    const { data: file, error: dlError } = await admin.storage
+      .from("documents")
+      .download(storageKey);
+
+    if (dlError || !file) {
+      return NextResponse.json({ error: "lecture impossible" }, { status: 500 });
+    }
+
+    try {
+      workbook = await readWorkbook(
+        new Uint8Array(await file.arrayBuffer()),
+        doc.name,
+      );
+      await writeDerivedJson(admin, cacheKey, workbook);
+    } catch (err) {
+      // Journaliser : un catch muet ici, et le prochain diagnostic se fera
+      // encore à la main dans le conteneur (cf. AGENTS.md).
+      console.error("[sheet] lecture échouée", doc.name, err);
+      const reason = err instanceof Error ? err.message : "";
+      return NextResponse.json(
+        {
+          error:
+            reason === "office_not_ready"
+              ? "office_not_ready"
+              : "sheet_read_failed",
+        },
+        { status: reason === "office_not_ready" ? 415 : 502 },
+      );
+    }
   }
 
   // Consultation journalisée, comme pour une page rendue : l'audit ne doit pas

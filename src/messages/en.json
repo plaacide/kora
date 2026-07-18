@@ -363,7 +363,9 @@
     "sheetFailed": "This workbook could not be read",
     "sheetFailedHint": "The file may be password-protected or corrupted. Let the deal owner know.",
     "sheetTruncated": "Showing the first {rows} rows of {total}. The rest of the workbook is not loaded.",
-    "cellCount": "{rows} rows × {cols} columns"
+    "cellCount": "{rows} rows × {cols} columns",
+    "expand": "Expand",
+    "collapse": "Collapse"
   },
   "security": {
     "title": "Security",

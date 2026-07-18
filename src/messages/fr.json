@@ -363,7 +363,9 @@
     "sheetFailed": "Ce classeur n'a pas pu être lu",
     "sheetFailedHint": "Le fichier est peut-être protégé par un mot de passe ou corrompu. Signalez-le au responsable du deal.",
     "sheetTruncated": "Affichage limité aux {rows} premières lignes sur {total}. Le reste du classeur n'est pas chargé.",
-    "cellCount": "{rows} lignes × {cols} colonnes"
+    "cellCount": "{rows} lignes × {cols} colonnes",
+    "expand": "Agrandir",
+    "collapse": "Réduire"
   },
   "security": {
     "title": "Sécurité",

@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { Chip } from "@/components/ui/Chip";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { cn } from "@/lib/cn";
+import { useExpanded, expandedShellClass } from "./useExpanded";
+import { ExpandButton } from "./ExpandButton";
 
 export function Viewer({
   versionId,
@@ -17,6 +20,7 @@ export function Viewer({
 }) {
   const t = useTranslations("viewer");
   const tt = useTranslations("tips");
+  const { expanded, toggle } = useExpanded();
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
   const [src, setSrc] = useState<string | null>(null);
@@ -65,10 +69,20 @@ export function Viewer({
     load(page);
   }, [page, load]);
 
-  return (
-    <div className="grid grid-cols-[92px_1fr] gap-4 items-start">
+  const panel = (
+    <div
+      className={cn(
+        "grid grid-cols-[92px_1fr] gap-4 items-start",
+        expanded && "fixed inset-0 z-50 bg-bg p-4 overflow-hidden",
+      )}
+    >
       {/* Vignettes */}
-      <aside className="flex flex-col gap-2">
+      <aside
+        className={cn(
+          "flex flex-col gap-2",
+          expanded && "overflow-y-auto max-h-full",
+        )}
+      >
         {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
           <button
             key={n}
@@ -85,7 +99,12 @@ export function Viewer({
         ))}
       </aside>
 
-      <section className="bg-surface border border-line rounded-card shadow-card overflow-hidden">
+      <section
+        className={cn(
+          "bg-surface border border-line rounded-card shadow-card overflow-hidden",
+          expanded && "flex flex-col max-h-full",
+        )}
+      >
         <div className="flex items-center gap-3 px-4 py-2.5 border-b border-separator-soft">
           <div className="min-w-0">
             <div className="text-[13px] font-[650] truncate">{docName}</div>
@@ -102,11 +121,15 @@ export function Viewer({
               <Chip tone="success">{t("downloadBlocked")}</Chip>
               <InfoTooltip text={tt("downloadBlocked")} />
             </span>
+            <ExpandButton expanded={expanded} onToggle={toggle} />
           </div>
         </div>
 
         <div
-          className="grid place-items-center p-5 bg-bg min-h-[420px] select-none"
+          className={cn(
+            "grid place-items-center p-5 bg-bg select-none",
+            expanded ? "flex-1 min-h-0 overflow-auto" : "min-h-[420px]",
+          )}
           onContextMenu={(e) => e.preventDefault()}
         >
           {notice ? (
@@ -134,7 +157,12 @@ export function Viewer({
               src={src}
               alt={`${docName} — page ${page}`}
               draggable={false}
-              className="max-w-full shadow-card rounded-[4px]"
+              className={cn(
+                "shadow-card rounded-[4px]",
+                // En plein écran, la page occupe la hauteur disponible ; sinon
+                // elle s'ajuste à la largeur de la carte.
+                expanded ? "max-h-full w-auto max-w-full" : "max-w-full",
+              )}
             />
           ) : null}
         </div>
@@ -161,4 +189,10 @@ export function Viewer({
       </section>
     </div>
   );
+
+  // Agrandi : monté sur <body>, hors de tout ancêtre transformé (cf.
+  // useExpanded). Sinon `inset-0` se résout contre le wrapper d'animation.
+  return expanded && typeof document !== "undefined"
+    ? createPortal(panel, document.body)
+    : panel;
 }

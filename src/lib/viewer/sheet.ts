@@ -42,6 +42,19 @@ export interface Cell {
   /** Couleur de fond, #rrggbb. */
   bg?: string;
   a?: "left" | "center" | "right";
+  /** Alignement vertical ; Excel place en bas par défaut. */
+  va?: "top" | "middle" | "bottom";
+  /** Retour à la ligne dans la cellule. */
+  wr?: true;
+  /** Retrait (indentation) d'Excel, en niveaux. */
+  ind?: number;
+  /** Taille de police en points, si elle diffère de la taille par défaut. */
+  fs?: number;
+  /** Bordures explicites du classeur, déjà prêtes pour CSS. */
+  bt?: string;
+  br?: string;
+  bb?: string;
+  bl?: string;
   /** Valeur numérique : alignée à droite comme dans Excel. */
   n?: true;
   /** Fusion : nombre de colonnes / lignes couvertes. */
@@ -56,6 +69,8 @@ export interface SheetData {
   rows: Cell[][];
   /** Largeurs de colonnes en pixels, dans l'ordre. */
   widths: number[];
+  /** Hauteurs de lignes en pixels, dans l'ordre ; 0 = hauteur par défaut. */
+  heights: number[];
   /** Vrai si cette feuille a été coupée par les garde-fous ci-dessus. */
   truncated: boolean;
   totalRows: number;
@@ -170,10 +185,64 @@ function cellStyle(cell: ExcelJS.Cell): Partial<Cell> {
     if (bg) out.bg = bg;
   }
 
-  const h = cell.alignment?.horizontal;
+  if (font?.size && font.size !== 11) out.fs = font.size;
+
+  const al = cell.alignment;
+  const h = al?.horizontal;
   if (h === "center" || h === "right" || h === "left") out.a = h;
+  const v = al?.vertical;
+  if (v === "top" || v === "middle" || v === "bottom") out.va = v;
+  if (al?.wrapText) out.wr = true;
+  if (al?.indent) out.ind = al.indent;
+
+  const b = cell.border;
+  if (b) {
+    const t = borderCss(b.top);
+    if (t) out.bt = t;
+    const r = borderCss(b.right);
+    if (r) out.br = r;
+    const bo = borderCss(b.bottom);
+    if (bo) out.bb = bo;
+    const l = borderCss(b.left);
+    if (l) out.bl = l;
+  }
 
   return out;
+}
+
+/**
+ * Bordure Excel vers CSS. Les styles d'Excel n'ont pas tous d'équivalent
+ * (« hair », « double »…) : on approche par l'épaisseur, ce qui préserve
+ * l'intention — un trait fin reste fin, un trait épais reste épais.
+ */
+function borderCss(
+  b: Partial<ExcelJS.Border> | undefined,
+): string | undefined {
+  if (!b?.style) return undefined;
+  const color = argbToCss(b.color) ?? "#000000";
+  switch (b.style) {
+    case "hair":
+    case "thin":
+      return `1px solid ${color}`;
+    case "dotted":
+      return `1px dotted ${color}`;
+    case "dashed":
+    case "dashDot":
+    case "dashDotDot":
+      return `1px dashed ${color}`;
+    case "medium":
+    case "mediumDashed":
+    case "mediumDashDot":
+    case "mediumDashDotDot":
+    case "slantDashDot":
+      return `2px solid ${color}`;
+    case "thick":
+      return `3px solid ${color}`;
+    case "double":
+      return `3px double ${color}`;
+    default:
+      return `1px solid ${color}`;
+  }
 }
 
 /** Convertit « A1:C3 » en bornes numériques. */
@@ -308,10 +377,18 @@ export async function readWorkbook(
       widths.push(widthToPx(ws.getColumn(c)?.width));
     }
 
+    // Hauteurs : Excel les exprime en points. 0 signifie « hauteur par
+    // défaut », qu'on laisse le navigateur calculer d'après le contenu.
+    const heights = rows.map((_, i) => {
+      const h = ws.getRow(i + 1)?.height;
+      return h && Number.isFinite(h) ? Math.round(h * (96 / 72)) : 0;
+    });
+
     sheets.push({
       name: ws.name,
       rows,
       widths,
+      heights,
       truncated: totalRows > rowLimit || totalCols > colLimit,
       totalRows,
       totalCols,
