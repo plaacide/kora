@@ -13,6 +13,16 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
+# Next inline les variables NEXT_PUBLIC_* DANS le bundle client, au build.
+# Elles doivent donc être fournies ici (elles ne sont pas secrètes : l'URL et
+# la clé publishable/anon sont de toute façon visibles côté navigateur).
+# À passer au build : --build-arg NEXT_PUBLIC_SUPABASE_URL=... etc.
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+
 # `output: "standalone"` (next.config.ts) produit .next/standalone.
 RUN npm run build
 

@@ -1,10 +1,11 @@
-# Déploiement Fly.io — image unique Kora (Next.js + LibreOffice).
+# Déploiement Fly.io — image unique Sanza (Next.js + LibreOffice).
 # Région cdg (Paris) : au plus près de la résidence UE promise.
 #
 # Démarrage : `fly launch --no-deploy` (crée l'app), puis `fly deploy`.
-# Secrets (jamais dans ce fichier) : `fly secrets set NEXT_PUBLIC_SUPABASE_URL=... ...`
+# NEXT_PUBLIC_* (non secrètes, inlinées au build) : passées en --build-arg.
+# Secrets runtime : `fly secrets set SUPABASE_SERVICE_ROLE_KEY=... RESEND_API_KEY=...`
 
-app = "kora"
+app = "sanza"
 primary_region = "cdg"
 
 [build]
