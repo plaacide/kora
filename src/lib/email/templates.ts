@@ -10,7 +10,7 @@ interface InvitationEmailInput {
  * Email d'invitation — HTML autonome, styles inline.
  *
  * Les clients mail ne supportent ni feuilles de style externes ni CSS moderne :
- * pas de Tailwind ici, on réécrit les tokens à la main (indigo Kora, Instrument
+ * pas de Tailwind ici, on réécrit les tokens à la main (indigo Sanza, Instrument
  * Sans avec repli système).
  */
 export function invitationEmail(input: InvitationEmailInput): {
@@ -53,7 +53,7 @@ export function invitationEmail(input: InvitationEmailInput): {
           <a href="${input.link}" style="display:inline-block;background:#2f3061;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
           <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#8a8a9c;">${escape(notice)}</p>
           <hr style="border:none;border-top:1px solid #eeeef2;margin:24px 0 16px;">
-          <p style="margin:0;font-size:11px;color:#a0a0b0;">Kora — ${fr ? "data room sécurisée" : "secure data room"} · ${fr ? "Chiffré" : "Encrypted"} · SOC 2</p>
+          <p style="margin:0;font-size:11px;color:#a0a0b0;">Sanza — ${fr ? "data room sécurisée" : "secure data room"} · ${fr ? "Chiffré" : "Encrypted"} · SOC 2</p>
         </td></tr>
       </table>
     </td></tr>

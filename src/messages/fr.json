@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Kora — Dealroom",
+    "title": "Sanza — Dealroom",
     "description": "Data room sécurisée et dealroom pour les transactions africaines."
   },
   "common": {
-    "appName": "Kora",
+    "appName": "Sanza",
     "tagline": "La data room sécurisée des transactions africaines.",
     "encrypted": "Chiffré · SOC 2",
     "encryptedHosting": "Chiffré · SOC 2 · Hébergement UE",
@@ -79,7 +79,7 @@
   "shell": {
     "searchPlaceholder": "Rechercher un deal, un document…",
     "logout": "Déconnexion",
-    "home": "Kora — accueil",
+    "home": "Sanza — accueil",
     "mainNav": "Navigation principale",
     "groups": {
       "overview": "Vue d'ensemble",
@@ -215,7 +215,7 @@
   "dataroom": {
     "title": "Data room",
     "subtitle": "Documents indexés automatiquement, chiffrés et tracés.",
-    "emptyState": "Aucun deal pour l'instant. Créez-en un : Kora génère automatiquement l'arborescence de data room (Corporate, Financier, Juridique, RH, PI, Conformité).",
+    "emptyState": "Aucun deal pour l'instant. Créez-en un : Sanza génère automatiquement l'arborescence de data room (Corporate, Financier, Juridique, RH, PI, Conformité).",
     "newDeal": "Nouveau deal",
     "createDeal": "Créer le deal",
     "creating": "Création…",
@@ -388,7 +388,7 @@
   "roadmap": {
     "badge": "Roadmap publique",
     "title": "Ce qui existe, ce qui arrive",
-    "subtitle": "Kora est en V0 : le cœur sécurisé fonctionne, le reste est en construction. Cette page dit honnêtement où on en est — et vous laisse peser sur la suite.",
+    "subtitle": "Sanza est en V0 : le cœur sécurisé fonctionne, le reste est en construction. Cette page dit honnêtement où on en est — et vous laisse peser sur la suite.",
     "intro": "Votez pour ce qui compte le plus pour vous. Ce sont les votes qui décident de l'ordre de construction, pas nos intuitions.",
     "suggest": "Suggérer une fonctionnalité",
     "loginToSuggest": "Se connecter pour suggérer",
@@ -413,7 +413,7 @@
     "send": "Envoyer",
     "backToApp": "Retour à l'app",
     "login": "Se connecter",
-    "disclaimer": "Les échéances sont indicatives et peuvent bouger : elles dépendent de vos retours. Kora est développé par une équipe réduite — nous préférons annoncer peu et livrer, plutôt que promettre large."
+    "disclaimer": "Les échéances sont indicatives et peuvent bouger : elles dépendent de vos retours. Sanza est développé par une équipe réduite — nous préférons annoncer peu et livrer, plutôt que promettre large."
   },
   "pipeline": {
     "title": "Pipeline",

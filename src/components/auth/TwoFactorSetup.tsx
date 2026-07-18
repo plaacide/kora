@@ -24,7 +24,7 @@ export function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) 
     const supabase = createClient();
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
-      friendlyName: `Kora TOTP ${Date.now()}`,
+      friendlyName: `Sanza TOTP ${Date.now()}`,
     });
     setBusy(false);
     if (error) return setError(error.message);

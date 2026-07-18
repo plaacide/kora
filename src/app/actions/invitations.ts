@@ -54,7 +54,7 @@ export async function createInvitation(input: {
     .maybeSingle();
 
   const orgName =
-    (deal?.organizations as unknown as { name?: string } | null)?.name ?? "Kora";
+    (deal?.organizations as unknown as { name?: string } | null)?.name ?? "Sanza";
   const locale = (await getLocale()) as "fr" | "en";
 
   const { subject, html } = invitationEmail({

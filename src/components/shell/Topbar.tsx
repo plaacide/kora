@@ -32,7 +32,7 @@ export async function Topbar({
             K
           </span>
           <span className="text-[14px] font-[650] tracking-[-0.01em] text-ink">
-            Kora
+            Sanza
           </span>
         </Link>
         <span className="text-[11px] font-[550] text-ink-secondary bg-chip-neutral-bg rounded-chip px-1.5 py-0.5">

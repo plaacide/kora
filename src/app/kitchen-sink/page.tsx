@@ -35,7 +35,7 @@ function Demo() {
     <main className="max-w-3xl mx-auto px-7 py-10 flex flex-col gap-9">
       <header className="flex flex-col gap-1">
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          Design system Kora
+          Design system Sanza
         </h1>
         <p className="text-[12.5px] text-ink-secondary">
           Primitives dérivées des tokens du prototype — couleurs OKLCH,

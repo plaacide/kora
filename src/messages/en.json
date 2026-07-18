@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Kora — Dealroom",
+    "title": "Sanza — Dealroom",
     "description": "Secure data room and dealroom for African transactions."
   },
   "common": {
-    "appName": "Kora",
+    "appName": "Sanza",
     "tagline": "The secure data room for African transactions.",
     "encrypted": "Encrypted · SOC 2",
     "encryptedHosting": "Encrypted · SOC 2 · EU hosting",
@@ -79,7 +79,7 @@
   "shell": {
     "searchPlaceholder": "Search a deal, a document…",
     "logout": "Log out",
-    "home": "Kora — home",
+    "home": "Sanza — home",
     "mainNav": "Main navigation",
     "groups": {
       "overview": "Overview",
@@ -215,7 +215,7 @@
   "dataroom": {
     "title": "Data room",
     "subtitle": "Documents auto-indexed, encrypted and traced.",
-    "emptyState": "No deal yet. Create one: Kora automatically generates the data room structure (Corporate, Financial, Legal, HR, IP, Compliance).",
+    "emptyState": "No deal yet. Create one: Sanza automatically generates the data room structure (Corporate, Financial, Legal, HR, IP, Compliance).",
     "newDeal": "New deal",
     "createDeal": "Create deal",
     "creating": "Creating…",
@@ -388,7 +388,7 @@
   "roadmap": {
     "badge": "Public roadmap",
     "title": "What exists, what's coming",
-    "subtitle": "Kora is at V0: the secure core works, the rest is being built. This page says honestly where we stand — and lets you weigh in on what comes next.",
+    "subtitle": "Sanza is at V0: the secure core works, the rest is being built. This page says honestly where we stand — and lets you weigh in on what comes next.",
     "intro": "Vote for what matters most to you. Votes decide the build order, not our hunches.",
     "suggest": "Suggest a feature",
     "loginToSuggest": "Log in to suggest",
@@ -413,7 +413,7 @@
     "send": "Send",
     "backToApp": "Back to app",
     "login": "Log in",
-    "disclaimer": "Timelines are indicative and may shift: they depend on your feedback. Kora is built by a small team — we prefer announcing little and shipping, over promising broadly."
+    "disclaimer": "Timelines are indicative and may shift: they depend on your feedback. Sanza is built by a small team — we prefer announcing little and shipping, over promising broadly."
   },
   "pipeline": {
     "title": "Pipeline",

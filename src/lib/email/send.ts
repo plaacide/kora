@@ -27,7 +27,7 @@ export async function sendEmail(message: EmailMessage): Promise<SendResult> {
 
   // Sans domaine vérifié, Resend n'autorise que onboarding@resend.dev,
   // qui ne peut écrire qu'au propriétaire du compte.
-  const from = process.env.EMAIL_FROM ?? "Kora <onboarding@resend.dev>";
+  const from = process.env.EMAIL_FROM ?? "Sanza <onboarding@resend.dev>";
 
   try {
     const resend = new Resend(key);
