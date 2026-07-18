@@ -42,8 +42,12 @@ export function AuthSplit({
       </div>
 
       {/* Panneau Encre : masqué sur mobile, où il pousserait le formulaire
-          sous la ligne de flottaison. */}
-      <div className="hidden lg:flex relative overflow-hidden flex-col justify-end p-10 bg-encre text-white">
+          sous la ligne de flottaison.
+
+          Contenu CENTRÉ verticalement, à la hauteur du formulaire d'en face.
+          Collé en bas, il se lisait comme un pied de page décoratif au lieu de
+          répondre au regard qui vient de quitter le champ mot de passe. */}
+      <div className="hidden lg:flex relative overflow-hidden flex-col justify-center p-10 lg:p-14 bg-encre text-white">
         <ResonanceArcs corner={arcsCorner} />
         <div className="relative z-10 max-w-md">{panel}</div>
         {footer && <div className="relative z-10 mt-6">{footer}</div>}
