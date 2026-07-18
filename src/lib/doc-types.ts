@@ -3,30 +3,43 @@
  * ni "use server") : il exporte des constantes, donc il doit rester importable
  * des deux côtés — voir AGENTS.md.
  *
- * Trois familles :
+ * Quatre familles :
  *   - pdf     : rendu direct par pdf.js, filigrané.
- *   - office  : converti en PDF par le worker LibreOffice, puis filigrané.
+ *   - office  : converti en PDF par LibreOffice, puis filigrané (docx, pptx…).
+ *   - sheet   : tableur — lu comme une grille, PAS comme une image.
  *   - other   : ni l'un ni l'autre (archive, vidéo…) — pas d'aperçu.
  *
- * Le worker ne change PAS le modèle de sécurité : la conversion se fait sur
- * notre infra, le fichier source ne part jamais chez un tiers, et c'est
- * toujours un PDF filigrané qui est servi au navigateur.
+ * Pourquoi les tableurs à part : un modèle financier rendu en PNG est
+ * illisible (colonnes tronquées, pas de défilement, formules invisibles), et
+ * LibreOffice découpe arbitrairement les classeurs larges en pages. On lit
+ * donc les données et on les affiche en tableau.
+ *
+ * Le modèle de sécurité ne change pas : dans les deux cas le fichier source
+ * est lu côté serveur et ne part jamais chez un tiers ni sur le poste du
+ * lecteur, et chaque consultation est journalisée. Nuance à ne pas masquer
+ * dans l'UI : un tableau est du texte, donc copiable — contrairement à une
+ * page rendue en image. Voir `viewer.sheetNotice`.
  */
 
-export type DocKind = "pdf" | "office" | "other";
+export type DocKind = "pdf" | "office" | "sheet" | "other";
 
-// Formats que LibreOffice convertit proprement en PDF.
+// Tableurs : lus en grille.
+const SHEET_EXT = [".xlsx", ".xls", ".xlsm", ".ods", ".csv"];
+
+const SHEET_MIME = [
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+  "application/vnd.oasis.opendocument.spreadsheet",
+  "text/csv",
+];
+
+// Documents à mise en page fixe : LibreOffice les convertit proprement en PDF.
 const OFFICE_EXT = [
-  ".xlsx", ".xls", ".xlsm", ".ods", ".csv",
   ".pptx", ".ppt", ".odp",
   ".docx", ".doc", ".odt", ".rtf",
 ];
 
 const OFFICE_MIME = [
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "application/vnd.ms-excel",
-  "application/vnd.oasis.opendocument.spreadsheet",
-  "text/csv",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "application/vnd.ms-powerpoint",
   "application/vnd.oasis.opendocument.presentation",
@@ -45,11 +58,21 @@ export function docKind(name: string, mime: string | null): DocKind {
   const e = ext(name);
   const m = (mime ?? "").toLowerCase();
   if (e === ".pdf" || m === "application/pdf") return "pdf";
-  if (OFFICE_EXT.includes(e) || OFFICE_MIME.includes(m)) return "office";
+  // L'extension prime sur le type MIME : les navigateurs envoient souvent
+  // application/vnd.ms-excel pour un .csv, et octet-stream pour le reste.
+  if (SHEET_EXT.includes(e)) return "sheet";
+  if (OFFICE_EXT.includes(e)) return "office";
+  if (SHEET_MIME.includes(m)) return "sheet";
+  if (OFFICE_MIME.includes(m)) return "office";
   return "other";
 }
 
-/** Un aperçu filigrané est-il possible pour ce fichier ? */
+/** Un aperçu est-il possible pour ce fichier ? */
 export function isViewable(name: string, mime: string | null): boolean {
   return docKind(name, mime) !== "other";
+}
+
+/** Ce fichier se lit-il en grille plutôt qu'en pages rendues ? */
+export function isSheet(name: string, mime: string | null): boolean {
+  return docKind(name, mime) === "sheet";
 }

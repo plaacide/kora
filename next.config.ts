@@ -12,7 +12,9 @@ const nextConfig: NextConfig = {
     root: path.resolve(__dirname),
   },
   // Binding natif (canvas) + pdfjs : à charger au runtime Node, pas à bundler.
-  serverExternalPackages: ["@napi-rs/canvas", "pdfjs-dist"],
+  // exceljs charge ses dépendances par require dynamique : le bundler ne les
+  // suit pas correctement, on le laisse au runtime Node.
+  serverExternalPackages: ["@napi-rs/canvas", "pdfjs-dist", "exceljs"],
   // pdfjs charge son worker par un import dynamique construit à l'exécution :
   // le traceur de Next ne le voit pas et `pdf.worker.mjs` manque dans la sortie
   // standalone. En local on ne s'en aperçoit pas (node_modules complet est là) ;

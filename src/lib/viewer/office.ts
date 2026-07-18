@@ -39,7 +39,11 @@ function extOf(name: string): string {
   return i < 0 ? "" : name.slice(i + 1).toLowerCase();
 }
 
-function runSoffice(inputPath: string, workDir: string): Promise<void> {
+function runSoffice(
+  inputPath: string,
+  workDir: string,
+  target: string,
+): Promise<void> {
   // Profil LibreOffice jetable par appel : deux conversions simultanées ne
   // partagent aucun état, ce qui évite le blocage de soffice sur un profil
   // déjà verrouillé.
@@ -53,7 +57,7 @@ function runSoffice(inputPath: string, workDir: string): Promise<void> {
         "--nofirststartwizard",
         `-env:UserInstallation=file://${profile}`,
         "--convert-to",
-        "pdf",
+        target,
         "--outdir",
         workDir,
         inputPath,
@@ -65,12 +69,14 @@ function runSoffice(inputPath: string, workDir: string): Promise<void> {
 }
 
 /**
- * Convertit des octets bureautiques en PDF. Renvoie null si LibreOffice n'est
- * pas disponible ; lève une erreur si la conversion elle-même échoue.
+ * Convertit des octets bureautiques vers `target` (« pdf », « xlsx »…).
+ * Renvoie null si LibreOffice n'est pas disponible ; lève une erreur si la
+ * conversion elle-même échoue.
  */
-export async function officeToPdf(
+export async function officeConvert(
   bytes: Uint8Array,
   fileName: string,
+  target: string,
 ): Promise<Uint8Array | null> {
   if (!(await officeConversionAvailable())) return null;
 
@@ -80,18 +86,30 @@ export async function officeToPdf(
     const inputPath = join(workDir, `${randomUUID()}.${ext}`);
     await writeFile(inputPath, bytes);
 
-    await runSoffice(inputPath, workDir);
+    await runSoffice(inputPath, workDir, target);
 
-    // LibreOffice nomme la sortie <base>.pdf ; on la retrouve sans supposer
-    // le nom exact.
-    const produced = (await readdir(workDir)).find((f) => f.endsWith(".pdf"));
+    // LibreOffice nomme la sortie <base>.<target> ; on la retrouve sans
+    // supposer le nom exact. On exclut le fichier d'entrée : convertir un
+    // .xlsx vers xlsx laisserait deux candidats dans le dossier.
+    const suffix = `.${target}`;
+    const produced = (await readdir(workDir)).find(
+      (f) => f.endsWith(suffix) && join(workDir, f) !== inputPath,
+    );
     if (!produced) throw new Error("no_output");
     // `readFile` renvoie un Buffer. C'est bien une sous-classe d'Uint8Array,
     // mais pdfjs le refuse explicitement (« Please provide binary data as
     // Uint8Array, rather than Buffer ») : on recopie la vue.
-    const pdf = await readFile(join(workDir, produced));
-    return new Uint8Array(pdf.buffer, pdf.byteOffset, pdf.byteLength);
+    const out = await readFile(join(workDir, produced));
+    return new Uint8Array(out.buffer, out.byteOffset, out.byteLength);
   } finally {
     await rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
+}
+
+/** Raccourci historique : conversion vers PDF. */
+export function officeToPdf(
+  bytes: Uint8Array,
+  fileName: string,
+): Promise<Uint8Array | null> {
+  return officeConvert(bytes, fileName, "pdf");
 }

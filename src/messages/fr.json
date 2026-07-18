@@ -179,6 +179,7 @@
       "folder_created": "Dossier créé",
       "document_uploaded": "Document déposé",
       "document_page_viewed": "Page consultée",
+      "document_sheet_viewed": "Tableur consulté",
       "document_downloaded": "Document téléchargé",
       "permission_set": "Droit modifié",
       "invitation_created": "Invitation envoyée",
@@ -341,21 +342,28 @@
   },
   "viewer": {
     "title": "Visionneuse",
-    "subtitle": "Pages filigranées à la volée. Le fichier source ne quitte jamais le serveur.",
-    "emptyState": "Aucun document PDF à afficher. Déposez-en un dans la data room.",
+    "subtitle": "Documents rendus page par page, tableurs lus en grille. Le fichier source ne quitte jamais le serveur.",
+    "emptyState": "Aucun document à afficher. Déposez-en un dans la data room.",
     "pageOf": "page {page} / {total}",
     "watermarked": "Filigrané",
     "downloadBlocked": "Téléchargement bloqué",
     "loading": "Chargement de la page…",
     "renderError": "Impossible d'afficher cette page",
     "officeNotReady": "Aperçu bureautique bientôt disponible",
-    "officeNotReadyHint": "Ce fichier Excel/PowerPoint sera bientôt lisible ici, filigrané. En attendant, demandez une version PDF au responsable du deal.",
+    "officeNotReadyHint": "Ce fichier sera bientôt lisible ici. En attendant, demandez une version PDF au responsable du deal.",
     "officeFailed": "La conversion de ce fichier a échoué",
     "officeFailedHint": "Réessayez dans un instant. Si le problème persiste, signalez-le au responsable du deal.",
     "unsupported": "Format sans aperçu",
     "unsupportedHint": "Ce type de fichier ne peut pas être prévisualisé dans la visionneuse.",
     "prev": "Précédente",
-    "next": "Suivante"
+    "next": "Suivante",
+    "sheetMode": "Lecture tableur",
+    "loadingSheet": "Lecture du classeur…",
+    "sheetEmpty": "Cette feuille est vide.",
+    "sheetFailed": "Ce classeur n'a pas pu être lu",
+    "sheetFailedHint": "Le fichier est peut-être protégé par un mot de passe ou corrompu. Signalez-le au responsable du deal.",
+    "sheetTruncated": "Affichage limité aux {rows} premières lignes sur {total}. Le reste du classeur n'est pas chargé.",
+    "cellCount": "{rows} lignes × {cols} colonnes"
   },
   "security": {
     "title": "Sécurité",
@@ -613,6 +621,7 @@
     "qa": "Les questions des investisseurs et vos réponses. Une réponse n'est visible qu'une fois publiée.",
     "security": "Protégez votre compte : authentification à deux facteurs et politique de mot de passe.",
     "twoFactor": "Un second code, en plus du mot de passe, à chaque connexion — via une application d'authentification.",
-    "roadmap": "Ce qui reste à construire, et quand. Vos testeurs peuvent suggérer et voter des fonctionnalités."
+    "roadmap": "Ce qui reste à construire, et quand. Vos testeurs peuvent suggérer et voter des fonctionnalités.",
+    "sheetMode": "Les tableurs sont lus en grille plutôt que rendus en image : un modèle financier doit rester lisible et défilable. Seules les valeurs sont transmises — jamais les formules, ni le fichier lui-même."
   }
 }

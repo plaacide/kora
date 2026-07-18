@@ -2,9 +2,10 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { getCurrentDeal } from "@/lib/current-deal";
-import { isViewable } from "@/lib/doc-types";
+import { isViewable, isSheet } from "@/lib/doc-types";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Viewer } from "@/components/viewer/Viewer";
+import { SheetView } from "@/components/viewer/SheetView";
 
 export default async function VisionneusePage({
   searchParams,
@@ -77,11 +78,21 @@ export default async function VisionneusePage({
           {t("subtitle")}
         </p>
       </div>
-      <Viewer
-        versionId={doc.current_version_id}
-        docName={doc.name}
-        docIndex={doc.index_path}
-      />
+      {/* Un tableur se lit en grille, pas en pages rendues : une image d'un
+          modèle financier est illisible. Voir src/lib/doc-types.ts. */}
+      {isSheet(doc.name, null) ? (
+        <SheetView
+          versionId={doc.current_version_id}
+          docName={doc.name}
+          docIndex={doc.index_path}
+        />
+      ) : (
+        <Viewer
+          versionId={doc.current_version_id}
+          docName={doc.name}
+          docIndex={doc.index_path}
+        />
+      )}
     </div>
   );
 }

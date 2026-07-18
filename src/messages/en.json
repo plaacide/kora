@@ -179,6 +179,7 @@
       "folder_created": "Folder created",
       "document_uploaded": "Document uploaded",
       "document_page_viewed": "Page viewed",
+      "document_sheet_viewed": "Spreadsheet viewed",
       "document_downloaded": "Document downloaded",
       "permission_set": "Permission changed",
       "invitation_created": "Invitation sent",
@@ -341,21 +342,28 @@
   },
   "viewer": {
     "title": "Viewer",
-    "subtitle": "Pages watermarked on the fly. The source file never leaves the server.",
-    "emptyState": "No PDF document to display. Drop one in the data room.",
+    "subtitle": "Documents rendered page by page, spreadsheets read as a grid. The source file never leaves the server.",
+    "emptyState": "No document to display. Drop one in the data room.",
     "pageOf": "page {page} / {total}",
     "watermarked": "Watermarked",
     "downloadBlocked": "Download blocked",
     "loading": "Loading page…",
     "renderError": "Cannot display this page",
     "officeNotReady": "Office preview coming soon",
-    "officeNotReadyHint": "This Excel/PowerPoint file will soon be viewable here, watermarked. In the meantime, ask the deal owner for a PDF version.",
+    "officeNotReadyHint": "This file will soon be viewable here. In the meantime, ask the deal owner for a PDF version.",
     "officeFailed": "Converting this file failed",
     "officeFailedHint": "Try again shortly. If it keeps failing, let the deal owner know.",
     "unsupported": "No preview for this format",
     "unsupportedHint": "This file type cannot be previewed in the viewer.",
     "prev": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "sheetMode": "Spreadsheet view",
+    "loadingSheet": "Reading workbook…",
+    "sheetEmpty": "This sheet is empty.",
+    "sheetFailed": "This workbook could not be read",
+    "sheetFailedHint": "The file may be password-protected or corrupted. Let the deal owner know.",
+    "sheetTruncated": "Showing the first {rows} rows of {total}. The rest of the workbook is not loaded.",
+    "cellCount": "{rows} rows × {cols} columns"
   },
   "security": {
     "title": "Security",
@@ -613,6 +621,7 @@
     "qa": "Investors' questions and your answers. An answer is only visible once published.",
     "security": "Protect your account: two-factor authentication and password policy.",
     "twoFactor": "A second code, on top of your password, at every sign-in — via an authenticator app.",
-    "roadmap": "What's left to build, and when. Your testers can suggest and vote on features."
+    "roadmap": "What's left to build, and when. Your testers can suggest and vote on features.",
+    "sheetMode": "Spreadsheets are read as a grid rather than rendered as an image, so a financial model stays readable and scrollable. Only values are sent — never formulas, nor the file itself."
   }
 }

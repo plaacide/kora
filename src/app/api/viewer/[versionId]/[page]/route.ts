@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { renderPdfPage } from "@/lib/viewer/render";
 import { docKind } from "@/lib/doc-types";
 import { officeToPdf, officeConversionAvailable } from "@/lib/viewer/office";
+import { resolveVersionAccess } from "@/lib/viewer/access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,9 +12,13 @@ export const dynamic = "force-dynamic";
  * Sert UNE page de document, filigranée, à un utilisateur autorisé.
  *
  * Chemin d'accès unique aux documents : le bucket n'a aucune policy de lecture
- * client. Ici on vérifie la session, puis les droits via une requête soumise à
- * la RLS (donc si l'utilisateur n'a pas accès au deal, il ne voit rien),
- * et seulement ensuite on lit le fichier avec la clé privilégiée.
+ * client. Le contrôle des droits vit dans `resolveVersionAccess` (partagé avec
+ * la route tableur) ; ce n'est qu'ensuite qu'on lit le fichier avec la clé
+ * privilégiée.
+ *
+ * Les tableurs ne passent PAS par ici : ils se lisent en grille
+ * (/api/sheet/[versionId]), une page rendue étant illisible pour un modèle
+ * financier.
  */
 export async function GET(
   _request: Request,
@@ -23,67 +27,16 @@ export async function GET(
   const { versionId, page } = await ctx.params;
   const pageNo = Number.parseInt(page, 10) || 1;
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "non authentifié" }, { status: 401 });
+  const result = await resolveVersionAccess(versionId);
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: result.error },
+      { status: result.status },
+    );
   }
+  const { doc, storageKey, mimeType, level, userId, userEmail } = result.access;
 
-  // Lecture SOUS RLS : c'est le contrôle d'accès réel. Un non-membre obtient
-  // null ici et n'ira jamais jusqu'à la lecture du fichier.
-  // FK explicite : `documents` et `document_versions` se référencent
-  // mutuellement (document_id / current_version_id). Sans ce hint, PostgREST
-  // ne sait pas quelle relation suivre et renvoie null.
-  const { data: version } = await supabase
-    .from("document_versions")
-    .select(
-      "id, storage_key, mime_type, documents!document_versions_document_id_fkey!inner(id, name, folder_id, deal_id, deals!inner(id, org_id))",
-    )
-    .eq("id", versionId)
-    .maybeSingle();
-
-  if (!version) {
-    return NextResponse.json({ error: "introuvable" }, { status: 404 });
-  }
-
-  const doc = version.documents as unknown as {
-    id: string;
-    name: string;
-    folder_id: string;
-    deal_id: string;
-    deals: { id: string; org_id: string };
-  };
-
-  // Niveau effectif (hérité des dossiers parents, expiration prise en compte).
-  // Fermé par défaut : toute erreur ou absence de droit => refus.
-  const { data: level } = await supabase.rpc("my_permission", {
-    p_folder: doc.folder_id,
-  });
-
-  if (!level || level === "none") {
-    return NextResponse.json({ error: "accès refusé" }, { status: 403 });
-  }
-
-  // Seul le niveau 'watermark' impose le filigrane ; 'view' et au-dessus
-  // donnent une page propre (cf. niveaux du prototype).
-  const watermarked = level === "watermark";
-  const stamp = new Date().toISOString().slice(0, 10);
-  const watermark = watermarked ? `${user.email} · ${stamp}` : "";
-
-  const admin = createAdminClient();
-  const { data: file, error: dlError } = await admin.storage
-    .from("documents")
-    .download(version.storage_key);
-
-  if (dlError || !file) {
-    return NextResponse.json({ error: "lecture impossible" }, { status: 500 });
-  }
-
-  const raw = new Uint8Array(await file.arrayBuffer());
-  const kind = docKind(doc.name, version.mime_type);
+  const kind = docKind(doc.name, mimeType);
 
   if (kind === "other") {
     // Archive, vidéo, etc. : aucun aperçu filigrané possible.
@@ -93,8 +46,31 @@ export async function GET(
     );
   }
 
-  // PDF : rendu direct. Bureautique : on passe d'abord par le worker, qui rend
-  // un PDF filigrané ensuite comme n'importe quel autre — le fichier source ne
+  if (kind === "sheet") {
+    return NextResponse.json(
+      { error: "is_a_sheet", kind: "sheet" },
+      { status: 415 },
+    );
+  }
+
+  // Seul le niveau 'watermark' impose le filigrane ; 'view' et au-dessus
+  // donnent une page propre (cf. niveaux du prototype).
+  const stamp = new Date().toISOString().slice(0, 10);
+  const watermark = level === "watermark" ? `${userEmail} · ${stamp}` : "";
+
+  const admin = createAdminClient();
+  const { data: file, error: dlError } = await admin.storage
+    .from("documents")
+    .download(storageKey);
+
+  if (dlError || !file) {
+    return NextResponse.json({ error: "lecture impossible" }, { status: 500 });
+  }
+
+  const raw = new Uint8Array(await file.arrayBuffer());
+
+  // PDF : rendu direct. Bureautique : conversion LibreOffice en PDF d'abord,
+  // filigranée ensuite comme n'importe quelle autre — le fichier source ne
   // sort jamais de notre infra.
   let pdfBytes: Uint8Array<ArrayBufferLike> = raw;
   if (kind === "office") {
@@ -134,7 +110,7 @@ export async function GET(
 
   // Chaque page ouverte est journalisée (audit chaîné).
   await admin.rpc("write_audit_as", {
-    p_actor: user.id,
+    p_actor: userId,
     p_org: doc.deals.org_id,
     p_action: "document.page_viewed",
     p_target_type: "document",
