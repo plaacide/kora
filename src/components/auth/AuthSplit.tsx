@@ -13,9 +13,13 @@ import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
  * Le logo reste en haut à gauche, au-dessus du formulaire — c'est le premier
  * point de repère, il ne doit pas partir du côté décoratif.
  *
- * Largeur du panneau : ~42 % de l'écran, avec un plancher pour que le texte ne
- * s'écrase pas sur un portable, et un plafond pour qu'il ne dévore pas
- * l'écran sur un moniteur large.
+ * Largeur du panneau : 42 % de l'écran, comme OVHcloud — une PROPORTION, sans
+ * plafond en pixels. Un plafond faisait rétrécir le panneau à 37,5 % sur un
+ * écran de 1920 alors qu'il tenait ses 42 % sur un 1440 : la page ne se
+ * ressemblait plus d'un poste à l'autre.
+ *
+ * Pas de plancher non plus : en dessous de `lg` (1024 px) le panneau est
+ * masqué, et 42 % de 1024 laisse déjà 430 px, largement de quoi respirer.
  */
 export function AuthSplit({
   arcsCorner = "bottom-right",
@@ -29,7 +33,7 @@ export function AuthSplit({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen grid lg:grid-cols-[1fr_clamp(380px,42%,720px)]">
+    <div className="min-h-screen grid lg:grid-cols-[1fr_42%]">
       {/* Colonne claire : logo puis formulaire */}
       <div className="flex flex-col p-6 lg:p-10">
         <Link href="/" aria-label="Sanza" className="inline-block w-fit">
