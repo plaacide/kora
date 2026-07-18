@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, clientIp } from "@/lib/security/rate-limit";
 import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
 import {
@@ -21,6 +22,7 @@ export async function signup(
     email: formData.get("email"),
     password: formData.get("password"),
     locale: formData.get("locale") ?? "fr",
+    account_type: formData.get("account_type") ?? "founder",
   });
 
   if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
@@ -31,16 +33,27 @@ export async function signup(
     return { errorKey: "tooManyAttempts" };
   }
 
-  const { full_name, email, password, locale } = parsed.data;
+  const { full_name, email, password, locale, account_type } = parsed.data;
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name, locale } },
+    options: { data: { full_name, locale, account_type } },
   });
 
   if (error) return mapError(error.message);
+
+  // Le type de compte (investisseur/fondateur) pilote l'onboarding. On le pose
+  // sur le profil via la clé privilégiée : le trigger a déjà créé le profil,
+  // et l'utilisateur n'a pas forcément de session (email à confirmer).
+  if (data.user) {
+    const admin = createAdminClient();
+    await admin
+      .from("profiles")
+      .update({ account_type })
+      .eq("id", data.user.id);
+  }
 
   // La langue choisie à l'inscription pilote l'UI immédiatement.
   const store = await cookies();

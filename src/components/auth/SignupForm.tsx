@@ -1,18 +1,25 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { signup } from "@/app/actions/auth";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
+import { cn } from "@/lib/cn";
+
+const ROLES = [
+  { key: "investor", emoji: "📊", title: "Investisseur", desc: "Je cherche des opportunités d'investissement" },
+  { key: "founder", emoji: "🚀", title: "Fondateur", desc: "Je lève des fonds pour ma startup" },
+] as const;
 
 export function SignupForm() {
   const [state, action, pending] = useActionState(signup, undefined);
   const t = useTranslations("auth.signup");
   const tc = useTranslations("common");
   const locale = useLocale();
+  const [role, setRole] = useState<"investor" | "founder">("investor");
 
   return (
     <div className="flex flex-col gap-6">
@@ -28,7 +35,37 @@ export function SignupForm() {
         </p>
       </div>
 
+      {/* Sélecteur de persona : aiguille l'onboarding. */}
+      <div className="flex flex-col gap-2">
+        <span className="text-[12px] font-[550] text-ink-secondary">
+          Vous êtes…
+        </span>
+        <div className="grid grid-cols-2 gap-2.5">
+          {ROLES.map((r) => (
+            <button
+              key={r.key}
+              type="button"
+              onClick={() => setRole(r.key)}
+              aria-pressed={role === r.key}
+              className={cn(
+                "flex flex-col items-start gap-1 rounded-[10px] border-2 p-3 text-left transition-colors cursor-pointer",
+                role === r.key
+                  ? "border-primary bg-[rgba(232,92,43,0.06)]"
+                  : "border-line hover:border-line-strong",
+              )}
+            >
+              <span className="text-[18px]">{r.emoji}</span>
+              <span className="text-[12.5px] font-[650]">{r.title}</span>
+              <span className="text-[10.5px] text-ink-muted leading-tight">
+                {r.desc}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <form action={action} className="flex flex-col gap-4">
+        <input type="hidden" name="account_type" value={role} />
         <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />
 
         <div>
