@@ -125,6 +125,22 @@ curl -s "https://api.resend.com/emails/$ID" -H "Authorization: Bearer $RESEND_AP
 Corollaire : le sujet (`Subject heading`) se sauvegarde séparément du corps ;
 vérifier les deux.
 
+## E-mails d'authentification : c'est NOUS qui les composons
+
+Depuis le Send Email Hook (`/api/auth/email-hook`), Supabase n'envoie plus rien
+lui-même : il appelle notre route et nous rendons le message
+(`src/lib/email/auth-templates.ts`), en français ou en anglais selon
+`profiles.locale`. Les gabarits du tableau de bord Supabase ne sont donc plus la
+source de vérité — ne plus y coller de HTML, il serait ignoré.
+
+Deux variables d'environnement sont nécessaires, et leur absence est silencieuse
+côté utilisateur : `SEND_EMAIL_HOOK_SECRET` (sinon la route refuse tout, aucun
+e-mail ne part) et `EMAIL_FROM` sur le domaine vérifié.
+
+Piège de forme : la valeur de `EMAIL_FROM` contient `<` et `>`. Sans guillemets
+dans `.env.local`, `source .env.local` casse le shell (`parse error near \n`) —
+dotenv, lui, le tolère, donc le défaut ne se voit qu'en ligne de commande.
+
 ## Resend : le domaine vérifié est la RACINE, pas `send.`
 
 Resend affiche des enregistrements sur `send.sanza.africa` (MX de rebond +
