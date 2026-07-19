@@ -344,7 +344,7 @@ export function Checklist({
                             if (!dossier) return null;
                             return (
                               <Link
-                                href="/data-room"
+                                href={`/data-room?dossier=${dossier.id}`}
                                 className="inline-flex items-center gap-1 mt-1.5 text-[11px] text-link hover:text-link-hover"
                               >
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

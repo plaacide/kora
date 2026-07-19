@@ -111,6 +111,7 @@ export function DataRoom({
   viewsByDoc,
   templatesByFolder,
   canEdit,
+  initialFolderId = null,
 }: {
   orgId: string;
   dealId: string;
@@ -124,6 +125,8 @@ export function DataRoom({
   /** Modèles du dossier, rattachés par NOM de dossier. */
   templatesByFolder: Record<string, FolderTemplate[]>;
   canEdit: boolean;
+  /** Dossier à ouvrir d'emblée (lien depuis la checklist). */
+  initialFolderId?: string | null;
 }) {
   const t = useTranslations("dataroom");
   const tp = useTranslations("permissions");
@@ -131,12 +134,33 @@ export function DataRoom({
   const router = useRouter();
 
   const roots = useMemo(() => folders.filter((f) => !f.parent_id), [folders]);
-  const [selected, setSelected] = useState<string | null>(roots[0]?.id ?? null);
+  // Cible du lien « À déposer dans … » venant de la checklist. On ne
+  // l'accepte que si le dossier appartient bien à ce deal : un identifiant
+  // d'URL est saisi par l'utilisateur, il ne doit pas décider seul de ce qu'on
+  // sélectionne.
+  const cible = useMemo(
+    () => (initialFolderId && folders.some((f) => f.id === initialFolderId)
+      ? initialFolderId
+      : null),
+    [initialFolderId, folders],
+  );
+
+  const [selected, setSelected] = useState<string | null>(
+    cible ?? roots[0]?.id ?? null,
+  );
   // Seul le premier dossier racine est déroulé : avec 6+ catégories (chacune
   // avec ses sous-dossiers), tout ouvrir rendait l'arbre trop long.
-  const [openMap, setOpenMap] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(roots.map((f, i) => [f.id, i === 0])),
-  );
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>(() => {
+    const base = Object.fromEntries(roots.map((f, i) => [f.id, i === 0]));
+    // Le dossier ciblé peut être un sous-dossier : sans dérouler ses parents,
+    // le lien « À déposer dans 1.2 » sélectionnerait un dossier invisible.
+    let courant = cible ? folders.find((f) => f.id === cible) : undefined;
+    while (courant?.parent_id) {
+      base[courant.parent_id] = true;
+      courant = folders.find((f) => f.id === courant!.parent_id);
+    }
+    return base;
+  });
   const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | undefined>();

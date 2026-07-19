@@ -14,7 +14,14 @@ import type { FolderTemplate } from "@/components/dataroom/FolderTemplates";
 import type { Level } from "@/lib/permissions";
 import type { Locale } from "@/i18n/locales";
 
-export default async function DataRoomPage() {
+export default async function DataRoomPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ dossier?: string }>;
+}) {
+  // `?dossier=<id>` : la checklist renvoie ici sur le dossier attendu d'une
+  // pièce. Sans ce paramètre, on retombe sur le premier dossier racine.
+  const { dossier } = await searchParams;
   const t = await getTranslations("dataroom");
   const tt = await getTranslations("tips");
   const locale = (await getLocale()) as Locale;
@@ -208,6 +215,7 @@ export default async function DataRoomPage() {
         accessByFolder={accessByFolder}
         viewsByDoc={viewsByDoc}
         templatesByFolder={templatesByFolder}
+        initialFolderId={dossier ?? null}
         canEdit={canEdit}
       />
     </div>
