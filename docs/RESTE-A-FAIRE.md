@@ -24,12 +24,26 @@ fonctionnalité parce qu'ils mettent en jeu ce qui ne se répare pas.
 
 ---
 
-## Bloc 1 — Offre et positionnement
+## Bloc 1 — Offre
 
-Reconstruit de mémoire, à confirmer.
+L'offre n'est PAS à décider : elle est publiée sur le site depuis le
+repositionnement. Fondateur 15 000 F/mois (1er mois offert, sans carte),
+Programme 150 000 F/mois (≤ 10 startups, paliers 25 et 50, abonnements de la
+cohorte inclus), Investisseur gratuit.
 
-- [ ] Ce qu'on vend, à qui, à quel prix — pour le fondateur et pour le SAE
-- [ ] Formulation de l'offre cohérente avec « guide de levée » / « cockpit »
+Ce qui manquait, c'est qu'aucune de ces règles n'était appliquée : ni plan, ni
+échéance, ni blocage.
+
+- [x] Plan et échéance sur l'organisation, mois offert à l'inscription
+- [x] Verrou sur les écritures (dans `deal_org_for_write`, seul point de
+      passage des 29 RPC) et sur la lecture (garde du groupe `(app)`)
+- [x] Écran de régularisation + avertissement les 7 derniers jours
+- [ ] Encaissement à la main : chaque paiement se pose en SQL
+      (`update organizations set paid_until = …`). Volontaire — à ce volume,
+      une ligne par paiement coûte moins qu'une intégration d'agrégateur.
+- [ ] Coordonnées de paiement réelles dans `src/app/abonnement/page.tsx`
+      (aujourd'hui : « écrivez-nous à contact@sanza.africa »)
+- [ ] Paliers 10 / 25 / 50 startups : publiés, pas encore contraints
 
 ## Bloc 2 — Site vitrine
 
@@ -37,6 +51,11 @@ Reconstruit de mémoire, à confirmer.
 - [ ] Pages restantes alignées sur le repositionnement
 
 ## Bloc 3 — Rôle SAE, cockpit de portefeuille
+
+**Mine à désamorcer en même temps :** `create_deal` fait
+`select m.org_id … limit 1` **sans `order by`** — l'organisation est choisie
+arbitrairement. Sans effet tant qu'une personne n'appartient qu'à une
+organisation ; c'est exactement l'hypothèse que le rôle SAE fait sauter.
 
 Le plus gros morceau, et le plus coûteux à repousser : il touche le modèle de
 rôles, donc la RLS, donc tout ce qui s'écrit après.
@@ -78,6 +97,8 @@ d'anormal.
       invitation acceptée, créés pour vérifier le parcours d'invitation
 - [ ] Traduire les gabarits d'e-mail Supabase encore en anglais
 - [ ] 3 erreurs de lint préexistantes (`SanzaLogo.tsx`, `dashboard/page.tsx`)
+- [ ] `SALES_NOTIFY_EMAIL` dans Coolify — sans elle, personne n'est prévenu
+      d'une demande de démo SAE (non vérifiable d'ici)
 - [ ] SPF à la racine de `sanza.africa` — hygiène, pas correctif : les
       invitations partent et arrivent
 

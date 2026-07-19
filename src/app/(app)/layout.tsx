@@ -40,10 +40,24 @@ export default async function AppLayout({
   const { data: dealOrg } = deal
     ? await supabase
         .from("organizations")
-        .select("name")
+        .select("name, paid_until")
         .eq("id", deal.org_id)
         .maybeSingle()
     : { data: null };
+
+  // Abonnement. La base refuse déjà toute ÉCRITURE au-delà de l'échéance
+  // (cf. `deal_org_for_write`) ; ici on ferme la lecture, mais vers un écran
+  // qui explique et propose de régulariser — une erreur SQL n'explique rien.
+  //
+  // `paid_until` à null = organisation jamais soumise à l'abonnement.
+  const echeance = (dealOrg as { paid_until?: string | null } | null)
+    ?.paid_until;
+  const restant = echeance
+    ? Math.ceil(
+        (new Date(echeance).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+      )
+    : null;
+  if (restant !== null && restant <= 0) redirect("/abonnement");
 
   const orgName =
     dealOrg?.name ??
@@ -75,6 +89,24 @@ export default async function AppLayout({
       role={role}
       persona={persona}
     >
+      {/* Le verrouillage est brutal — plus rien n'est accessible. Il ne doit
+          donc jamais surprendre : on prévient la dernière semaine, et le
+          message se resserre à mesure que l'échéance approche. */}
+      {restant !== null && restant <= 7 && (
+        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[10px] border border-[oklch(0.85_0.09_75)] bg-[oklch(0.97_0.03_85)] px-3.5 py-2.5">
+          <span className="text-[12.5px] font-[550] text-[oklch(0.42_0.11_60)]">
+            {restant <= 1
+              ? "Votre accès se ferme aujourd’hui."
+              : `Votre accès se ferme dans ${restant} jours.`}
+          </span>
+          <a
+            href="/abonnement"
+            className="text-[12.5px] font-[550] text-[oklch(0.42_0.11_60)] underline underline-offset-2"
+          >
+            Régulariser
+          </a>
+        </div>
+      )}
       {children}
     </AppShell>
   );
