@@ -25,12 +25,42 @@ export function isInternalRole(role: string | null | undefined): boolean {
   return INTERNAL_ROLES.includes(role ?? "");
 }
 
-/** Navigation telle qu'elle doit apparaître pour ce rôle. */
-export function navFor(role: string | null | undefined): NavGroup[] {
-  if (isInternalRole(role)) return navGroups;
-  return navGroups
-    .map((g) => ({ ...g, items: g.items.filter((i) => !i.internalOnly) }))
-    .filter((g) => g.items.length > 0);
+/**
+ * Écrans qui n'ont aucun sens pour un fondateur.
+ *
+ * Le pipeline suit un PORTEFEUILLE d'opérations : un fondateur n'en a qu'une,
+ * la sienne. Lui montrer un kanban à une colonne, c'est lui faire croire qu'il
+ * a manqué une étape.
+ */
+const HORS_SUJET_FONDATEUR = ["/pipeline"];
+
+/**
+ * Navigation telle qu'elle doit apparaître pour ce rôle et ce métier.
+ *
+ * `persona` est facultatif : sans lui, on retombe sur le comportement
+ * historique (interne = tout). Ce n'est pas une protection — la RLS et les RPC
+ * s'en chargent — mais un menu qui ne propose que ce qui a du sens.
+ */
+export function navFor(
+  role: string | null | undefined,
+  persona?: "founder" | "investor" | "fund",
+): NavGroup[] {
+  const base = isInternalRole(role)
+    ? navGroups
+    : navGroups.map((g) => ({
+        ...g,
+        items: g.items.filter((i) => !i.internalOnly),
+      }));
+
+  const filtre =
+    persona === "founder"
+      ? base.map((g) => ({
+          ...g,
+          items: g.items.filter((i) => !HORS_SUJET_FONDATEUR.includes(i.href)),
+        }))
+      : base;
+
+  return filtre.filter((g) => g.items.length > 0);
 }
 
 /**

@@ -152,6 +152,39 @@
       "help": "Help",
       "roadmap": "Roadmap",
       "nda": "Signed agreements"
+    },
+    "founder": {
+      "groups": {
+        "overview": "My raise",
+        "deal": "My dossier",
+        "organisation": "My account"
+      },
+      "nav": {
+        "dashboard": "Home",
+        "dealSheet": "My raise",
+        "dataRoom": "My documents",
+        "viewer": "Reading",
+        "checklist": "Documents to provide",
+        "readiness": "Where I stand",
+        "permissions": "Who has access",
+        "invitations": "Invite an investor",
+        "versions": "History",
+        "nda": "Signed agreements",
+        "audit": "Who viewed what",
+        "qa": "Questions received"
+      }
+    },
+    "investor": {
+      "groups": {
+        "deal": "The dossier",
+        "organisation": "My account"
+      },
+      "nav": {
+        "dataRoom": "Documents",
+        "viewer": "Reading",
+        "qa": "My questions",
+        "nda": "Signed agreement"
+      }
     }
   },
   "dashboard": {

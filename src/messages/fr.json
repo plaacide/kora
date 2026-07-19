@@ -152,6 +152,39 @@
       "help": "Aide",
       "roadmap": "Roadmap",
       "nda": "Accords signés"
+    },
+    "founder": {
+      "groups": {
+        "overview": "Ma levée",
+        "deal": "Mon dossier",
+        "organisation": "Mon compte"
+      },
+      "nav": {
+        "dashboard": "Accueil",
+        "dealSheet": "Ma levée",
+        "dataRoom": "Mes documents",
+        "viewer": "Lecture",
+        "checklist": "Pièces à fournir",
+        "readiness": "Où j'en suis",
+        "permissions": "Qui a accès",
+        "invitations": "Inviter un investisseur",
+        "versions": "Historique",
+        "nda": "Accords signés",
+        "audit": "Qui a consulté quoi",
+        "qa": "Questions reçues"
+      }
+    },
+    "investor": {
+      "groups": {
+        "deal": "Le dossier",
+        "organisation": "Mon compte"
+      },
+      "nav": {
+        "dataRoom": "Documents",
+        "viewer": "Lecture",
+        "qa": "Mes questions",
+        "nda": "Accord signé"
+      }
     }
   },
   "dashboard": {
