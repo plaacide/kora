@@ -2,8 +2,10 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
+import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
+import { personaFor } from "@/lib/persona";
+import { AccueilFondateur } from "../accueil-fondateur";
 import { Card, CardBody } from "@/components/ui/Card";
-import { Chip } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
 import { Mono } from "@/components/ui/Table";
 import { Sparkline } from "@/components/dashboard/Sparkline";
@@ -49,13 +51,38 @@ export default async function DashboardPage() {
     name: string;
     default_currency: string;
   } | null;
-  const currency = org?.default_currency ?? "XOF";
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name")
+    .select("full_name, account_type")
     .eq("id", user?.id ?? "")
     .maybeSingle();
+
+  // Un fondateur n'a pas de portefeuille à surveiller : il a une levée à
+  // compléter. Les agrégats qui suivent (volume, deals actifs, readiness
+  // moyen, filtres « En DD » / « IC ce mois ») répondent aux questions d'un
+  // fonds ; on lui sert un écran qui répond aux siennes.
+  const { deal: dealCourant } = await getCurrentDeal(supabase);
+  const roleCourant = dealCourant
+    ? await getDealRole(supabase, dealCourant.org_id)
+    : await getAnyRole(supabase);
+  const persona = personaFor(
+    (profile as { account_type?: string } | null)?.account_type,
+    roleCourant,
+  );
+
+  if (persona === "founder" && dealCourant && user) {
+    return (
+      <AccueilFondateur
+        supabase={supabase}
+        deal={dealCourant}
+        prenom={
+          (profile?.full_name ?? user.email ?? "").split(/[\s@]/)[0] || "—"
+        }
+        userId={user.id}
+      />
+    );
+  }
 
   const [
     { data: deals },

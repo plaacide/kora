@@ -700,5 +700,23 @@
     "twoFactor": "A second code, on top of your password, at every sign-in — via an authenticator app.",
     "roadmap": "What's left to build, and when. Your testers can suggest and vote on features.",
     "sheetMode": "Spreadsheets are read as a grid rather than rendered as an image, so a financial model stays readable and scrollable. Only values are sent — never formulas, nor the file itself."
+  },
+  "founderHome": {
+    "hello": "Hello, {name}",
+    "subtitle": "Your raise “{deal}”, at a glance.",
+    "completeCta": "Complete my dossier",
+    "inviteCta": "Invite an investor",
+    "readyTitle": "Where I stand",
+    "readyHint": "{done} of {total} documents provided. {missing} still missing.",
+    "missingTitle": "Still to provide",
+    "missingMore": "and {n} more →",
+    "viewsTitle": "Who viewed your dossier",
+    "viewsEmpty": "No one has opened your documents yet. Your invitees' views will appear here.",
+    "viewedBy": "{who} viewed",
+    "accessTitle": "Who has access",
+    "accessEmpty": "No investor invited yet.",
+    "accessManage": "Manage access →",
+    "docsCount": "{n} document(s) uploaded",
+    "docsLink": "See my documents"
   }
 }

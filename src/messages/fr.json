@@ -700,5 +700,23 @@
     "twoFactor": "Un second code, en plus du mot de passe, à chaque connexion — via une application d'authentification.",
     "roadmap": "Ce qui reste à construire, et quand. Vos testeurs peuvent suggérer et voter des fonctionnalités.",
     "sheetMode": "Les tableurs sont lus en grille plutôt que rendus en image : un modèle financier doit rester lisible et défilable. Seules les valeurs sont transmises — jamais les formules, ni le fichier lui-même."
+  },
+  "founderHome": {
+    "hello": "Bonjour, {name}",
+    "subtitle": "Votre levée « {deal} », en un coup d'œil.",
+    "completeCta": "Compléter mon dossier",
+    "inviteCta": "Inviter un investisseur",
+    "readyTitle": "Où j'en suis",
+    "readyHint": "{done} pièce(s) fournie(s) sur {total}. Il en manque {missing}.",
+    "missingTitle": "Ce qu'il reste à fournir",
+    "missingMore": "et {n} autre(s) →",
+    "viewsTitle": "Qui a consulté votre dossier",
+    "viewsEmpty": "Personne n'a encore ouvert vos documents. Les consultations de vos invités apparaîtront ici.",
+    "viewedBy": "{who} a consulté",
+    "accessTitle": "Qui a accès",
+    "accessEmpty": "Aucun investisseur invité pour l'instant.",
+    "accessManage": "Gérer les accès →",
+    "docsCount": "{n} document(s) déposé(s)",
+    "docsLink": "Voir mes documents"
   }
 }
