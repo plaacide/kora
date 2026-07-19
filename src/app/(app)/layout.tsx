@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { personaFor } from "@/lib/persona";
+import { joursRestants } from "@/lib/echeance";
 
 export default async function AppLayout({
   children,
@@ -55,11 +56,7 @@ export default async function AppLayout({
   // `paid_until` à null = organisation jamais soumise à l'abonnement.
   const echeance = (dealOrg as { paid_until?: string | null } | null)
     ?.paid_until;
-  const restant = echeance
-    ? Math.ceil(
-        (new Date(echeance).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-      )
-    : null;
+  const restant = joursRestants(echeance);
   if (restant !== null && restant <= 0) redirect("/abonnement");
 
   const orgName =
