@@ -12,6 +12,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Uploader } from "./Uploader";
 import { DocPreview } from "./DocPreview";
+import { Chevron, FolderIcon } from "./FolderIcon";
 import {
   FolderTemplates,
   type FolderTemplate,
@@ -301,18 +302,13 @@ export function DataRoom({
           {kids.length > 0 ? (
             <button
               onClick={() => setOpenMap((m) => ({ ...m, [f.id]: !open }))}
-              className="w-3 text-[9px] text-ink-muted cursor-pointer"
+              className="w-3 flex items-center justify-center text-ink-muted hover:text-ink transition-colors cursor-pointer"
               aria-expanded={open}
               aria-label={
                 open ? t("collapse", { name: f.name }) : t("expand", { name: f.name })
               }
             >
-              <span
-                className="inline-block transition-transform"
-                style={{ transform: open ? "rotate(90deg)" : "none" }}
-              >
-                ▶
-              </span>
+              <Chevron open={open} />
             </button>
           ) : (
             <span className="w-3" />
@@ -325,6 +321,21 @@ export function DataRoom({
             }}
             className="flex items-center gap-1.5 flex-1 min-w-0 py-1.5 text-left cursor-pointer"
           >
+            {/* Un dossier rempli se distingue d'un dossier vide sans avoir à
+                lire le compteur : c'est ce qu'on cherche du regard en
+                parcourant une arborescence de trente entrées. */}
+            <span
+              className={cn(
+                "flex-none",
+                active
+                  ? "text-chip-indigo-fg"
+                  : depth === 0
+                    ? "text-ink-secondary"
+                    : "text-ink-muted",
+              )}
+            >
+              <FolderIcon open={open && kids.length > 0} filled={countIn(f.id) > 0} />
+            </span>
             <Mono
               className={cn(
                 "text-[10.5px] flex-none",
@@ -485,8 +496,8 @@ export function DataRoom({
             >
               <span />
               <div className="flex items-center gap-2.5 min-w-0">
-                <span className="grid place-items-center w-[30px] h-[30px] rounded-[7px] bg-chip-amber-bg text-chip-amber-fg text-[13px] flex-none">
-                  ▸
+                <span className="grid place-items-center w-[30px] h-[30px] rounded-[7px] bg-chip-amber-bg text-chip-amber-fg flex-none">
+                  <FolderIcon filled={countIn(f.id) > 0} />
                 </span>
                 <div className="min-w-0">
                   <div className="text-[12.5px] font-semibold truncate">

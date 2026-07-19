@@ -10,6 +10,8 @@ import {
   type ViewRow,
 } from "@/components/dataroom/DataRoom";
 import { NewDealButton } from "@/components/dataroom/NewDealButton";
+import { personaFor } from "@/lib/persona";
+import { personaLabel } from "@/components/shell/persona-label";
 import type { FolderTemplate } from "@/components/dataroom/FolderTemplates";
 import type { Level } from "@/lib/permissions";
 import type { Locale } from "@/i18n/locales";
@@ -38,15 +40,33 @@ export default async function DataRoomPage({
   // Les invités consultent, ils ne restructurent pas la room.
   const canEdit = ["owner", "admin", "member"].includes(role ?? "");
 
+  // Le titre doit dire la même chose que le menu. « Data room » sous une
+  // entrée « Mes documents », c'est déjà une hésitation de trop.
+  const {
+    data: { user: utilisateur },
+  } = await supabase.auth.getUser();
+  const { data: profilPersona } = await supabase
+    .from("profiles")
+    .select("account_type")
+    .eq("id", utilisateur?.id ?? "")
+    .maybeSingle();
+  const persona = personaFor(
+    (profilPersona as { account_type?: string } | null)?.account_type,
+    role,
+  );
+  const mot = personaLabel(t, persona);
+  // Un fondateur n'ouvre pas une deuxième levée : le bouton ne lui parle pas.
+  const peutCreerUnDeal = canEdit && persona === "fund";
+
   if (!deal || !orgId) {
     return (
       <div className="flex flex-col gap-6 max-w-2xl">
         <div>
           <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-            {t("title")}{" "}<InfoTooltip text={tt("dataRoom")} />
+            {mot("title")}{" "}<InfoTooltip text={tt("dataRoom")} />
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">
-            {t("subtitle")}
+            {mot("subtitle")}
           </p>
         </div>
         <Card>
@@ -55,7 +75,7 @@ export default async function DataRoomPage({
               <p className="text-[12.5px] text-ink-secondary max-w-md leading-relaxed">
                 {t("emptyState")}
               </p>
-              {canEdit && <NewDealButton />}
+              {peutCreerUnDeal && <NewDealButton />}
             </div>
           </CardBody>
         </Card>
@@ -194,13 +214,13 @@ export default async function DataRoomPage({
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-            {t("title")}{" "}<InfoTooltip text={tt("dataRoom")} />
+            {mot("title")}{" "}<InfoTooltip text={tt("dataRoom")} />
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">
-            {t("subtitle")}
+            {mot("subtitle")}
           </p>
         </div>
-        {canEdit && <NewDealButton />}
+        {peutCreerUnDeal && <NewDealButton />}
       </div>
 
       <DataRoom

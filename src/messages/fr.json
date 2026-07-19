@@ -358,7 +358,15 @@
     "folder": "Dossier",
     "renameFolder": "Renommer le dossier",
     "renameDoc": "Renommer le document",
-    "docName": "Nom du document"
+    "docName": "Nom du document",
+    "founder": {
+      "title": "Mes documents",
+      "subtitle": "Vos pièces, chiffrées et tracées. Vous seul décidez qui les voit."
+    },
+    "investor": {
+      "title": "Documents",
+      "subtitle": "Les pièces que le fondateur a partagées avec vous."
+    }
   },
   "invitations": {
     "title": "Invitations & NDA",

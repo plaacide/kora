@@ -358,7 +358,15 @@
     "folder": "Folder",
     "renameFolder": "Rename folder",
     "renameDoc": "Rename document",
-    "docName": "Document name"
+    "docName": "Document name",
+    "founder": {
+      "title": "My documents",
+      "subtitle": "Your documents, encrypted and traced. You alone decide who sees them."
+    },
+    "investor": {
+      "title": "Documents",
+      "subtitle": "The documents the founder has shared with you."
+    }
   },
   "invitations": {
     "title": "Invitations & NDA",
