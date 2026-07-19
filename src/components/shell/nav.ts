@@ -11,6 +11,12 @@ export interface NavItem {
    * protection est dans la RLS et les RPC.
    */
   internalOnly?: boolean;
+  /**
+   * Écran propre au PROGRAMME. Sans ce drapeau, le groupe « Cohorte »
+   * apparaîtrait aussi chez un fonds ou un fondateur, pour qui il ne veut rien
+   * dire — ils n'ont pas de cohorte.
+   */
+  saeOnly?: boolean;
 }
 
 export interface NavGroup {
@@ -35,6 +41,17 @@ export function isInternalRole(role: string | null | undefined): boolean {
 const HORS_SUJET_FONDATEUR = ["/pipeline"];
 
 /**
+ * Ce que voit un PROGRAMME — liste blanche, et non liste noire.
+ *
+ * Les autres métiers se définissent par soustraction, parce qu'ils possèdent
+ * un dossier. Le programme, lui, n'en possède aucun : data room, visionneuse,
+ * checklist, versions, NDA ne s'appliquent à rien chez lui. Énumérer ce qu'il
+ * a le droit de voir est plus sûr — un écran ajouté demain n'apparaîtra pas
+ * chez lui par accident.
+ */
+const ECRANS_PROGRAMME = ["/portefeuille", "/cohorte", "/securite", "/roadmap"];
+
+/**
  * Navigation telle qu'elle doit apparaître pour ce rôle et ce métier.
  *
  * `persona` est facultatif : sans lui, on retombe sur le comportement
@@ -43,14 +60,29 @@ const HORS_SUJET_FONDATEUR = ["/pipeline"];
  */
 export function navFor(
   role: string | null | undefined,
-  persona?: "founder" | "investor" | "fund",
+  persona?: "founder" | "investor" | "fund" | "sae",
 ): NavGroup[] {
-  const base = isInternalRole(role)
+  const roleOk = isInternalRole(role)
     ? navGroups
     : navGroups.map((g) => ({
         ...g,
         items: g.items.filter((i) => !i.internalOnly),
       }));
+
+  // Les écrans de cohorte n'existent que pour le programme.
+  const base =
+    persona === "sae"
+      ? roleOk
+      : roleOk.map((g) => ({ ...g, items: g.items.filter((i) => !i.saeOnly) }));
+
+  if (persona === "sae") {
+    return navGroups
+      .map((g) => ({
+        ...g,
+        items: g.items.filter((i) => ECRANS_PROGRAMME.includes(i.href)),
+      }))
+      .filter((g) => g.items.length > 0);
+  }
 
   const filtre =
     persona === "founder"
@@ -95,6 +127,13 @@ export const navGroups: NavGroup[] = [
       // L'invité doit pouvoir relire le NDA qu'il a signé : c'est sa preuve.
       { key: "nda", href: "/nda" },
       { key: "audit", href: "/audit", internalOnly: true },
+    ],
+  },
+  {
+    key: "cohort",
+    items: [
+      { key: "portfolio", href: "/portefeuille", internalOnly: true, saeOnly: true },
+      { key: "cohort", href: "/cohorte", internalOnly: true, saeOnly: true },
     ],
   },
   {

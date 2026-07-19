@@ -122,3 +122,61 @@ export function waitlistEmail(input: { locale: "fr" | "en" }): {
 
   return { subject, html };
 }
+
+/**
+ * Invitation à rejoindre la cohorte d'un programme.
+ *
+ * Le message dit explicitement ce que le programme verra ET ce qu'il ne verra
+ * pas. C'est une demande d'accès à des informations sensibles — montant
+ * recherché, degré de préparation — adressée à quelqu'un qui n'a rien demandé.
+ * Une invitation vague se refuse par défaut, et à raison.
+ */
+export function cohortInviteEmail(input: {
+  saeName: string;
+  link: string;
+  locale: "fr" | "en";
+}): { subject: string; html: string } {
+  const fr = input.locale === "fr";
+
+  const subject = fr
+    ? `${input.saeName} souhaite suivre votre préparation sur Sanza`
+    : `${input.saeName} would like to follow your progress on Sanza`;
+
+  const intro = fr
+    ? `<strong>${escape(input.saeName)}</strong> vous invite à rejoindre sa cohorte sur Sanza. Vous restez propriétaire de votre dossier : rejoindre une cohorte ne donne accès à aucun de vos documents.`
+    : `<strong>${escape(input.saeName)}</strong> invites you to join their cohort on Sanza. You remain the owner of your file: joining a cohort grants access to none of your documents.`;
+
+  const voit = fr
+    ? "Ce que le programme verra : le nom de votre startup, votre stade, le montant recherché, votre degré de préparation et les pièces qu'il vous reste à fournir."
+    : "What the programme will see: your startup name, stage, target amount, readiness level and the documents you still have to provide.";
+
+  const voitPas = fr
+    ? "Ce qu'il ne verra pas : vos documents. Ni leur contenu, ni leur nom. Vous seul décidez qui accède à votre data room, et vous pouvez quitter la cohorte à tout moment."
+    : "What it will not see: your documents — neither their content nor their names. You alone decide who accesses your data room, and you may leave the cohort at any time.";
+
+  const cta = fr ? "Voir la demande" : "Review the request";
+
+  const html = `<!doctype html>
+<html lang="${input.locale}">
+<body style="margin:0;padding:0;background:#f7f5f0;font-family:'Instrument Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f5f0;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #e8e5dc;border-radius:12px;padding:32px;">
+        <tr><td>
+          <div style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;border-radius:8px;background:#171a2c;color:#ffffff;font-weight:700;font-size:16px;letter-spacing:-0.015em;">a</div>
+          <h1 style="margin:20px 0 12px;font-size:20px;font-weight:600;color:#171a2c;letter-spacing:-0.02em;">${escape(subject)}</h1>
+          <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#4a4e63;">${intro}</p>
+          <p style="margin:0 0 10px;font-size:13px;line-height:1.6;color:#4a4e63;">${escape(voit)}</p>
+          <p style="margin:0 0 20px;font-size:13px;line-height:1.6;color:#4a4e63;">${escape(voitPas)}</p>
+          <a href="${input.link}" style="display:inline-block;background:#e85c2b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
+          <hr style="border:none;border-top:1px solid #e8e5dc;margin:24px 0 16px;">
+          <p style="margin:0;font-size:11px;color:#8b8fa3;">Sanza — ${fr ? "data room sécurisée" : "secure data room"}</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, html };
+}

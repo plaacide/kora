@@ -122,7 +122,8 @@
       "deal": "Deal",
       "reporting": "Reporting",
       "organisation": "Organisation",
-      "dealEmpty": "Aucun deal"
+      "dealEmpty": "Aucun deal",
+      "cohort": "Cohorte"
     },
     "nav": {
       "dashboard": "Dashboard",
@@ -151,7 +152,8 @@
       "notifications": "Notifications",
       "help": "Aide",
       "roadmap": "Roadmap",
-      "nda": "Accords signés"
+      "nda": "Accords signés",
+      "cohort": "Cohorte"
     },
     "founder": {
       "groups": {
