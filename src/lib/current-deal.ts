@@ -88,6 +88,9 @@ export async function getAnyRole(
     .from("memberships")
     .select("role")
     .eq("user_id", user.id)
+    // Tri déterministe : sans lui, l'organisation retenue est arbitraire
+    // dès qu'une personne en a plusieurs — ce que le rôle SAE rend courant.
+    .order("created_at")
     .limit(1)
     .maybeSingle();
   return (data?.role as string) ?? null;

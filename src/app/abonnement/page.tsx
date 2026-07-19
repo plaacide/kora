@@ -23,6 +23,9 @@ export default async function AbonnementPage() {
     .from("memberships")
     .select("organizations(name, paid_until, plan)")
     .eq("user_id", user.id)
+    // Tri déterministe : sans lui, l'organisation retenue est arbitraire
+    // dès qu'une personne en a plusieurs — ce que le rôle SAE rend courant.
+    .order("created_at")
     .limit(1)
     .maybeSingle();
 

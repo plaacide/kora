@@ -44,6 +44,9 @@ export default async function AuditPage() {
     .from("memberships")
     .select("org_id")
     .eq("user_id", user?.id ?? "")
+    // Tri déterministe : sans lui, l'organisation retenue est arbitraire
+    // dès qu'une personne en a plusieurs — ce que le rôle SAE rend courant.
+    .order("created_at")
     .limit(1)
     .maybeSingle();
   const orgId = membership?.org_id as string | undefined;
