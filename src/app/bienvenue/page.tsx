@@ -48,7 +48,7 @@ export default async function BienvenuePage() {
           <p className="text-[13px] text-white/70 mt-2 leading-relaxed">
             {isInvestor
               ? "Votre profil est prêt. Des deals correspondent déjà à votre thèse — parcourez le dealroom."
-              : "Votre fiche est prête. Complétez votre data room pour rassurer les investisseurs et faire monter votre readiness."}
+              : "Votre fiche est prête. Complétez maintenant votre dossier : chaque pièce fournie fait monter sa complétude, et c'est elle que les investisseurs regardent."}
           </p>
         </div>
 

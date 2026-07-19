@@ -159,8 +159,9 @@ export function FounderOnboarding() {
           qui n'accepte rien, et qui promettait « +18 pts », faisait une promesse
           que l'écran ne pouvait pas tenir. */}
 
-      {/* Complétude de la fiche — délibérément PAS appelée « readiness » : ce mot
-          désigne partout ailleurs le score de la checklist DD. */}
+      {/* Complétude de la FICHE, à ne pas confondre avec la complétude du
+          DOSSIER (la checklist). Deux mesures, deux noms : renseigner son
+          secteur ne rend pas un dossier présentable à un investisseur. */}
       <div className="mt-4 bg-bg border border-line rounded-[10px] p-3.5">
         <div className="flex items-center justify-between text-[12px] font-[550]">
           <span>Fiche complétée</span>
@@ -170,9 +171,10 @@ export function FounderOnboarding() {
           <span className={cn("block h-full bg-primary transition-all")} style={{ width: `${completude}%` }} />
         </span>
         <p className="text-[11px] text-ink-muted mt-2">
-          Votre score de readiness, lui, se construit dans la checklist de due
-          diligence — il part de 0 et monte à mesure que vous cochez les
-          exigences.
+          C&apos;est votre carte de visite. La complétude de votre{" "}
+          <strong className="font-[650]">dossier</strong>, elle, se construit
+          ensuite : elle mesure les pièces réellement fournies, et c&apos;est
+          celle que les investisseurs regardent.
         </p>
       </div>
 
