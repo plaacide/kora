@@ -227,7 +227,23 @@
     "due_diligence": "Due diligence",
     "ic": "Comité (IC)",
     "signed": "Signé",
-    "passed": "Passé"
+    "passed": "Passé",
+    "founder": {
+      "sourcing": "En préparation",
+      "screening": "Premiers contacts",
+      "due_diligence": "Due diligence en cours",
+      "ic": "Décision investisseur",
+      "signed": "Signé",
+      "passed": "Sans suite"
+    },
+    "investor": {
+      "sourcing": "En préparation",
+      "screening": "Premiers contacts",
+      "due_diligence": "Due diligence en cours",
+      "ic": "Décision investisseur",
+      "signed": "Signé",
+      "passed": "Sans suite"
+    }
   },
   "audit": {
     "title": "Audit trail",

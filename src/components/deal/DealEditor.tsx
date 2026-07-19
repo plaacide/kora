@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { PlainError } from "@/components/auth/FormError";
 import { STAGES } from "@/lib/stages";
+import type { Persona } from "@/lib/persona";
+import { usePersonaLabel } from "@/components/shell/persona-label";
 
 const TYPES = ["VC", "PE", "M&A", "Dette DFI"];
 const CURRENCIES = ["XOF", "XAF", "NGN", "KES", "GHS", "USD", "EUR"];
@@ -26,13 +28,17 @@ export interface DealForm {
 export function DealEditor({
   deal,
   canDelete,
+  persona = "fund",
 }: {
   deal: DealForm;
   canDelete: boolean;
+  persona?: Persona;
 }) {
   const t = useTranslations("deal");
   const tc = useTranslations("common");
-  const ts = useTranslations("stages");
+  // Le fondateur choisit où en est SA levée, pas où en est son évaluation
+  // par un fonds.
+  const etape = usePersonaLabel("stages", persona);
   const router = useRouter();
 
   const [form, setForm] = useState(deal);
@@ -114,7 +120,7 @@ export function DealEditor({
           >
             {STAGES.map((s) => (
               <option key={s} value={s}>
-                {ts(s)}
+                {etape(s)}
               </option>
             ))}
           </select>

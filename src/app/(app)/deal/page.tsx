@@ -3,6 +3,8 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal, getDealRole } from "@/lib/current-deal";
+import { personaFor } from "@/lib/persona";
+import { personaLabel } from "@/components/shell/persona-label";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
@@ -90,6 +92,20 @@ export default async function DealPage() {
   }
 
   const role = await getDealRole(supabase, deal.org_id);
+
+  // L'étape décrit le processus d'un FONDS (sourcing, screening, comité).
+  // Vue du fondateur, c'est SON dossier qu'on examine : les mêmes états, dits
+  // dans ses termes.
+  const { data: profilPersona } = await supabase
+    .from("profiles")
+    .select("account_type")
+    .eq("id", (await supabase.auth.getUser()).data.user?.id ?? "")
+    .maybeSingle();
+  const personaCourant = personaFor(
+    (profilPersona as { account_type?: string } | null)?.account_type,
+    role,
+  );
+  const etape = personaLabel(ts, personaCourant);
   const canEdit = ["owner", "admin", "member"].includes(role ?? "");
   const canDelete = ["owner", "admin"].includes(role ?? "");
 
@@ -225,7 +241,7 @@ export default async function DealPage() {
             <h1 className="text-[19px] font-[650] tracking-[-0.02em]">
               {deal.name}
             </h1>
-            <Chip tone="indigo">{ts.has(deal.stage) ? ts(deal.stage) : deal.stage}</Chip>
+            <Chip tone="indigo">{ts.has(deal.stage) ? etape(deal.stage) : deal.stage}</Chip>
           </div>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">{deal.type}</p>
         </div>
@@ -233,7 +249,13 @@ export default async function DealPage() {
           <Link href="/roadmap" className={SECONDARY_BTN}>
             {t("syndicate")}
           </Link>
-          {canEdit && <EditDealButton deal={form} canDelete={canDelete} />}
+          {canEdit && (
+            <EditDealButton
+              deal={form}
+              canDelete={canDelete}
+              persona={personaCourant}
+            />
+          )}
           <Link href="/data-room" className={PRIMARY_BTN}>
             {t("openDataRoom")}
           </Link>

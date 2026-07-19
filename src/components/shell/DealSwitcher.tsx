@@ -2,8 +2,8 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import type { Persona } from "@/lib/persona";
+import { usePersonaLabel } from "./persona-label";
 import { setCurrentDeal } from "@/app/actions/deal-context";
 import type { DealRef } from "@/lib/current-deal";
 
@@ -22,14 +22,9 @@ export function DealSwitcher({
   currentId: string | null;
   persona?: Persona;
 }) {
-  const t = useTranslations("shell");
-  // Même mécanique que la Sidebar : le libellé du métier s'il existe, sinon
-  // le générique. « Deal » ne veut rien dire pour qui lève des fonds.
-  const tp = useTranslations(`shell.${persona === "fund" ? "nav" : persona}`);
-  const groupe = (cle: string) =>
-    persona !== "fund" && tp.has(`groups.${cle}`)
-      ? tp(`groups.${cle}`)
-      : t(`groups.${cle}`);
+  // « Deal » ne veut rien dire pour qui lève des fonds.
+  const mot = usePersonaLabel("shell", persona);
+  const groupe = (cle: string) => mot(`groups.${cle}`);
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 

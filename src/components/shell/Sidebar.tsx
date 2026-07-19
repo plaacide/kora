@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { navFor } from "./nav";
 import type { Persona } from "@/lib/persona";
+import { usePersonaLabel } from "./persona-label";
 import { NavIcon } from "./NavIcon";
 import { DealSwitcher } from "./DealSwitcher";
 import type { DealRef } from "@/lib/current-deal";
@@ -23,16 +24,10 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const t = useTranslations("shell");
-  // Vocabulaire du métier : un fondateur lève, il ne « source » pas. Les
-  // libellés spécifiques surchargent les libellés génériques ; ceux qui n'ont
-  // pas d'équivalent retombent dessus, ce qui évite d'entretenir trois listes
-  // complètes en parallèle.
-  const tp = useTranslations(`shell.${persona === "fund" ? "nav" : persona}`);
-  const label = (cle: string, chemin: "nav" | "groups") => {
-    const specifique = persona === "fund" ? null : `${chemin}.${cle}`;
-    if (specifique && tp.has(specifique)) return tp(specifique);
-    return t(`${chemin}.${cle}`);
-  };
+  // Vocabulaire du métier : un fondateur lève, il ne « source » pas.
+  const mot = usePersonaLabel("shell", persona);
+  const label = (cle: string, chemin: "nav" | "groups") =>
+    mot(`${chemin}.${cle}`);
 
   return (
     <nav
