@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { originFromHeaders } from "@/lib/app-origin";
 import { clientIp } from "@/lib/security/rate-limit";
 import { sendEmail } from "@/lib/email/send";
 import { invitationEmail } from "@/lib/email/templates";
@@ -41,11 +42,11 @@ export async function createInvitation(input: {
   const invitation = data as { token: string; deal_id: string };
   const token = invitation.token;
 
-  // Origine réelle de la requête : marche en local comme sur Vercel.
-  const h = await headers();
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  const host = h.get("host") ?? "localhost:3000";
-  const link = `${proto}://${host}/invitation/${token}`;
+  // Derrière Traefik, `host` porte l'adresse d'écoute du conteneur
+  // (`0.0.0.0:8080`), pas le domaine public : le lien partait injoignable.
+  // C'est le domaine public qui compte ici plus qu'ailleurs — le lien part
+  // par e-mail chez un tiers, et rien ne le ramène vers nous s'il est faux.
+  const link = `${originFromHeaders(await headers())}/invitation/${token}`;
 
   const { data: deal } = await supabase
     .from("deals")
