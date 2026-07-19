@@ -87,7 +87,15 @@ grant select on public.cohort_links to authenticated;
 -- Helpers
 -- ---------------------------------------------------------------------------
 
-/** Le programme suit-il cette organisation ? Lien accepté uniquement. */
+/**
+ * Le programme suit-il cette organisation ?
+ *
+ * Lien accepté ET programme à jour de son abonnement. Un programme qui ferme
+ * ne « supprime » rien — l'organisation reste (le journal d'audit l'interdit,
+ * `on delete restrict`) — il cesse simplement de payer. Sans cette condition,
+ * il continuerait de lire l'avancement de ses anciennes startups
+ * indéfiniment, et personne ne s'en apercevrait.
+ */
 create or replace function public.is_sae_of(p_startup_org uuid)
 returns boolean
 language sql stable security definer set search_path = public as $$
@@ -95,6 +103,7 @@ language sql stable security definer set search_path = public as $$
     select 1 from public.cohort_links c
     where c.startup_org_id = p_startup_org
       and c.status = 'accepted'
+      and public.org_active(c.sae_org_id)
       and public.is_org_internal(c.sae_org_id)
   );
 $$;
@@ -274,6 +283,10 @@ language sql stable security definer set search_path = public as $$
   join public.deals d on d.org_id = o.id
   left join public.checklist_items ci on ci.deal_id = d.id
   where c.status = 'accepted'
+    -- Le programme doit être à jour : quand il cesse de payer, il cesse de
+    -- voir. C'est le seul « il ferme » qui existe vraiment — l'organisation,
+    -- elle, ne peut pas être supprimée tant qu'elle a un journal d'audit.
+    and public.org_active(c.sae_org_id)
     and public.is_org_internal(c.sae_org_id)
   group by o.id, o.name, d.id, d.name, d.stage, d.amount, d.currency,
            d.readiness_score;
