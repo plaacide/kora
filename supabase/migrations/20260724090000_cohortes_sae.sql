@@ -306,8 +306,15 @@ grant execute on function public.sae_portfolio() to authenticated;
 -- une organisation — précisément l'hypothèse que le rôle SAE fait sauter, un
 -- directeur de programme appartenant à la sienne et, potentiellement, à
 -- d'autres. Le tri rend le choix reproductible.
+-- Les valeurs par défaut sont reprises À L'IDENTIQUE de la définition en
+-- place. Les omettre n'est pas neutre : Postgres refuse de les retirer par
+-- « create or replace » (42P13, « cannot remove parameter defaults ») et exige
+-- un DROP — qui aurait fait perdre les grants au passage.
 create or replace function public.create_deal(
-  p_name text, p_type text, p_currency text, p_amount numeric
+  p_name text,
+  p_type text default 'VC',
+  p_currency text default 'XOF',
+  p_amount numeric default null
 )
 returns public.deals
 language plpgsql security definer set search_path = public as $$

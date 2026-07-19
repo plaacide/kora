@@ -42,6 +42,32 @@ expression (ternaire).
 Un `CASE` renvoie du `text` : caster explicitement (`::public.mon_enum`),
 sinon erreur 42804.
 
+## `create or replace function` : la signature doit être REPRISE À L'IDENTIQUE
+
+Redéfinir une fonction ne se limite pas à réécrire son corps. Postgres refuse
+tout changement de forme par `create or replace` :
+
+- retirer une valeur par défaut → `42P13 cannot remove parameter defaults from
+  existing function`
+- changer le type de retour → `42P13 cannot change return type of existing
+  function`
+
+Dans les deux cas il exige un `DROP FUNCTION` préalable — qui fait perdre les
+`grant` au passage, donc il faut les réémettre.
+
+Le piège est qu'on ne recopie pas toujours la signature complète en allant
+chercher la fonction : `create_deal` s'écrit
+`(p_name text, p_type text default 'VC', p_currency text default 'XOF',
+p_amount numeric default null)`. Réécrite sans ses défauts, elle échoue —
+alors que le corps, lui, était juste.
+
+Reprendre la signature depuis la DERNIÈRE définition en date : une même
+fonction est souvent redéfinie par plusieurs migrations successives, et c'est
+la plus récente qui fait foi.
+
+**Rien ne le détecte avant l'exécution** : ni TypeScript, ni `next build`, ni
+la relecture du SQL.
+
 ## package-lock : le régénérer avec le npm de l'IMAGE, pas celui du Mac
 
 Le Mac tourne sur Node 26 / npm 11 ; l'image Docker sur `node:22` / npm 10.
