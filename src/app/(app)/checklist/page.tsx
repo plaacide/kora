@@ -41,7 +41,10 @@ export default async function ChecklistPage() {
     );
   }
 
-  const CHAMPS = "id, category, label, description, status, document_id";
+  // Les preuves viennent de la table de liaison : une exigence en accepte
+  // plusieurs (PV sur 3 exercices, rapport CAC général + spécial).
+  const CHAMPS =
+    "id, category, label, description, status, checklist_item_documents(document_id)";
 
   const [{ data: itemsAvecDossier, error: erreurDossier }, { data: documents }, { data: folders }] =
     await Promise.all([
@@ -79,7 +82,32 @@ export default async function ChecklistPage() {
         .order("position")
     : { data: itemsAvecDossier, error: null };
 
-  const list = (error ? [] : (items ?? [])) as unknown as ChecklistItem[];
+  // Même précaution pour la table de liaison, qui s'applique elle aussi à la
+  // main : si elle n'existe pas encore, on relit l'ancienne colonne et on la
+  // présente comme une liste à un élément. L'écran reste juste, simplement
+  // limité à une preuve — au lieu de se vider.
+  const { data: repli } = error
+    ? await supabase
+        .from("checklist_items")
+        .select("id, category, label, description, status, document_id, folder_id")
+        .eq("deal_id", deal.id)
+        .order("category")
+        .order("position")
+    : { data: null };
+
+  const brut = (repli ?? items ?? []) as unknown as (Record<string, unknown> & {
+    document_id?: string | null;
+    checklist_item_documents?: { document_id: string }[];
+  })[];
+
+  const list = brut.map((i) => ({
+    ...i,
+    documents: i.checklist_item_documents
+      ? i.checklist_item_documents.map((l) => l.document_id)
+      : i.document_id
+        ? [i.document_id]
+        : [],
+  })) as unknown as ChecklistItem[];
 
   if (list.length === 0) {
     return (

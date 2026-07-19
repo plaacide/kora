@@ -300,7 +300,8 @@
       "checklist_item_added": "Requirement added",
       "checklist_item_updated": "Requirement updated",
       "checklist_item_deleted": "Requirement deleted",
-      "document_thumbnail_viewed": "Preview viewed"
+      "document_thumbnail_viewed": "Preview viewed",
+      "checklist_document_unlinked": "Evidence unlinked"
     }
   },
   "dataroom": {
@@ -689,7 +690,10 @@
     "deleteReq": "Delete",
     "depositIn": "File it in {folder}",
     "expectedFolderGroup": "Expected folder",
-    "otherDocsGroup": "Other documents"
+    "otherDocsGroup": "Other documents",
+    "addDoc": "Add a proof…",
+    "unlinkDoc": "Remove this proof",
+    "removedDoc": "Deleted document"
   },
   "readiness": {
     "title": "Dossier completeness",

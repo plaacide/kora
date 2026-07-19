@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   setChecklistStatus,
-  linkChecklistDocument,
+  attachChecklistDocument,
+  detachChecklistDocument,
   addChecklistItem,
   updateChecklistItem,
   deleteChecklistItem,
@@ -26,7 +27,8 @@ export interface ChecklistItem {
   label: string;
   description: string;
   status: Status;
-  document_id: string | null;
+  /** Les preuves rattachées. Plusieurs : PV sur 3 exercices, CAC général + spécial. */
+  documents: string[];
   /** Dossier de la data room où cette pièce se dépose. */
   folder_id: string | null;
 }
@@ -91,6 +93,8 @@ export function Checklist({
   const tempId = useRef(0);
   // Dossier attendu, par identifiant — pour afficher « à déposer dans 1.2 ».
   const folderById = new Map(folders.map((f) => [f.id, f]));
+  // Pour nommer les preuves rattachées (l'exigence n'en porte que les ids).
+  const docById = new Map(docs.map((d) => [d.id, d]));
   const [, startTransition] = useTransition();
 
   // Après un router.refresh(), le serveur renvoie la liste et le score à jour :
@@ -149,25 +153,42 @@ export function Checklist({
     );
   }
 
-  function link(item: ChecklistItem, docId: string) {
-    const value = docId || null;
-    // Miroir de la règle appliquée en base (cf. migration « preuve vaut
-    // pièce ») : rattacher une preuve valide une pièce à faire, la retirer
-    // ramène une pièce faite à l'état initial. Une pièce « en cours » n'est
-    // pas promue — le fondateur a exprimé une intention, on ne la contredit
-    // pas. Sans ce miroir, la jauge ne bougerait qu'au rechargement.
-    const statut: ChecklistItem["status"] =
-      value && item.status === "todo"
-        ? "done"
-        : !value && item.status === "done"
-          ? "todo"
-          : item.status;
+  /**
+   * Miroir de la règle appliquée en base (cf. migration « preuves
+   * multiples ») : le statut suit le NOMBRE de preuves. La première valide une
+   * pièce à faire, la dernière retirée la ramène à l'état initial. Une pièce
+   * « en cours » n'est pas promue — le fondateur a exprimé une intention, on
+   * ne la contredit pas. Sans ce miroir, la jauge ne bougerait qu'au
+   * rechargement.
+   */
+  function statutPour(item: ChecklistItem, preuves: string[]): Status {
+    if (preuves.length > 0 && item.status === "todo") return "done";
+    if (preuves.length === 0 && item.status === "done") return "todo";
+    return item.status;
+  }
 
+  function attach(item: ChecklistItem, docId: string) {
+    if (!docId || item.documents.includes(docId)) return;
+    const preuves = [...item.documents, docId];
     run(
       local.map((i) =>
-        i.id === item.id ? { ...i, document_id: value, status: statut } : i,
+        i.id === item.id
+          ? { ...i, documents: preuves, status: statutPour(item, preuves) }
+          : i,
       ),
-      () => linkChecklistDocument(item.id, value),
+      () => attachChecklistDocument(item.id, docId),
+    );
+  }
+
+  function detach(item: ChecklistItem, docId: string) {
+    const preuves = item.documents.filter((d) => d !== docId);
+    run(
+      local.map((i) =>
+        i.id === item.id
+          ? { ...i, documents: preuves, status: statutPour(item, preuves) }
+          : i,
+      ),
+      () => detachChecklistDocument(item.id, docId),
     );
   }
 
@@ -187,7 +208,7 @@ export function Checklist({
       label,
       description: newDesc.trim(),
       status: "todo",
-      document_id: null,
+      documents: [],
       // Une exigence ajoutée à la main n'a pas de dossier de référence.
       folder_id: null,
     };
@@ -336,7 +357,7 @@ export function Checklist({
                             RCCM. Affiché seulement quand la pièce manque —
                             une fois la preuve rattachée, l'indication n'a
                             plus d'utilité et alourdirait la lecture. */}
-                        {!i.document_id &&
+                        {i.documents.length === 0 &&
                           (() => {
                             const dossier = i.folder_id
                               ? folderById.get(i.folder_id)
@@ -356,30 +377,76 @@ export function Checklist({
                               </Link>
                             );
                           })()}
+
+                        {/* Les preuves rattachées, nommées. Un compteur
+                            (« 3 documents ») obligerait à ouvrir pour savoir
+                            s'il manque l'exercice 2023 — c'est précisément la
+                            question que le fondateur se pose. */}
+                        {i.documents.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-1.5">
+                            {i.documents.map((id) => {
+                              const d = docById.get(id);
+                              return (
+                                <span
+                                  key={id}
+                                  className="inline-flex items-center gap-1 rounded-[6px] border border-line bg-surface-2 pl-1.5 pr-1 py-0.5 text-[11px] text-ink-secondary max-w-[240px]"
+                                >
+                                  <span className="truncate">
+                                    {d
+                                      ? `${folderIndex(d.index_path)} ${d.name}`
+                                      : t("removedDoc")}
+                                  </span>
+                                  {canEdit && (
+                                    <button
+                                      onClick={() => detach(i, id)}
+                                      aria-label={t("unlinkDoc")}
+                                      className="text-ink-muted hover:text-[oklch(0.55_0.17_25)] leading-none text-[13px]"
+                                    >
+                                      ×
+                                    </button>
+                                  )}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
 
                   {canEdit && editing !== i.id && (
                     <div className="flex items-center gap-2 flex-none">
-                      {/* La preuve : quel document satisfait l'exigence. */}
+                      {/* Ajout d'une preuve. Le champ revient toujours à vide :
+                          c'est une action (« ajouter »), pas la valeur d'un
+                          état — les preuves déjà rattachées se lisent à gauche.
+                          Un select qui afficherait la dernière choisie ferait
+                          croire qu'elle remplace les autres. */}
                       <select
-                        value={i.document_id ?? ""}
-                        onChange={(e) => link(i, e.target.value)}
+                        value=""
+                        onChange={(e) => attach(i, e.target.value)}
                         className="h-7 max-w-[160px] px-1.5 text-[11px] bg-surface text-ink-secondary rounded-[6px] border border-line cursor-pointer focus:outline-none"
                         aria-label={t("linkDoc")}
                       >
-                        <option value="">{t("noDoc")}</option>
+                        <option value="">
+                          {i.documents.length ? t("addDoc") : t("noDoc")}
+                        </option>
                         {/* Les documents du dossier attendu d'abord : sur une
                             data room fournie, la bonne preuve serait autrement
                             noyée au milieu de dizaines de fichiers. Les autres
                             restent proposés — la suggestion oriente, elle
                             n'impose pas. */}
                         {(() => {
+                          // Une preuve déjà rattachée n'est plus proposée :
+                          // la resélectionner ne ferait rien (la clé primaire
+                          // rend l'insertion idempotente), mais le fondateur
+                          // n'a aucun moyen de le savoir en lisant la liste.
+                          const libres = docs.filter(
+                            (d) => !i.documents.includes(d.id),
+                          );
                           const duDossier = i.folder_id
-                            ? docs.filter((d) => d.folder_id === i.folder_id)
+                            ? libres.filter((d) => d.folder_id === i.folder_id)
                             : [];
-                          const autres = docs.filter(
+                          const autres = libres.filter(
                             (d) => !duDossier.includes(d),
                           );
                           const ligne = (d: DocOption) => (
@@ -388,7 +455,7 @@ export function Checklist({
                             </option>
                           );
                           if (duDossier.length === 0)
-                            return docs.map(ligne);
+                            return libres.map(ligne);
                           return (
                             <>
                               <optgroup label={t("expectedFolderGroup")}>

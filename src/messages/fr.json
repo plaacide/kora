@@ -300,7 +300,8 @@
       "checklist_item_added": "Exigence ajoutée",
       "checklist_item_updated": "Exigence modifiée",
       "checklist_item_deleted": "Exigence supprimée",
-      "document_thumbnail_viewed": "Aperçu consulté"
+      "document_thumbnail_viewed": "Aperçu consulté",
+      "checklist_document_unlinked": "Justificatif retiré"
     }
   },
   "dataroom": {
@@ -689,7 +690,10 @@
     "deleteReq": "Supprimer",
     "depositIn": "À déposer dans {folder}",
     "expectedFolderGroup": "Dossier attendu",
-    "otherDocsGroup": "Autres documents"
+    "otherDocsGroup": "Autres documents",
+    "addDoc": "Ajouter une preuve…",
+    "unlinkDoc": "Retirer cette preuve",
+    "removedDoc": "Document supprimé"
   },
   "readiness": {
     "title": "Complétude du dossier",

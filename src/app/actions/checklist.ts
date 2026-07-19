@@ -26,18 +26,36 @@ export async function setChecklistStatus(
 }
 
 /**
- * Rattache (ou détache) la preuve d'une exigence.
+ * Ajoute une preuve à une exigence.
  *
- * Renvoie le readiness recalculé : rattacher une preuve fait désormais passer
- * la pièce à « fait », donc le score bouge — l'écran doit pouvoir le refléter
- * sans attendre le rechargement.
+ * Une exigence en accepte plusieurs : trois exercices de PV, le rapport CAC
+ * général et le spécial. Le geste est donc additif — il ne remplace rien.
+ *
+ * Renvoie le readiness recalculé : la première preuve fait passer la pièce à
+ * « fait », donc le score bouge — l'écran doit pouvoir le refléter sans
+ * attendre le rechargement.
  */
-export async function linkChecklistDocument(
+export async function attachChecklistDocument(
   itemId: string,
-  docId: string | null,
+  docId: string,
 ): Promise<{ ok: boolean; error?: string; readiness?: number }> {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("link_checklist_document", {
+  const { data, error } = await supabase.rpc("attach_checklist_document", {
+    p_item: itemId,
+    p_doc: docId,
+  });
+  if (error) return { ok: false, error: error.message };
+  refresh();
+  return { ok: true, readiness: data as number };
+}
+
+/** Retire une preuve. La dernière retirée ramène l'exigence à « à faire ». */
+export async function detachChecklistDocument(
+  itemId: string,
+  docId: string,
+): Promise<{ ok: boolean; error?: string; readiness?: number }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("detach_checklist_document", {
     p_item: itemId,
     p_doc: docId,
   });
