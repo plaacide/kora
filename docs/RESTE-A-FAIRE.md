@@ -57,16 +57,36 @@ Ce qui manquait, c'est qu'aucune de ces règles n'était appliquée : ni plan, n
 arbitrairement. Sans effet tant qu'une personne n'appartient qu'à une
 organisation ; c'est exactement l'hypothèse que le rôle SAE fait sauter.
 
-Le plus gros morceau, et le plus coûteux à repousser : il touche le modèle de
-rôles, donc la RLS, donc tout ce qui s'écrit après.
-
-- [ ] Architecture du rôle SAE (structure d'accompagnement) : il suit
-      plusieurs startups sans être membre de leurs organisations
-- [ ] Écran portefeuille : où en est chaque startup accompagnée
+- [x] Socle : le SAE est une ORGANISATION, liée d'org à org par
+      `cohort_links`. `can_see_deal` n'est pas touché — le programme ne voit
+      aucun document parce que rien ne le lui accorde. Une interdiction
+      s'oublie, une absence de chemin non.
+- [x] Consentement : la startup accepte elle-même, et les deux côtés peuvent
+      rompre le lien
+- [x] Canal de lecture `sae_portfolio()` — une FONCTION, pas une politique
+      RLS : les colonnes y sont énumérées, ce qui n'y figure pas ne sort pas
+- [x] Un programme qui cesse de payer cesse de voir sa cohorte (`org_active`)
+- [x] Mines désamorcées : sept `limit 1` sans `order by`
+- [x] Les trois écrans : /portefeuille, /cohorte, /rejoindre/[token]
+- [x] Les accès expirent à 90 jours par défaut, `extend_access` pour prolonger
+- [ ] **Non vérifié faute de compte `sae`** : les écrans n'ont jamais été vus
+      en vrai, et l'acceptation jamais jouée de bout en bout
 - [ ] Export bailleur (PDF / XLSX) — aucun générateur n'est présent dans le
       projet aujourd'hui, c'est une dépendance à ajouter
 
-## Bloc 4 — Checklist et data room
+**Décision prise en route.** L'accès aux documents pour un programme passe par
+le fondateur, qui l'invite comme un investisseur — flux existant, audité,
+révocable. La promesse du site (« le fondateur reste seul maître des accès à
+sa data room ») tient donc mot pour mot. Si un accès d'office devenait
+souhaitable, il faudrait d'abord retirer cette phrase de la page d'accueil.
+
+## Bloc 4 — Dashboard portefeuille et export
+
+- [ ] Dashboard agrégé du programme (les agrégats existent, c'est du
+      réassemblage)
+- [ ] Export bailleurs — part de zéro, aucun générateur PDF/XLSX
+
+## Bloc 4 bis — Checklist et data room
 
 - [x] Chaque exigence sait dans quel dossier sa pièce se dépose
 - [x] Rattacher une preuve valide l'exigence et recalcule le score
