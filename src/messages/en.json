@@ -157,7 +157,8 @@
       "groups": {
         "overview": "My raise",
         "deal": "My dossier",
-        "organisation": "My account"
+        "organisation": "My account",
+        "dealEmpty": "No dossier"
       },
       "nav": {
         "dashboard": "Home",
@@ -172,19 +173,22 @@
         "nda": "Signed agreements",
         "audit": "Who viewed what",
         "qa": "Questions received"
-      }
+      },
+      "searchPlaceholder": "Search a document…"
     },
     "investor": {
       "groups": {
         "deal": "The dossier",
-        "organisation": "My account"
+        "organisation": "My account",
+        "dealEmpty": "No dossier"
       },
       "nav": {
         "dataRoom": "Documents",
         "viewer": "Reading",
         "qa": "My questions",
         "nda": "Signed agreement"
-      }
+      },
+      "searchPlaceholder": "Search a document…"
     }
   },
   "dashboard": {
@@ -361,7 +365,9 @@
     "docName": "Document name",
     "founder": {
       "title": "My documents",
-      "subtitle": "Your documents, encrypted and traced. You alone decide who sees them."
+      "subtitle": "Your documents, encrypted and traced. You alone decide who sees them.",
+      "emptyState": "No dossier yet.",
+      "dealName": "Raise name"
     },
     "investor": {
       "title": "Documents",
@@ -416,7 +422,10 @@
     "login": "Log in",
     "signup": "Create an account",
     "wrongAccountTitle": "Wrong account",
-    "wrongAccountBody": "This invitation is addressed to {invited}, but you are logged in as {current}. Log out and sign in with the right address."
+    "wrongAccountBody": "This invitation is addressed to {invited}, but you are logged in as {current}. Log out and sign in with the right address.",
+    "founder": {
+      "emptyState": "No raise. Create your dossier to invite investors."
+    }
   },
   "permissions": {
     "title": "Permissions",
@@ -432,6 +441,9 @@
       "view": "View",
       "download": "Download",
       "edit": "Edit"
+    },
+    "founder": {
+      "emptyState": "No raise. Create your dossier to manage access."
     }
   },
   "viewer": {
@@ -461,7 +473,17 @@
     "expand": "Expand",
     "collapse": "Collapse",
     "goToPage": "Go to page {page}",
-    "thumbAlt": "Preview of page {page}"
+    "thumbAlt": "Preview of page {page}",
+    "founder": {
+      "officeNotReadyHint": "This file will soon be readable here. A PDF version always works.",
+      "officeFailedHint": "Try again shortly. If it keeps failing, write to us.",
+      "sheetFailedHint": "The file may be password-protected or corrupted."
+    },
+    "investor": {
+      "officeNotReadyHint": "This file will soon be readable here. Meanwhile, ask the founder for a PDF.",
+      "officeFailedHint": "Try again shortly. If it keeps failing, let the founder know.",
+      "sheetFailedHint": "The file may be password-protected or corrupted. Let the founder know."
+    }
   },
   "security": {
     "title": "Security",
@@ -586,7 +608,19 @@
     "deleteBody": "“{name}” and its entire data room (folders, documents, permissions, invitations) will be permanently deleted. The audit log will keep the record of this deletion. This cannot be undone.",
     "deleteConfirm": "Delete permanently",
     "prev": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "founder": {
+      "title": "My raise",
+      "subtitle": "The amount sought, your progress and your documents.",
+      "emptyState": "No raise yet.",
+      "editCard": "Edit my raise",
+      "name": "Raise name",
+      "dealHistory": "My raise history",
+      "icNotes": "Internal notes",
+      "noNotes": "No note yet.",
+      "team": "My team",
+      "readiness": "Dossier completeness"
+    }
   },
   "versions": {
     "title": "Versions",

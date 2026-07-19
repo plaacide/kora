@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { addIcNote, deleteIcNote } from "@/app/actions/deal-sections";
 import { PlainError } from "@/components/auth/FormError";
+import type { Persona } from "@/lib/persona";
+import { usePersonaLabel } from "@/components/shell/persona-label";
 
 export interface IcNoteItem {
   id: string;
@@ -18,12 +20,15 @@ export function IcNotes({
   dealId,
   notes,
   canEdit,
+  persona = "fund",
 }: {
   dealId: string;
   notes: IcNoteItem[];
   canEdit: boolean;
+  persona?: Persona;
 }) {
   const t = useTranslations("deal");
+  const mot = usePersonaLabel("deal", persona);
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState("");
@@ -43,7 +48,7 @@ export function IcNotes({
     <div className="flex flex-col">
       <div className="flex justify-between items-center px-4 py-3 border-b border-separator-soft">
         <span className="text-[13px] font-[650] flex items-center gap-1.5">
-          {t("icNotes")}
+          {mot("icNotes")}
         </span>
         {canEdit && (
           <button
@@ -99,7 +104,7 @@ export function IcNotes({
       )}
 
       {notes.length === 0 && !open && (
-        <p className="text-[12px] text-ink-muted px-4 py-3">{t("noNotes")}</p>
+        <p className="text-[12px] text-ink-muted px-4 py-3">{mot("noNotes")}</p>
       )}
 
       {notes.map((n) => (

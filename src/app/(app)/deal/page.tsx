@@ -3,7 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal, getDealRole } from "@/lib/current-deal";
-import { personaFor } from "@/lib/persona";
+import { getPersona } from "@/lib/persona-server";
 import { personaLabel } from "@/components/shell/persona-label";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
@@ -58,6 +58,12 @@ export default async function DealPage() {
   const ta = await getTranslations("audit");
   const locale = (await getLocale()) as Locale;
   const supabase = await createClient();
+  // Résolu AVANT tout retour anticipé : l'écran « aucune levée » a lui aussi
+  // besoin du vocabulaire du métier. L'étape décrit le processus d'un FONDS
+  // (sourcing, comité) ; vue du fondateur, c'est SON dossier qu'on examine.
+  const personaCourant = await getPersona(supabase);
+  const mot = personaLabel(t, personaCourant);
+  const etape = personaLabel(ts, personaCourant);
   await requireInternal(supabase);
 
   // La fiche suit le sélecteur de deal.
@@ -78,12 +84,12 @@ export default async function DealPage() {
     return (
       <div className="flex flex-col gap-6 max-w-2xl">
         <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}
+          {mot("title")}
         </h1>
         <Card>
           <CardBody>
             <p className="text-[12.5px] text-ink-secondary py-3">
-              {t("emptyState")}
+              {mot("emptyState")}
             </p>
           </CardBody>
         </Card>
@@ -93,19 +99,6 @@ export default async function DealPage() {
 
   const role = await getDealRole(supabase, deal.org_id);
 
-  // L'étape décrit le processus d'un FONDS (sourcing, screening, comité).
-  // Vue du fondateur, c'est SON dossier qu'on examine : les mêmes états, dits
-  // dans ses termes.
-  const { data: profilPersona } = await supabase
-    .from("profiles")
-    .select("account_type")
-    .eq("id", (await supabase.auth.getUser()).data.user?.id ?? "")
-    .maybeSingle();
-  const personaCourant = personaFor(
-    (profilPersona as { account_type?: string } | null)?.account_type,
-    role,
-  );
-  const etape = personaLabel(ts, personaCourant);
   const canEdit = ["owner", "admin", "member"].includes(role ?? "");
   const canDelete = ["owner", "admin"].includes(role ?? "");
 
@@ -280,7 +273,7 @@ export default async function DealPage() {
         <Card>
           <CardBody>
             <span className="text-[11.5px] text-ink-secondary flex items-center gap-1">
-              {t("readiness")}
+              {mot("readiness")}
               <InfoTooltip text={t("tipReadiness")} />
             </span>
             <div className="flex items-center gap-2 mt-1">
@@ -338,11 +331,20 @@ export default async function DealPage() {
         {/* Colonne gauche : historique + notes d'IC */}
         <div className="flex flex-col gap-3">
           <Card className="overflow-hidden">
-            <DealHistory items={history} tip={t("tipHistory")} />
+            <DealHistory
+              items={history}
+              tip={t("tipHistory")}
+              persona={personaCourant}
+            />
           </Card>
 
           <Card className="overflow-hidden">
-            <IcNotes dealId={deal.id} notes={notes} canEdit={canEdit} />
+            <IcNotes
+              dealId={deal.id}
+              notes={notes}
+              canEdit={canEdit}
+              persona={personaCourant}
+            />
           </Card>
         </div>
 
@@ -350,7 +352,7 @@ export default async function DealPage() {
         <div className="flex flex-col gap-3">
           <Card className="overflow-hidden">
             <div className="px-4 py-3 border-b border-separator-soft text-[13px] font-[650] flex items-center gap-1.5">
-              {t("team")}
+              {mot("team")}
               <InfoTooltip text={t("tipTeam")} />
             </div>
             {team.map((p) => (

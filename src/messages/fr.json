@@ -157,7 +157,8 @@
       "groups": {
         "overview": "Ma levée",
         "deal": "Mon dossier",
-        "organisation": "Mon compte"
+        "organisation": "Mon compte",
+        "dealEmpty": "Aucun dossier"
       },
       "nav": {
         "dashboard": "Accueil",
@@ -172,19 +173,22 @@
         "nda": "Accords signés",
         "audit": "Qui a consulté quoi",
         "qa": "Questions reçues"
-      }
+      },
+      "searchPlaceholder": "Rechercher un document…"
     },
     "investor": {
       "groups": {
         "deal": "Le dossier",
-        "organisation": "Mon compte"
+        "organisation": "Mon compte",
+        "dealEmpty": "Aucun dossier"
       },
       "nav": {
         "dataRoom": "Documents",
         "viewer": "Lecture",
         "qa": "Mes questions",
         "nda": "Accord signé"
-      }
+      },
+      "searchPlaceholder": "Rechercher un document…"
     }
   },
   "dashboard": {
@@ -361,7 +365,9 @@
     "docName": "Nom du document",
     "founder": {
       "title": "Mes documents",
-      "subtitle": "Vos pièces, chiffrées et tracées. Vous seul décidez qui les voit."
+      "subtitle": "Vos pièces, chiffrées et tracées. Vous seul décidez qui les voit.",
+      "emptyState": "Aucun dossier pour l'instant.",
+      "dealName": "Nom de la levée"
     },
     "investor": {
       "title": "Documents",
@@ -416,7 +422,10 @@
     "login": "Se connecter",
     "signup": "Créer un compte",
     "wrongAccountTitle": "Mauvais compte",
-    "wrongAccountBody": "Cette invitation est adressée à {invited}, mais vous êtes connecté en tant que {current}. Déconnectez-vous et reconnectez-vous avec la bonne adresse."
+    "wrongAccountBody": "Cette invitation est adressée à {invited}, mais vous êtes connecté en tant que {current}. Déconnectez-vous et reconnectez-vous avec la bonne adresse.",
+    "founder": {
+      "emptyState": "Aucune levée. Créez votre dossier pour inviter des investisseurs."
+    }
   },
   "permissions": {
     "title": "Permissions",
@@ -432,6 +441,9 @@
       "view": "Voir",
       "download": "Télécharger",
       "edit": "Éditer"
+    },
+    "founder": {
+      "emptyState": "Aucune levée. Créez votre dossier pour gérer les accès."
     }
   },
   "viewer": {
@@ -461,7 +473,17 @@
     "expand": "Agrandir",
     "collapse": "Réduire",
     "goToPage": "Aller à la page {page}",
-    "thumbAlt": "Aperçu de la page {page}"
+    "thumbAlt": "Aperçu de la page {page}",
+    "founder": {
+      "officeNotReadyHint": "Ce fichier sera bientôt lisible ici. En attendant, une version PDF fonctionne toujours.",
+      "officeFailedHint": "Réessayez dans un instant. Si le problème persiste, écrivez-nous.",
+      "sheetFailedHint": "Le fichier est peut-être protégé par un mot de passe ou corrompu."
+    },
+    "investor": {
+      "officeNotReadyHint": "Ce fichier sera bientôt lisible ici. En attendant, demandez une version PDF au fondateur.",
+      "officeFailedHint": "Réessayez dans un instant. Si le problème persiste, signalez-le au fondateur.",
+      "sheetFailedHint": "Le fichier est peut-être protégé par un mot de passe ou corrompu. Signalez-le au fondateur."
+    }
   },
   "security": {
     "title": "Sécurité",
@@ -586,7 +608,19 @@
     "deleteBody": "« {name} » et toute sa data room (dossiers, documents, permissions, invitations) seront définitivement supprimés. Le journal d'audit, lui, conservera la trace de cette suppression. Cette action est irréversible.",
     "deleteConfirm": "Supprimer définitivement",
     "prev": "Précédent",
-    "next": "Suivant"
+    "next": "Suivant",
+    "founder": {
+      "title": "Ma levée",
+      "subtitle": "Le montant recherché, l'avancement et vos documents.",
+      "emptyState": "Aucune levée pour l'instant.",
+      "editCard": "Modifier ma levée",
+      "name": "Nom de la levée",
+      "dealHistory": "Historique de ma levée",
+      "icNotes": "Notes internes",
+      "noNotes": "Aucune note pour l'instant.",
+      "team": "Mon équipe",
+      "readiness": "Complétude du dossier"
+    }
   },
   "versions": {
     "title": "Versions",

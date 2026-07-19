@@ -4,6 +4,8 @@ import { SanzaLogo } from "@/components/ui/SanzaLogo";
 import { EncryptionBadge } from "@/components/ui/EncryptionBadge";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { logout } from "@/app/actions/auth";
+import type { Persona } from "@/lib/persona";
+import { personaLabel } from "./persona-label";
 
 function initials(email: string): string {
   const name = email.split("@")[0] ?? "";
@@ -15,11 +17,15 @@ function initials(email: string): string {
 export async function Topbar({
   orgName,
   userEmail,
+  persona = "fund",
 }: {
   orgName: string;
   userEmail: string;
+  persona?: Persona;
 }) {
   const t = await getTranslations("shell");
+  // Composant SERVEUR : variante `personaLabel`, pas le hook.
+  const mot = personaLabel(t, persona);
 
   return (
     <header className="sticky top-0 z-[60] flex items-center gap-2.5 h-[52px] px-4 bg-[rgba(255,255,255,0.92)] backdrop-blur-md border-b border-line">
@@ -33,7 +39,7 @@ export async function Topbar({
       </div>
 
       <div className="flex items-center gap-2 w-[260px] h-8 px-2.5 border border-line rounded-field bg-surface text-ink-placeholder">
-        <span className="text-[12.5px]">{t("searchPlaceholder")}</span>
+        <span className="text-[12.5px]">{mot("searchPlaceholder")}</span>
         <kbd className="ml-auto font-mono text-[10.5px] font-medium bg-chip-neutral-bg rounded-[4px] px-1.5 py-0.5 text-ink-secondary">
           ⌘K
         </kbd>

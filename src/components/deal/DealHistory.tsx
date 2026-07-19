@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Mono } from "@/components/ui/Table";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
+import type { Persona } from "@/lib/persona";
+import { usePersonaLabel } from "@/components/shell/persona-label";
 
 export interface HistoryItem {
   label: string;
@@ -17,11 +19,14 @@ const PAGE = 5;
 export function DealHistory({
   items,
   tip,
+  persona = "fund",
 }: {
   items: HistoryItem[];
   tip: string;
+  persona?: Persona;
 }) {
   const t = useTranslations("deal");
+  const mot = usePersonaLabel("deal", persona);
   const [page, setPage] = useState(0);
 
   const pages = Math.max(1, Math.ceil(items.length / PAGE));
@@ -31,7 +36,7 @@ export function DealHistory({
   return (
     <div className="flex flex-col">
       <div className="px-4 py-3 border-b border-separator-soft text-[13px] font-[650] flex items-center gap-1.5">
-        {t("dealHistory")}
+        {mot("dealHistory")}
         <InfoTooltip text={tip} />
       </div>
 

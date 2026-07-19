@@ -23,7 +23,7 @@ export function AppShell({
 }) {
   return (
     <div className="min-h-screen">
-      <Topbar orgName={orgName} userEmail={userEmail} />
+      <Topbar orgName={orgName} userEmail={userEmail} persona={persona} />
       <div className="flex">
         <Sidebar
           deals={deals}
