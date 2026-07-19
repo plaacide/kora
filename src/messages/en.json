@@ -303,7 +303,8 @@
       "checklist_item_updated": "Requirement updated",
       "checklist_item_deleted": "Requirement deleted",
       "document_thumbnail_viewed": "Preview viewed",
-      "checklist_document_unlinked": "Evidence unlinked"
+      "checklist_document_unlinked": "Evidence unlinked",
+      "permission_extended": "Access extended"
     }
   },
   "dataroom": {

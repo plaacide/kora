@@ -303,7 +303,8 @@
       "checklist_item_updated": "Exigence modifiée",
       "checklist_item_deleted": "Exigence supprimée",
       "document_thumbnail_viewed": "Aperçu consulté",
-      "checklist_document_unlinked": "Justificatif retiré"
+      "checklist_document_unlinked": "Justificatif retiré",
+      "permission_extended": "Accès prolongé"
     }
   },
   "dataroom": {
