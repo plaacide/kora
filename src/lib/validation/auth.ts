@@ -11,7 +11,7 @@ export const signupSchema = z.object({
     .regex(/[a-zA-Z]/, { error: "passwordLetter" })
     .regex(/[0-9]/, { error: "passwordDigit" }),
   locale: z.enum(["fr", "en"]).default("fr"),
-  account_type: z.enum(["investor", "founder"]).default("founder"),
+  account_type: z.enum(["investor", "founder", "sae"]).default("founder"),
 });
 
 export const loginSchema = z.object({

@@ -42,6 +42,7 @@ export default async function OnboardingPage() {
     const type = (profile as { account_type?: string } | null)?.account_type;
     if (type === "investor") redirect("/onboarding/investisseur");
     if (type === "founder") redirect("/onboarding/fondateur");
+    if (type === "sae") redirect("/onboarding/programme");
   }
 
   // Fallback (pré-migration ou type absent) : création d'organisation classique.

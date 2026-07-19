@@ -12,6 +12,7 @@ import { cn } from "@/lib/cn";
 const ROLES = [
   { key: "investor", emoji: "📊", title: "Investisseur", desc: "Je cherche des opportunités d'investissement" },
   { key: "founder", emoji: "🚀", title: "Fondateur", desc: "Je lève des fonds pour ma startup" },
+  { key: "sae", emoji: "🎯", title: "Programme", desc: "J'accompagne plusieurs startups" },
 ] as const;
 
 export function SignupForm() {
@@ -19,7 +20,7 @@ export function SignupForm() {
   const t = useTranslations("auth.signup");
   const tc = useTranslations("common");
   const locale = useLocale();
-  const [role, setRole] = useState<"investor" | "founder">("investor");
+  const [role, setRole] = useState<"investor" | "founder" | "sae">("investor");
 
   return (
     <div className="flex flex-col gap-6">
@@ -40,7 +41,7 @@ export function SignupForm() {
         <span className="text-[12px] font-[550] text-ink-secondary">
           Vous êtes…
         </span>
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-3 gap-2">
           {ROLES.map((r) => (
             <button
               key={r.key}
@@ -48,7 +49,7 @@ export function SignupForm() {
               onClick={() => setRole(r.key)}
               aria-pressed={role === r.key}
               className={cn(
-                "flex flex-col items-start gap-1 rounded-[10px] border-2 p-3 text-left transition-colors cursor-pointer",
+                "flex flex-col items-start gap-1 rounded-[10px] border-2 p-2.5 text-left transition-colors cursor-pointer",
                 role === r.key
                   ? "border-primary bg-[rgba(232,92,43,0.06)]"
                   : "border-line hover:border-line-strong",
