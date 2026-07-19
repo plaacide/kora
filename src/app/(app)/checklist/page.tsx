@@ -8,6 +8,7 @@ import {
   Checklist,
   type ChecklistItem,
   type DocOption,
+  type FolderOption,
 } from "@/components/checklist/Checklist";
 import { ApplyChecklistButton } from "@/components/checklist/ApplyChecklistButton";
 
@@ -40,21 +41,44 @@ export default async function ChecklistPage() {
     );
   }
 
-  const [{ data: items, error }, { data: documents }] = await Promise.all([
-    supabase
-      .from("checklist_items")
-      .select("id, category, label, description, status, document_id")
-      .eq("deal_id", deal.id)
-      .order("category")
-      .order("position"),
-    supabase
-      .from("documents")
-      .select("id, name, index_path")
-      .eq("deal_id", deal.id)
-      .order("index_path"),
-  ]);
+  const CHAMPS = "id, category, label, description, status, document_id";
 
-  // Tolérant tant que la migration n'est pas appliquée.
+  const [{ data: itemsAvecDossier, error: erreurDossier }, { data: documents }, { data: folders }] =
+    await Promise.all([
+      supabase
+        .from("checklist_items")
+        .select(`${CHAMPS}, folder_id`)
+        .eq("deal_id", deal.id)
+        .order("category")
+        .order("position"),
+      supabase
+        .from("documents")
+        .select("id, name, index_path, folder_id")
+        .eq("deal_id", deal.id)
+        .order("index_path"),
+      // Où chaque pièce se dépose : c'est ce qui transforme la liste en guide.
+      supabase
+        .from("folders")
+        .select("id, name, index_path")
+        .eq("deal_id", deal.id)
+        .order("index_path"),
+    ]);
+
+  // Repli si la colonne `folder_id` n'existe pas encore : la migration qui
+  // l'ajoute s'applique à la main, et le code peut donc arriver en production
+  // avant elle. Sans ce repli, la requête échouait et le fondateur découvrait
+  // une checklist VIDE — 22 exigences et un dossier à 70 % effacés de l'écran
+  // le temps d'un déploiement. Un défaut de séquencement ne doit pas ressembler
+  // à une perte de données.
+  const { data: items, error } = erreurDossier
+    ? await supabase
+        .from("checklist_items")
+        .select(CHAMPS)
+        .eq("deal_id", deal.id)
+        .order("category")
+        .order("position")
+    : { data: itemsAvecDossier, error: null };
+
   const list = (error ? [] : (items ?? [])) as unknown as ChecklistItem[];
 
   if (list.length === 0) {
@@ -98,6 +122,7 @@ export default async function ChecklistPage() {
         dealId={deal.id}
         items={list}
         docs={(documents ?? []) as DocOption[]}
+        folders={(folders ?? []) as FolderOption[]}
         readiness={deal.readiness_score ?? 0}
         canEdit={canEdit}
       />

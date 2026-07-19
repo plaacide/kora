@@ -595,7 +595,10 @@
     "reqDescPlaceholder": "Description (optional)",
     "addBtn": "Add",
     "editReq": "Edit",
-    "deleteReq": "Delete"
+    "deleteReq": "Delete",
+    "depositIn": "File it in {folder}",
+    "expectedFolderGroup": "Expected folder",
+    "otherDocsGroup": "Other documents"
   },
   "readiness": {
     "title": "Readiness score",

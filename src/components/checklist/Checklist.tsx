@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -10,6 +11,7 @@ import {
   updateChecklistItem,
   deleteChecklistItem,
 } from "@/app/actions/checklist";
+import { folderIndex } from "@/lib/folder-index";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
 import { PlainError } from "@/components/auth/FormError";
@@ -25,9 +27,18 @@ export interface ChecklistItem {
   description: string;
   status: Status;
   document_id: string | null;
+  /** Dossier de la data room où cette pièce se dépose. */
+  folder_id: string | null;
 }
 
 export interface DocOption {
+  id: string;
+  name: string;
+  index_path: string;
+  folder_id?: string | null;
+}
+
+export interface FolderOption {
   id: string;
   name: string;
   index_path: string;
@@ -59,12 +70,14 @@ export function Checklist({
   dealId,
   items,
   docs,
+  folders,
   readiness,
   canEdit,
 }: {
   dealId: string;
   items: ChecklistItem[];
   docs: DocOption[];
+  folders: FolderOption[];
   readiness: number;
   canEdit: boolean;
 }) {
@@ -76,6 +89,8 @@ export function Checklist({
   const [error, setError] = useState<string | undefined>();
   // Identifiants provisoires des exigences ajoutées avant retour du serveur.
   const tempId = useRef(0);
+  // Dossier attendu, par identifiant — pour afficher « à déposer dans 1.2 ».
+  const folderById = new Map(folders.map((f) => [f.id, f]));
   const [, startTransition] = useTransition();
 
   // Après un router.refresh(), le serveur renvoie la liste et le score à jour :
@@ -173,6 +188,8 @@ export function Checklist({
       description: newDesc.trim(),
       status: "todo",
       document_id: null,
+      // Une exigence ajoutée à la main n'a pas de dossier de référence.
+      folder_id: null,
     };
     run([...local, temp], () =>
       addChecklistItem(dealId, cat, label, newDesc.trim()),
@@ -313,6 +330,32 @@ export function Checklist({
                             {i.description}
                           </p>
                         )}
+                        {/* Où déposer la pièce. C'est ce qui distingue un
+                            guide d'une liste : sans cette ligne, le fondateur
+                            doit deviner lequel des 30 dossiers accueille son
+                            RCCM. Affiché seulement quand la pièce manque —
+                            une fois la preuve rattachée, l'indication n'a
+                            plus d'utilité et alourdirait la lecture. */}
+                        {!i.document_id &&
+                          (() => {
+                            const dossier = i.folder_id
+                              ? folderById.get(i.folder_id)
+                              : undefined;
+                            if (!dossier) return null;
+                            return (
+                              <Link
+                                href="/data-room"
+                                className="inline-flex items-center gap-1 mt-1.5 text-[11px] text-link hover:text-link-hover"
+                              >
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                  <path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2.5h7A1.5 1.5 0 0 1 19 10v7.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z" />
+                                </svg>
+                                {t("depositIn", {
+                                  folder: `${folderIndex(dossier.index_path)} ${dossier.name}`,
+                                })}
+                              </Link>
+                            );
+                          })()}
                       </>
                     )}
                   </div>
@@ -327,11 +370,38 @@ export function Checklist({
                         aria-label={t("linkDoc")}
                       >
                         <option value="">{t("noDoc")}</option>
-                        {docs.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            {d.index_path} {d.name}
-                          </option>
-                        ))}
+                        {/* Les documents du dossier attendu d'abord : sur une
+                            data room fournie, la bonne preuve serait autrement
+                            noyée au milieu de dizaines de fichiers. Les autres
+                            restent proposés — la suggestion oriente, elle
+                            n'impose pas. */}
+                        {(() => {
+                          const duDossier = i.folder_id
+                            ? docs.filter((d) => d.folder_id === i.folder_id)
+                            : [];
+                          const autres = docs.filter(
+                            (d) => !duDossier.includes(d),
+                          );
+                          const ligne = (d: DocOption) => (
+                            <option key={d.id} value={d.id}>
+                              {folderIndex(d.index_path)} {d.name}
+                            </option>
+                          );
+                          if (duDossier.length === 0)
+                            return docs.map(ligne);
+                          return (
+                            <>
+                              <optgroup label={t("expectedFolderGroup")}>
+                                {duDossier.map(ligne)}
+                              </optgroup>
+                              {autres.length > 0 && (
+                                <optgroup label={t("otherDocsGroup")}>
+                                  {autres.map(ligne)}
+                                </optgroup>
+                              )}
+                            </>
+                          );
+                        })()}
                       </select>
                       <button
                         onClick={() => {
