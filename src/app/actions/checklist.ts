@@ -25,18 +25,25 @@ export async function setChecklistStatus(
   return { ok: true, readiness: data as number };
 }
 
+/**
+ * Rattache (ou détache) la preuve d'une exigence.
+ *
+ * Renvoie le readiness recalculé : rattacher une preuve fait désormais passer
+ * la pièce à « fait », donc le score bouge — l'écran doit pouvoir le refléter
+ * sans attendre le rechargement.
+ */
 export async function linkChecklistDocument(
   itemId: string,
   docId: string | null,
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; error?: string; readiness?: number }> {
   const supabase = await createClient();
-  const { error } = await supabase.rpc("link_checklist_document", {
+  const { data, error } = await supabase.rpc("link_checklist_document", {
     p_item: itemId,
     p_doc: docId,
   });
   if (error) return { ok: false, error: error.message };
   refresh();
-  return { ok: true };
+  return { ok: true, readiness: data as number };
 }
 
 /** Crée une exigence de DD personnalisée. */

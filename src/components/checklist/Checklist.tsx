@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -74,14 +74,23 @@ export function Checklist({
   const [local, setLocal] = useState(items);
   const [score, setScore] = useState(readiness);
   const [error, setError] = useState<string | undefined>();
+  // Identifiants provisoires des exigences ajoutées avant retour du serveur.
+  const tempId = useRef(0);
   const [, startTransition] = useTransition();
 
   // Après un router.refresh(), le serveur renvoie la liste et le score à jour :
   // on resynchronise l'état local dessus (source de vérité).
-  useEffect(() => {
+  //
+  // Ajusté PENDANT le rendu et non dans un effet : c'est le motif documenté
+  // par React pour dériver un état d'une prop. Dans un effet, la resynchro
+  // provoquait un second rendu en cascade — l'utilisateur voyait brièvement
+  // l'ancienne liste après chaque enregistrement.
+  const [vus, setVus] = useState(items);
+  if (items !== vus) {
+    setVus(items);
     setLocal(items);
     setScore(readiness);
-  }, [items, readiness]);
+  }
 
   // Ajout d'exigence : catégorie dont le formulaire est ouvert + champs.
   const [adding, setAdding] = useState<ChecklistItem["category"] | null>(null);
@@ -127,8 +136,22 @@ export function Checklist({
 
   function link(item: ChecklistItem, docId: string) {
     const value = docId || null;
+    // Miroir de la règle appliquée en base (cf. migration « preuve vaut
+    // pièce ») : rattacher une preuve valide une pièce à faire, la retirer
+    // ramène une pièce faite à l'état initial. Une pièce « en cours » n'est
+    // pas promue — le fondateur a exprimé une intention, on ne la contredit
+    // pas. Sans ce miroir, la jauge ne bougerait qu'au rechargement.
+    const statut: ChecklistItem["status"] =
+      value && item.status === "todo"
+        ? "done"
+        : !value && item.status === "done"
+          ? "todo"
+          : item.status;
+
     run(
-      local.map((i) => (i.id === item.id ? { ...i, document_id: value } : i)),
+      local.map((i) =>
+        i.id === item.id ? { ...i, document_id: value, status: statut } : i,
+      ),
       () => linkChecklistDocument(item.id, value),
     );
   }
@@ -140,8 +163,11 @@ export function Checklist({
     setNewLabel("");
     setNewDesc("");
     // Optimiste avec un id temporaire ; le refresh apporte le vrai.
+    // Compteur plutôt que Math.random : un identifiant tiré au hasard change
+    // à chaque rendu et déstabilise la réconciliation de React.
+    tempId.current += 1;
     const temp: ChecklistItem = {
-      id: `temp-${Math.random().toString(36).slice(2)}`,
+      id: `temp-${tempId.current}`,
       category: cat,
       label,
       description: newDesc.trim(),
