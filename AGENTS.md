@@ -167,6 +167,36 @@ Piège de forme : la valeur de `EMAIL_FROM` contient `<` et `>`. Sans guillemets
 dans `.env.local`, `source .env.local` casse le shell (`parse error near \n`) —
 dotenv, lui, le tolère, donc le défaut ne se voit qu'en ligne de commande.
 
+## Liens e-mail : PKCE les casse, TOUJOURS `flowType: "implicit"`
+
+`@supabase/ssr` utilise PKCE par défaut. Pour la navigation c'est le bon
+choix ; pour un lien envoyé par e-mail, c'est fatal, et de deux façons :
+
+- le jeton arrive préfixé `pkce_…`, et `verifyOtp()` le REJETTE — il attend un
+  `token_hash` simple ;
+- PKCE dépose un `code_verifier` en cookie dans le navigateur qui a fait la
+  demande. Un lien demandé sur l'ordinateur et ouvert sur le téléphone ne peut
+  donc pas fonctionner, par construction.
+
+Symptôme observé : « lien expiré » dès le PREMIER clic, aussi bien à la
+confirmation d'inscription qu'à la réinitialisation de mot de passe. Le message
+trompe — `/auth/confirm` renvoie `erreur=lien_expire` pour toute erreur de
+`verifyOtp`, qu'elle soit due à l'expiration, à un jeton déjà utilisé ou, ici,
+à un jeton d'un autre type.
+
+Tout appel qui DÉCLENCHE un e-mail (`signUp`, `resetPasswordForEmail`) doit
+donc utiliser `createClient({ flowType: "implicit" })`.
+
+**Rien ne le détecte avant l'exécution**, et le journal Resend dit
+« delivered » : l'e-mail part, il arrive, c'est le lien qu'il contient qui est
+inutilisable. Pour vérifier, relire le lien réellement envoyé :
+
+```bash
+curl -s "https://api.resend.com/emails/$ID" -H "Authorization: Bearer $RESEND_API_KEY"
+```
+
+Un `token_hash=pkce_…` dans l'URL est le signe.
+
 ## Resend : le domaine vérifié est la RACINE, pas `send.`
 
 Resend affiche des enregistrements sur `send.sanza.africa` (MX de rebond +

@@ -43,7 +43,9 @@ export async function signup(
   }
 
   const { full_name, email, password, locale, account_type } = parsed.data;
-  const supabase = await createClient();
+  // Flux implicite : le lien de confirmation doit s'ouvrir depuis n'importe
+  // quel appareil, pas seulement celui qui s'est inscrit.
+  const supabase = await createClient({ flowType: "implicit" });
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -145,7 +147,9 @@ export async function requestPasswordReset(
     return { errorKey: "tooManyAttempts" };
   }
 
-  const supabase = await createClient();
+  // Idem : un lien de réinitialisation s'ouvre souvent depuis le téléphone,
+  // alors que la demande a été faite depuis l'ordinateur. PKCE l'interdirait.
+  const supabase = await createClient({ flowType: "implicit" });
   const origin = await appOrigin();
 
   const { error } = await supabase.auth.resetPasswordForEmail(

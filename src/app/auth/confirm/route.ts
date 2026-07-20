@@ -39,10 +39,14 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.verifyOtp({
-    type,
-    token_hash: tokenHash,
-  });
+
+  // Un jeton préfixé `pkce_` n'est pas un token_hash : c'est un code PKCE, et
+  // `verifyOtp` le rejette. Les liens émis avant le passage au flux implicite
+  // en portent — ils dorment encore dans des boîtes mail, et échouaient tous
+  // dès le PREMIER clic. L'erreur générique les faisait passer pour expirés.
+  const { error } = tokenHash.startsWith("pkce_")
+    ? await supabase.auth.exchangeCodeForSession(tokenHash.slice(5))
+    : await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
 
   if (error) {
     // Lien expiré ou déjà utilisé : on renvoie vers la demande, pas vers une
