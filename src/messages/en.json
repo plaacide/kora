@@ -50,8 +50,10 @@
     },
     "verifyEmail": {
       "title": "Check your email",
-      "body": "A confirmation link has just been sent to you. Click it to activate your account, then log in.",
-      "back": "Back to login"
+      "body": "If this address did not already have an account, a confirmation link has just been sent: click it to activate.",
+      "back": "Back to sign in",
+      "already": "If you already had an account with this address, no email is sent — sign in directly, or reset your password if you have forgotten it.",
+      "reset": "Reset my password"
     },
     "errors": {
       "invalidCredentials": "Incorrect email or password.",

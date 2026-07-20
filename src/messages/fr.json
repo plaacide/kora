@@ -50,8 +50,10 @@
     },
     "verifyEmail": {
       "title": "Vérifiez votre email",
-      "body": "Un lien de confirmation vient de vous être envoyé. Cliquez dessus pour activer votre compte, puis connectez-vous.",
-      "back": "Retour à la connexion"
+      "body": "Si cette adresse n’avait pas encore de compte, un lien de confirmation vient de vous être envoyé : cliquez dessus pour l’activer.",
+      "back": "Retour à la connexion",
+      "already": "Si vous aviez déjà un compte avec cette adresse, aucun e-mail n’est envoyé — connectez-vous directement, ou réinitialisez votre mot de passe si vous l’avez oublié.",
+      "reset": "Réinitialiser mon mot de passe"
     },
     "errors": {
       "invalidCredentials": "Email ou mot de passe incorrect.",
