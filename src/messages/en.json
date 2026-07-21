@@ -784,6 +784,22 @@
     "accessEmpty": "No investor invited yet.",
     "accessManage": "Manage access →",
     "docsCount": "{n} document(s) uploaded",
-    "docsLink": "See my documents"
+    "docsLink": "See my documents",
+    "metricPrep": "Readiness",
+    "metricPieces": "Documents provided",
+    "metricInvites": "Active guests",
+    "metricViews": "Views (7 d)",
+    "viewsDeltaUp": "+{n} vs. past 7 d",
+    "viewsDeltaFlat": "flat vs. past 7 d",
+    "whoDoc": "Document",
+    "whoWhen": "Seen",
+    "whoCoverage": "Coverage",
+    "coverageHint": "The ring shows how much of the document was opened.",
+    "docsTitle": "Most-viewed documents",
+    "docsHint": "Where their attention goes.",
+    "docViews": "{n} view(s)",
+    "docReaders": "{n} reader(s)",
+    "noCoverage": "—",
+    "whoPerson": "Person"
   }
 }

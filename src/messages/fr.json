@@ -784,6 +784,22 @@
     "accessEmpty": "Aucun investisseur invité pour l'instant.",
     "accessManage": "Gérer les accès →",
     "docsCount": "{n} document(s) déposé(s)",
-    "docsLink": "Voir mes documents"
+    "docsLink": "Voir mes documents",
+    "metricPrep": "Préparation",
+    "metricPieces": "Pièces fournies",
+    "metricInvites": "Invités actifs",
+    "metricViews": "Vues (7 j)",
+    "viewsDeltaUp": "+{n} vs. 7 j passés",
+    "viewsDeltaFlat": "stable vs. 7 j passés",
+    "whoDoc": "Document",
+    "whoWhen": "Vu",
+    "whoCoverage": "Couverture",
+    "coverageHint": "L'anneau montre la part du document ouverte.",
+    "docsTitle": "Documents les plus regardés",
+    "docsHint": "Où se porte leur attention.",
+    "docViews": "{n} vue(s)",
+    "docReaders": "{n} lecteur(s)",
+    "noCoverage": "—",
+    "whoPerson": "Personne"
   }
 }

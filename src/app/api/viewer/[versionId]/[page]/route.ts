@@ -97,7 +97,17 @@ export async function GET(
       readDerivedJson<{ pageCount: number }>(admin, metaKey(versionId)),
     ]);
     if (hit && meta?.pageCount) {
-      await auditPage(admin, userId, doc, pageNo, level, thumb);
+      // Backfill : les documents déjà en cache n'ont jamais écrit leur nombre
+      // de pages en base. Sans ça, la couverture de lecture resterait vide
+      // pour tout le fonds documentaire existant. `is null` = une seule fois.
+      await Promise.all([
+        auditPage(admin, userId, doc, pageNo, level, thumb),
+        admin
+          .from("document_versions")
+          .update({ page_count: meta.pageCount })
+          .eq("id", versionId)
+          .is("page_count", null),
+      ]);
       return pngResponse(hit, meta.pageCount, level, true);
     }
   }
@@ -172,6 +182,15 @@ export async function GET(
     await Promise.all([
       writeDerived(admin, cachedPageKey, new Uint8Array(png), "image/png"),
       writeDerivedJson(admin, metaKey(versionId), { pageCount }),
+      // Persisté aussi dans la BASE : c'est le dénominateur de la couverture
+      // de lecture (accueil fondateur). Le cache de stockage suffisait au
+      // viewer, mais l'accueil interroge la table, pas le stockage. Écrit une
+      // fois, quand le rendu le connaît ; `is null` évite de réécrire.
+      admin
+        .from("document_versions")
+        .update({ page_count: pageCount })
+        .eq("id", versionId)
+        .is("page_count", null),
     ]);
   }
 
