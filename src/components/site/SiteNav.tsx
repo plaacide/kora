@@ -39,7 +39,7 @@ export function SiteNav() {
           <SanzaLogo size={24} />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-6">
           {LIENS.map((l) => (
             <a
               key={l.href}
@@ -69,7 +69,7 @@ export function SiteNav() {
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          className="md:hidden grid place-items-center w-11 h-11 -mr-2 text-ink"
+          className="lg:hidden grid place-items-center w-11 h-11 -mr-2 text-ink"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
             {open ? (
@@ -89,7 +89,7 @@ export function SiteNav() {
       </div>
 
       {open && (
-        <div className={cn("md:hidden border-t border-line bg-bg px-5 py-3 flex flex-col")}>
+        <div className={cn("lg:hidden border-t border-line bg-bg px-5 py-3 flex flex-col")}>
           {LIENS.map((l) => (
             <a
               key={l.href}
