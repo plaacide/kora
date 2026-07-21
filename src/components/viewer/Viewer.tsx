@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 import { useExpanded, EXPANDED_Z } from "./useExpanded";
 import { ExpandButton } from "./ExpandButton";
 import { PageImage } from "./PageImage";
+import { usePageDwell } from "./usePageDwell";
 
 export function Viewer({
   versionId,
@@ -55,7 +56,16 @@ export function Viewer({
     setPageCount((c) => (c === n ? c : n));
   }, []);
 
-  const handleVisible = useCallback((p: number) => setCurrent(p), []);
+  // Mesure du temps de lecture réel (couche de signal B). Le hook clôt et
+  // envoie la tranche de la page précédente à chaque changement de page.
+  const noterDwell = usePageDwell(versionId);
+  const handleVisible = useCallback(
+    (p: number) => {
+      setCurrent(p);
+      noterDwell(p);
+    },
+    [noterDwell],
+  );
 
   const goTo = (p: number) => {
     const el = pageRefs.current.get(p);

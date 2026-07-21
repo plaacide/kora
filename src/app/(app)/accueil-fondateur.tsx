@@ -101,6 +101,18 @@ interface Regard {
   type: BadgeType;
   quand: string;
   couverture: number | null;
+  temps: string | null;
+}
+
+/** Millisecondes → « 45 s », « 3 min », « 1 h 12 ». `null` si négligeable. */
+function dureeCourte(ms: number): string | null {
+  const s = Math.round(ms / 1000);
+  if (s < 1) return null;
+  if (s < 60) return `${s} s`;
+  const min = Math.round(s / 60);
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min / 60);
+  return `${h} h ${String(min % 60).padStart(2, "0")}`;
 }
 
 interface DocSignal {
@@ -142,6 +154,7 @@ export async function AccueilFondateur({
     { data: docs },
     { data: acces },
     { data: journal },
+    { data: reading },
   ] = await Promise.all([
     supabase
       .from("checklist_items")
@@ -168,6 +181,10 @@ export async function AccueilFondateur({
       .neq("actor_id", userId)
       .order("created_at", { ascending: false })
       .limit(600),
+    // Temps de lecture RÉEL (couche B) : total ms par (personne, document),
+    // auteur exclu côté RPC. Tolérant : renvoie une erreur tant que la
+    // migration n'est pas appliquée, on retombe alors sur « aucun temps ».
+    supabase.rpc("deal_reading_time", { p_deal: deal.id }),
   ]);
 
   const liste = (exigences ?? []) as {
@@ -252,17 +269,30 @@ export async function AccueilFondateur({
     return Math.min(100, Math.round((pagesVues / pagesTotal) * 100));
   }
 
+  // Temps de lecture réel, par (personne, document). Clé alignée sur celle des
+  // vues (e-mail complet | docId) pour se raccrocher aux mêmes lignes.
+  const tempsParCouple = new Map<string, number>();
+  for (const r of (reading ?? []) as Array<{
+    actor_email: string | null;
+    document_id: string;
+    total_ms: number;
+  }>) {
+    tempsParCouple.set(`${r.actor_email ?? "—"}|${r.document_id}`, r.total_ms);
+  }
+
   const regards: Regard[] = [...parCouple.values()]
     .sort((a, b) => +new Date(b.dernier) - +new Date(a.dernier))
     .slice(0, 6)
     .map((c) => {
       const m = meta.get(c.docId);
+      const ms = tempsParCouple.get(`${c.qui}|${c.docId}`) ?? 0;
       return {
         qui: c.qui.split("@")[0],
         doc: m?.nom ?? c.docId,
         type: m?.type ?? "DOC",
         quand: relatif(c.dernier),
         couverture: couverture(c.pages.size, m?.pages ?? 0),
+        temps: ms > 0 ? dureeCourte(ms) : null,
       };
     });
 
@@ -486,7 +516,8 @@ export async function AccueilFondateur({
               <div className="flex items-center gap-3 px-1 pb-1.5 text-[10px] font-[700] uppercase tracking-[0.04em] text-ink-muted border-b border-separator-soft">
                 <div className="flex-[1.3] min-w-0">{t("whoPerson")}</div>
                 <div className="flex-[1.6] min-w-0">{t("whoDoc")}</div>
-                <div className="w-[64px] shrink-0">{t("whoWhen")}</div>
+                <div className="w-[52px] shrink-0">{t("whoTime")}</div>
+                <div className="w-[58px] shrink-0">{t("whoWhen")}</div>
                 <div className="w-[34px] shrink-0 text-right">{t("whoCoverage")}</div>
               </div>
               {regards.map((r, i) => (
@@ -506,7 +537,10 @@ export async function AccueilFondateur({
                     <Badge type={r.type} />
                     <span className="text-[12.5px] text-ink truncate">{r.doc}</span>
                   </div>
-                  <div className="w-[64px] shrink-0 text-[11.5px] text-ink-secondary">
+                  <div className="w-[52px] shrink-0 text-[11.5px] font-[550] text-ink">
+                    {r.temps ?? <span className="text-ink-muted">—</span>}
+                  </div>
+                  <div className="w-[58px] shrink-0 text-[11.5px] text-ink-secondary">
                     {r.quand}
                   </div>
                   <div className="w-[34px] shrink-0 flex justify-end">

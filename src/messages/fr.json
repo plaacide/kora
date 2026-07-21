@@ -811,6 +811,7 @@
     "docViews": "{n} vue(s)",
     "docReaders": "{n} lecteur(s)",
     "noCoverage": "—",
-    "whoPerson": "Personne"
+    "whoPerson": "Personne",
+    "whoTime": "Temps"
   }
 }
