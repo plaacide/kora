@@ -113,54 +113,68 @@ export async function createInvitedAccount(input: {
     return { ok: false, error: "weak_password" };
   }
 
-  const supabase = await createClient();
+  // Tout est enveloppé : une exception non capturée (clé de service absente,
+  // réseau…) laissait l'invité devant un écran qui « ne fait rien ». On la
+  // journalise côté serveur ET on renvoie une erreur affichable.
+  try {
+    const supabase = await createClient();
 
-  // Le jeton décide de l'e-mail : l'invité ne le choisit pas, il ne peut donc
-  // pas se créer un accès pour une autre adresse que celle invitée.
-  const { data: rows } = await supabase.rpc("invitation_public", {
-    p_token: input.token,
-  });
-  const invite = (rows as unknown as Array<{
-    email: string;
-    valid: boolean;
-  }> | null)?.[0];
-  if (!invite || !invite.valid) return { ok: false, error: "invalid_invitation" };
-
-  const locale = (await getLocale()) as "fr" | "en";
-  const admin = createAdminClient();
-
-  const { data: created, error } = await admin.auth.admin.createUser({
-    email: invite.email,
-    password: pwd,
-    email_confirm: true,
-    user_metadata: { full_name: nom, locale, account_type: "investor" },
-  });
-
-  if (error) {
-    // Adresse déjà connue : on n'écrase pas un compte, on invite à se connecter.
-    if (/already|registered|exist/i.test(error.message)) {
-      return { ok: false, exists: true };
+    // Le jeton décide de l'e-mail : l'invité ne le choisit pas, il ne peut donc
+    // pas se créer un accès pour une autre adresse que celle invitée.
+    const { data: rows } = await supabase.rpc("invitation_public", {
+      p_token: input.token,
+    });
+    const invite = (rows as unknown as Array<{
+      email: string;
+      valid: boolean;
+    }> | null)?.[0];
+    if (!invite || !invite.valid) {
+      return { ok: false, error: "invalid_invitation" };
     }
-    return { ok: false, error: error.message };
+
+    const locale = (await getLocale()) as "fr" | "en";
+    const admin = createAdminClient();
+
+    const { data: created, error } = await admin.auth.admin.createUser({
+      email: invite.email,
+      password: pwd,
+      email_confirm: true,
+      user_metadata: { full_name: nom, locale, account_type: "investor" },
+    });
+
+    if (error) {
+      // Adresse déjà connue : on n'écrase pas un compte, on invite à se connecter.
+      if (/already|registered|exist/i.test(error.message)) {
+        return { ok: false, exists: true };
+      }
+      console.error("[invite-signup] createUser échoué :", error.message);
+      return { ok: false, error: error.message };
+    }
+
+    // Le déclencheur a créé le profil sans métier : on le pose à « investisseur ».
+    if (created.user) {
+      await admin
+        .from("profiles")
+        .update({ account_type: "investor" })
+        .eq("id", created.user.id);
+    }
+
+    // Connexion immédiate : pose les cookies de session pour que le retour sur
+    // la page d'invitation trouve un utilisateur authentifié et ouvre le NDA.
+    const { error: signErr } = await supabase.auth.signInWithPassword({
+      email: invite.email,
+      password: pwd,
+    });
+    if (signErr) {
+      console.error("[invite-signup] signIn échoué :", signErr.message);
+      return { ok: false, error: signErr.message };
+    }
+
+    return { ok: true };
+  } catch (e) {
+    console.error("[invite-signup] exception :", e);
+    return { ok: false, error: "server_error" };
   }
-
-  // Le déclencheur a créé le profil sans métier : on le pose à « investisseur ».
-  if (created.user) {
-    await admin
-      .from("profiles")
-      .update({ account_type: "investor" })
-      .eq("id", created.user.id);
-  }
-
-  // Connexion immédiate : pose les cookies de session pour que le retour sur la
-  // page d'invitation trouve un utilisateur authentifié et ouvre la porte NDA.
-  const { error: signErr } = await supabase.auth.signInWithPassword({
-    email: invite.email,
-    password: pwd,
-  });
-  if (signErr) return { ok: false, error: signErr.message };
-
-  return { ok: true };
 }
 
 /**

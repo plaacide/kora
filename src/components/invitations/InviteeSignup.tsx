@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createInvitedAccount } from "@/app/actions/invitations";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -35,7 +34,6 @@ export function InviteeSignup({
     generic: string;
   };
 }) {
-  const router = useRouter();
   const [nom, setNom] = useState("");
   const [pwd, setPwd] = useState("");
   const [erreur, setErreur] = useState<string | undefined>();
@@ -47,22 +45,29 @@ export function InviteeSignup({
     setErreur(undefined);
     setDejaInscrit(false);
     demarrer(async () => {
-      const res = await createInvitedAccount({
-        token,
-        fullName: nom.trim(),
-        password: pwd,
-      });
-      if (res.ok) {
-        // Le compte existe et la session est posée : on recharge, la page
-        // trouve un utilisateur authentifié et affiche la porte NDA.
-        router.refresh();
-        return;
+      try {
+        const res = await createInvitedAccount({
+          token,
+          fullName: nom.trim(),
+          password: pwd,
+        });
+        if (res.ok) {
+          // Rechargement COMPLET, pas un refresh doux : la session vient d'être
+          // posée en cookie par l'action ; une navigation dure garantit que la
+          // page la relit et ouvre la porte NDA.
+          window.location.assign(`/invitation/${token}`);
+          return;
+        }
+        if (res.exists) {
+          setDejaInscrit(true);
+          return;
+        }
+        setErreur(res.error === "weak_password" ? labels.weak : labels.generic);
+      } catch {
+        // L'action ne devrait plus jeter, mais si le réseau coupe pendant
+        // l'appel, l'invité doit voir quelque chose plutôt qu'un écran figé.
+        setErreur(labels.generic);
       }
-      if (res.exists) {
-        setDejaInscrit(true);
-        return;
-      }
-      setErreur(res.error === "weak_password" ? labels.weak : labels.generic);
     });
   }
 
