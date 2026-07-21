@@ -4,8 +4,9 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { originFromHeaders } from "@/lib/app-origin";
-import { clientIp } from "@/lib/security/rate-limit";
+import { clientIp, rateLimit } from "@/lib/security/rate-limit";
 import { sendEmail } from "@/lib/email/send";
 import { invitationEmail } from "@/lib/email/templates";
 import type { Level } from "@/lib/permissions";
@@ -78,6 +79,88 @@ export async function createInvitation(input: {
     emailSkipped: sent.skipped,
     emailError: sent.ok ? undefined : sent.error,
   };
+}
+
+/**
+ * Créer son accès depuis une invitation — pour un invité qui n'a PAS de compte.
+ *
+ * Le blocage résolu : un investisseur invité arrivait sur la page, on lui
+ * demandait de se connecter, mais il n'avait ni compte ni mot de passe. Le
+ * renvoyer vers l'inscription générique imposait un SECOND e-mail de
+ * confirmation à l'adresse qui venait justement de recevoir l'invitation —
+ * une friction absurde.
+ *
+ * Le compte est donc créé ici, e-mail pré-confirmé. Ce n'est pas un trou de
+ * sécurité : le jeton d'invitation est non devinable et a été envoyé À cette
+ * adresse ; le posséder démontre l'accès à la boîte, exactement ce qu'un
+ * e-mail de confirmation vérifierait. C'est le modèle « invitation = compte
+ * pré-vérifié » de GitHub ou Slack.
+ */
+export async function createInvitedAccount(input: {
+  token: string;
+  fullName: string;
+  password: string;
+}): Promise<{ ok: boolean; error?: string; exists?: boolean }> {
+  const ip = await clientIp();
+  if (!rateLimit(`invite-signup:${ip}`, 6, 60 * 60 * 1000).ok) {
+    return { ok: false, error: "too_many_attempts" };
+  }
+
+  const nom = input.fullName.trim();
+  if (nom.length < 2) return { ok: false, error: "name_too_short" };
+  const pwd = input.password;
+  if (pwd.length < 8 || !/[a-zA-Z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+    return { ok: false, error: "weak_password" };
+  }
+
+  const supabase = await createClient();
+
+  // Le jeton décide de l'e-mail : l'invité ne le choisit pas, il ne peut donc
+  // pas se créer un accès pour une autre adresse que celle invitée.
+  const { data: rows } = await supabase.rpc("invitation_public", {
+    p_token: input.token,
+  });
+  const invite = (rows as unknown as Array<{
+    email: string;
+    valid: boolean;
+  }> | null)?.[0];
+  if (!invite || !invite.valid) return { ok: false, error: "invalid_invitation" };
+
+  const locale = (await getLocale()) as "fr" | "en";
+  const admin = createAdminClient();
+
+  const { data: created, error } = await admin.auth.admin.createUser({
+    email: invite.email,
+    password: pwd,
+    email_confirm: true,
+    user_metadata: { full_name: nom, locale, account_type: "investor" },
+  });
+
+  if (error) {
+    // Adresse déjà connue : on n'écrase pas un compte, on invite à se connecter.
+    if (/already|registered|exist/i.test(error.message)) {
+      return { ok: false, exists: true };
+    }
+    return { ok: false, error: error.message };
+  }
+
+  // Le déclencheur a créé le profil sans métier : on le pose à « investisseur ».
+  if (created.user) {
+    await admin
+      .from("profiles")
+      .update({ account_type: "investor" })
+      .eq("id", created.user.id);
+  }
+
+  // Connexion immédiate : pose les cookies de session pour que le retour sur la
+  // page d'invitation trouve un utilisateur authentifié et ouvre la porte NDA.
+  const { error: signErr } = await supabase.auth.signInWithPassword({
+    email: invite.email,
+    password: pwd,
+  });
+  if (signErr) return { ok: false, error: signErr.message };
+
+  return { ok: true };
 }
 
 /**

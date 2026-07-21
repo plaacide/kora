@@ -431,7 +431,17 @@
     "wrongAccountBody": "Cette invitation est adressée à {invited}, mais vous êtes connecté en tant que {current}. Déconnectez-vous et reconnectez-vous avec la bonne adresse.",
     "founder": {
       "emptyState": "Aucune levée. Créez votre dossier pour inviter des investisseurs."
-    }
+    },
+    "newTitle": "Créez votre accès",
+    "newBody": "Vous avez été invité à consulter le dossier « {deal} ». Choisissez un mot de passe pour accéder en sécurité — vos consultations sont horodatées.",
+    "newFullName": "Votre nom complet",
+    "newPassword": "Choisir un mot de passe",
+    "newPasswordHint": "8 caractères minimum, avec au moins une lettre et un chiffre.",
+    "newSubmit": "Accéder au dossier",
+    "newHaveAccount": "Vous avez déjà un compte Sanza ?",
+    "newExists": "Cette adresse a déjà un compte Sanza.",
+    "newWeak": "Mot de passe trop faible : 8 caractères minimum, une lettre et un chiffre.",
+    "newGeneric": "La création du compte a échoué. Réessayez dans un instant."
   },
   "permissions": {
     "title": "Permissions",

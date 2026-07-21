@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { NdaGate } from "@/components/invitations/NdaGate";
 import { SanzaLogo } from "@/components/ui/SanzaLogo";
-import { Button } from "@/components/ui/Button";
+import { InviteeSignup } from "@/components/invitations/InviteeSignup";
 
 /** Page publique : l'invité y arrive avant même d'avoir un compte. */
 export default async function InvitationPage({
@@ -54,26 +53,27 @@ export default async function InvitationPage({
   } = await supabase.auth.getUser();
 
   // Pas de compte : l'accès anonyme est exclu — l'audit doit nommer un lecteur.
+  // Mais on ne renvoie PAS vers une inscription générique (qui exigerait un
+  // second e-mail de confirmation) : le compte se crée ici, sur place.
   if (!user) {
     return shell(
-      <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
-            {t("signInTitle")}
-          </h1>
-          <p className="mt-1.5 text-[12.5px] text-ink-secondary leading-relaxed">
-            {t("signInBody", { email: invite.email, deal: invite.deal_name })}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Link href={`/connexion?next=/invitation/${token}`}>
-            <Button variant="primary">{t("login")}</Button>
-          </Link>
-          <Link href={`/inscription?next=/invitation/${token}`}>
-            <Button variant="secondary">{t("signup")}</Button>
-          </Link>
-        </div>
-      </div>,
+      <InviteeSignup
+        token={token}
+        email={invite.email}
+        labels={{
+          title: t("newTitle"),
+          body: t("newBody", { deal: invite.deal_name }),
+          fullName: t("newFullName"),
+          password: t("newPassword"),
+          passwordHint: t("newPasswordHint"),
+          submit: t("newSubmit"),
+          haveAccount: t("newHaveAccount"),
+          login: t("login"),
+          exists: t("newExists"),
+          weak: t("newWeak"),
+          generic: t("newGeneric"),
+        }}
+      />,
     );
   }
 

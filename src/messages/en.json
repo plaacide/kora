@@ -431,7 +431,17 @@
     "wrongAccountBody": "This invitation is addressed to {invited}, but you are logged in as {current}. Log out and sign in with the right address.",
     "founder": {
       "emptyState": "No raise. Create your dossier to invite investors."
-    }
+    },
+    "newTitle": "Create your access",
+    "newBody": "You were invited to review the “{deal}” data room. Choose a password to access it securely — your views are timestamped.",
+    "newFullName": "Your full name",
+    "newPassword": "Choose a password",
+    "newPasswordHint": "At least 8 characters, with one letter and one digit.",
+    "newSubmit": "Enter the data room",
+    "newHaveAccount": "Already have a Sanza account?",
+    "newExists": "This address already has a Sanza account.",
+    "newWeak": "Password too weak: at least 8 characters, one letter and one digit.",
+    "newGeneric": "Account creation failed. Please try again shortly."
   },
   "permissions": {
     "title": "Permissions",
