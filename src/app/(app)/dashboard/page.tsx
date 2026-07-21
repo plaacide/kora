@@ -41,15 +41,6 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("org_id, organizations(name, default_currency)")
-    .eq("user_id", user?.id ?? "")
-    // Tri déterministe : sans lui, l'organisation retenue est arbitraire
-    // dès qu'une personne en a plusieurs — ce que le rôle SAE rend courant.
-    .order("created_at")
-    .limit(1)
-    .maybeSingle();
 
 
   const { data: profile } = await supabase
