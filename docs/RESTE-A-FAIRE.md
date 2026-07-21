@@ -106,6 +106,33 @@ souhaitable, il faudrait d'abord retirer cette phrase de la page d'accueil.
       exercices, rapport CAC général et spécial, bénéficiaires effectifs,
       assurances)
 
+## Bloc 7 — Le FLOW DocSend (architecture, pas polish)
+
+Le fondateur veut le FLOW de DocSend, pas seulement des écrans restylés. Le
+flow = l'architecture de navigation et la façon dont tout s'enchaîne. Décision
+prise : plusieurs salles À TERME (modèle bibliothèque/espaces), mais par phases
+— l'app est EN PRODUCTION avec une vraie startup (Sulma), on ne réécrit pas le
+cœur d'un bloc.
+
+Différence de modèle clarifiée : chez Sanza aujourd'hui, deal = room (un seul
+objet). Chez DocSend, bibliothèque de contenus (documents, une fois) SÉPARÉE
+des espaces (salles composées par-dessus). La séparation sert qui gère
+BEAUCOUP de salles ; un fondateur qui lève une fois a un jeu de documents = une
+room, donc le modèle actuel est plus simple et adapté à lui.
+
+- [x] **Contacts** — l'entité la plus distinctement absente. Les gens autour de
+      la levée réunis en fiches (invité · NDA signé · a consulté), avec
+      documents vus, temps de lecture, dernière activité. Assemblé des données
+      existantes (invitations + audit + dwell), aucune migration, aucune touche
+      au cœur.
+- [ ] Navigation à deux niveaux façon DocSend : barre du haut (Tableau de bord ·
+      Mes levées · Contacts) + sous-nav claire dans la levée
+- [ ] **Bibliothèque + salles multiples** — la phase LOURDE. Documents dans une
+      bibliothèque, salles composées par-dessus (many-to-many). Réécrit
+      `documents.deal_id`, la RLS, la data room (883 lignes). À faire quand un
+      besoin réel de 2e salle apparaît — PAS avant, à cause des données de
+      Sulma en production.
+
 ## Bloc 6 — Qualité du site, étalon DocSend
 
 Étalon retenu par le fondateur : docsend.com. Structure de Sanza déjà proche

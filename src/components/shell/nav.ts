@@ -123,6 +123,7 @@ export const navGroups: NavGroup[] = [
       { key: "readiness", href: "/readiness", internalOnly: true },
       { key: "permissions", href: "/permissions", internalOnly: true },
       { key: "invitations", href: "/invitations", internalOnly: true },
+      { key: "contacts", href: "/contacts", internalOnly: true },
       { key: "versions", href: "/versions", internalOnly: true },
       // L'invité doit pouvoir relire le NDA qu'il a signé : c'est sa preuve.
       { key: "nda", href: "/nda" },

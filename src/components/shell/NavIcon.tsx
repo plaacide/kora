@@ -101,6 +101,14 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M3 7l9 6 9-6" />
     </>
   ),
+  contacts: (
+    <>
+      <circle cx="8.5" cy="8" r="3" />
+      <path d="M3 19c.7-2.8 2.8-4.3 5.5-4.3S13.3 16.2 14 19" />
+      <path d="M16 5.2a3 3 0 0 1 0 5.6" />
+      <path d="M17.5 14.9c2 .5 3.4 1.9 4 4.1" />
+    </>
+  ),
   versions: (
     <>
       <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" />
