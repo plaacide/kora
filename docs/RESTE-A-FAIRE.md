@@ -69,8 +69,11 @@ organisation ; c'est exactement l'hypothèse que le rôle SAE fait sauter.
 - [x] Mines désamorcées : sept `limit 1` sans `order by`
 - [x] Les trois écrans : /portefeuille, /cohorte, /rejoindre/[token]
 - [x] Les accès expirent à 90 jours par défaut, `extend_access` pour prolonger
-- [ ] **Non vérifié faute de compte `sae`** : les écrans n'ont jamais été vus
-      en vrai, et l'acceptation jamais jouée de bout en bout
+- [x] Parcours d'inscription programme (`/onboarding/programme`) + le métier
+      « Programme » dans le sélecteur d'inscription
+- [ ] **À jouer de bout en bout** : comptes de test créés (un par métier), mais
+      le parcours cohorte complet — inviter, accepter, voir le portefeuille —
+      n'a pas encore été fait en vrai
 - [ ] Export bailleur (PDF / XLSX) — aucun générateur n'est présent dans le
       projet aujourd'hui, c'est une dépendance à ajouter
 
@@ -93,6 +96,24 @@ souhaitable, il faudrait d'abord retirer cette phrase de la page d'accueil.
 - [x] Une exigence accepte plusieurs preuves (PV et états financiers sur trois
       exercices, rapport CAC général et spécial, bénéficiaires effectifs,
       assurances)
+
+## Bloc 6 — Qualité du site, étalon DocSend
+
+Étalon retenu par le fondateur : docsend.com. Structure de Sanza déjà proche
+(hero → segments → comment ça marche → tarifs → FAQ → CTA) ; l'écart est de
+finition, de preuve et de caractère typographique. À ATTAQUER APRÈS les phases
+restantes.
+
+- [x] Débordement horizontal de la barre (768–1024px) — corrigé
+- [ ] Titres en Space Grotesk (cousin libre de Sharp Grotesk) — meilleur
+      rapport effort/impact, sans risque
+- [ ] Retirer le logo « sanza » dupliqué au centre du hero
+- [ ] Eyebrow « LE DEALFLOW AFRICAIN » → langage fondateur (« dealflow » est
+      du vocabulaire de fonds, contraire au repositionnement)
+- [ ] Capture d'e-mail intégrée au hero, à la DocSend
+- [ ] Captures produit réelles dans les sections (depuis les vrais écrans)
+- [ ] Preuve : PAS de faux témoignages ni faux logos. « En construction avec
+      nos premiers programmes » est plus crédible qu'un chiffre inventé.
 
 ## Bloc 5 — Vocabulaire et écrans — **fermé**
 
