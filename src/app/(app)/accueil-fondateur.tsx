@@ -407,9 +407,15 @@ export async function AccueilFondateur({
         <Card>
           <CardBody>
             <div className="flex items-baseline justify-between">
-              <span className="text-[12.5px] font-[550] text-ink-secondary">
-                {t("readyTitle")}
-              </span>
+              {/* Le détail par catégorie vit sur /readiness. On y renvoie
+                  d'ici plutôt que par une entrée de menu qui doublerait cette
+                  carte. */}
+              <Link
+                href="/readiness"
+                className="text-[12.5px] font-[550] text-ink-secondary hover:text-ink transition-colors"
+              >
+                {t("readyTitle")} →
+              </Link>
               <Mono className="text-[26px] text-ink tracking-[-0.03em]">
                 {score}%
               </Mono>

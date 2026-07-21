@@ -125,8 +125,15 @@ room, donc le modèle actuel est plus simple et adapté à lui.
       documents vus, temps de lecture, dernière activité. Assemblé des données
       existantes (invitations + audit + dwell), aucune migration, aucune touche
       au cœur.
-- [ ] Navigation à deux niveaux façon DocSend : barre du haut (Tableau de bord ·
-      Mes levées · Contacts) + sous-nav claire dans la levée
+- [x] Navigation resserrée, premier passage : « Vue d'ensemble » (Accueil,
+      Contacts) au-dessus de la salle ; dans la salle, un ordre = flow
+      (documents → à fournir → questions → accès → invités → qui a regardé →
+      accords). Retirées du menu (pages gardées) : la visionneuse (on l'ouvre
+      via un document) et « Où j'en suis » côté fondateur (doublon de la carte
+      du tableau de bord — lien depuis la carte à la place).
+- [ ] Consolidation plus profonde : fusionner Permissions + Invitations en un
+      seul « Accès » (fusion de pages, pas juste de menu) pour approcher les 5
+      entrées nettes de DocSend
 - [ ] **Bibliothèque + salles multiples** — la phase LOURDE. Documents dans une
       bibliothèque, salles composées par-dessus (many-to-many). Réécrit
       `documents.deal_id`, la RLS, la data room (883 lignes). À faire quand un

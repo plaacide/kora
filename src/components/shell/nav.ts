@@ -38,7 +38,10 @@ export function isInternalRole(role: string | null | undefined): boolean {
  * la sienne. Lui montrer un kanban à une colonne, c'est lui faire croire qu'il
  * a manqué une étape.
  */
-const HORS_SUJET_FONDATEUR = ["/pipeline"];
+// `/readiness` : le tableau de bord du fondateur porte déjà la carte « Où j'en
+// suis » ; le détail par catégorie reste accessible via un lien depuis cette
+// carte, pas via une entrée de menu qui la dédoublerait.
+const HORS_SUJET_FONDATEUR = ["/pipeline", "/readiness"];
 
 /**
  * Ce que voit un PROGRAMME — liste blanche, et non liste noire.
@@ -106,28 +109,35 @@ export const navGroups: NavGroup[] = [
   {
     key: "overview",
     items: [
-      // Le tableau de bord agrège l'activité du fonds, le pipeline liste des
-      // opérations que l'invité n'a pas à connaître.
+      // Au-dessus de la salle : le tableau de bord, les gens, le pipeline (le
+      // pipeline liste des opérations que l'invité n'a pas à connaître).
       { key: "dashboard", href: "/dashboard", internalOnly: true },
+      { key: "contacts", href: "/contacts", internalOnly: true },
       { key: "pipeline", href: "/pipeline", internalOnly: true },
     ],
   },
   {
     key: "deal",
+    // La salle. Ordre = le flow : le contenu d'abord, puis ce qu'il reste à
+    // fournir, les questions, qui y accède, qui a regardé, les preuves.
+    //
+    // Deux entrées ont été RETIRÉES du menu (leurs pages existent toujours) :
+    //   · la visionneuse — on y arrive en ouvrant un document, ce n'est pas
+    //     une destination de navigation (DocSend n'a pas d'entrée « Lecture ») ;
+    //   · « Où j'en suis » pour le fondateur — le tableau de bord porte déjà
+    //     cette carte, l'avoir aussi en menu, c'est deux fois la même chose.
     items: [
       { key: "dealSheet", href: "/deal", internalOnly: true },
       { key: "dataRoom", href: "/data-room" },
-      { key: "viewer", href: "/visionneuse" },
-      { key: "qa", href: "/qa" },
       { key: "checklist", href: "/checklist", internalOnly: true },
-      { key: "readiness", href: "/readiness", internalOnly: true },
+      { key: "qa", href: "/qa" },
       { key: "permissions", href: "/permissions", internalOnly: true },
       { key: "invitations", href: "/invitations", internalOnly: true },
-      { key: "contacts", href: "/contacts", internalOnly: true },
-      { key: "versions", href: "/versions", internalOnly: true },
+      { key: "audit", href: "/audit", internalOnly: true },
       // L'invité doit pouvoir relire le NDA qu'il a signé : c'est sa preuve.
       { key: "nda", href: "/nda" },
-      { key: "audit", href: "/audit", internalOnly: true },
+      { key: "versions", href: "/versions", internalOnly: true },
+      { key: "readiness", href: "/readiness", internalOnly: true },
     ],
   },
   {
