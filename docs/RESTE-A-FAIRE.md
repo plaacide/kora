@@ -83,11 +83,18 @@ révocable. La promesse du site (« le fondateur reste seul maître des accès �
 sa data room ») tient donc mot pour mot. Si un accès d'office devenait
 souhaitable, il faudrait d'abord retirer cette phrase de la page d'accueil.
 
-## Bloc 4 — Dashboard portefeuille et export
+## Bloc 4 — Dashboard portefeuille et export — **fait**
 
-- [ ] Dashboard agrégé du programme (les agrégats existent, c'est du
-      réassemblage)
-- [ ] Export bailleurs — part de zéro, aucun générateur PDF/XLSX
+- [x] Agrégats en tête du portefeuille : nombre de startups, prêtes (≥ 75 %),
+      préparation moyenne, volume recherché cumulé
+- [x] Volume affiché SEULEMENT si la cohorte est mono-devise — additionner des
+      FCFA et des NGN donnerait un total qui ne veut rien dire
+- [x] Export bailleurs en XLSX réel (`/api/portefeuille/export`). Aucune
+      dépendance nouvelle : `exceljs` servait déjà à LIRE les tableaux, il sait
+      les écrire — le piège du package-lock reste fermé. Format tableur et non
+      PDF : un bailleur trie et agrège, un PDF l'en empêcherait.
+- [ ] PDF brandé pour bailleurs — plus tard, quand un programme le demandera.
+      Le format utile (Excel) est livré ; le PDF est du confort.
 
 ## Bloc 4 bis — Checklist et data room
 

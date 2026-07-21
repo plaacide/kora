@@ -50,18 +50,83 @@ export default async function PortefeuillePage() {
       )
     : 0;
 
+  // Volume recherché cumulé, mais UNIQUEMENT si toute la cohorte est dans la
+  // même devise : additionner des FCFA et des NGN donnerait un total qui ne
+  // veut rien dire. À défaut, on ne l'affiche pas plutôt que de mentir.
+  const devises = new Set(
+    lignes.filter((l) => l.amount !== null).map((l) => l.currency),
+  );
+  const volume =
+    devises.size === 1
+      ? lignes.reduce((s, l) => s + (l.amount ?? 0), 0)
+      : null;
+  const devise = devises.size === 1 ? [...devises][0] : null;
+
+  // Prêtes = préparation ≥ 75 %. Le seuil qui intéresse un bailleur : combien
+  // de sa cohorte peut se présenter à un investisseur aujourd'hui.
+  const pretes = lignes.filter((l) => (l.readiness ?? 0) >= 75).length;
+
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
-          Portefeuille
-        </h1>
-        <p className="text-[12.5px] text-ink-secondary mt-0.5">
-          {lignes.length === 0
-            ? "Aucune startup dans votre cohorte pour l’instant."
-            : `${lignes.length} startup${lignes.length > 1 ? "s" : ""} · préparation moyenne ${moyenne} %`}
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+            Portefeuille
+          </h1>
+          <p className="text-[12.5px] text-ink-secondary mt-0.5">
+            {lignes.length === 0
+              ? "Aucune startup dans votre cohorte pour l’instant."
+              : `${lignes.length} startup${lignes.length > 1 ? "s" : ""} · préparation moyenne ${moyenne} %`}
+          </p>
+        </div>
+        {lignes.length > 0 && (
+          <a
+            href="/api/portefeuille/export"
+            className="inline-flex items-center gap-2 rounded-[9px] border border-line bg-surface px-4 py-2 text-[13px] font-[550] text-ink-secondary hover:text-ink hover:border-line-strong transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M12 3v12" />
+              <path d="M7 10l5 5 5-5" />
+              <path d="M4 21h16" />
+            </svg>
+            Exporter (Excel)
+          </a>
+        )}
       </div>
+
+      {lignes.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: "Startups", valeur: String(lignes.length) },
+            { label: "Prêtes (≥ 75 %)", valeur: `${pretes}/${lignes.length}` },
+            { label: "Préparation moyenne", valeur: `${moyenne} %` },
+            {
+              label: "Volume recherché",
+              valeur:
+                volume !== null
+                  ? `${new Intl.NumberFormat("fr-FR").format(volume)} ${devise ?? ""}`.trim()
+                  : "—",
+              indice: volume === null ? "devises multiples" : undefined,
+            },
+          ].map((k) => (
+            <Card key={k.label}>
+              <CardBody>
+                <div className="text-[11px] font-[550] text-ink-secondary">
+                  {k.label}
+                </div>
+                <Mono className="text-[22px] tracking-[-0.03em] mt-1 block">
+                  {k.valeur}
+                </Mono>
+                {k.indice && (
+                  <div className="text-[10.5px] text-ink-muted mt-0.5">
+                    {k.indice}
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {lignes.length === 0 ? (
         <Card>
