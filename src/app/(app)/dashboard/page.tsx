@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { isoDans } from "@/lib/echeance";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { personaFor } from "@/lib/persona";
@@ -50,10 +51,6 @@ export default async function DashboardPage() {
     .limit(1)
     .maybeSingle();
 
-  const org = membership?.organizations as unknown as {
-    name: string;
-    default_currency: string;
-  } | null;
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -113,10 +110,7 @@ export default async function DashboardPage() {
       .select("id, expires_at, profiles(full_name, email)")
       .not("expires_at", "is", null)
       .gt("expires_at", new Date().toISOString())
-      .lt(
-        "expires_at",
-        new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-      ),
+      .lt("expires_at", isoDans(48 * 60 * 60 * 1000)),
     // Jalons à venir. Tolérant : renvoie null tant que la migration n'est pas
     // appliquée, on retombe alors sur une liste vide.
     supabase

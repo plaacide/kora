@@ -146,7 +146,9 @@ d'anormal.
 - [ ] Supprimer les données de test : compte `placideb@icloud.com` et son
       invitation acceptée, créés pour vérifier le parcours d'invitation
 - [ ] Traduire les gabarits d'e-mail Supabase encore en anglais
-- [ ] 3 erreurs de lint préexistantes (`SanzaLogo.tsx`, `dashboard/page.tsx`)
+- [x] 3 erreurs de lint réglées (composant hissé hors du rendu dans
+      `SanzaLogo`, `Date.now()` sorti du rendu dans `dashboard`, `org` mort
+      retiré). Restent 2 avertissements bénins de paramètres inutilisés.
 - [ ] `SALES_NOTIFY_EMAIL` dans Coolify — sans elle, personne n'est prévenu
       d'une demande de démo SAE (non vérifiable d'ici)
 - [ ] SPF à la racine de `sanza.africa` — hygiène, pas correctif : les

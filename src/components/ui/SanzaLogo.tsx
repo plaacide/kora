@@ -6,6 +6,41 @@
  * Règles (cf. brand handoff) : jamais d'écho sur une autre lettre, jamais sur
  * fond orange. `animate` uniquement sur l'écran de connexion / splash.
  */
+/**
+ * Un écho du « a », décalé et estompé, DERRIÈRE la lettre.
+ *
+ * Défini au niveau du module et non dans `SanzaLogo` : un composant recréé à
+ * chaque rendu casse la réconciliation de React (règle `static-components`), et
+ * couleur/animation lui suffisent en props.
+ */
+function Echo({
+  off,
+  op,
+  color,
+  animate,
+}: {
+  off: string;
+  op: number;
+  color: string;
+  animate: boolean;
+}) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        position: "absolute",
+        left: off,
+        top: 0,
+        color,
+        opacity: op,
+        animation: animate ? "sz-vib 2.4s ease-in-out infinite" : "none",
+      }}
+    >
+      a
+    </span>
+  );
+}
+
 export function SanzaLogo({
   size = 22,
   dark = false,
@@ -17,22 +52,6 @@ export function SanzaLogo({
 }) {
   const main = dark ? "#ffffff" : "#171a2c";
   const echo = dark ? "#f08a5e" : "#e85c2b";
-
-  const Echo = ({ off, op }: { off: string; op: number }) => (
-    <span
-      aria-hidden
-      style={{
-        position: "absolute",
-        left: off,
-        top: 0,
-        color: echo,
-        opacity: op,
-        animation: animate ? "sz-vib 2.4s ease-in-out infinite" : "none",
-      }}
-    >
-      a
-    </span>
-  );
 
   return (
     <span
@@ -49,8 +68,8 @@ export function SanzaLogo({
     >
       sanz
       <span style={{ position: "relative", display: "inline-block" }}>
-        <Echo off="0.16em" op={0.3} />
-        <Echo off="0.08em" op={0.55} />
+        <Echo off="0.16em" op={0.3} color={echo} animate={animate} />
+        <Echo off="0.08em" op={0.55} color={echo} animate={animate} />
         <span style={{ position: "relative" }}>a</span>
       </span>
     </span>

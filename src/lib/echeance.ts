@@ -15,3 +15,14 @@ export function joursRestants(echeance: string | null | undefined): number | nul
   const ms = new Date(echeance).getTime() - new Date().getTime();
   return Math.ceil(ms / (1000 * 60 * 60 * 24));
 }
+
+/**
+ * Instant décalé de `ms`, au format ISO — pour borner une requête.
+ *
+ * Isolé ici pour la même raison que `joursRestants` : `Date.now()` appelé dans
+ * le rendu d'un composant est signalé par le compilateur React, même côté
+ * serveur où il est sans danger.
+ */
+export function isoDans(ms: number): string {
+  return new Date(Date.now() + ms).toISOString();
+}
