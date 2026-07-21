@@ -143,12 +143,20 @@ export async function createInvitedAccount(input: {
     });
 
     if (error) {
-      // Adresse déjà connue : on n'écrase pas un compte, on invite à se connecter.
-      if (/already|registered|exist/i.test(error.message)) {
+      // Adresse déjà connue : on n'écrase pas un compte, on invite à se
+      // connecter. Supabase le signale par le CODE `email_exists` (status 422),
+      // pas de façon fiable dans `message` — se fier au message seul laissait
+      // passer le cas et affichait « échec » au lieu de « déjà un compte ».
+      const e = error as { code?: string; status?: number; message?: string };
+      if (
+        e.code === "email_exists" ||
+        e.status === 422 ||
+        /already|registered|exist/i.test(e.message ?? "")
+      ) {
         return { ok: false, exists: true };
       }
-      console.error("[invite-signup] createUser échoué :", error.message);
-      return { ok: false, error: error.message };
+      console.error("[invite-signup] createUser échoué :", e.code, e.message);
+      return { ok: false, error: e.message ?? "createuser_failed" };
     }
 
     // Le déclencheur a créé le profil sans métier : on le pose à « investisseur ».
