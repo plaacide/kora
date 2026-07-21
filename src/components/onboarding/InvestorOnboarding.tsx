@@ -52,7 +52,7 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
   if (step === 1) {
     return (
       <OnboardingShell step={1} total={2}>
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
           Votre profil d&apos;investisseur
         </h1>
         <p className="text-[12.5px] text-ink-secondary mt-1">
@@ -108,7 +108,7 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
 
   return (
     <OnboardingShell step={2} total={2}>
-      <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+      <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
         Votre thèse d&apos;investissement
       </h1>
       <p className="text-[12.5px] text-ink-secondary mt-1">

@@ -70,7 +70,7 @@ export default async function PortefeuillePage() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
             Portefeuille
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">

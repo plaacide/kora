@@ -83,7 +83,7 @@ export default async function DealPage() {
   if (!deal) {
     return (
       <div className="flex flex-col gap-6 max-w-2xl">
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
           {mot("title")}
         </h1>
         <Card>

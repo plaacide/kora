@@ -62,7 +62,7 @@ export default async function DataRoomPage({
     return (
       <div className="flex flex-col gap-6 max-w-2xl">
         <div>
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
             {mot("title")}{" "}<InfoTooltip text={tt("dataRoom")} />
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">
@@ -213,7 +213,7 @@ export default async function DataRoomPage({
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
             {mot("title")}{" "}<InfoTooltip text={tt("dataRoom")} />
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">

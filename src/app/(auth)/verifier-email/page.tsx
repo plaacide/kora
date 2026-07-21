@@ -20,7 +20,7 @@ export default async function VerifierEmailPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+      <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
         {t("title")}
       </h1>
       <p className="text-[13px] text-ink-secondary leading-relaxed">

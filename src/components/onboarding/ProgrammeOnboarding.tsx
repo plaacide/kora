@@ -37,7 +37,7 @@ export function ProgrammeOnboarding() {
 
   return (
     <OnboardingShell step={1} total={1}>
-      <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+      <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
         Votre programme
       </h1>
       <p className="text-[13px] text-ink-secondary leading-relaxed mt-2">

@@ -98,7 +98,7 @@ export function FounderOnboarding() {
   if (step === 1) {
     return (
       <OnboardingShell step={1} total={2}>
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">Votre startup</h1>
+        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">Votre startup</h1>
         <p className="text-[12.5px] text-ink-secondary mt-1">
           Ces informations composent votre fiche visible par les investisseurs.
         </p>
@@ -134,7 +134,7 @@ export function FounderOnboarding() {
 
   return (
     <OnboardingShell step={2} total={2}>
-      <h1 className="text-[22px] font-[650] tracking-[-0.02em]">Votre levée</h1>
+      <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">Votre levée</h1>
       <p className="text-[12.5px] text-ink-secondary mt-1">
         Ces montants figurent sur votre fiche, visible des investisseurs.
       </p>

@@ -39,7 +39,7 @@ export default async function InvitationPage({
   if (!invite || !invite.valid) {
     return shell(
       <div className="flex flex-col gap-3">
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
           {t("invalidTitle")}
         </h1>
         <p className="text-[12.5px] text-ink-secondary leading-relaxed">
@@ -58,7 +58,7 @@ export default async function InvitationPage({
     return shell(
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
             {t("signInTitle")}
           </h1>
           <p className="mt-1.5 text-[12.5px] text-ink-secondary leading-relaxed">
@@ -81,7 +81,7 @@ export default async function InvitationPage({
   if (user.email?.toLowerCase() !== invite.email.toLowerCase()) {
     return shell(
       <div className="flex flex-col gap-3">
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
           {t("wrongAccountTitle")}
         </h1>
         <p className="text-[12.5px] text-ink-secondary leading-relaxed">

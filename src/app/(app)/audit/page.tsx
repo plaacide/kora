@@ -77,7 +77,7 @@ export default async function AuditPage() {
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
             {t("title")}{" "}<InfoTooltip text={tt("audit")} />
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">

@@ -20,7 +20,7 @@ export function ForgotPasswordForm({ expired }: { expired?: boolean }) {
   if (state?.sent) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
           {t("sentTitle")}
         </h1>
         <p className="text-[12.5px] text-ink-secondary leading-relaxed">
@@ -42,7 +42,7 @@ export function ForgotPasswordForm({ expired }: { expired?: boolean }) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
           {t("title")}
         </h1>
         <p className="mt-1 text-[12.5px] text-ink-secondary">{t("subtitle")}</p>

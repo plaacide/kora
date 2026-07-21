@@ -13,7 +13,7 @@ export default function NotFound() {
         <SanzaLogo size={30} />
         <EchoMotif />
         <div className="flex flex-col gap-2">
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
             Cette page n&apos;existe pas.
           </h1>
           <p className="text-[13px] text-ink-secondary leading-relaxed">

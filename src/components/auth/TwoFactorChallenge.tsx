@@ -47,7 +47,7 @@ export function TwoFactorChallenge() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
           {t("challengeTitle")}
         </h1>
         <p className="mt-1 text-[12.5px] text-ink-secondary">

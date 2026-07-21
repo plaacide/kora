@@ -202,7 +202,7 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
             {firstName ? t("greeting", { name: firstName }) : t("greetingPlain")}
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">

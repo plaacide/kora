@@ -103,7 +103,7 @@ export async function AccueilFondateur({
     <div className="flex flex-col gap-5">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">
+          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
             {t("hello", { name: prenom })}
           </h1>
           <p className="text-[12.5px] text-ink-secondary mt-0.5">
