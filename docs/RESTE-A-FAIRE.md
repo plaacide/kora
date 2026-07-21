@@ -43,7 +43,9 @@ Ce qui manquait, c'est qu'aucune de ces règles n'était appliquée : ni plan, n
       une ligne par paiement coûte moins qu'une intégration d'agrégateur.
 - [ ] Coordonnées de paiement réelles dans `src/app/abonnement/page.tsx`
       (aujourd'hui : « écrivez-nous à contact@sanza.africa »)
-- [ ] Paliers 10 / 25 / 50 startups : publiés, pas encore contraints
+- [x] Paliers 10 / 25 / 50 startups CONTRAINTS : colonne `cohort_limit`
+      (défaut 10), posée à la main comme `paid_until`. Le plafond mord à
+      l'invitation, l'écran cohorte affiche « X / N places ».
 
 ## Bloc 2 — Site vitrine
 

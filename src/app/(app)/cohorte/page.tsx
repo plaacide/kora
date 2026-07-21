@@ -11,19 +11,45 @@ import { CohorteForm, type LienCohorte } from "@/components/cohorte/CohorteForm"
  */
 export default async function CohortePage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { data } = await supabase
-    .from("cohort_links")
-    .select("id, email, status, created_at, organizations!cohort_links_startup_org_id_fkey(name)")
-    .order("created_at", { ascending: false });
+  const [{ data }, { data: profil }] = await Promise.all([
+    supabase
+      .from("cohort_links")
+      .select("id, email, status, created_at, organizations!cohort_links_startup_org_id_fkey(name)")
+      .order("created_at", { ascending: false }),
+    // Le palier vit sur l'organisation. On lit celle du membre — l'écran est
+    // réservé au programme, il n'en a qu'une.
+    supabase
+      .from("memberships")
+      .select("organizations(cohort_limit)")
+      .eq("user_id", user?.id ?? "")
+      .order("created_at")
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
+  const liens = (data ?? []) as unknown as LienCohorte[];
+  const limite =
+    (profil?.organizations as unknown as { cohort_limit?: number } | null)
+      ?.cohort_limit ?? 10;
+  // On compte comme la base : les liens non révoqués occupent une place.
+  const occupe = liens.filter((l) => l.status !== "revoked").length;
 
   return (
     <div className="flex flex-col gap-5 max-w-2xl">
-      <div>
-        <h1 className="text-[22px] font-[650] tracking-[-0.02em]">Ma cohorte</h1>
-        <p className="text-[12.5px] text-ink-secondary mt-0.5">
-          Invitez vos startups. Chacune accepte elle-même.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h1 className="text-[22px] font-[650] tracking-[-0.02em]">Ma cohorte</h1>
+          <p className="text-[12.5px] text-ink-secondary mt-0.5">
+            Invitez vos startups. Chacune accepte elle-même.
+          </p>
+        </div>
+        <span className="text-[12px] text-ink-muted">
+          {occupe} / {limite} places
+        </span>
       </div>
 
       <Card>
