@@ -72,6 +72,7 @@ export default async function InvitationPage({
           exists: t("newExists"),
           weak: t("newWeak"),
           generic: t("newGeneric"),
+          incomplete: t("newIncomplete"),
         }}
       />,
     );

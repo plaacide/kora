@@ -441,7 +441,8 @@
     "newHaveAccount": "Already have a Sanza account?",
     "newExists": "This address already has a Sanza account.",
     "newWeak": "Password too weak: at least 8 characters, one letter and one digit.",
-    "newGeneric": "Account creation failed. Please try again shortly."
+    "newGeneric": "Account creation failed. Please try again shortly.",
+    "newIncomplete": "Enter your name and a password of at least 8 characters."
   },
   "permissions": {
     "title": "Permissions",

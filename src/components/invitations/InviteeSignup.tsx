@@ -32,6 +32,7 @@ export function InviteeSignup({
     exists: string;
     weak: string;
     generic: string;
+    incomplete: string;
   };
 }) {
   const [nom, setNom] = useState("");
@@ -41,7 +42,13 @@ export function InviteeSignup({
   const [encours, demarrer] = useTransition();
 
   function valider() {
-    if (nom.trim().length < 2 || pwd.length < 8) return;
+    // On ne DÉSACTIVE plus le bouton en cas de champ incomplet : un bouton
+    // grisé qui ne réagit pas, c'est littéralement « rien ne se passe ». On le
+    // laisse cliquable et on DIT ce qui manque.
+    if (nom.trim().length < 2 || pwd.length < 8) {
+      setErreur(labels.incomplete);
+      return;
+    }
     setErreur(undefined);
     setDejaInscrit(false);
     demarrer(async () => {
@@ -120,11 +127,7 @@ export function InviteeSignup({
         </p>
       )}
 
-      <Button
-        variant="primary"
-        onClick={valider}
-        disabled={encours || nom.trim().length < 2 || pwd.length < 8}
-      >
+      <Button variant="primary" onClick={valider} disabled={encours}>
         {encours ? "…" : labels.submit}
       </Button>
 
