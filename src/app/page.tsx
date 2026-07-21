@@ -260,7 +260,7 @@ export default function Home() {
             Le dealflow africain, enfin structuré
           </div>
 
-          <h1 className="text-[clamp(32px,5.4vw,54px)] font-bold tracking-[-0.02em] leading-[1.12] text-white m-0 mb-5 text-balance">
+          <h1 className="font-display text-[clamp(32px,5.4vw,54px)] font-bold tracking-[-0.02em] leading-[1.12] text-white m-0 mb-5 text-balance">
             Levez comme si ce n&apos;était pas
             <br className="hidden sm:block" /> votre première fois.
           </h1>
@@ -320,7 +320,7 @@ export default function Home() {
       >
         <Reveal>
           <Eyebrow>La plateforme</Eyebrow>
-          <h2 className="text-[clamp(26px,4vw,36px)] font-bold tracking-[-0.015em] m-0 mb-11 max-w-[560px] text-balance">
+          <h2 className="font-display text-[clamp(26px,4vw,36px)] font-bold tracking-[-0.015em] m-0 mb-11 max-w-[560px] text-balance">
             De la levée guidée au reporting, tout le cycle
           </h2>
         </Reveal>
@@ -457,7 +457,7 @@ export default function Home() {
           <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] items-start">
             <Reveal>
               <Eyebrow tone="soft">Incubateurs · accélérateurs · SAE</Eyebrow>
-              <h2 className="text-[clamp(24px,3.8vw,34px)] font-bold tracking-[-0.015em] text-white m-0 mb-4 text-balance">
+              <h2 className="font-display text-[clamp(24px,3.8vw,34px)] font-bold tracking-[-0.015em] text-white m-0 mb-4 text-balance">
                 Vous accompagnez des startups ? Équipez toute votre cohorte.
               </h2>
               <p className="text-[15px] text-[#B9BCC9] leading-[1.65] mb-6 max-w-[520px]">
@@ -516,7 +516,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1180px] px-5 md:px-8 py-[72px] md:py-20">
           <Reveal>
             <Eyebrow>Comment ça marche</Eyebrow>
-            <h2 className="text-[clamp(24px,3.6vw,32px)] font-bold tracking-[-0.015em] m-0 mb-11">
+            <h2 className="font-display text-[clamp(24px,3.6vw,32px)] font-bold tracking-[-0.015em] m-0 mb-11">
               De la rencontre au closing, en quatre temps
             </h2>
           </Reveal>
@@ -546,7 +546,7 @@ export default function Home() {
         <Reveal>
           <div className="text-center mb-12">
             <Eyebrow>Tarifs</Eyebrow>
-            <h2 className="text-[clamp(26px,4vw,36px)] font-bold tracking-[-0.015em] m-0 mb-3.5">
+            <h2 className="font-display text-[clamp(26px,4vw,36px)] font-bold tracking-[-0.015em] m-0 mb-3.5">
               Le fondateur possède, le programme supervise,
               <br className="hidden md:block" /> l&apos;investisseur consulte
             </h2>
@@ -680,7 +680,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1180px] px-5 md:px-8 py-[72px] md:py-20">
           <Reveal>
             <Eyebrow>Questions directes, réponses directes</Eyebrow>
-            <h2 className="text-[clamp(24px,3.6vw,32px)] font-bold tracking-[-0.015em] m-0 mb-11">
+            <h2 className="font-display text-[clamp(24px,3.6vw,32px)] font-bold tracking-[-0.015em] m-0 mb-11">
               Ce que vous êtes en droit de demander
             </h2>
           </Reveal>
@@ -719,7 +719,7 @@ export default function Home() {
               <span className="w-[7px] h-[34px] rounded-[4px] bg-primary opacity-55 inline-block" />
               <span className="w-[7px] h-[52px] rounded-[4px] bg-white inline-block" />
             </div>
-            <h2 className="text-[clamp(26px,4.2vw,38px)] font-bold tracking-[-0.015em] text-white m-0 mb-3.5">
+            <h2 className="font-display text-[clamp(26px,4.2vw,38px)] font-bold tracking-[-0.015em] text-white m-0 mb-3.5">
               Faites résonner vos deals.
             </h2>
             <p className="text-[16px] text-[#B9BCC9] mb-8">

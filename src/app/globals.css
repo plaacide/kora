@@ -61,6 +61,8 @@
 @theme inline {
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+  /* Police de titre — expose l'utilitaire Tailwind `font-display`. */
+  --font-display: var(--font-space), var(--font-instrument), sans-serif;
 }
 
 @layer base {

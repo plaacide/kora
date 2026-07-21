@@ -114,8 +114,8 @@ finition, de preuve et de caractère typographique. À ATTAQUER APRÈS les phase
 restantes.
 
 - [x] Débordement horizontal de la barre (768–1024px) — corrigé
-- [ ] Titres en Space Grotesk (cousin libre de Sharp Grotesk) — meilleur
-      rapport effort/impact, sans risque
+- [x] Titres du site en Space Grotesk (cousin libre de Sharp Grotesk) —
+      le caractère grotesque de DocSend, avec les couleurs Sanza
 - [ ] Retirer le logo « sanza » dupliqué au centre du hero
 - [ ] Eyebrow « LE DEALFLOW AFRICAIN » → langage fondateur (« dealflow » est
       du vocabulaire de fonds, contraire au repositionnement)
