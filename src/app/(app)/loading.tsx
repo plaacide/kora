@@ -11,7 +11,7 @@ export default function Loading() {
         style={{
           fontFamily: "var(--font-instrument), 'Instrument Sans', sans-serif",
           fontWeight: 700,
-          fontSize: 44,
+          fontSize: 84,
           lineHeight: 1,
           letterSpacing: "-0.015em",
         }}
