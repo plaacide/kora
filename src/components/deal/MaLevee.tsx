@@ -179,6 +179,90 @@ export function MaLevee({
         </div>
       </div>
 
+      {/* Historique de financement */}
+      <div className="flex items-baseline justify-between mb-2">
+        <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Historique de financement</h2>
+        <span className="text-[12.5px] text-[#9DA0A8]">1,5 M$ levés · 1 tour clôturé</span>
+      </div>
+      <div className="border border-[#ECEBE6] rounded-[6px] flex items-stretch mb-9 flex-col md:flex-row">
+        <div className="flex-1 p-[18px]">
+          <div className="flex items-center gap-2 mb-2">
+            <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-2 py-[3px]">CLÔTURÉE · MARS 2024</span>
+            <span className="text-[13px] font-[650]">Pre-Seed 2024</span>
+          </div>
+          <div style={mono} className="text-[20px] font-[600] tracking-[-0.02em] mb-3">1,5 M$</div>
+          <div className="flex items-center gap-2.5">
+            <span className="flex">
+              {[["AN", "#7A5CA8"], ["KO", "#2C7A5C"], ["DI", "#B5843A"]].map(([ini, bg], i) => (
+                <span key={ini} className="grid place-items-center w-7 h-7 rounded-[6px] text-white text-[9.5px] font-[700] border-2 border-white" style={{ background: bg, marginLeft: i ? -9 : 0 }}>{ini}</span>
+              ))}
+            </span>
+            <span className="text-[12px] text-[#55585F] leading-[1.4]">Awa Ndiaye <span className="text-[#9DA0A8]">(lead)</span> · Kola Ventures · Diallo FO</span>
+          </div>
+        </div>
+        <div className="flex items-center px-1.5 text-[#C7C9CF] text-[18px] justify-center">→</div>
+        <div className="flex-1 p-[18px] md:border-l border-[#ECEBE6] bg-[#FEFCFA]">
+          <div className="flex items-center gap-2 mb-2">
+            <span style={mono} className="text-[9px] font-[600] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-2 py-[3px]">EN COURS</span>
+            <span className="text-[13px] font-[650]">{dealName}</span>
+          </div>
+          <div className="flex items-baseline gap-2 mb-3"><span style={mono} className="text-[20px] font-[600] tracking-[-0.02em]">3,2 M$</span><span className="text-[12px] text-[#9DA0A8]">engagés / 10 M$</span></div>
+          <div className="flex items-center gap-2.5">
+            <span className="flex">
+              <span className="grid place-items-center w-7 h-7 rounded-[6px] bg-[#1A1B1F] text-white text-[9.5px] font-[700] border-2 border-white">JD</span>
+              <span className="grid place-items-center w-7 h-7 rounded-[6px] bg-[#2C5F8A] text-white text-[9.5px] font-[700] border-2 border-white -ml-[9px]">PR</span>
+              <span className="grid place-items-center w-7 h-7 rounded-[6px] border-2 border-dashed border-[#C9C6BD] text-[#A0A3AB] text-[11px] font-[700] bg-white -ml-[9px]">+1</span>
+            </span>
+            <span className="text-[12px] text-[#55585F] leading-[1.4]">Sequoia <span className="text-[#9DA0A8]">(lead pressenti)</span> · Proparco · Teranga</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Documents clés + Équipe */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-9 mb-9">
+        <div>
+          <div className="flex items-baseline justify-between mb-2">
+            <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Documents clés</h2>
+            <Link href="/data-room" className="text-[12.5px] font-[600] text-[#C24619]">Voir la data room →</Link>
+          </div>
+          <div className="border-t border-[#ECEBE6]">
+            {[
+              { t: "PDF", n: "Deck_Sulma_Seed.pdf", v: "8 vues", muet: false },
+              { t: "CSV", n: "Prévisionnels_3ans.csv", v: "4 vues", muet: false },
+              { t: "PDF", n: "Cap_table.pdf", v: "à ajouter", muet: true },
+            ].map((d) => (
+              <div key={d.n} className="flex items-center gap-2.5 py-3 border-b border-[#F1F0EC] last:border-0">
+                <span style={mono} className={"rounded-[3px] px-[5px] py-0.5 text-[8.5px] font-[600] " + (d.t === "PDF" ? "bg-[#FBE6E0] text-[#C0392B]" : "bg-[#E4F3EC] text-[#147A5C]")}>{d.t}</span>
+                <span className="flex-1 text-[13px] font-[600]">{d.n}</span>
+                <span style={mono} className={"text-[11px] " + (d.muet ? "text-[#9DA0A8]" : "text-[#6E727A]")}>{d.v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="flex items-baseline justify-between mb-2">
+            <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Équipe sur la levée</h2>
+            <span className="text-[12.5px] font-[600] text-[#C24619] cursor-pointer">Gérer →</span>
+          </div>
+          <div className="border-t border-[#ECEBE6]">
+            {[
+              { ini: "PB", bg: "#1A1B1F", nom: "Placide Bakala", role: "CEO · pilote la levée", tag: "OWNER", tagCls: "text-[#C24619] bg-[#FBEDE6]" },
+              { ini: "AN", bg: "#7A5CA8", nom: "Awa Ndiaye", role: "CFO · prépare le financier", tag: "ÉDITEUR", tagCls: "text-[#33353B] bg-[#F1F0EB]" },
+              { ini: "MK", bg: "#2C7A5C", nom: "Me Koffi", role: "Conseil juridique · externe", tag: "LECTEUR", tagCls: "text-[#8B8E96] bg-[#F1F0EB]" },
+            ].map((m) => (
+              <div key={m.nom} className="flex items-center gap-2.5 py-3 border-b border-[#F1F0EC] last:border-0">
+                <span className="grid place-items-center w-[30px] h-[30px] rounded-[6px] text-white text-[10px] font-[700]" style={{ background: m.bg }}>{m.ini}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[13px] font-[600] truncate">{m.nom}</span>
+                  <span className="block text-[11px] text-[#9DA0A8] truncate">{m.role}</span>
+                </span>
+                <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-[3px] " + m.tagCls}>{m.tag}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Investisseurs sur cette levée */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Investisseurs sur cette levée</h2>
