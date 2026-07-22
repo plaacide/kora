@@ -55,6 +55,25 @@ const HORS_SUJET_FONDATEUR = ["/pipeline", "/readiness"];
 const ECRANS_PROGRAMME = ["/portefeuille", "/cohorte", "/securite", "/roadmap"];
 
 /**
+ * Écrans devenus des ONGLETS de la data room (handoff §3b) : ils vivent dans
+ * la barre RoomTabs, plus dans le menu latéral. Retirés du menu pour l'équipe
+ * INTERNE seulement — l'invité, qui n'a pas la barre d'onglets, garde ses
+ * accès dans le menu. Versions et readiness sont repliés ailleurs (historique
+ * d'un document, carte du tableau de bord).
+ */
+const ONGLETS_DATA_ROOM = [
+  "/permissions",
+  "/checklist",
+  "/qa",
+  "/nda",
+  "/audit",
+  "/invitations",
+  "/versions",
+  "/readiness",
+  "/contacts",
+];
+
+/**
  * Navigation telle qu'elle doit apparaître pour ce rôle et ce métier.
  *
  * `persona` est facultatif : sans lui, on retombe sur le comportement
@@ -87,13 +106,24 @@ export function navFor(
       .filter((g) => g.items.length > 0);
   }
 
+  // Interne (fondateur/fonds) : les écrans de salle sont des onglets, on les
+  // retire du menu latéral. Il ne reste que les 3 destinations du handoff —
+  // Accueil · Espaces (data room) · Ma levée — plus le compte.
+  const interne = persona === "founder" || persona === "fund";
+  const sansOnglets = interne
+    ? base.map((g) => ({
+        ...g,
+        items: g.items.filter((i) => !ONGLETS_DATA_ROOM.includes(i.href)),
+      }))
+    : base;
+
   const filtre =
     persona === "founder"
-      ? base.map((g) => ({
+      ? sansOnglets.map((g) => ({
           ...g,
           items: g.items.filter((i) => !HORS_SUJET_FONDATEUR.includes(i.href)),
         }))
-      : base;
+      : sansOnglets;
 
   return filtre.filter((g) => g.items.length > 0);
 }
