@@ -3,8 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
+import { RoomContenu } from "@/components/dataroom/RoomContenu";
 import {
-  DataRoom,
   type DocRow,
   type AccessRow,
   type ViewRow,
@@ -209,35 +209,17 @@ export default async function DataRoomPage({
     };
   });
 
+  // Onglet « Contenu » de la data room (handoff §3b) : l'en-tête et les onglets
+  // sont fournis par RoomTabs (shell), la page ne rend que la table du contenu.
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
-            {mot("title")}{" "}<InfoTooltip text={tt("dataRoom")} />
-          </h1>
-          <p className="text-[12.5px] text-ink-secondary mt-0.5">
-            {mot("subtitle")}
-          </p>
-        </div>
-        {peutCreerUnDeal && <NewDealButton />}
-      </div>
-
-      <DataRoom
-        key={deal.id}
-        orgId={orgId}
-        dealId={deal.id}
-        dealName={deal.name}
-        dealType={deal.type ?? "vc"}
-        readiness={deal.readiness_score ?? 0}
-        folders={folders ?? []}
-        documents={docs}
-        accessByFolder={accessByFolder}
-        viewsByDoc={viewsByDoc}
-        templatesByFolder={templatesByFolder}
-        initialFolderId={dossier ?? null}
-        canEdit={canEdit}
-      />
-    </div>
+    <RoomContenu
+      key={deal.id}
+      orgId={orgId}
+      dealId={deal.id}
+      folders={folders ?? []}
+      documents={docs}
+      initialFolderId={dossier ?? null}
+      canEdit={canEdit}
+    />
   );
 }
