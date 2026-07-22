@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ShareButton } from "@/components/dataroom/ShareButton";
 
 /**
  * En-tête de data room + barre des 6 onglets (handoff app v5 §3b).
@@ -26,7 +27,7 @@ const TABS: { href: string; label: string; count?: number; accent?: boolean }[] 
 
 const ROOM_ROUTES = new Set(TABS.map((t) => t.href));
 
-export function RoomTabs({ dealName }: { dealName: string }) {
+export function RoomTabs({ dealName, dealId }: { dealName: string; dealId: string }) {
   const pathname = usePathname();
   if (!ROOM_ROUTES.has(pathname)) return null;
 
@@ -59,7 +60,7 @@ export function RoomTabs({ dealName }: { dealName: string }) {
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
           <span className="border border-[#E4E2DC] rounded-[5px] px-3 py-2 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] cursor-pointer">Afficher un aperçu</span>
-          <Link href="/invitations" className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F]">Partager</Link>
+          <ShareButton dealId={dealId} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />
           <span className="grid place-items-center border border-[#E4E2DC] rounded-[5px] w-[34px] h-[34px] text-[#6E727A] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] cursor-pointer text-[16px]">⋯</span>
         </div>
       </div>

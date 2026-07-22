@@ -4,6 +4,7 @@ import { SanzaLogo } from "@/components/ui/SanzaLogo";
 import { EncryptionBadge } from "@/components/ui/EncryptionBadge";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { logout } from "@/app/actions/auth";
+import { ShareButton } from "@/components/dataroom/ShareButton";
 import type { Persona } from "@/lib/persona";
 import { personaLabel } from "./persona-label";
 
@@ -25,10 +26,12 @@ export async function Topbar({
   orgName,
   userEmail,
   persona = "fund",
+  dealId,
 }: {
   orgName: string;
   userEmail: string;
   persona?: Persona;
+  dealId?: string;
 }) {
   const t = await getTranslations("shell");
   // Composant SERVEUR : variante `personaLabel`, pas le hook.
@@ -69,17 +72,7 @@ export async function Topbar({
       <div className="ml-auto flex items-center gap-4">
         <EncryptionBadge />
         {/* Partager = ouvrir le flux d'invitation (donner accès). */}
-        <Link
-          href="/invitations"
-          className="sz-cta text-[13px] px-4 py-2 gap-2 inline-flex items-center"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" />
-            <path d="M16 6l-4-4-4 4" />
-            <path d="M12 2v13" />
-          </svg>
-          {t("share")}
-        </Link>
+        <ShareButton dealId={dealId ?? ""} label={t("share")} className="sz-cta text-[13px] px-4 py-2 inline-flex items-center" />
         <LocaleSwitcher />
         <span
           className="grid place-items-center w-[31px] h-[31px] rounded-[6px] bg-[#1A1B1F] text-white text-[11px] font-[700]"

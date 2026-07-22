@@ -1,9 +1,9 @@
 import { getTranslations, getLocale } from "next-intl/server";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
+import { ShareButton } from "@/components/dataroom/ShareButton";
 import type { Locale } from "@/i18n/locales";
 
 /**
@@ -109,9 +109,7 @@ export default async function PermissionsPage() {
     <div className="text-[#1A1B1F]">
       <div className="flex items-center justify-between mb-3.5">
         <p className="text-[12.5px] text-[#6E727A]">{t("accessNote")}</p>
-        <Link href="/invitations" className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap">
-          {t("invite")}
-        </Link>
+        <ShareButton dealId={deal.id} label={t("invite")} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap" />
       </div>
 
       <div style={mono} className="grid grid-cols-[2fr_1.1fr_1fr_1fr_80px] gap-3 px-2 pb-2 border-b border-[#ECEBE6] text-[9px] tracking-[0.08em] text-[#A0A3AB]">

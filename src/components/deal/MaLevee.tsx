@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ShareButton } from "@/components/dataroom/ShareButton";
 
 /**
  * « Ma levée » — reconstruction fidèle du handoff app v5 (§4).
@@ -59,10 +60,12 @@ const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
 
 export function MaLevee({
   dealName,
+  dealId,
   readiness,
   missing,
 }: {
   dealName: string;
+  dealId: string;
   readiness: number;
   missing: { label: string; folderId: string | null }[];
 }) {
@@ -266,7 +269,7 @@ export function MaLevee({
       {/* Investisseurs sur cette levée */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Investisseurs sur cette levée</h2>
-        <Link href="/invitations" className="text-[12.5px] font-[600] text-[#C24619]">+ Inviter un investisseur</Link>
+        <ShareButton dealId={dealId} label="+ Inviter un investisseur" className="text-[12.5px] font-[600] text-[#C24619]" />
       </div>
       <div className="border-t border-[#ECEBE6] mb-8">
         <div style={mono} className="grid grid-cols-[1.6fr_0.8fr_1fr_0.9fr] gap-3 py-2 text-[9px] text-[#A0A3AB] tracking-[0.05em] border-b border-[#ECEBE6]">

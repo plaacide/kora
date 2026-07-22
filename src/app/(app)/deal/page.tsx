@@ -45,6 +45,7 @@ export default async function DealPage() {
   return (
     <MaLevee
       dealName={deal.name}
+      dealId={deal.id}
       readiness={deal.readiness_score ?? 0}
       missing={missing}
     />

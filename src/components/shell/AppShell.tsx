@@ -27,7 +27,7 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-white">
-      <Topbar orgName={orgName} userEmail={userEmail} persona={persona} />
+      <Topbar orgName={orgName} userEmail={userEmail} persona={persona} dealId={currentDealId ?? deals[0]?.id ?? ""} />
       <div className="flex">
         <Sidebar
           deals={deals}
@@ -42,7 +42,7 @@ export function AppShell({
               les routes de la salle (RoomTabs se masque ailleurs), pour l'équipe
               interne seulement — l'invité garde sa nav. */}
           {(persona === "founder" || persona === "fund") && (
-            <RoomTabs dealName={currentDealName} />
+            <RoomTabs dealName={currentDealName} dealId={currentDealId ?? deals[0]?.id ?? ""} />
           )}
           <PageTransition>{children}</PageTransition>
         </main>
