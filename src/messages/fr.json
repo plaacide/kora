@@ -309,7 +309,9 @@
       "document_thumbnail_viewed": "Aperçu consulté",
       "checklist_document_unlinked": "Justificatif retiré",
       "permission_extended": "Accès prolongé"
-    }
+    },
+    "entries": "entrées",
+    "export": "Exporter"
   },
   "dataroom": {
     "title": "Data room",
@@ -463,7 +465,15 @@
     },
     "founder": {
       "emptyState": "Aucune levée. Créez votre dossier pour gérer les accès."
-    }
+    },
+    "accessNote": "Qui entre dans cette data room, avec quels droits. Chaque accès est révocable et expire.",
+    "invite": "Inviter",
+    "colPerson": "Personne",
+    "colRights": "Droits",
+    "colFolders": "Dossiers",
+    "colLastVisit": "Dernière visite",
+    "noGuests": "Aucun invité pour l'instant.",
+    "revoke": "Révoquer"
   },
   "viewer": {
     "title": "Visionneuse",
@@ -670,7 +680,14 @@
     "signedAt": "Date de signature",
     "ip": "Adresse IP",
     "fingerprint": "Empreinte",
-    "proofNote": "Cette empreinte scelle l'identité du signataire, le contenu de l'accord, l'horodatage et l'origine de la connexion. Toute altération la rendrait invalide."
+    "proofNote": "Cette empreinte scelle l'identité du signataire, le contenu de l'accord, l'horodatage et l'origine de la connexion. Toute altération la rendrait invalide.",
+    "requiredBefore": "NDA exigé avant l'entrée",
+    "editTemplate": "Modifier le modèle de NDA",
+    "proofLine": "Chaque invité signe avant d'accéder aux documents. La preuve — horodatage, IP, empreinte du document — reste attachée à la personne et ne peut être modifiée.",
+    "colSigner": "Signataire",
+    "colSignedAt": "Signé le",
+    "colFingerprint": "Empreinte",
+    "colProof": "Preuve"
   },
   "checklist": {
     "title": "Checklist DD",

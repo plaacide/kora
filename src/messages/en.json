@@ -309,7 +309,9 @@
       "document_thumbnail_viewed": "Preview viewed",
       "checklist_document_unlinked": "Evidence unlinked",
       "permission_extended": "Access extended"
-    }
+    },
+    "entries": "entries",
+    "export": "Export"
   },
   "dataroom": {
     "title": "Data room",
@@ -463,7 +465,15 @@
     },
     "founder": {
       "emptyState": "No raise. Create your dossier to manage access."
-    }
+    },
+    "accessNote": "Who enters this data room, with what rights. Every access is revocable and expires.",
+    "invite": "Invite",
+    "colPerson": "Person",
+    "colRights": "Rights",
+    "colFolders": "Folders",
+    "colLastVisit": "Last visit",
+    "noGuests": "No guests yet.",
+    "revoke": "Revoke"
   },
   "viewer": {
     "title": "Viewer",
@@ -670,7 +680,14 @@
     "signedAt": "Signature date",
     "ip": "IP address",
     "fingerprint": "Fingerprint",
-    "proofNote": "This fingerprint seals the signer's identity, the agreement's content, the timestamp and the connection origin. Any alteration would invalidate it."
+    "proofNote": "This fingerprint seals the signer's identity, the agreement's content, the timestamp and the connection origin. Any alteration would invalidate it.",
+    "requiredBefore": "NDA required before entry",
+    "editTemplate": "Edit NDA template",
+    "proofLine": "Each guest signs before accessing documents. The proof — timestamp, IP, document fingerprint — stays attached to the person and cannot be changed.",
+    "colSigner": "Signer",
+    "colSignedAt": "Signed on",
+    "colFingerprint": "Fingerprint",
+    "colProof": "Proof"
   },
   "checklist": {
     "title": "DD checklist",
