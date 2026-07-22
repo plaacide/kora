@@ -34,7 +34,7 @@ export function RoomTabs({ dealName }: { dealName: string }) {
     <div className="mb-6">
       {/* Fil d'Ariane */}
       <div className="flex items-center gap-[7px] text-[12.5px] text-[#9DA0A8] mb-4">
-        <Link href="/data-room" className="hover:text-[#1A1B1F]">Espaces</Link>
+        <Link href="/espaces" className="hover:text-[#1A1B1F]">Data room</Link>
         <span className="text-[#D5D2CA]">/</span>
         <span className="font-[600] text-[#1A1B1F] truncate">Due diligence — {dealName}</span>
       </div>

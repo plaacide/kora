@@ -113,7 +113,11 @@ export function navFor(
   const sansOnglets = interne
     ? base.map((g) => ({
         ...g,
-        items: g.items.filter((i) => !ONGLETS_DATA_ROOM.includes(i.href)),
+        items: g.items
+          .filter((i) => !ONGLETS_DATA_ROOM.includes(i.href))
+          // « Data room » mène à la LISTE des salles (/espaces), pas au contenu
+          // direct : c'est l'entrée du niveau « Espaces » du handoff.
+          .map((i) => (i.href === "/data-room" ? { ...i, href: "/espaces" } : i)),
       }))
     : base;
 
