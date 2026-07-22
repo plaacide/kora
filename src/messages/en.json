@@ -838,6 +838,7 @@
     "signalBody": "{who} viewed {docs} of your documents ({time} reading). Strong interest — reach out.",
     "topDocs": "Most-viewed documents",
     "topReaders": "Who read the most",
-    "docsCountShort": "{n} doc(s)"
+    "docsCountShort": "{n} doc(s)",
+    "softCommit": "in soft-commitments · {pct}%"
   }
 }

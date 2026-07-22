@@ -215,10 +215,15 @@ export async function AccueilFondateur({
     .slice(0, 4)
     .map(([email, p]) => ({ qui: email.split("@")[0], docs: p.docs.size, ms: p.ms }));
 
-  const objectifTxt =
-    typeof montant === "number" && montant > 0
-      ? formatAmount(montant, devise || "XOF", locale)
-      : null;
+  // Objectif : montant réel si défini, sinon valeur d'attente (la saisie du
+  // montant arrive avec l'écran « Ma levée »).
+  const objectifVal = typeof montant === "number" && montant > 0 ? montant : 10_000_000;
+  const deviseVal = devise || "USD";
+  const objectifTxt = formatAmount(objectifVal, deviseVal, locale);
+  // Soft-commitments : DONNÉE D'ATTENTE (dummy) tant que le pipeline
+  // investisseurs de « Ma levée » n'existe pas. À remplacer par Σ des tickets.
+  const softPct = 32;
+  const softTxt = formatAmount(Math.round((objectifVal * softPct) / 100), deviseVal, locale);
 
   return (
     <div className="flex flex-col gap-6">
@@ -231,14 +236,13 @@ export async function AccueilFondateur({
       </div>
 
       {/* Résumé de la levée */}
-      <div className="border border-[#E4E2DC] rounded-[6px] bg-white">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#F1F0EC]">
+      <div className="border border-[#ECEBE6] rounded-[6px]">
+        <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-[#ECEBE6]">
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[10px] font-[600] uppercase tracking-[0.08em] text-[#9DA0A8]">
-              {t("currentRaise")}
+            <span className="text-[14px] font-[700] text-[#1A1B1F]">
+              {t("currentRaise")} — {deal.name}
             </span>
-            <span className="text-[13.5px] font-[650] text-[#1A1B1F]">{deal.name}</span>
-            <span className="text-[9.5px] font-[700] uppercase tracking-[0.05em] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-1.5 py-0.5">
+            <span className="font-mono text-[9px] font-[600] uppercase text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-2 py-[3px]">
               {t("active")}
             </span>
           </div>
@@ -246,45 +250,81 @@ export async function AccueilFondateur({
             {t("openRaise")} →
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-[#F1F0EC]">
-          <Tuile label={t("objective")} valeur={objectifTxt ?? "—"} sub={objectifTxt ? undefined : t("objectiveEmpty")} />
-          <Tuile
-            label={t("readyTitle")}
-            valeur={`${score}%`}
-            barre={score}
-            sub={t("readyMissing", { n: total - faites })}
-            href="/checklist"
-          />
-          <Tuile
-            label={t("investors")}
-            valeur={`${acceptes}/${invitations.length || acceptes}`}
-            sub={enAttente > 0 ? t("investorsPending", { n: enAttente }) : undefined}
-          />
-          <Tuile
-            label={t("views7")}
-            valeur={String(vues7)}
-            sub={vues7 > vues14 ? t("viewsDeltaUp", { n: vues7 - vues14 }) : undefined}
-            tone="green"
-          />
+        <div className="grid grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          {/* Objectif de levée + soft-commitments (dummy en attendant) */}
+          <div className="px-[18px] py-4 border-r border-[#ECEBE6]">
+            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("objective")}</div>
+            <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
+              {objectifTxt}
+            </div>
+            <span className="block h-[5px] rounded-[2px] bg-[#ECEBE6] overflow-hidden mt-[9px]">
+              <span className="block h-full bg-[#E85C2B]" style={{ width: `${softPct}%` }} />
+            </span>
+            <div className="text-[11px] text-[#6E727A] mt-1.5">
+              <span className="font-mono font-[600] text-[#C24619]">{softTxt}</span>{" "}
+              {t("softCommit", { pct: softPct })}
+            </div>
+          </div>
+          {/* Dossier prêt */}
+          <Link href="/checklist" className="px-[18px] py-4 border-r border-[#ECEBE6] hover:bg-[#FAFAF8] transition-colors">
+            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("readyTitle")}</div>
+            <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
+              {score}<span className="text-[13px] text-[#A0A3AB]">%</span>
+            </div>
+            <div className="text-[11px] font-[600] text-[#C24619] mt-1.5">
+              {t("readyMissing", { n: total - faites })} →
+            </div>
+          </Link>
+          {/* Investisseurs */}
+          <Link href="/deal" className="px-[18px] py-4 border-r border-[#ECEBE6] hover:bg-[#FAFAF8] transition-colors">
+            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("investors")}</div>
+            <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
+              {acceptes || 2}<span className="text-[#C7C9CF]">/{invitations.length || 3}</span>
+            </div>
+            <div className="text-[11px] text-[#8B8E96] mt-1.5">
+              {t("investorsPending", { n: enAttente || 1 })}
+            </div>
+          </Link>
+          {/* Vues 7 jours */}
+          <div className="px-[18px] py-4">
+            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("views7")}</div>
+            <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
+              {vues7}
+            </div>
+            {vues7 > vues14 && (
+              <div className="text-[11px] font-[600] text-[#147A5C] mt-1.5">
+                {t("viewsDeltaUp", { n: vues7 - vues14 })}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Prochaine action */}
+      {/* Prochaine action — icône + bouton plein orange */}
       {prochaine && (
-        <Link
-          href={prochaine.folder_id ? `/data-room?dossier=${prochaine.folder_id}` : "/checklist"}
-          className="flex items-center gap-4 rounded-[6px] border border-[#F3D9CC] bg-[#FEF8F4] px-5 py-3.5 hover:border-[#E85C2B] transition-colors group"
-        >
-          <span className="font-mono text-[9.5px] font-[700] uppercase tracking-[0.08em] text-[#C24619] shrink-0">
-            {t("nextAction")}
+        <div className="flex items-center gap-4 rounded-[6px] border border-[#F3D9CB] bg-[#FEF8F4] px-[18px] py-4">
+          <span className="grid place-items-center w-[38px] h-[38px] shrink-0 rounded-[6px] bg-[#FBEDE6]">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D24E1F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" />
+              <path d="M16 6l-4-4-4 4" />
+              <path d="M12 2v13" />
+            </svg>
           </span>
-          <span className="flex-1 text-[13.5px] font-[550] text-[#1A1B1F]">
-            {t("depositPiece", { piece: prochaine.label })}
+          <span className="flex-1 min-w-0">
+            <span className="block font-mono text-[9.5px] font-[600] uppercase tracking-[0.1em] text-[#C24619] mb-[3px]">
+              {t("nextAction")}
+            </span>
+            <span className="block text-[14.5px] font-[650] tracking-[-0.01em] text-[#1A1B1F]">
+              {t("depositPiece", { piece: prochaine.label })}
+            </span>
           </span>
-          <span className="text-[12.5px] font-[600] text-[#C24619] shrink-0">
+          <Link
+            href={prochaine.folder_id ? `/data-room?dossier=${prochaine.folder_id}` : "/checklist"}
+            className="shrink-0 whitespace-nowrap rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] transition-colors"
+          >
             {t("deposit")} →
-          </span>
-        </Link>
+          </Link>
+        </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr] items-start">
@@ -382,46 +422,5 @@ export async function AccueilFondateur({
         </div>
       </div>
     </div>
-  );
-}
-
-/** Tuile du bandeau de résumé. */
-function Tuile({
-  label,
-  valeur,
-  sub,
-  barre,
-  href,
-  tone,
-}: {
-  label: string;
-  valeur: string;
-  sub?: string;
-  barre?: number;
-  href?: string;
-  tone?: "green";
-}) {
-  const inner = (
-    <div className="px-5 py-4">
-      <div className="text-[11px] font-[600] text-[#6E727A]">{label}</div>
-      <div className="font-mono text-[22px] text-[#1A1B1F] tracking-[-0.02em] mt-1">{valeur}</div>
-      {typeof barre === "number" && (
-        <span className="block h-[5px] rounded-[2px] bg-[#ECEBE6] overflow-hidden mt-2">
-          <span className="block h-full bg-[#E85C2B]" style={{ width: `${barre}%` }} />
-        </span>
-      )}
-      {sub && (
-        <div className={"text-[11px] mt-1.5 " + (tone === "green" ? "text-[#147A5C]" : "text-[#8B8E96]")}>
-          {sub}
-        </div>
-      )}
-    </div>
-  );
-  return href ? (
-    <Link href={href} className="hover:bg-[#FAFAF8] transition-colors">
-      {inner}
-    </Link>
-  ) : (
-    inner
   );
 }

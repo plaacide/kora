@@ -22,7 +22,7 @@ export function AppShell({
   persona?: Persona;
 }) {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Topbar orgName={orgName} userEmail={userEmail} persona={persona} />
       <div className="flex">
         <Sidebar
@@ -31,7 +31,9 @@ export function AppShell({
           role={role}
           persona={persona}
         />
-        <main className="flex-1 min-w-0 px-8 py-7 max-w-[1720px]">
+        {/* Fond BLANC (handoff) : la zone de contenu est blanche, la sidebar
+            crème. Pas de fond papier. */}
+        <main className="flex-1 min-w-0 bg-white px-8 py-7 max-w-[1720px]">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>

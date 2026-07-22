@@ -838,6 +838,7 @@
     "signalBody": "{who} a consulté {docs} de vos documents ({time} de lecture). Signal d'intérêt fort — proposez un échange.",
     "topDocs": "Documents les plus regardés",
     "topReaders": "Qui a regardé le plus",
-    "docsCountShort": "{n} doc(s)"
+    "docsCountShort": "{n} doc(s)",
+    "softCommit": "engagés en soft-commitments · {pct} %"
   }
 }
