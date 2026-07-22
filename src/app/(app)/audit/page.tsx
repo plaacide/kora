@@ -1,6 +1,7 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
+import { ExportButton, type AuditCsvRow } from "@/components/audit/ExportButton";
 import type { Locale } from "@/i18n/locales";
 
 /**
@@ -78,6 +79,26 @@ export default async function AuditPage() {
     return d.toDateString() === aujourdhui ? heure.format(d) : jour.format(d);
   }
 
+  // Lignes d'export : date complète, code d'action brut (précision d'audit),
+  // détail, acteur, empreinte complète.
+  const dateComplete = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+  const csvRows: AuditCsvRow[] = (entries ?? []).map((e) => {
+    const meta = (e.metadata ?? {}) as Record<string, unknown>;
+    const detail =
+      ((meta.name as string) ?? (meta.email as string) ?? (meta.document_name as string) ?? (meta.label as string) ?? "") +
+      (meta.page ? ` · p.${meta.page}` : "");
+    return {
+      when: dateComplete.format(new Date(e.created_at)),
+      action: e.action,
+      detail,
+      who: e.actor_email ?? "",
+      hash: e.entry_hash,
+    };
+  });
+
   return (
     <div className="text-[#1A1B1F]">
       <div className="flex items-center justify-between mb-4">
@@ -94,9 +115,7 @@ export default async function AuditPage() {
             ? `● ${t("chainBroken").toUpperCase()}`
             : `● ${t("chainValid").toUpperCase()} · ${verdict?.total ?? entries?.length ?? 0} ${t("entries").toUpperCase()}`}
         </span>
-        <span className="border border-[#E4E2DC] rounded-[5px] px-3.5 py-2 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] cursor-pointer">
-          {t("export")}
-        </span>
+        <ExportButton rows={csvRows} label={t("export")} />
       </div>
 
       <div style={mono} className="grid grid-cols-[104px_1.9fr_1.3fr_120px] gap-3 px-2 pb-2 border-b border-[#ECEBE6] text-[9px] tracking-[0.08em] text-[#A0A3AB]">

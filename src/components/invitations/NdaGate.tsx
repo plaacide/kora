@@ -13,11 +13,14 @@ export function NdaGate({
   dealName,
   orgName,
   ndaRequired,
+  ndaTemplate,
 }: {
   token: string;
   dealName: string;
   orgName: string;
   ndaRequired: boolean;
+  /** Texte d'accord personnalisé du fondateur ; sinon texte générique. */
+  ndaTemplate?: string | null;
 }) {
   const t = useTranslations("invitations");
   const router = useRouter();
@@ -56,7 +59,11 @@ export function NdaGate({
       {ndaRequired && (
         <div className="bg-surface border border-line rounded-card p-4 max-h-52 overflow-y-auto text-[12px] text-ink-secondary leading-relaxed">
           <p className="font-[650] text-ink mb-2">{t("ndaHeading")}</p>
-          <p>{t("ndaBody", { org: orgName, deal: dealName })}</p>
+          {ndaTemplate?.trim() ? (
+            <p className="whitespace-pre-wrap">{ndaTemplate}</p>
+          ) : (
+            <p>{t("ndaBody", { org: orgName, deal: dealName })}</p>
+          )}
         </div>
       )}
 

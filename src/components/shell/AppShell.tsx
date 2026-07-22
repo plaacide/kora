@@ -1,6 +1,6 @@
 import { Topbar } from "./Topbar";
 import { Sidebar } from "./Sidebar";
-import { RoomTabs } from "./RoomTabs";
+import { RoomTabs, type RoomCounts } from "./RoomTabs";
 import { PageTransition } from "./PageTransition";
 import type { DealRef } from "@/lib/current-deal";
 import type { Persona } from "@/lib/persona";
@@ -13,6 +13,7 @@ export function AppShell({
   currentDealId,
   role,
   persona,
+  roomCounts,
 }: {
   children: React.ReactNode;
   orgName: string;
@@ -21,6 +22,7 @@ export function AppShell({
   currentDealId: string | null;
   role: string | null;
   persona?: Persona;
+  roomCounts?: RoomCounts;
 }) {
   const currentDealName =
     deals.find((d) => d.id === currentDealId)?.name ?? deals[0]?.name ?? orgName;
@@ -42,7 +44,7 @@ export function AppShell({
               les routes de la salle (RoomTabs se masque ailleurs), pour l'équipe
               interne seulement — l'invité garde sa nav. */}
           {(persona === "founder" || persona === "fund") && (
-            <RoomTabs dealName={currentDealName} dealId={currentDealId ?? deals[0]?.id ?? ""} />
+            <RoomTabs dealName={currentDealName} dealId={currentDealId ?? deals[0]?.id ?? ""} counts={roomCounts} />
           )}
           <PageTransition>{children}</PageTransition>
         </main>

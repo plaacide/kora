@@ -99,7 +99,7 @@ export default async function DataRoomPage({
     supabase
       .from("documents")
       .select(
-        "id, folder_id, name, index_path, status, document_versions!documents_current_version_fk(id, version_no, size_bytes, created_at)",
+        "id, folder_id, name, index_path, status, is_key, document_versions!documents_current_version_fk(id, version_no, size_bytes, created_at)",
       )
       .eq("deal_id", deal.id)
       .order("index_path"),
@@ -206,6 +206,7 @@ export default async function DataRoomPage({
       modified: v?.created_at ? dateFmt.format(new Date(v.created_at)) : null,
       views: viewCount[d.id] ?? 0,
       permission: levelByFolder.get(d.folder_id) ?? "none",
+      is_key: (d as { is_key?: boolean }).is_key ?? false,
     };
   });
 

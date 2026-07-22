@@ -4,9 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { askQuestion, saveAnswer, setAnswerStatus } from "@/app/actions/qa";
-import { Button } from "@/components/ui/Button";
-import { Chip, type ChipTone } from "@/components/ui/Chip";
-import { Mono } from "@/components/ui/Table";
 import { Modal } from "@/components/ui/Modal";
 import { PlainError } from "@/components/auth/FormError";
 import { cn } from "@/lib/cn";
@@ -24,10 +21,13 @@ export interface QaItem {
   is_mine: boolean;
 }
 
-const TONE: Record<AnswerStatus, ChipTone> = {
-  draft: "outline",
-  internal_review: "amber",
-  published: "success",
+const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
+
+/** Pastilles de statut, style maquette (mono, plates). */
+const STATUT_PILL: Record<AnswerStatus, string> = {
+  draft: "text-[#8B8E96] bg-[#F1F0EB]",
+  internal_review: "text-[#B4741B] bg-[#FBF0DC]",
+  published: "text-[#147A5C] bg-[#E4F3EC]",
 };
 
 const FILTERS: Array<AnswerStatus | "all"> = [
@@ -36,6 +36,9 @@ const FILTERS: Array<AnswerStatus | "all"> = [
   "internal_review",
   "published",
 ];
+
+const champ =
+  "w-full px-2.5 py-2 text-[12.5px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-none";
 
 export function QaBoard({
   dealId,
@@ -110,10 +113,7 @@ export function QaBoard({
       ]),
     ];
     const csv = rows.map((r) => r.join(",")).join("\n");
-    // BOM : sans lui, Excel casse les accents.
-    const blob = new Blob(["﻿" + csv], {
-      type: "text/csv;charset=utf-8",
-    });
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -123,7 +123,7 @@ export function QaBoard({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 text-[#1A1B1F]">
       <PlainError message={error} />
 
       <div className="flex items-center gap-2 flex-wrap">
@@ -132,54 +132,49 @@ export function QaBoard({
             key={f}
             onClick={() => setFilter(f)}
             className={cn(
-              "flex items-center gap-1.5 text-[11.5px] font-semibold rounded-[6px] px-2.5 py-1.5 cursor-pointer transition-colors",
-              filter === f
-                ? "bg-chip-neutral-bg text-ink"
-                : "text-ink-secondary hover:text-ink",
+              "flex items-center gap-1.5 text-[11.5px] font-[600] rounded-[5px] px-2.5 py-1.5 cursor-pointer transition-colors",
+              filter === f ? "bg-[#F1F0EB] text-[#1A1B1F]" : "text-[#6E727A] hover:text-[#1A1B1F]",
             )}
           >
             {f === "all" ? t("filterAll") : t(`status.${f}`)}
-            <span className="text-ink-muted">{count(f)}</span>
+            <span style={mono} className="text-[#9DA0A8]">{count(f)}</span>
           </button>
         ))}
 
         <div className="ml-auto flex gap-2">
           {items.length > 0 && (
-            <Button variant="secondary" size="sm" onClick={exportCsv}>
+            <button onClick={exportCsv} className="border border-[#E4E2DC] rounded-[5px] px-3.5 py-2 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8]">
               {t("export")}
-            </Button>
+            </button>
           )}
-          <Button variant="primary" size="sm" onClick={() => setAskOpen(true)}>
+          <button onClick={() => setAskOpen(true)} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]">
             {t("ask")}
-          </Button>
+          </button>
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-surface border border-line rounded-card shadow-card px-5 py-8 text-center">
-          <p className="text-[12.5px] text-ink-secondary">{t("empty")}</p>
+        <div className="border border-[#ECEBE6] rounded-[6px] px-5 py-8 text-center">
+          <p className="text-[12.5px] text-[#6E727A]">{t("empty")}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((q) => (
-            <div
-              key={q.id}
-              className="bg-surface border border-line rounded-card shadow-card p-4"
-            >
+            <div key={q.id} className="border border-[#ECEBE6] rounded-[6px] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[13px] font-semibold text-ink leading-relaxed">
-                    {q.body}
-                  </p>
-                  <Mono className="text-[10.5px] text-ink-muted mt-1">
+                  <p className="text-[13px] font-[600] leading-relaxed">{q.body}</p>
+                  <span style={mono} className="block text-[10.5px] text-[#9DA0A8] mt-1">
                     {q.asker} · {q.created_at}
-                  </Mono>
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 flex-none">
-                  {q.is_mine && <Chip tone="indigo">{t("mine")}</Chip>}
-                  <Chip tone={TONE[q.answer_status]}>
+                  {q.is_mine && (
+                    <span style={mono} className="text-[9px] font-[600] rounded-[4px] px-2 py-[3px] uppercase text-[#185FA5] bg-[#E9F2FB]">{t("mine")}</span>
+                  )}
+                  <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-[3px] uppercase whitespace-nowrap " + STATUT_PILL[q.answer_status]}>
                     {t(`status.${q.answer_status}`)}
-                  </Chip>
+                  </span>
                 </div>
               </div>
 
@@ -189,61 +184,46 @@ export function QaBoard({
                 <div className="mt-3 flex flex-col gap-2">
                   <textarea
                     value={drafts[q.id] ?? q.answer_body ?? ""}
-                    onChange={(e) =>
-                      setDrafts((d) => ({ ...d, [q.id]: e.target.value }))
-                    }
+                    onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
                     onBlur={() => persistAnswer(q.id)}
                     rows={3}
                     placeholder={t("answerPlaceholder")}
-                    className="px-2.5 py-2 text-[12.5px] bg-bg text-ink rounded-field border border-line focus:border-accent focus:outline-none resize-none"
+                    className={champ}
                   />
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {q.answer_status !== "internal_review" && (
-                      <button
-                        onClick={() => advance(q.id, "internal_review")}
-                        className="text-[11.5px] font-medium text-[oklch(0.48_0.09_80)] cursor-pointer"
-                      >
+                      <button onClick={() => advance(q.id, "internal_review")} className="text-[11.5px] font-[600] text-[#B4741B] cursor-pointer">
                         {t("toReview")}
                       </button>
                     )}
                     {q.answer_status !== "published" && (
-                      <button
-                        onClick={() => advance(q.id, "published")}
-                        className="text-[11.5px] font-medium text-[oklch(0.42_0.10_155)] cursor-pointer"
-                      >
+                      <button onClick={() => advance(q.id, "published")} className="text-[11.5px] font-[600] text-[#147A5C] cursor-pointer">
                         {t("publish")}
                       </button>
                     )}
                     {q.answer_status === "published" && (
-                      <button
-                        onClick={() => advance(q.id, "draft")}
-                        className="text-[11.5px] font-medium text-ink-secondary cursor-pointer"
-                      >
+                      <button onClick={() => advance(q.id, "draft")} className="text-[11.5px] font-[600] text-[#6E727A] cursor-pointer">
                         {t("unpublish")}
                       </button>
                     )}
                     {q.answerer && (
-                      <Mono className="ml-auto text-[10.5px] text-ink-muted">
+                      <span style={mono} className="ml-auto text-[10.5px] text-[#9DA0A8]">
                         {t("answeredBy", { name: q.answerer })}
-                      </Mono>
+                      </span>
                     )}
                   </div>
                 </div>
               ) : q.answer_body ? (
-                <div className="mt-3 bg-bg border border-separator-soft rounded-card p-3">
-                  <p className="text-[12.5px] text-ink leading-relaxed">
-                    {q.answer_body}
-                  </p>
+                <div className="mt-3 bg-[#FAFAF8] border border-[#ECEBE6] rounded-[5px] p-3">
+                  <p className="text-[12.5px] leading-relaxed">{q.answer_body}</p>
                   {q.answerer && (
-                    <Mono className="text-[10.5px] text-ink-muted mt-1.5 block">
+                    <span style={mono} className="text-[10.5px] text-[#9DA0A8] mt-1.5 block">
                       {t("answeredBy", { name: q.answerer })}
-                    </Mono>
+                    </span>
                   )}
                 </div>
               ) : (
-                <p className="mt-3 text-[11.5px] text-ink-muted">
-                  {t("pendingAnswer")}
-                </p>
+                <p className="mt-3 text-[11.5px] text-[#9DA0A8]">{t("pendingAnswer")}</p>
               )}
             </div>
           ))}
@@ -251,30 +231,27 @@ export function QaBoard({
       )}
 
       <Modal open={askOpen} onClose={() => setAskOpen(false)} title={t("ask")}>
-        <div className="flex flex-col gap-4">
+        <div className="px-6 py-5 flex flex-col gap-4">
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             rows={4}
             autoFocus
             placeholder={t("questionPlaceholder")}
-            className="px-2.5 py-2 text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none resize-none"
+            className={champ}
           />
-          <p className="text-[11px] text-ink-muted leading-relaxed">
-            {t("askNote")}
-          </p>
+          <p className="text-[11px] text-[#9DA0A8] leading-relaxed">{t("askNote")}</p>
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setAskOpen(false)}>
+            <button onClick={() => setAskOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAFAF8]">
               {t("cancel")}
-            </Button>
-            <Button
-              variant="primary"
+            </button>
+            <button
               onClick={submitQuestion}
-              loading={busy}
               disabled={busy || question.trim().length < 5}
+              className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60"
             >
               {busy ? t("sending") : t("send")}
-            </Button>
+            </button>
           </div>
         </div>
       </Modal>

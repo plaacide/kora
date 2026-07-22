@@ -28,6 +28,16 @@ export function Sidebar({
   const label = (cle: string, chemin: "nav" | "groups") =>
     mot(`${chemin}.${cle}`);
 
+  // La salle courante détermine le libellé de « Ma levée » : une data room de
+  // diligence n'est pas une levée. On lit l'objectif du deal courant (déjà en
+  // main via `deals`), sans plomberie supplémentaire.
+  const objectifCourant =
+    deals.find((d) => d.id === currentDealId)?.objectif ?? deals[0]?.objectif ?? "levee";
+  const navLabel = (cle: string) =>
+    cle === "dealSheet" && objectifCourant === "diligence"
+      ? label("dealSheetDiligence", "nav")
+      : label(cle, "nav");
+
   return (
     <nav
       aria-label={t("mainNav")}
@@ -64,7 +74,7 @@ export function Sidebar({
                     )}
                   >
                     <NavIcon name={item.key} />
-                    <span className="truncate">{label(item.key, "nav")}</span>
+                    <span className="truncate">{navLabel(item.key)}</span>
                   </Link>
                 </li>
               );

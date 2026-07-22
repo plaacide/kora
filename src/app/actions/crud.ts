@@ -61,6 +61,32 @@ export async function deleteDeal(dealId: string): Promise<Result> {
   return { ok: true };
 }
 
+/** Archive (ou désarchive) une data room : la range hors de la liste active. */
+/** Marque (ou démarque) un document comme « clé » — l'étoile de la data room. */
+export async function setDocumentKey(docId: string, key: boolean): Promise<Result> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_document_key", { p_doc: docId, p_key: key });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/data-room");
+  revalidatePath("/deal");
+  return { ok: true };
+}
+
+export async function setDealArchived(
+  dealId: string,
+  archived: boolean,
+): Promise<Result> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_deal_archived", {
+    p_deal: dealId,
+    p_archived: archived,
+  });
+  if (error) return { ok: false, error: error.message };
+  refresh();
+  revalidatePath("/espaces");
+  return { ok: true };
+}
+
 // --- Dossiers --------------------------------------------------------------
 
 export async function renameFolder(

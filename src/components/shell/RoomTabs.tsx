@@ -16,18 +16,33 @@ import { ShareButton } from "@/components/dataroom/ShareButton";
  * routes de la salle. L'invité garde sa navigation propre.
  */
 
-const TABS: { href: string; label: string; count?: number; accent?: boolean }[] = [
+/** Comptes réels affichés en pastille sur les onglets (calculés côté serveur). */
+export interface RoomCounts {
+  permissions?: number;
+  checklist?: number;
+  qa?: number;
+}
+
+const TABS: { href: string; label: string; countKey?: keyof RoomCounts; accent?: boolean }[] = [
   { href: "/data-room", label: "Contenu" },
-  { href: "/permissions", label: "Autorisations", count: 3 },
-  { href: "/checklist", label: "Suivi de la diligence", count: 16, accent: true },
-  { href: "/qa", label: "Questions-réponses", count: 2, accent: true },
+  { href: "/permissions", label: "Autorisations", countKey: "permissions" },
+  { href: "/checklist", label: "Suivi de la diligence", countKey: "checklist", accent: true },
+  { href: "/qa", label: "Questions-réponses", countKey: "qa", accent: true },
   { href: "/nda", label: "Signatures" },
   { href: "/audit", label: "Journal d'audit" },
 ];
 
 const ROOM_ROUTES = new Set(TABS.map((t) => t.href));
 
-export function RoomTabs({ dealName, dealId }: { dealName: string; dealId: string }) {
+export function RoomTabs({
+  dealName,
+  dealId,
+  counts,
+}: {
+  dealName: string;
+  dealId: string;
+  counts?: RoomCounts;
+}) {
   const pathname = usePathname();
   if (!ROOM_ROUTES.has(pathname)) return null;
 
@@ -37,7 +52,7 @@ export function RoomTabs({ dealName, dealId }: { dealName: string; dealId: strin
       <div className="flex items-center gap-[7px] text-[12.5px] text-[#9DA0A8] mb-4">
         <Link href="/espaces" className="hover:text-[#1A1B1F]">Data room</Link>
         <span className="text-[#D5D2CA]">/</span>
-        <span className="font-[600] text-[#1A1B1F] truncate">Due diligence — {dealName}</span>
+        <span className="font-[600] text-[#1A1B1F] truncate">{dealName}</span>
       </div>
 
       {/* En-tête de la salle */}
@@ -46,22 +61,11 @@ export function RoomTabs({ dealName, dealId }: { dealName: string; dealId: strin
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
         </span>
         <div className="flex-1 min-w-0">
-          <div className="text-[22px] font-[700] tracking-[-0.02em]">Due diligence — {dealName}</div>
-          <div className="flex items-center gap-2 text-[12.5px] text-[#6E727A] mt-[5px] flex-wrap">
-            Rattachée à
-            <Link href="/deal" className="inline-flex items-center gap-[5px] border border-[#E4E2DC] rounded-[5px] px-[9px] py-[3px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8]">
-              Levée {dealName}
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9DA0A8" strokeWidth="2.4" strokeLinecap="round"><path d="m6 9 6 6 6-6" /></svg>
-            </Link>
-            <span className="text-[#D5D2CA]">·</span>
-            à jour à l&apos;instant
-            <span style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="text-[9px] font-[600] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-2 py-[3px]">ACTIVE</span>
-          </div>
+          <div className="text-[22px] font-[700] tracking-[-0.02em] truncate">{dealName}</div>
+          <div className="text-[12.5px] text-[#6E727A] mt-[5px]">Data room</div>
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
-          <span className="border border-[#E4E2DC] rounded-[5px] px-3 py-2 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] cursor-pointer">Afficher un aperçu</span>
           <ShareButton dealId={dealId} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />
-          <span className="grid place-items-center border border-[#E4E2DC] rounded-[5px] w-[34px] h-[34px] text-[#6E727A] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] cursor-pointer text-[16px]">⋯</span>
         </div>
       </div>
 
@@ -69,6 +73,7 @@ export function RoomTabs({ dealName, dealId }: { dealName: string; dealId: strin
       <div className="flex gap-[22px] border-b border-[#ECEBE6] text-[13px] font-[600] overflow-x-auto">
         {TABS.map((tab) => {
           const active = pathname === tab.href;
+          const count = tab.countKey ? counts?.[tab.countKey] : undefined;
           return (
             <Link
               key={tab.href}
@@ -79,7 +84,7 @@ export function RoomTabs({ dealName, dealId }: { dealName: string; dealId: strin
               }
             >
               {tab.label}
-              {typeof tab.count === "number" && (
+              {typeof count === "number" && count > 0 && (
                 <span
                   style={{ fontFamily: "var(--font-plex-mono), monospace" }}
                   className={
@@ -88,7 +93,7 @@ export function RoomTabs({ dealName, dealId }: { dealName: string; dealId: strin
                       : "text-[11px] font-[500] text-[#A0A3AB]"
                   }
                 >
-                  {tab.count}
+                  {count}
                 </span>
               )}
             </Link>

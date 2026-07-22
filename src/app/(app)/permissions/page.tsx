@@ -4,6 +4,8 @@ import { requireInternal } from "@/lib/access";
 import { getCurrentDeal } from "@/lib/current-deal";
 import { Card, CardBody } from "@/components/ui/Card";
 import { ShareButton } from "@/components/dataroom/ShareButton";
+import { RevokeButton } from "@/components/permissions/RevokeButton";
+import { RightsEditor } from "@/components/permissions/RightsEditor";
 import type { Locale } from "@/i18n/locales";
 
 /**
@@ -15,14 +17,6 @@ import type { Locale } from "@/i18n/locales";
  */
 
 const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
-
-const DROIT: Record<string, string> = {
-  download: "Télécharger",
-  watermark: "Filigrané",
-  view: "Lecture seule",
-  edit: "Éditer",
-  none: "Aucun",
-};
 
 function initials(name: string): string {
   return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase() || "?";
@@ -92,6 +86,7 @@ export default async function PermissionsPage() {
         email: p.email,
         niveau,
         dossiers: tousLes ? `Tous (${nbFolders})` : dossiers.slice(0, 3).join(", ") || "—",
+        folderIds: droits.map((d) => d.folderId),
         vue: derniereVue.get(p.email.toLowerCase()) ?? null,
       };
     });
@@ -128,13 +123,10 @@ export default async function PermissionsPage() {
                 <span className="block text-[11px] text-[#9DA0A8] truncate">{i.email}</span>
               </span>
             </span>
-            <span className="flex items-center gap-1.5 text-[12.5px] font-[600] cursor-pointer">
-              {DROIT[i.niveau] ?? i.niveau}
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A0A3AB" strokeWidth="2.2" strokeLinecap="round"><path d="m6 9 6 6 6-6" /></svg>
-            </span>
+            <RightsEditor dealId={deal.id} userId={i.id} folderIds={i.folderIds} current={i.niveau} />
             <span className="text-[12px] text-[#55585F] truncate">{i.dossiers}</span>
             <span className="text-[12px] text-[#55585F]">{i.vue ? relatif(i.vue) : "—"}</span>
-            <span className="text-right text-[12px] font-[600] text-[#C24619] cursor-pointer">{t("revoke")}</span>
+            <RevokeButton dealId={deal.id} userId={i.id} folderIds={i.folderIds} label={t("revoke")} confirmLabel={t("revokeConfirm", { name: i.nom })} />
           </div>
         ))
       )}

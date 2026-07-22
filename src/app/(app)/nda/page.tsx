@@ -1,5 +1,8 @@
+import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentDeal, getDealRole } from "@/lib/current-deal";
+import { NdaSettings } from "@/components/nda/NdaSettings";
 import type { Locale } from "@/i18n/locales";
 
 /**
@@ -33,6 +36,23 @@ export default async function NdaPage() {
   const { data, error } = await supabase.rpc("my_ndas");
   const ndas = (error ? [] : (data ?? [])) as unknown as Nda[];
 
+  // Réglages NDA de la data room courante (équipe interne seulement). Tolérant
+  // si les colonnes nda_* n'existent pas encore.
+  const { deal } = await getCurrentDeal(supabase);
+  const role = deal ? await getDealRole(supabase, deal.org_id) : null;
+  const isInternal = ["owner", "admin", "member"].includes(role ?? "");
+  let ndaRequired = false;
+  let ndaTemplate = "";
+  if (deal && isInternal) {
+    const { data: reglages } = await supabase
+      .from("deals")
+      .select("nda_required, nda_template")
+      .eq("id", deal.id)
+      .maybeSingle();
+    ndaRequired = !!(reglages as { nda_required?: boolean } | null)?.nda_required;
+    ndaTemplate = ((reglages as { nda_template?: string | null } | null)?.nda_template) ?? "";
+  }
+
   const fmt = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
     day: "numeric",
     month: "short",
@@ -43,17 +63,15 @@ export default async function NdaPage() {
 
   return (
     <div className="text-[#1A1B1F]">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <span className="text-[13px] font-[600]">{t("requiredBefore")}</span>
-          <span className="inline-flex w-[34px] h-[19px] rounded-full bg-[#1D9E75] relative">
-            <span className="absolute right-0.5 top-0.5 w-[15px] h-[15px] rounded-full bg-white" />
-          </span>
-        </div>
-        <span className="border border-[#E4E2DC] rounded-[5px] px-3.5 py-2 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] cursor-pointer whitespace-nowrap">
-          {t("editTemplate")}
-        </span>
-      </div>
+      {deal && isInternal && (
+        <NdaSettings
+          dealId={deal.id}
+          required={ndaRequired}
+          template={ndaTemplate}
+          label={t("requiredBefore")}
+          editLabel={t("editTemplate")}
+        />
+      )}
       <p className="text-[12.5px] text-[#6E727A] mb-4">{t("proofLine")}</p>
 
       <div style={mono} className="grid grid-cols-[2fr_1.3fr_1.1fr_90px] gap-3 px-2 pb-2 border-b border-[#ECEBE6] text-[9px] tracking-[0.08em] text-[#A0A3AB]">
@@ -74,7 +92,7 @@ export default async function NdaPage() {
             </span>
             <span style={mono} className="text-[11.5px] text-[#55585F]">{fmt.format(new Date(n.signed_at))}</span>
             <span style={mono} className="text-[10.5px] text-[#9DA0A8] truncate">{n.signature_hash.slice(0, 10)}…</span>
-            <span className="text-right"><span className="text-[12px] font-[600] text-[#C24619] cursor-pointer">PDF ↓</span></span>
+            <span className="text-right"><Link href={`/preuve/${n.id}`} className="text-[12px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">Preuve ↓</Link></span>
           </div>
         ))
       )}

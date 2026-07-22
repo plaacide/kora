@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 /**
  * Modal réutilisable, style handoff : voile sombre, carte blanche rayon 8,
  * ombre douce. Ferme au clic sur le voile et à Échap.
+ *
+ * Rendu via un PORTAIL sur `document.body` : sinon le voile `fixed inset-0`
+ * serait borné par un ancêtre qui établit un bloc conteneur (l'animation
+ * `animate-in` de PageTransition) et n'apparaîtrait que dans la zone de
+ * contenu — un « carré » au lieu de couvrir tout l'écran.
  */
 export function Modal({
   open,
@@ -22,6 +28,9 @@ export function Modal({
   width?: number;
   className?: string;
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -29,17 +38,19 @@ export function Modal({
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
       onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] px-4 bg-[rgba(26,27,31,0.35)]"
+      className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] px-4 bg-[rgba(23,24,28,0.5)]"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ width, maxWidth: "100%", boxShadow: "0 24px 70px rgba(26,27,31,0.28)" }}
-        className={"bg-white rounded-[8px] overflow-hidden max-h-[85vh] overflow-y-auto " + className}
+        // Ombre CONTENUE (spread négatif), noire neutre : séparation nette de la
+        // carte sur le voile sombre, sans halo ni flou d'arrière-plan.
+        style={{ width, maxWidth: "100%", boxShadow: "0 18px 48px -16px rgba(0,0,0,0.5)" }}
+        className={"bg-white rounded-[10px] overflow-hidden max-h-[85vh] overflow-y-auto " + className}
       >
         {title && (
           <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[#F1F0EC]">
@@ -49,6 +60,7 @@ export function Modal({
         )}
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

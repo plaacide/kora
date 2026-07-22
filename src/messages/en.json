@@ -168,6 +168,7 @@
       "nav": {
         "dashboard": "Home",
         "dealSheet": "My raise",
+        "dealSheetDiligence": "My data room",
         "dataRoom": "Data room",
         "viewer": "Reading",
         "checklist": "Documents to provide",
@@ -308,7 +309,18 @@
       "checklist_item_deleted": "Requirement deleted",
       "document_thumbnail_viewed": "Preview viewed",
       "checklist_document_unlinked": "Evidence unlinked",
-      "permission_extended": "Access extended"
+      "permission_extended": "Access extended",
+      "raise_updated": "Raise updated",
+      "raise_investor_saved": "Investor tracked",
+      "raise_investor_deleted": "Investor removed",
+      "raise_closed": "Raise closed",
+      "raise_opened": "New raise opened",
+      "raise_added_past": "Past round added",
+      "raise_deleted": "Round deleted",
+      "deal_archived": "Data room archived",
+      "deal_unarchived": "Data room unarchived",
+      "deal_nda_updated": "NDA setting updated",
+      "document_key_set": "Key document"
     },
     "entries": "entries",
     "export": "Export"
@@ -473,7 +485,8 @@
     "colFolders": "Folders",
     "colLastVisit": "Last visit",
     "noGuests": "No guests yet.",
-    "revoke": "Revoke"
+    "revoke": "Revoke",
+    "revokeConfirm": "Revoke {name}’s access? They will no longer be able to open your documents."
   },
   "viewer": {
     "title": "Viewer",
@@ -856,6 +869,12 @@
     "topDocs": "Most-viewed documents",
     "topReaders": "Who read the most",
     "docsCountShort": "{n} doc(s)",
-    "softCommit": "in soft-commitments · {pct}%"
+    "softCommit": "in soft-commitments · {pct}%",
+    "roomTitle": "Active data room",
+    "openRoom": "Open data room",
+    "people": "People",
+    "peopleAccepted": "{n} with access",
+    "subtitleDiligence": "Where your data room stands, and who's reading your documents.",
+    "noInvites": "no investor invited yet"
   }
 }

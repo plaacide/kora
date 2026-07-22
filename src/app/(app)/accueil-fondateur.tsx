@@ -82,6 +82,7 @@ export async function AccueilFondateur({
 
   const [
     { data: dealRow },
+    raiseRes,
     { data: exigences },
     { data: docs },
     { data: invites },
@@ -92,6 +93,13 @@ export async function AccueilFondateur({
       .from("deals")
       .select("amount, currency, stage")
       .eq("id", deal.id)
+      .maybeSingle(),
+    // Levée réelle (tolérant tant que la migration n'est pas appliquée).
+    supabase
+      .from("raises")
+      .select("montant_cible, montant_engage, devise")
+      .eq("deal_id", deal.id)
+      .eq("statut", "en_cours")
       .maybeSingle(),
     supabase
       .from("checklist_items")
@@ -133,6 +141,10 @@ export async function AccueilFondateur({
   const invitations = (invites ?? []) as { email: string; status: string }[];
   const acceptes = invitations.filter((i) => i.status === "accepted").length;
   const enAttente = invitations.length - acceptes;
+
+  // Objectif de la salle : la levée affiche montant + pipeline investisseurs ;
+  // la diligence non (ni montant, ni soft-commitments — aucune donnée inventée).
+  const estLevee = deal.objectif !== "diligence";
 
   // Métadonnées par document.
   const meta = new Map<string, { nom: string; pages: number; type: BadgeType }>();
@@ -215,15 +227,18 @@ export async function AccueilFondateur({
     .slice(0, 4)
     .map(([email, p]) => ({ qui: email.split("@")[0], docs: p.docs.size, ms: p.ms }));
 
-  // Objectif : montant réel si défini, sinon valeur d'attente (la saisie du
-  // montant arrive avec l'écran « Ma levée »).
-  const objectifVal = typeof montant === "number" && montant > 0 ? montant : 10_000_000;
-  const deviseVal = devise || "USD";
-  const objectifTxt = formatAmount(objectifVal, deviseVal, locale);
-  // Soft-commitments : DONNÉE D'ATTENTE (dummy) tant que le pipeline
-  // investisseurs de « Ma levée » n'existe pas. À remplacer par Σ des tickets.
-  const softPct = 32;
-  const softTxt = formatAmount(Math.round((objectifVal * softPct) / 100), deviseVal, locale);
+  // Objectif + soft-commitments : RÉELS, depuis la levée en cours. Plus aucune
+  // valeur inventée — si le montant n'est pas saisi, on invite à le faire.
+  const raiseRow = raiseRes.data as
+    | { montant_cible: number | null; montant_engage: number | null; devise: string | null }
+    | null;
+  const cible = raiseRow?.montant_cible ?? (typeof montant === "number" ? montant : null);
+  const engage = raiseRow?.montant_engage ?? 0;
+  const deviseVal = raiseRow?.devise || devise || "USD";
+  const objectifDefini = typeof cible === "number" && cible > 0;
+  const objectifTxt = objectifDefini ? formatAmount(cible, deviseVal, locale) : null;
+  const softPct = objectifDefini ? Math.min(100, Math.round((engage / cible) * 100)) : 0;
+  const softTxt = formatAmount(engage, deviseVal, locale);
 
   return (
     <div className="flex flex-col gap-6">
@@ -232,7 +247,7 @@ export async function AccueilFondateur({
         <h1 className="font-display text-[27px] font-[700] tracking-[-0.02em] text-[#1A1B1F]">
           {t("hello", { name: prenom })}
         </h1>
-        <p className="text-[13.5px] text-[#6E727A] mt-1">{t("subtitleV5")}</p>
+        <p className="text-[13.5px] text-[#6E727A] mt-1">{estLevee ? t("subtitleV5") : t("subtitleDiligence")}</p>
       </div>
 
       {/* Résumé de la levée */}
@@ -240,31 +255,45 @@ export async function AccueilFondateur({
         <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-[#ECEBE6]">
           <div className="flex items-center gap-2.5">
             <span className="text-[14px] font-[700] text-[#1A1B1F]">
-              {t("currentRaise")} — {deal.name}
+              {(estLevee ? t("currentRaise") : t("roomTitle"))} — {deal.name}
             </span>
             <span className="font-mono text-[9px] font-[600] uppercase text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-2 py-[3px]">
               {t("active")}
             </span>
           </div>
           <Link href="/deal" className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
-            {t("openRaise")} →
+            {(estLevee ? t("openRaise") : t("openRoom"))} →
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          {/* Objectif de levée + soft-commitments (dummy en attendant) */}
+        <div className={"grid grid-cols-2 " + (estLevee ? "md:grid-cols-[1.4fr_1fr_1fr_1fr]" : "md:grid-cols-3")}>
+          {/* Objectif de levée + soft-commitments (RÉELS, depuis la levée) —
+              LEVÉE seulement : une diligence n'a ni montant cible ni engagés. */}
+          {estLevee && (
           <div className="px-[18px] py-4 border-r border-[#ECEBE6]">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("objective")}</div>
-            <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
-              {objectifTxt}
-            </div>
-            <span className="block h-[5px] rounded-[2px] bg-[#ECEBE6] overflow-hidden mt-[9px]">
-              <span className="block h-full bg-[#E85C2B]" style={{ width: `${softPct}%` }} />
-            </span>
-            <div className="text-[11px] text-[#6E727A] mt-1.5">
-              <span className="font-mono font-[600] text-[#C24619]">{softTxt}</span>{" "}
-              {t("softCommit", { pct: softPct })}
-            </div>
+            {objectifDefini ? (
+              <>
+                <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
+                  {objectifTxt}
+                </div>
+                <span className="block h-[5px] rounded-[2px] bg-[#ECEBE6] overflow-hidden mt-[9px]">
+                  <span className="block h-full bg-[#E85C2B]" style={{ width: `${softPct}%` }} />
+                </span>
+                <div className="text-[11px] text-[#6E727A] mt-1.5">
+                  <span className="font-mono font-[600] text-[#C24619]">{softTxt}</span>{" "}
+                  {t("softCommit", { pct: softPct })}
+                </div>
+              </>
+            ) : (
+              <Link href="/deal" className="block">
+                <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#C7C9CF]">
+                  {t("objectiveEmpty")}
+                </div>
+                <div className="text-[11px] font-[600] text-[#C24619] mt-2.5">{t("openRaise")} →</div>
+              </Link>
+            )}
           </div>
+          )}
           {/* Dossier prêt */}
           <Link href="/checklist" className="px-[18px] py-4 border-r border-[#ECEBE6] hover:bg-[#FAFAF8] transition-colors">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("readyTitle")}</div>
@@ -275,15 +304,29 @@ export async function AccueilFondateur({
               {t("readyMissing", { n: total - faites })} →
             </div>
           </Link>
-          {/* Investisseurs */}
-          <Link href="/deal" className="px-[18px] py-4 border-r border-[#ECEBE6] hover:bg-[#FAFAF8] transition-colors">
-            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("investors")}</div>
-            <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
-              {acceptes || 2}<span className="text-[#C7C9CF]">/{invitations.length || 3}</span>
-            </div>
-            <div className="text-[11px] text-[#8B8E96] mt-1.5">
-              {t("investorsPending", { n: enAttente || 1 })}
-            </div>
+          {/* Investisseurs (levée) / Personnes (diligence) — chiffres RÉELS :
+              acceptations / invitations. Plus de repli inventé. */}
+          <Link href={estLevee ? "/deal" : "/permissions"} className="px-[18px] py-4 border-r border-[#ECEBE6] hover:bg-[#FAFAF8] transition-colors">
+            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{estLevee ? t("investors") : t("people")}</div>
+            {estLevee ? (
+              <>
+                <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
+                  {acceptes}<span className="text-[#C7C9CF]">/{invitations.length}</span>
+                </div>
+                <div className="text-[11px] text-[#8B8E96] mt-1.5">
+                  {invitations.length === 0 ? t("noInvites") : t("investorsPending", { n: enAttente })}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
+                  {invitations.length}
+                </div>
+                <div className="text-[11px] text-[#8B8E96] mt-1.5">
+                  {t("peopleAccepted", { n: acceptes })}
+                </div>
+              </>
+            )}
           </Link>
           {/* Vues 7 jours */}
           <div className="px-[18px] py-4">

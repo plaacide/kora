@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { folderIndex } from "@/lib/folder-index";
 import { createFolder } from "@/app/actions/deals";
+import { setDocumentKey } from "@/app/actions/crud";
 import { Uploader } from "./Uploader";
 import type { FolderRow, DocRow } from "./DataRoom";
 
@@ -12,13 +13,10 @@ import type { FolderRow, DocRow } from "./DataRoom";
  * Contenu de la data room — nouvelle présentation, handoff app v5 §3b (onglet
  * Contenu).
  *
- * Table pleine largeur sans carte : Index · Nom · Type · Dernière MàJ · Visible
- * · actions. On navigue dans l'arborescence en cliquant un dossier ; un fil
- * d'Ariane ramène en arrière. L'upload et la création de dossier réutilisent
- * les mécanismes existants (Uploader, createFolder) — rien de perdu de ce côté.
- *
- * La colonne « Visible » est un interrupteur d'attente (dummy) : le masquage
- * par dossier se branchera sur les permissions.
+ * Table pleine largeur sans carte : Index · Nom · Type · Dernière MàJ. On
+ * navigue dans l'arborescence en cliquant un dossier ; un fil d'Ariane ramène
+ * en arrière. L'upload et la création de dossier réutilisent les mécanismes
+ * existants (Uploader, createFolder).
  */
 
 const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
@@ -29,14 +27,6 @@ function badge(name: string): { t: string; cls: string } {
   if (["xlsx", "xls", "csv"].includes(ext)) return { t: ext === "csv" ? "CSV" : "XLSX", cls: "bg-[#E4F3EC] text-[#147A5C]" };
   if (["doc", "docx"].includes(ext)) return { t: "DOCX", cls: "bg-[#EEF4FB] text-[#2C5F8A]" };
   return { t: (ext || "DOC").toUpperCase().slice(0, 4), cls: "bg-[#F1F0EB] text-[#6E727A]" };
-}
-
-function Toggle({ on }: { on: boolean }) {
-  return (
-    <span className={"inline-flex w-[30px] h-[17px] rounded-full relative " + (on ? "bg-[#1D9E75]" : "bg-[#DAD8D0]")}>
-      <span className={"absolute top-0.5 w-[13px] h-[13px] rounded-full bg-white " + (on ? "right-0.5" : "left-0.5")} />
-    </span>
-  );
 }
 
 export function RoomContenu({
@@ -84,6 +74,11 @@ export function RoomContenu({
 
   const dossierCourant = courant ? byId.get(courant) ?? null : null;
 
+  async function basculerCle(docId: string, actuel: boolean) {
+    const res = await setDocumentKey(docId, !actuel);
+    if (res.ok) router.refresh();
+  }
+
   async function ajouterDossier() {
     if (nom.trim().length < 2) return;
     setBusy(true);
@@ -104,13 +99,6 @@ export function RoomContenu({
     <div>
       {/* Barre d'outils */}
       <div className="flex justify-end gap-2.5 mb-3.5">
-        <span className="flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] cursor-pointer">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M3 6h18M6 12h12M10 18h4" /></svg>
-          Organiser
-        </span>
-        <span className="border border-[#E4E2DC] rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] cursor-pointer">
-          Demander des fichiers
-        </span>
         {canEdit && (
           <button onClick={() => setNouvDossier((v) => !v)} className="border border-[#E4E2DC] rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8]">
             Créer un dossier
@@ -158,12 +146,16 @@ export function RoomContenu({
       )}
 
       {/* En-tête de table */}
-      <div style={mono} className="grid grid-cols-[44px_1fr_90px_120px_70px_40px] gap-3 px-2 pb-2 border-b border-[#ECEBE6] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
-        <span>INDEX</span><span>NOM</span><span>TYPE</span><span>DERNIÈRE MÀJ</span><span>VISIBLE</span><span></span>
+      <div style={mono} className="grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 px-2 pb-2 border-b border-[#ECEBE6] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
+        <span>INDEX</span><span>NOM</span><span>TYPE</span><span>DERNIÈRE MÀJ</span><span className="text-center">CLÉ</span>
       </div>
 
       {sousDossiers.length === 0 && fichiers.length === 0 && (
-        <p className="text-[12.5px] text-[#9DA0A8] py-6 text-center">Ce dossier est vide.</p>
+        <p className="text-[12.5px] text-[#9DA0A8] py-6 text-center">
+          {courant
+            ? "Ce dossier est vide — déposez vos fichiers ci-dessous."
+            : "Créez un dossier, puis déposez-y vos documents."}
+        </p>
       )}
 
       {/* Dossiers */}
@@ -171,7 +163,7 @@ export function RoomContenu({
         <button
           key={f.id}
           onClick={() => setCourant(f.id)}
-          className="w-full grid grid-cols-[44px_1fr_90px_120px_70px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#F1F0EC] hover:bg-[#FAFAF8] text-left"
+          className="w-full grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#F1F0EC] hover:bg-[#FAFAF8] text-left"
         >
           <span style={mono} className="text-[11px] text-[#9DA0A8]">{folderIndex(f.index_path)}</span>
           <span className="flex items-center gap-[11px] min-w-0">
@@ -183,8 +175,7 @@ export function RoomContenu({
           </span>
           <span className="text-[12px] text-[#6E727A]">Dossier</span>
           <span className="text-[12px] text-[#9DA0A8]">—</span>
-          <span><Toggle on /></span>
-          <span className="text-[#A0A3AB] text-[16px] text-center">⋯</span>
+          <span />
         </button>
       ))}
 
@@ -192,7 +183,7 @@ export function RoomContenu({
       {fichiers.map((d) => {
         const b = badge(d.name);
         return (
-          <div key={d.id} className="grid grid-cols-[44px_1fr_90px_120px_70px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#F1F0EC] hover:bg-[#FAFAF8]">
+          <div key={d.id} className="grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#F1F0EC] hover:bg-[#FAFAF8]">
             <span style={mono} className="text-[11px] text-[#9DA0A8]">{folderIndex(d.index_path)}</span>
             <Link href={`/visionneuse?doc=${d.id}`} className="flex items-center gap-[11px] min-w-0">
               <span style={mono} className={"rounded-[4px] px-[5px] py-0.5 text-[8.5px] font-[600] shrink-0 " + b.cls}>{b.t}</span>
@@ -201,15 +192,31 @@ export function RoomContenu({
             </Link>
             <span className="text-[12px] text-[#6E727A]">{b.t}</span>
             <span className="text-[12px] text-[#9DA0A8]">{d.modified ?? "—"}</span>
-            <span><Toggle on /></span>
-            <span className="text-[#A0A3AB] text-[16px] text-center">⋯</span>
+            {canEdit ? (
+              <button
+                onClick={() => basculerCle(d.id, !!d.is_key)}
+                title={d.is_key ? "Retirer des documents clés" : "Marquer comme document clé"}
+                aria-label="Document clé"
+                className="justify-self-center"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill={d.is_key ? "#E8A33D" : "none"} stroke={d.is_key ? "#E8A33D" : "#C7C9CF"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
+                </svg>
+              </button>
+            ) : (
+              d.is_key ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#E8A33D" stroke="#E8A33D" strokeWidth="1.7" className="justify-self-center"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" /></svg>
+              ) : <span />
+            )}
           </div>
         );
       })}
 
-      {/* Upload dans le dossier courant (réutilise l'Uploader existant) */}
-      {canEdit && (
-        <div className="hidden">
+      {/* Zone de dépôt VISIBLE dans un dossier (glisser-déposer + clic). À la
+          racine on ne peut pas déposer : « Ajouter des contenus » y crée un
+          dossier. Le bouton du haut déclenche aussi ce même sélecteur. */}
+      {canEdit && courant && (
+        <div className="mt-3 rounded-[6px] border border-dashed border-[#D5D2CA] hover:border-[#C24619] transition-colors overflow-hidden">
           <Uploader
             ref={uploadRef}
             orgId={orgId}

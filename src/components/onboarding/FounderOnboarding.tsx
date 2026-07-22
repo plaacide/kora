@@ -42,8 +42,22 @@ function Select({
   );
 }
 
+const OBJECTIFS = [
+  {
+    key: "levee",
+    titre: "Lever des fonds",
+    sous: "Partager avec des investisseurs. Montant, préparation, qui regarde quoi.",
+  },
+  {
+    key: "diligence",
+    titre: "Due diligence / audit",
+    sous: "Partager avec une banque, un partenaire ou un auditeur. Sans montant ni levée.",
+  },
+] as const;
+
 export function FounderOnboarding() {
   const [step, setStep] = useState(1);
+  const [objectif, setObjectif] = useState("");
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
   const [sector, setSector] = useState("");
@@ -53,6 +67,9 @@ export function FounderOnboarding() {
   const [arr, setArr] = useState("");
   const [error, setError] = useState<string | undefined>();
   const [pending, start] = useTransition();
+
+  // La levée demande un second écran (montants) ; la diligence non.
+  const totalSteps = objectif === "diligence" ? 1 : 2;
 
   // Complétude de la FICHE, recalculée à chaque champ (miroir de `save_startup`).
   // À ne pas confondre avec le readiness du deal, qui mesure la checklist DD et
@@ -77,9 +94,15 @@ export function FounderOnboarding() {
         sector: sector || undefined,
         stage: stage || undefined,
         oneLiner: oneLiner.trim() || undefined,
+        objectif: objectif || undefined,
       });
       if (!res.ok) return setError(res.error);
       setError(undefined);
+      // Diligence : pas d'écran « levée », on termine directement.
+      if (objectif === "diligence") {
+        await completeOnboarding(name.trim() || "Ma startup");
+        return;
+      }
       setStep(2);
     });
   }
@@ -97,15 +120,42 @@ export function FounderOnboarding() {
 
   if (step === 1) {
     return (
-      <OnboardingShell step={1} total={2}>
+      <OnboardingShell step={1} total={totalSteps}>
         <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">Votre startup</h1>
         <p className="text-[12.5px] text-ink-secondary mt-1">
-          Ces informations composent votre fiche visible par les investisseurs.
+          Ces informations composent votre fiche visible par vos destinataires.
         </p>
 
         <PlainError message={error} />
 
-        <div className="mt-6 grid grid-cols-2 gap-3">
+        {/* Objectif de la data room : pilote l'écran et les données collectées. */}
+        <div className="mt-6">
+          <label className="text-[11.5px] font-medium text-ink-secondary">Pourquoi ouvrez-vous une data room&nbsp;?</label>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            {OBJECTIFS.map((o) => {
+              const actif = objectif === o.key;
+              return (
+                <button
+                  key={o.key}
+                  type="button"
+                  onClick={() => setObjectif(o.key)}
+                  className={cn(
+                    "text-left rounded-[10px] border p-3 transition-colors",
+                    actif ? "border-accent bg-accent/5 ring-1 ring-accent" : "border-line bg-surface hover:border-ink-muted",
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] font-[650] text-ink">{o.titre}</span>
+                    <span className={cn("w-3.5 h-3.5 rounded-full border flex-none", actif ? "border-accent bg-accent" : "border-line")} />
+                  </div>
+                  <p className="text-[11px] text-ink-muted mt-1 leading-snug">{o.sous}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3">
           <Input label="Nom de la startup" value={name} onChange={(e) => setName(e.target.value)} placeholder="Kalyx Foods" />
           <Select label="Pays" value={country} onChange={setCountry} options={COUNTRIES} />
           <Select label="Secteur" value={sector} onChange={setSector} options={SECTORS} />
@@ -124,8 +174,8 @@ export function FounderOnboarding() {
         </div>
 
         <div className="mt-8 flex justify-end">
-          <Button variant="primary" onClick={next1} loading={pending} disabled={name.trim().length < 2}>
-            Continuer →
+          <Button variant="primary" onClick={next1} loading={pending} disabled={name.trim().length < 2 || !objectif}>
+            {objectif === "diligence" ? "Terminer" : "Continuer →"}
           </Button>
         </div>
       </OnboardingShell>

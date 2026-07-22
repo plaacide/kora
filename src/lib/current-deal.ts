@@ -9,6 +9,10 @@ export interface DealRef {
   org_id: string;
   type: string | null;
   readiness_score: number | null;
+  /** 'levee' | 'diligence' — pilote l'écran de la salle. */
+  objectif: string;
+  /** Horodatage d'archivage, null si la salle est active. */
+  archived_at: string | null;
 }
 
 /**
@@ -25,20 +29,39 @@ export interface DealRef {
 export async function getCurrentDeal(
   supabase: SupabaseClient,
 ): Promise<{ deal: DealRef | null; deals: DealRef[] }> {
-  const { data } = await supabase
+  const primary = await supabase
     .from("deals")
-    .select("id, name, org_id, type, readiness_score")
+    .select("id, name, org_id, type, readiness_score, objectif, archived_at")
     .order("created_at", { ascending: false });
 
-  const deals = (data ?? []) as DealRef[];
+  // Repli si `archived_at` n'existe pas encore (migration non appliquée) : ce
+  // helper est appelé sur CHAQUE page — il ne doit jamais casser l'app.
+  let rows = primary.data as Array<Record<string, unknown>> | null;
+  if (primary.error) {
+    const repli = await supabase
+      .from("deals")
+      .select("id, name, org_id, type, readiness_score, objectif")
+      .order("created_at", { ascending: false });
+    rows = repli.data as Array<Record<string, unknown>> | null;
+  }
+
+  const deals = ((rows ?? []) as Array<Partial<DealRef>>).map((d) => ({
+    ...d,
+    objectif: d.objectif ?? "levee",
+    archived_at: d.archived_at ?? null,
+  })) as DealRef[];
   if (deals.length === 0) return { deal: null, deals };
 
   const store = await cookies();
   const wanted = store.get(DEAL_COOKIE)?.value;
 
-  // Revalidation : si le cookie pointe vers un deal auquel l'utilisateur n'a
-  // pas accès (ou qui n'existe plus), on retombe sur le plus récent.
-  const deal = deals.find((d) => d.id === wanted) ?? deals[0];
+  // Le cookie prime s'il pointe vers une salle visible (l'utilisateur a pu
+  // ouvrir une salle archivée exprès). Sinon on retombe sur la salle active la
+  // plus récente — archiver la salle courante la sort donc du flux.
+  const deal =
+    deals.find((d) => d.id === wanted) ??
+    deals.find((d) => !d.archived_at) ??
+    deals[0];
   return { deal, deals };
 }
 

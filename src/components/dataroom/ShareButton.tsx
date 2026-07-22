@@ -24,16 +24,19 @@ export function ShareButton({
   dealId,
   label = "Partager",
   className,
+  defaultNda = true,
 }: {
   dealId: string;
   label?: string;
   className?: string;
+  /** État initial de « exiger un NDA » — reprend le réglage de la data room. */
+  defaultNda?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [level, setLevel] = useState<Level>("watermark");
-  const [nda, setNda] = useState(true);
+  const [nda, setNda] = useState(defaultNda);
   const [expire, setExpire] = useState("");
   const [busy, setBusy] = useState(false);
   const [erreur, setErreur] = useState<string | undefined>();

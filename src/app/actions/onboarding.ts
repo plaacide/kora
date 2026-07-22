@@ -27,7 +27,7 @@ export async function saveInvestorProfile(input: {
   return { ok: true };
 }
 
-/** Fondateur : fiche startup + levée (upsert progressif). */
+/** Fondateur : fiche startup + objectif + levée (upsert progressif). */
 export async function saveStartup(input: {
   name?: string;
   country?: string;
@@ -36,6 +36,8 @@ export async function saveStartup(input: {
   oneLiner?: string;
   amount?: number | null;
   arr?: number | null;
+  /** 'levee' | 'diligence' — pilote l'écran et les données collectées. */
+  objectif?: string;
 }): Promise<Result> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("save_startup", {
@@ -46,6 +48,7 @@ export async function saveStartup(input: {
     p_one_liner: input.oneLiner ?? null,
     p_amount: input.amount ?? null,
     p_arr: input.arr ?? null,
+    p_objectif: input.objectif ?? null,
   });
   if (error) return { ok: false, error: error.message };
   return { ok: true };

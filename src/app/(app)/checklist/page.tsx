@@ -136,14 +136,9 @@ export default async function ChecklistPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
-          {t("title")}{" "}<InfoTooltip text={tt("checklist")} />
-        </h1>
-        <p className="text-[12.5px] text-ink-secondary mt-0.5">
-          {deal.name} · {t("subtitle")}
-        </p>
-      </div>
+      <p className="text-[12.5px] text-[#6E727A] flex items-center gap-1.5">
+        {t("subtitle")} <InfoTooltip text={tt("checklist")} />
+      </p>
 
       <Checklist
         key={deal.id}

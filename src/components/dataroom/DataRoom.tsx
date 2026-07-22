@@ -49,6 +49,8 @@ export interface DocRow {
   modified: string | null;
   views: number;
   permission: Level;
+  /** Marqué « document clé » (étoile). */
+  is_key?: boolean;
 }
 
 export interface AccessRow {

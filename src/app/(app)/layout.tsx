@@ -80,6 +80,24 @@ export default async function AppLayout({
     role,
   );
 
+  // Comptes réels des onglets de la salle (équipe interne seulement) : invités
+  // ayant accès, exigences restantes, questions ouvertes. Requêtes `head`
+  // (compte seul) et tolérantes — un compte manquant masque juste la pastille.
+  const interne = persona === "founder" || persona === "fund";
+  let roomCounts: { permissions?: number; checklist?: number; qa?: number } | undefined;
+  if (interne && deal) {
+    const [perm, chk, qa] = await Promise.all([
+      supabase.from("invitations").select("id", { count: "exact", head: true }).eq("deal_id", deal.id).eq("status", "accepted"),
+      supabase.from("checklist_items").select("id", { count: "exact", head: true }).eq("deal_id", deal.id).neq("status", "done"),
+      supabase.from("qa_questions").select("id", { count: "exact", head: true }).eq("deal_id", deal.id).neq("answer_status", "published"),
+    ]);
+    roomCounts = {
+      permissions: perm.count ?? undefined,
+      checklist: chk.count ?? undefined,
+      qa: qa.count ?? undefined,
+    };
+  }
+
   return (
     <AppShell
       orgName={orgName}
@@ -88,6 +106,7 @@ export default async function AppLayout({
       currentDealId={deal?.id ?? null}
       role={role}
       persona={persona}
+      roomCounts={roomCounts}
     >
       {/* Le verrouillage est brutal — plus rien n'est accessible. Il ne doit
           donc jamais surprendre : on prévient la dernière semaine, et le

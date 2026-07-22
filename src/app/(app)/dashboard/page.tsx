@@ -12,6 +12,7 @@ import { Mono } from "@/components/ui/Table";
 import { Sparkline } from "@/components/dashboard/Sparkline";
 import { DealsTable, type DealRow } from "@/components/dashboard/DealsTable";
 import { NewDealButton } from "@/components/dataroom/NewDealButton";
+import { NewDataRoomButton } from "@/components/dataroom/RoomsList";
 import { formatAmount, formatDate } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
 
@@ -62,16 +63,34 @@ export default async function DashboardPage() {
     roleCourant,
   );
 
-  if (persona === "founder" && dealCourant && user) {
+  if (persona === "founder") {
+    const prenom = (profile?.full_name ?? user?.email ?? "").split(/[\s@]/)[0] || "—";
+    if (dealCourant && user) {
+      return (
+        <AccueilFondateur supabase={supabase} deal={dealCourant} prenom={prenom} userId={user.id} />
+      );
+    }
+    // Fondateur SANS data room : accueil de bienvenue avec le bon flux de
+    // création (pas le tableau de bord des fonds, ni un « Nouveau deal » VC/XOF).
     return (
-      <AccueilFondateur
-        supabase={supabase}
-        deal={dealCourant}
-        prenom={
-          (profile?.full_name ?? user.email ?? "").split(/[\s@]/)[0] || "—"
-        }
-        userId={user.id}
-      />
+      <div className="flex flex-col gap-6 text-[#1A1B1F]">
+        <div>
+          <h1 className="font-display text-[27px] font-[700] tracking-[-0.02em]">Bonjour, {prenom}</h1>
+          <p className="text-[13.5px] text-[#6E727A] mt-1">Créez votre première data room pour démarrer.</p>
+        </div>
+        <div className="border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center max-w-2xl">
+          <span className="mx-auto grid place-items-center w-12 h-12 rounded-[8px] bg-[#FBEDE6] text-[#C24619] mb-4">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
+          </span>
+          <h2 className="text-[15px] font-[700]">Aucune data room pour l&apos;instant</h2>
+          <p className="text-[12.5px] text-[#6E727A] mt-1.5 mb-5 max-w-md mx-auto leading-relaxed">
+            Une data room regroupe vos documents, votre levée et les accès de vos investisseurs. Créez-en une pour commencer — avec le modèle OHADA/UEMOA ou de zéro.
+          </p>
+          <div className="flex justify-center">
+            <NewDataRoomButton label="Créer ma data room" />
+          </div>
+        </div>
+      </div>
     );
   }
 

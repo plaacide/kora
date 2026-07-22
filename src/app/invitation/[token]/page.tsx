@@ -23,6 +23,7 @@ export default async function InvitationPage({
     deal_name: string;
     org_name: string;
     nda_required: boolean;
+    nda_template: string | null;
     valid: boolean;
   }> | null)?.[0];
 
@@ -101,6 +102,7 @@ export default async function InvitationPage({
       dealName={invite.deal_name}
       orgName={invite.org_name}
       ndaRequired={invite.nda_required}
+      ndaTemplate={invite.nda_template}
     />,
   );
 }

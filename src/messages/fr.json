@@ -168,6 +168,7 @@
       "nav": {
         "dashboard": "Accueil",
         "dealSheet": "Ma levée",
+        "dealSheetDiligence": "Ma data room",
         "dataRoom": "Data room",
         "viewer": "Lecture",
         "checklist": "Pièces à fournir",
@@ -308,7 +309,18 @@
       "checklist_item_deleted": "Exigence supprimée",
       "document_thumbnail_viewed": "Aperçu consulté",
       "checklist_document_unlinked": "Justificatif retiré",
-      "permission_extended": "Accès prolongé"
+      "permission_extended": "Accès prolongé",
+      "raise_updated": "Levée modifiée",
+      "raise_investor_saved": "Investisseur suivi",
+      "raise_investor_deleted": "Investisseur retiré",
+      "raise_closed": "Levée clôturée",
+      "raise_opened": "Nouvelle levée ouverte",
+      "raise_added_past": "Tour passé ajouté",
+      "raise_deleted": "Tour supprimé",
+      "deal_archived": "Data room archivée",
+      "deal_unarchived": "Data room désarchivée",
+      "deal_nda_updated": "Réglage NDA modifié",
+      "document_key_set": "Document clé"
     },
     "entries": "entrées",
     "export": "Exporter"
@@ -473,7 +485,8 @@
     "colFolders": "Dossiers",
     "colLastVisit": "Dernière visite",
     "noGuests": "Aucun invité pour l'instant.",
-    "revoke": "Révoquer"
+    "revoke": "Révoquer",
+    "revokeConfirm": "Révoquer l’accès de {name} ? Cette personne ne pourra plus ouvrir vos documents."
   },
   "viewer": {
     "title": "Visionneuse",
@@ -856,6 +869,12 @@
     "topDocs": "Documents les plus regardés",
     "topReaders": "Qui a regardé le plus",
     "docsCountShort": "{n} doc(s)",
-    "softCommit": "engagés en soft-commitments · {pct} %"
+    "softCommit": "engagés en soft-commitments · {pct} %",
+    "roomTitle": "Data room en cours",
+    "openRoom": "Ouvrir la data room",
+    "people": "Personnes",
+    "peopleAccepted": "{n} avec accès validé",
+    "subtitleDiligence": "Voici l'état de votre dossier et qui consulte vos documents.",
+    "noInvites": "aucun investisseur invité"
   }
 }
