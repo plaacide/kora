@@ -7,7 +7,6 @@ import { navFor } from "./nav";
 import type { Persona } from "@/lib/persona";
 import { usePersonaLabel } from "./persona-label";
 import { NavIcon } from "./NavIcon";
-import { DealSwitcher } from "./DealSwitcher";
 import type { DealRef } from "@/lib/current-deal";
 import { cn } from "@/lib/cn";
 
@@ -34,17 +33,16 @@ export function Sidebar({
       aria-label={t("mainNav")}
       className="w-[226px] shrink-0 h-[calc(100vh-56px)] sticky top-[56px] overflow-y-auto border-r border-[#ECEBE6] bg-[#FAFAF8] px-3 pt-4 pb-5"
     >
-      {navFor(role, persona).map((group) => (
+      {navFor(role, persona).map((group) => {
+        // Handoff : pas d'en-tête sur les destinations principales (Accueil,
+        // Data room, Ma levée) — elles se listent directement, comme la
+        // maquette. Seuls les groupes « annexes » (compte, cohorte) gardent un
+        // libellé. Le sélecteur de deal disparaît aussi : une seule levée, et
+        // l'organisation vit désormais dans la topbar.
+        const avecLibelle = group.key !== "overview" && group.key !== "deal";
+        return (
         <div key={group.key} className="mb-3.5">
-          {/* Le groupe « Deal » porte le sélecteur : c'est lui qui décide quel
-              deal tous les écrans en dessous affichent. */}
-          {group.key === "deal" ? (
-            <DealSwitcher
-              deals={deals}
-              currentId={currentDealId}
-              persona={persona}
-            />
-          ) : (
+          {avecLibelle && (
             <div className="px-2.5 pb-1.5 pt-1 font-mono text-[9.5px] font-[600] uppercase tracking-[0.1em] text-[#B0B2B9]">
               {label(group.key, "groups")}
             </div>
@@ -73,7 +71,8 @@ export function Sidebar({
             })}
           </ul>
         </div>
-      ))}
+        );
+      })}
     </nav>
   );
 }
