@@ -30,7 +30,7 @@ export function DealSwitcher({
 
   if (deals.length === 0) {
     return (
-      <div className="px-2.5 pb-1.5 text-[10px] font-bold uppercase tracking-[0.07em] text-[#6f7488]">
+      <div className="px-2.5 pb-1.5 pt-1 font-mono text-[9.5px] font-[600] uppercase tracking-[0.1em] text-[#B0B2B9]">
         {groupe("dealEmpty")}
       </div>
     );
@@ -40,7 +40,7 @@ export function DealSwitcher({
     <div className="px-1.5 pb-1.5">
       <label
         htmlFor="deal-switcher"
-        className="block px-1 pb-1 text-[10px] font-bold uppercase tracking-[0.07em] text-[#6f7488]"
+        className="block px-1 pb-1 font-mono text-[9.5px] font-[600] uppercase tracking-[0.1em] text-[#B0B2B9]"
       >
         {groupe("deal")}
       </label>
@@ -55,7 +55,7 @@ export function DealSwitcher({
             router.refresh();
           });
         }}
-        className="w-full h-7 pl-1.5 pr-5 text-[12px] font-semibold text-white bg-encre-2 border border-[#33374d] rounded-btn cursor-pointer focus:outline-none focus-visible:outline-2 focus-visible:outline-accent"
+        className="w-full h-8 pl-2 pr-5 text-[12.5px] font-[600] text-[#1A1B1F] bg-white border border-[#E4E2DC] rounded-[5px] cursor-pointer focus:outline-none focus-visible:outline-2 focus-visible:outline-accent"
       >
         {deals.map((d) => (
           <option key={d.id} value={d.id}>

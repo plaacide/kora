@@ -32,10 +32,10 @@ export function Sidebar({
   return (
     <nav
       aria-label={t("mainNav")}
-      className="w-[204px] shrink-0 h-[calc(100vh-52px)] sticky top-[52px] overflow-y-auto border-r border-[#22263c] bg-encre px-2.5 pt-3.5 pb-8"
+      className="w-[226px] shrink-0 h-[calc(100vh-56px)] sticky top-[56px] overflow-y-auto border-r border-[#ECEBE6] bg-[#FAFAF8] px-3 pt-4 pb-5"
     >
       {navFor(role, persona).map((group) => (
-        <div key={group.key} className="mb-4">
+        <div key={group.key} className="mb-3.5">
           {/* Le groupe « Deal » porte le sélecteur : c'est lui qui décide quel
               deal tous les écrans en dessous affichent. */}
           {group.key === "deal" ? (
@@ -45,7 +45,7 @@ export function Sidebar({
               persona={persona}
             />
           ) : (
-            <div className="px-2.5 pb-1.5 text-[10px] font-bold uppercase tracking-[0.07em] text-[#6f7488]">
+            <div className="px-2.5 pb-1.5 pt-1 font-mono text-[9.5px] font-[600] uppercase tracking-[0.1em] text-[#B0B2B9]">
               {label(group.key, "groups")}
             </div>
           )}
@@ -59,10 +59,10 @@ export function Sidebar({
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex items-center gap-2.5 rounded-btn px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
+                      "flex items-center gap-[11px] rounded-[5px] px-2.5 py-2 text-[13.5px] transition-colors",
                       active
-                        ? "bg-[rgba(232,92,43,0.14)] text-vibration-soft"
-                        : "text-[#b8bcca] hover:bg-encre-2 hover:text-white",
+                        ? "bg-[#FBEDE6] text-[#C24619] font-[600]"
+                        : "text-[#55585F] font-medium hover:bg-[#F1F0EB] hover:text-[#1A1B1F]",
                     )}
                   >
                     <NavIcon name={item.key} />

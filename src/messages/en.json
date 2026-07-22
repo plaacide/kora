@@ -194,7 +194,8 @@
         "nda": "Signed agreement"
       },
       "searchPlaceholder": "Search a document…"
-    }
+    },
+    "share": "Share"
   },
   "dashboard": {
     "greeting": "Hello, {name}",

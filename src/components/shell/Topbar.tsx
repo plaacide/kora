@@ -14,6 +14,13 @@ function initials(email: string): string {
   return letters.toUpperCase() || "??";
 }
 
+/** Sigle d'une organisation : initiales des deux premiers mots (Sulma Whole → SW). */
+function orgInitials(name: string): string {
+  const mots = name.trim().split(/\s+/).filter(Boolean);
+  const letters = (mots[0]?.[0] ?? "") + (mots[1]?.[0] ?? mots[0]?.[1] ?? "");
+  return letters.toUpperCase() || "??";
+}
+
 export async function Topbar({
   orgName,
   userEmail,
@@ -28,28 +35,54 @@ export async function Topbar({
   const mot = personaLabel(t, persona);
 
   return (
-    <header className="sticky top-0 z-[60] flex items-center gap-2.5 h-[52px] px-4 bg-[rgba(255,255,255,0.92)] backdrop-blur-md border-b border-line">
-      <div className="flex items-center gap-2 pr-3.5 border-r border-line">
-        <Link href="/dashboard" aria-label={t("home")}>
-          <SanzaLogo size={19} />
-        </Link>
-        <span className="text-[11px] font-[550] text-ink-secondary bg-chip-neutral-bg rounded-chip px-1.5 py-0.5">
+    <header className="sticky top-0 z-[60] flex items-center gap-4 h-[56px] px-5 bg-white border-b border-[#ECEBE6]">
+      <Link href="/dashboard" aria-label={t("home")}>
+        <SanzaLogo size={20} />
+      </Link>
+      <span className="w-px h-[22px] bg-[#ECEBE6]" aria-hidden />
+
+      {/* Sélecteur d'organisation — badge carré-arrondi + nom + chevron. */}
+      <Link
+        href="/deal"
+        className="flex items-center gap-2.5 rounded-[5px] px-2.5 py-1.5 -ml-0.5 hover:bg-[#F5F4F0] transition-colors"
+      >
+        <span className="grid place-items-center w-6 h-6 rounded-[5px] bg-[#FBEDE6] text-[#C24619] text-[9.5px] font-[700]">
+          {orgInitials(orgName)}
+        </span>
+        <span className="text-[13.5px] font-[600] text-ink truncate max-w-[160px]">
           {orgName}
         </span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A0A3AB" strokeWidth="2" strokeLinecap="round" aria-hidden>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </Link>
+
+      <div className="flex items-center gap-2.5 w-[300px] h-9 px-3 rounded-[5px] bg-[#F5F4F0] text-[#A0A3AB]">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+          <circle cx="11" cy="11" r="7" />
+          <path d="M21 21l-4.3-4.3" />
+        </svg>
+        <span className="text-[13px] truncate">{mot("searchPlaceholder")}</span>
+        <kbd className="ml-auto font-mono text-[10px] text-[#9DA0A8]">⌘K</kbd>
       </div>
 
-      <div className="flex items-center gap-2 w-[260px] h-8 px-2.5 border border-line rounded-field bg-surface text-ink-placeholder">
-        <span className="text-[12.5px]">{mot("searchPlaceholder")}</span>
-        <kbd className="ml-auto font-mono text-[10.5px] font-medium bg-chip-neutral-bg rounded-[4px] px-1.5 py-0.5 text-ink-secondary">
-          ⌘K
-        </kbd>
-      </div>
-
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-4">
         <EncryptionBadge />
+        {/* Partager = ouvrir le flux d'invitation (donner accès). */}
+        <Link
+          href="/invitations"
+          className="sz-cta text-[13px] px-4 py-2 gap-2 inline-flex items-center"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" />
+            <path d="M16 6l-4-4-4 4" />
+            <path d="M12 2v13" />
+          </svg>
+          {t("share")}
+        </Link>
         <LocaleSwitcher />
         <span
-          className="grid place-items-center w-[30px] h-[30px] rounded-full bg-encre text-white text-[11.5px] font-[650]"
+          className="grid place-items-center w-[31px] h-[31px] rounded-[6px] bg-[#1A1B1F] text-white text-[11px] font-[700]"
           title={userEmail}
         >
           {initials(userEmail)}
