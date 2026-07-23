@@ -197,9 +197,13 @@
   animation: fade-in 0.25s ease-out both;
 }
 
-/* Entrée de contenu : léger fondu vers le haut. */
+/* Entrée de contenu (appliquée à TOUTE la page à chaque navigation) : fondu
+   d'opacité SEULEMENT. Un `translateY` faisait glisser tout l'écran de 6 px à
+   chaque changement d'écran — ça se lisait comme des composants mal fixés. Un
+   transform ici crée en plus un bloc conteneur qui piège les `position: fixed`
+   des enfants (le voile des modals n'occupait que la zone de contenu). */
 .animate-in {
-  animation: fade-in-up 0.3s ease-out both;
+  animation: fade-in 0.18s ease-out both;
 }
 
 /* Ouverture de modale/popover. */
