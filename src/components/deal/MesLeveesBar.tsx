@@ -51,7 +51,10 @@ export function MesLeveesBar({
           className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F] disabled:opacity-50"
         />
       </div>
-      {levees.length <= 1 ? null : (
+      {/* Les puces s'affichent dès UNE levée : sinon, en basculant sur une data
+          room sans levée, la levée existante devenait invisible — on croyait
+          l'avoir perdue. */}
+      {levees.length === 0 ? null : (
         <div className="flex gap-2 flex-wrap">
           {levees.map((l) => {
             const actif = l.dealId === currentDealId;

@@ -183,9 +183,10 @@ function NewRoomModal({ onClose, fixedObjectif }: { onClose: () => void; fixedOb
     start(async () => {
       const res = await createDataRoom({ name: name.trim(), objectif, template });
       if (!res.ok) return setError(res.error);
-      // Une levée → on arrive sur « Ma levée » avec le formulaire ouvert à
-      // remplir ; une diligence → directement le contenu de la data room.
-      router.push(objectif === "levee" ? "/deal?configurer=1" : "/data-room");
+      // Une data room n'a PAS de levée : on atterrit sur son contenu, pas sur
+      // l'écran levée (qui montrerait « aucune levée » et donnerait l'illusion
+      // que la levée existante a disparu). La levée s'ouvre ensuite à part.
+      router.push("/data-room");
     });
   }
 
