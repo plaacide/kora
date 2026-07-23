@@ -77,6 +77,36 @@ export async function deleteRaiseInvestor(id: string): Promise<Result> {
   return { ok: true };
 }
 
+/** Ouvre une NOUVELLE levée (nom propre) attachée à une data room. */
+export async function createRaise(dealId: string, name?: string): Promise<Result & { id?: string }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("create_raise", { p_deal: dealId, p_name: name ?? null });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/deal");
+  revalidatePath("/espaces");
+  revalidatePath("/dashboard");
+  return { ok: true, id: (data as { id?: string } | null)?.id };
+}
+
+/** Rattache une levée à une AUTRE data room (même organisation). */
+export async function setRaiseDeal(raiseId: string, dealId: string): Promise<Result> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_raise_deal", { p_raise: raiseId, p_deal: dealId });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/deal");
+  revalidatePath("/espaces");
+  return { ok: true };
+}
+
+/** Renomme une levée. */
+export async function setRaiseName(raiseId: string, name: string): Promise<Result> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_raise_name", { p_raise: raiseId, p_name: name });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/deal");
+  return { ok: true };
+}
+
 /** Clôture la levée en cours (elle passe en historique). */
 export async function closeRaise(dealId: string): Promise<Result> {
   const supabase = await createClient();

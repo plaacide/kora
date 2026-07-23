@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal } from "@/lib/current-deal";
 import { MaLevee } from "@/components/deal/MaLevee";
+import { MesLeveesBar, type LeveeChip } from "@/components/deal/MesLeveesBar";
 import { NewDataRoomButton } from "@/components/dataroom/RoomsList";
 import type { Raise, RaiseInvestor } from "@/lib/raise";
 
@@ -18,7 +19,8 @@ export default async function DealPage() {
   const supabase = await createClient();
   await requireInternal(supabase);
 
-  const { deal } = await getCurrentDeal(supabase);
+  const { deal, deals } = await getCurrentDeal(supabase);
+  const dataRooms = deals.map((d) => ({ id: d.id, name: d.name }));
   if (!deal) {
     return (
       <div className="flex flex-col gap-5 max-w-2xl text-[#1A1B1F]">
@@ -27,12 +29,12 @@ export default async function DealPage() {
           <span className="mx-auto grid place-items-center w-12 h-12 rounded-[8px] bg-[#FBEDE6] text-[#C24619] mb-4">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" /></svg>
           </span>
-          <h2 className="text-[15px] font-[700]">Vous n&apos;avez pas encore de levée</h2>
+          <h2 className="text-[15px] font-[700]">Aucune data room</h2>
           <p className="text-[12.5px] text-[#6E727A] mt-1.5 mb-5 max-w-md mx-auto leading-relaxed">
-            Créez votre levée pour renseigner votre montant recherché, votre audience et votre pipeline d&apos;investisseurs. Ses documents vivront dans sa data room.
+            Une levée s&apos;attache à une data room (ses documents). Créez d&apos;abord une data room — vous y ouvrirez une levée ensuite.
           </p>
           <div className="flex justify-center">
-            <NewDataRoomButton label="Créer ma levée" fixedObjectif="levee" />
+            <NewDataRoomButton label="Créer une data room" />
           </div>
         </div>
       </div>
@@ -52,7 +54,7 @@ export default async function DealPage() {
       supabase
         .from("raises")
         .select(
-          "id, montant_cible, montant_engage, devise, type_tour, stade, valorisation_pre, date_cloture, audience, description, statut, indicateurs",
+          "id, name, montant_cible, montant_engage, devise, type_tour, stade, valorisation_pre, date_cloture, audience, description, statut, indicateurs",
         )
         .eq("deal_id", deal.id)
         .order("created_at", { ascending: false }),
@@ -129,8 +131,25 @@ export default async function DealPage() {
   const etoiles = tousDocs.filter((d) => d.is_key);
   const keyDocs = (etoiles.length > 0 ? etoiles : [...tousDocs].sort((a, b) => b.vues - a.vues)).slice(0, 5);
 
+  // « Mes levées » : toutes les levées actives (une par data room). Sert la
+  // barre de bascule + « + Nouvelle levée » (data rooms sans levée).
+  const { data: activeRaises } = await supabase
+    .from("raises")
+    .select("id, name, deal_id")
+    .eq("statut", "en_cours")
+    .in("deal_id", deals.map((d) => d.id));
+  const nomDeal = new Map(deals.map((d) => [d.id, d.name]));
+  const avecLevee = new Set<string>();
+  const levees: LeveeChip[] = ((activeRaises ?? []) as { id: string; name: string | null; deal_id: string }[]).map((r) => {
+    avecLevee.add(r.deal_id);
+    return { id: r.id, name: r.name || nomDeal.get(r.deal_id) || "Levée", dealId: r.deal_id, dealName: nomDeal.get(r.deal_id) ?? "" };
+  });
+  const roomsSansLevee = deals.filter((d) => !avecLevee.has(d.id)).map((d) => ({ id: d.id, name: d.name }));
+
   return (
-    <MaLevee
+    <>
+      <MesLeveesBar levees={levees} currentDealId={deal.id} roomsSansLevee={roomsSansLevee} />
+      <MaLevee
       dealName={deal.name}
       dealId={deal.id}
       readiness={deal.readiness_score ?? 0}
@@ -142,6 +161,9 @@ export default async function DealPage() {
       team={team}
       keyDocs={keyDocs}
       ndaDefault={ndaDefault}
-    />
+      dataRooms={dataRooms}
+      roomsSansLevee={roomsSansLevee}
+      />
+    </>
   );
 }

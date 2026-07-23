@@ -4,6 +4,8 @@ import { Fragment, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ShareButton } from "@/components/dataroom/ShareButton";
+import { OuvrirLeveeButton } from "@/components/deal/OuvrirLeveeButton";
+import { ChangerDataRoomButton } from "@/components/deal/ChangerDataRoomButton";
 import { Modal } from "@/components/ui/Modal";
 import {
   saveRaise,
@@ -11,9 +13,9 @@ import {
   deleteRaiseInvestor,
   saveRaiseIndicators,
   closeRaise,
-  openRaise,
   addPastRaise,
   deleteRaise,
+  setRaiseName,
 } from "@/app/actions/raises";
 import {
   type Raise,
@@ -143,6 +145,8 @@ export function MaLevee({
   team = [],
   keyDocs = [],
   ndaDefault = true,
+  dataRooms = [],
+  roomsSansLevee = [],
 }: {
   dealName: string;
   dealId: string;
@@ -156,6 +160,10 @@ export function MaLevee({
   keyDocs?: { id: string; name: string; type: string; vues: number }[];
   /** Réglage NDA de la data room — défaut du bouton Partager. */
   ndaDefault?: boolean;
+  /** Data rooms de l'org (pour « Ouvrir une levée » → choix de la data room). */
+  dataRooms?: { id: string; name: string }[];
+  /** Data rooms sans levée active (pour « Changer la data room »). */
+  roomsSansLevee?: { id: string; name: string }[];
 }) {
   // ----- Diligence : pilotage sans levée -----
   if (objectif === "diligence") {
@@ -188,7 +196,7 @@ export function MaLevee({
       {/* En-tête */}
       <div className="flex items-start justify-between gap-5 mb-4">
         <div>
-          <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">Ma levée</h1>
+          <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{raise?.name || "Ma levée"}</h1>
           <p className="text-[13.5px] text-[#6E727A] mt-1">
             Le pilotage de votre tour de table : montant, échéance, audience et data room.
           </p>
@@ -205,9 +213,11 @@ export function MaLevee({
       {!raise ? (
         /* Aucune levée en cours (le fondateur a clôturé sans rouvrir). */
         <div className="border border-dashed border-[#D5D2CA] rounded-[6px] px-5 py-8 mb-7 text-center">
-          <p className="text-[13px] font-[600] text-[#1A1B1F]">Aucune levée en cours</p>
-          <p className="text-[12px] text-[#9DA0A8] mt-1 mb-4">Ouvrez un nouveau tour pour renseigner montant, audience et indicateurs.</p>
-          <OpenRaiseButton dealId={dealId} hasCurrent={false} label="Ouvrir une nouvelle levée" className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />
+          <p className="text-[13px] font-[600] text-[#1A1B1F]">Aucune levée sur cette data room</p>
+          <p className="text-[12px] text-[#9DA0A8] mt-1 mb-4">Ouvrez une levée pour renseigner montant, audience et indicateurs.</p>
+          <div className="flex justify-center">
+            <OuvrirLeveeButton deals={dataRooms} defaultDealId={dealId} label="Ouvrir une levée" className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />
+          </div>
         </div>
       ) : (
       <>
@@ -372,7 +382,10 @@ export function MaLevee({
       <PipelineInvestisseurs dealId={dealId} devise={devise} investors={investors} />
 
       {/* Data room attachée — RÉELLE */}
-      <h2 className="text-[15px] font-[700] tracking-[-0.01em] mb-2">Data room attachée</h2>
+      <div className="flex items-baseline justify-between mb-2">
+        <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Data room attachée</h2>
+        {raise?.id && <ChangerDataRoomButton raiseId={raise.id} rooms={roomsSansLevee} />}
+      </div>
       <PreparationCard dealName={dealName} readiness={readiness} missing={missing} legende="rattachée à cette levée" />
     </div>
   );
@@ -773,12 +786,9 @@ function RaiseChips({
           <span style={mono} className="text-[11px] text-[#9DA0A8]">{formatMoney(r.montant_cible, r.devise)}</span>
         </span>
       ))}
-      <OpenRaiseButton
-        dealId={dealId}
-        hasCurrent={!!raise}
-        label="+ Nouvelle levée"
-        className="flex items-center border border-dashed border-[#D5D2CA] rounded-[5px] px-3.5 py-2.5 text-[13px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619] whitespace-nowrap"
-      />
+      {/* « + Nouvelle levée » vit dans « Mes levées » (barre du haut) : on ouvre
+          une levée sur une data room qui n'en a pas encore. Une data room a une
+          seule levée active. Ici on garde juste l'ajout d'un tour passé. */}
       <AddPastRaiseButton dealId={dealId} />
     </div>
   );
@@ -914,77 +924,6 @@ function DeleteRoundButton({ id }: { id: string }) {
   );
 }
 
-/**
- * Ouvre un nouveau tour. S'il y a déjà une levée en cours, une POPUP demande
- * d'abord si on la clôture (elle rejoint l'historique) avant d'ouvrir. Sinon,
- * ouverture directe. La base refuse d'ouvrir tant qu'un tour est ouvert : on
- * clôture donc explicitement dans la popup, puis on ouvre.
- */
-function OpenRaiseButton({
-  dealId,
-  hasCurrent,
-  label,
-  className,
-}: {
-  dealId: string;
-  hasCurrent: boolean;
-  label: string;
-  className: string;
-}) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [error, setError] = useState<string | undefined>();
-
-  function onClick() {
-    setError(undefined);
-    // Une levée est ouverte → on demande via la popup. Sinon, ouverture directe.
-    if (hasCurrent) {
-      setConfirmOpen(true);
-      return;
-    }
-    start(async () => {
-      const res = await openRaise(dealId);
-      if (res.ok) router.refresh();
-      else setError(res.error);
-    });
-  }
-
-  function cloturerEtOuvrir() {
-    start(async () => {
-      const c = await closeRaise(dealId);
-      if (!c.ok) return setError(c.error);
-      const o = await openRaise(dealId);
-      if (!o.ok) return setError(o.error);
-      setConfirmOpen(false);
-      router.refresh();
-    });
-  }
-
-  return (
-    <>
-      <button onClick={onClick} disabled={pending} className={className + " disabled:opacity-50"}>
-        {pending ? "…" : label}
-      </button>
-
-      <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title="Ouvrir une nouvelle levée" width={460}>
-        <div className="px-6 py-5">
-          <p className="text-[13px] text-[#33353B] leading-relaxed">
-            Une levée est déjà en cours. Voulez-vous la <span className="font-[700]">clôturer</span> — elle rejoindra l&apos;historique de financement — et ouvrir un nouveau tour&nbsp;?
-          </p>
-          {error && <p className="text-[12px] text-[#C0392B] mt-2.5">{error}</p>}
-          <div className="flex justify-end gap-2 mt-5">
-            <button onClick={() => setConfirmOpen(false)} className={btnGhost}>Annuler</button>
-            <button onClick={cloturerEtOuvrir} disabled={pending} className={btnPrimary}>
-              {pending ? "…" : "Clôturer et ouvrir"}
-            </button>
-          </div>
-        </div>
-      </Modal>
-    </>
-  );
-}
-
 /** Clôturer la levée en cours — bouton visible + popup in-app (pas de window.confirm). */
 function CloseRaiseButton({ dealId }: { dealId: string }) {
   const router = useRouter();
@@ -1102,6 +1041,7 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
   const [cloture, setCloture] = useState(raise?.date_cloture ?? "");
   const [audience, setAudience] = useState<string[]>(raise?.audience ?? []);
   const [description, setDescription] = useState(raise?.description ?? "");
+  const [leveeName, setLeveeName] = useState(raise?.name ?? "");
   const [confDel, setConfDel] = useState(false);
 
   function supprimerLevee() {
@@ -1133,6 +1073,11 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
         description: description.trim() || undefined,
       });
       if (!res.ok) return setError(res.error);
+      // Nom propre de la levée (RPC séparé, par identifiant).
+      if (raise?.id && leveeName.trim() && leveeName.trim() !== (raise.name ?? "")) {
+        const rn = await setRaiseName(raise.id, leveeName.trim());
+        if (!rn.ok) return setError(rn.error);
+      }
       setError(undefined);
       setOpen(false);
       router.refresh();
@@ -1151,6 +1096,10 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
 
       <Modal open={open} onClose={() => setOpen(false)} title="Modifier la levée" width={560}>
         <div className="px-6 py-5 flex flex-col gap-4">
+          <div>
+            <label className={lab}>Nom de la levée</label>
+            <input value={leveeName} onChange={(e) => setLeveeName(e.target.value)} placeholder="Série A 2026" className={champ} />
+          </div>
           <div className="grid grid-cols-[1.4fr_0.8fr] gap-3">
             <div>
               <label className={lab}>Montant recherché</label>

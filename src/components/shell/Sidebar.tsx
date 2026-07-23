@@ -28,15 +28,9 @@ export function Sidebar({
   const label = (cle: string, chemin: "nav" | "groups") =>
     mot(`${chemin}.${cle}`);
 
-  // La salle courante détermine le libellé de « Ma levée » : une data room de
-  // diligence n'est pas une levée. On lit l'objectif du deal courant (déjà en
-  // main via `deals`), sans plomberie supplémentaire.
-  const objectifCourant =
-    deals.find((d) => d.id === currentDealId)?.objectif ?? deals[0]?.objectif ?? "levee";
-  const navLabel = (cle: string) =>
-    cle === "dealSheet" && objectifCourant === "diligence"
-      ? label("dealSheetDiligence", "nav")
-      : label(cle, "nav");
+  // « Mes levées » : l'entrée /deal liste désormais les levées (une par data
+  // room), indépendamment de l'objectif — plus de swap diligence.
+  const navLabel = (cle: string) => label(cle, "nav");
 
   return (
     <nav

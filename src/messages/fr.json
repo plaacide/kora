@@ -167,7 +167,7 @@
       },
       "nav": {
         "dashboard": "Accueil",
-        "dealSheet": "Ma levée",
+        "dealSheet": "Mes levées",
         "dealSheetDiligence": "Ma data room",
         "dataRoom": "Data room",
         "viewer": "Lecture",
@@ -320,7 +320,8 @@
       "deal_archived": "Data room archivée",
       "deal_unarchived": "Data room désarchivée",
       "deal_nda_updated": "Réglage NDA modifié",
-      "document_key_set": "Document clé"
+      "document_key_set": "Document clé",
+      "raise_moved": "Levée rattachée à une autre data room"
     },
     "entries": "entrées",
     "export": "Exporter"

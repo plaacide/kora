@@ -18,6 +18,8 @@ export type Vitrine = Record<string, Indicateur[]>;
 
 export interface Raise {
   id: string;
+  /** Nom propre de la levée (ex. « Série A 2026 »), indépendant de la data room. */
+  name?: string | null;
   montant_cible: number | null;
   montant_engage: number;
   devise: string;

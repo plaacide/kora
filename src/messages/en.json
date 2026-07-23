@@ -167,7 +167,7 @@
       },
       "nav": {
         "dashboard": "Home",
-        "dealSheet": "My raise",
+        "dealSheet": "My raises",
         "dealSheetDiligence": "My data room",
         "dataRoom": "Data room",
         "viewer": "Reading",
@@ -320,7 +320,8 @@
       "deal_archived": "Data room archived",
       "deal_unarchived": "Data room unarchived",
       "deal_nda_updated": "NDA setting updated",
-      "document_key_set": "Key document"
+      "document_key_set": "Key document",
+      "raise_moved": "Raise moved to another data room"
     },
     "entries": "entries",
     "export": "Export"

@@ -193,33 +193,10 @@ function NewRoomModal({ onClose, fixedObjectif }: { onClose: () => void; fixedOb
     <Modal open onClose={onClose} title={titre} width={480}>
       <div className="px-6 py-5 flex flex-col gap-4">
         <div>
-          <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1 block">{fixedObjectif === "levee" ? "Nom de la levée" : "Nom de la data room"}</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder={fixedObjectif === "levee" ? "Levée Seed 2026" : "Levée Seed, Due diligence banque…"} className={champ} />
+          <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1 block">Nom de la data room</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="Due diligence, Data room Seed…" className={champ} />
+          <p className="text-[11px] text-[#9DA0A8] mt-1">Un contenant de documents. Vous pourrez y ouvrir une levée ensuite.</p>
         </div>
-        {!fixedObjectif && (
-        <div>
-          <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1.5 block">Objectif</label>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { key: "levee", titre: "Lever des fonds", sous: "Montant, audience, investisseurs." },
-              { key: "diligence", titre: "Due diligence", sous: "Partage banque / partenaire, sans levée." },
-            ].map((o) => {
-              const actif = objectif === o.key;
-              return (
-                <button
-                  key={o.key}
-                  type="button"
-                  onClick={() => setObjectif(o.key)}
-                  className={"text-left rounded-[8px] border p-3 transition-colors " + (actif ? "border-[#E85C2B] bg-[#FEF8F4]" : "border-[#E4E2DC] hover:border-[#C9C6BD]")}
-                >
-                  <div className="text-[13px] font-[650] text-[#1A1B1F]">{o.titre}</div>
-                  <p className="text-[11px] text-[#9DA0A8] mt-1 leading-snug">{o.sous}</p>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        )}
         <div>
           <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1.5 block">Point de départ</label>
           <div className="grid grid-cols-2 gap-3">
