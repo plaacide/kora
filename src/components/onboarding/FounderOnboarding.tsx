@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { OnboardingShell } from "./OnboardingShell";
+import { OnboardingShell, AsideEncre, AsideClair } from "./OnboardingShell";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PlainError } from "@/components/auth/FormError";
@@ -11,6 +11,8 @@ import { cn } from "@/lib/cn";
 const COUNTRIES = ["Côte d'Ivoire", "Sénégal", "Bénin", "Mali", "Togo", "Burkina Faso", "Cameroun", "Nigeria", "Autre"];
 const SECTORS = ["Agritech", "Fintech", "Santé", "Logistique", "Énergie", "Éducation", "Autre"];
 const STAGES = ["Pré-seed", "Seed", "Série A", "Série B+"];
+/** Longueur maximale de la phrase de présentation (handoff v2 §5). */
+const PHRASE_MAX = 120;
 
 function Select({
   label,
@@ -41,6 +43,13 @@ function Select({
     </div>
   );
 }
+
+/** Rail de gauche : la 3ᵉ étape se fait APRÈS l'inscription (handoff §5). */
+const ETAPES_FONDATEUR = [
+  { title: "Votre startup", subtitle: "Identité, secteur et objectif" },
+  { title: "Votre levée", subtitle: "Montant recherché et revenus" },
+  { title: "Votre data room", subtitle: "Après l'inscription" },
+];
 
 const OBJECTIFS = [
   {
@@ -120,8 +129,18 @@ export function FounderOnboarding() {
 
   if (step === 1) {
     return (
-      <OnboardingShell step={1} total={totalSteps}>
-        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">Votre startup</h1>
+      <OnboardingShell
+        step={1}
+        total={totalSteps}
+        steps={ETAPES_FONDATEUR}
+        aside={
+          <AsideEncre title="Bon à savoir">
+            Votre fiche reste modifiable à tout moment. Renseignez ce que vous
+            savez aujourd&apos;hui — vous compléterez le reste plus tard.
+          </AsideEncre>
+        }
+      >
+        <h1 className="font-display text-[24px] font-[700] tracking-[-0.02em]">Votre startup</h1>
         <p className="text-[12.5px] text-ink-secondary mt-1">
           Ces informations composent votre fiche visible par vos destinataires.
         </p>
@@ -163,17 +182,31 @@ export function FounderOnboarding() {
         </div>
 
         <div className="mt-3 flex flex-col gap-1.5">
-          <label className="text-[11.5px] font-medium text-ink-secondary">En une phrase</label>
+          <div className="flex items-baseline justify-between">
+            <label className="text-[11.5px] font-medium text-ink-secondary">En une phrase</label>
+            {/* Compteur de caractères (handoff §5) : il vire à l'orange dans les
+                dix derniers, pour prévenir avant de buter sur la limite. */}
+            <span
+              style={{ fontFamily: "var(--font-plex-mono), monospace" }}
+              className={
+                "text-[10.5px] " +
+                (oneLiner.length > PHRASE_MAX - 10 ? "text-[#C24619]" : "text-[#A9ACBB]")
+              }
+            >
+              {oneLiner.length} / {PHRASE_MAX}
+            </span>
+          </div>
           <textarea
             value={oneLiner}
-            onChange={(e) => setOneLiner(e.target.value)}
+            onChange={(e) => setOneLiner(e.target.value.slice(0, PHRASE_MAX))}
+            maxLength={PHRASE_MAX}
             rows={2}
             placeholder="Ce que fait votre startup, en une ligne."
             className="px-2.5 py-2 text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none resize-none"
           />
         </div>
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 pt-6 border-t border-[#F0EDE4] flex justify-end">
           <Button variant="primary" onClick={next1} loading={pending} disabled={name.trim().length < 2 || !objectif}>
             {objectif === "diligence" ? "Terminer" : "Continuer →"}
           </Button>
@@ -183,8 +216,21 @@ export function FounderOnboarding() {
   }
 
   return (
-    <OnboardingShell step={2} total={2}>
-      <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">Votre levée</h1>
+    <OnboardingShell
+      step={2}
+      total={2}
+      steps={ETAPES_FONDATEUR}
+      aside={
+        <AsideClair title="Fiche et dossier, deux choses">
+          La <strong className="font-[650]">fiche</strong> est votre carte de
+          visite : nom, secteur, montant. Le{" "}
+          <strong className="font-[650]">dossier</strong>, lui, ce sont les
+          pièces que vous déposerez ensuite — c&apos;est celui que les
+          investisseurs regardent.
+        </AsideClair>
+      }
+    >
+      <h1 className="font-display text-[24px] font-[700] tracking-[-0.02em]">Votre levée</h1>
       <p className="text-[12.5px] text-ink-secondary mt-1">
         Ces montants figurent sur votre fiche, visible des investisseurs.
       </p>
@@ -228,7 +274,7 @@ export function FounderOnboarding() {
         </p>
       </div>
 
-      <div className="mt-8 flex items-center justify-between">
+      <div className="mt-8 pt-6 border-t border-[#F0EDE4] flex items-center justify-between">
         <button type="button" onClick={() => setStep(1)} className="text-[12.5px] font-medium text-ink-secondary hover:text-ink cursor-pointer">
           ← Retour
         </button>

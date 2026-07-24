@@ -7,6 +7,12 @@ import { Input } from "@/components/ui/Input";
 import { PlainError } from "@/components/auth/FormError";
 import { completeOnboarding } from "@/app/actions/onboarding";
 
+/** Rail des étapes (handoff v2 §5). */
+const ETAPES = [
+  { title: "Votre programme", subtitle: "Nom et périmètre" },
+  { title: "Votre cohorte", subtitle: "Après l'inscription" },
+];
+
 /**
  * Onboarding d'un PROGRAMME — incubateur, accélérateur, structure
  * d'accompagnement.
@@ -36,7 +42,7 @@ export function ProgrammeOnboarding() {
   }
 
   return (
-    <OnboardingShell step={1} total={1}>
+    <OnboardingShell step={1} total={1} steps={ETAPES}>
       <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
         Votre programme
       </h1>

@@ -11,6 +11,13 @@ import {
   completeOnboarding,
 } from "@/app/actions/onboarding";
 
+/** Rail des étapes (handoff v2 §5). */
+const ETAPES = [
+  { title: "Votre profil", subtitle: "Type de fonds et organisation" },
+  { title: "Votre thèse", subtitle: "Secteurs, stades et tickets" },
+  { title: "Vos deals", subtitle: "Après l'inscription" },
+];
+
 const TYPES = ["Fonds VC", "Business angel", "DFI", "Family office", "Corporate"];
 const SECTORS = ["Agritech", "Fintech", "Santé", "Logistique", "Énergie", "Éducation"];
 const GEOS = ["Afrique de l'Ouest", "Afrique de l'Est", "Afrique du Nord", "Afrique australe"];
@@ -51,7 +58,7 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
 
   if (step === 1) {
     return (
-      <OnboardingShell step={1} total={2}>
+      <OnboardingShell step={1} total={2} steps={ETAPES}>
         <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
           Votre profil d&apos;investisseur
         </h1>
@@ -107,7 +114,7 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
   }
 
   return (
-    <OnboardingShell step={2} total={2}>
+    <OnboardingShell step={2} total={2} steps={ETAPES}>
       <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
         Votre thèse d&apos;investissement
       </h1>

@@ -6,17 +6,20 @@ type Size = "sm" | "md";
 
 const base =
   "inline-flex items-center justify-center gap-1.5 font-semibold cursor-pointer " +
-  "transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap rounded-btn";
+  "transition-colors disabled:cursor-not-allowed whitespace-nowrap rounded-btn";
 
 const variants: Record<Variant, string> = {
+  // Désactivé : gris franc, pas un orange délavé — un CTA en orange pâle
+  // permanent se lit comme un bouton cassé (handoff v2 §5).
   primary:
-    "bg-primary text-white border border-transparent shadow-[0_1px_2px_rgba(20,20,60,0.2)] hover:bg-primary-strong",
+    "bg-primary text-white border border-transparent shadow-[0_1px_2px_rgba(20,20,60,0.2)] hover:bg-primary-strong " +
+    "disabled:bg-[#F0EDE4] disabled:text-[#A9ACBB] disabled:shadow-none",
   secondary:
-    "bg-surface text-ink border border-line-strong shadow-card hover:bg-[oklch(0.975_0.003_260)]",
+    "bg-surface text-ink border border-line-strong shadow-card hover:bg-[oklch(0.975_0.003_260)] disabled:opacity-50",
   ghost:
-    "bg-transparent text-ink-secondary border border-transparent hover:bg-[oklch(0.955_0.004_260)]",
+    "bg-transparent text-ink-secondary border border-transparent hover:bg-[oklch(0.955_0.004_260)] disabled:opacity-50",
   danger:
-    "bg-surface text-[oklch(0.42_0.1_40)] border border-[oklch(0.82_0.06_45)] hover:bg-[oklch(0.975_0.015_45)]",
+    "bg-surface text-[oklch(0.42_0.1_40)] border border-[oklch(0.82_0.06_45)] hover:bg-[oklch(0.975_0.015_45)] disabled:opacity-50",
 };
 
 const sizes: Record<Size, string> = {
