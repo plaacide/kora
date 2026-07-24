@@ -154,13 +154,13 @@ export function QaBoard({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="border border-[#ECEBE6] rounded-[6px] px-5 py-8 text-center">
+        <div className="border border-[#E2DED4] rounded-[6px] px-5 py-8 text-center">
           <p className="text-[12.5px] text-[#6E727A]">{t("empty")}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((q) => (
-            <div key={q.id} className="border border-[#ECEBE6] rounded-[6px] p-4">
+            <div key={q.id} className="border border-[#E2DED4] rounded-[6px] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[13px] font-[600] leading-relaxed">{q.body}</p>
@@ -214,7 +214,7 @@ export function QaBoard({
                   </div>
                 </div>
               ) : q.answer_body ? (
-                <div className="mt-3 bg-[#FAFAF8] border border-[#ECEBE6] rounded-[5px] p-3">
+                <div className="mt-3 bg-[#FAFAF8] border border-[#E2DED4] rounded-[5px] p-3">
                   <p className="text-[12.5px] leading-relaxed">{q.answer_body}</p>
                   {q.answerer && (
                     <span style={mono} className="text-[10.5px] text-[#9DA0A8] mt-1.5 block">

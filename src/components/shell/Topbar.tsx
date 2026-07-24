@@ -38,11 +38,11 @@ export async function Topbar({
   const mot = personaLabel(t, persona);
 
   return (
-    <header className="sticky top-0 z-[60] flex items-center gap-4 h-[56px] px-5 bg-white border-b border-[#ECEBE6]">
+    <header className="sticky top-0 z-[60] flex items-center gap-4 h-[56px] px-5 bg-white border-b border-[#E2DED4]">
       <Link href="/dashboard" aria-label={t("home")}>
         <SanzaLogo size={20} />
       </Link>
-      <span className="w-px h-[22px] bg-[#ECEBE6]" aria-hidden />
+      <span className="w-px h-[22px] bg-[#E2DED4]" aria-hidden />
 
       {/* Sélecteur d'organisation — badge carré-arrondi + nom + chevron. */}
       <Link

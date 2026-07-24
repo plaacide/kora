@@ -146,7 +146,7 @@ export function RoomContenu({
       )}
 
       {/* En-tête de table */}
-      <div style={mono} className="grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 px-2 pb-2 border-b border-[#ECEBE6] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
+      <div style={mono} className="grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 px-2 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
         <span>INDEX</span><span>NOM</span><span>TYPE</span><span>DERNIÈRE MÀJ</span><span className="text-center">CLÉ</span>
       </div>
 
@@ -163,7 +163,7 @@ export function RoomContenu({
         <button
           key={f.id}
           onClick={() => setCourant(f.id)}
-          className="w-full grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#F1F0EC] hover:bg-[#FAFAF8] text-left"
+          className="w-full grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAFAF8] text-left"
         >
           <span style={mono} className="text-[11px] text-[#9DA0A8]">{folderIndex(f.index_path)}</span>
           <span className="flex items-center gap-[11px] min-w-0">
@@ -183,7 +183,7 @@ export function RoomContenu({
       {fichiers.map((d) => {
         const b = badge(d.name);
         return (
-          <div key={d.id} className="grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#F1F0EC] hover:bg-[#FAFAF8]">
+          <div key={d.id} className="grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAFAF8]">
             <span style={mono} className="text-[11px] text-[#9DA0A8]">{folderIndex(d.index_path)}</span>
             <Link href={`/visionneuse?doc=${d.id}`} className="flex items-center gap-[11px] min-w-0">
               <span style={mono} className={"rounded-[4px] px-[5px] py-0.5 text-[8.5px] font-[600] shrink-0 " + b.cls}>{b.t}</span>

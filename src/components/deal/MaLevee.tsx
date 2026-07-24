@@ -225,8 +225,8 @@ export function MaLevee({
       <VitrineBand dealId={dealId} audience={audience} indicateurs={raise.indicateurs ?? {}} />
 
       {/* Résumé de la levée — RÉEL */}
-      <div className="border border-[#ECEBE6] rounded-[6px] mb-7">
-        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr] divide-y md:divide-y-0 md:divide-x divide-[#ECEBE6]">
+      <div className="border border-[#E2DED4] rounded-[6px] mb-7">
+        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr] divide-y md:divide-y-0 md:divide-x divide-[#E2DED4]">
           <div className="px-5 py-[18px]">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">Montant recherché</div>
             <div style={mono} className="text-[26px] font-[600] tracking-[-0.02em]">
@@ -234,7 +234,7 @@ export function MaLevee({
             </div>
             {cible != null && cible > 0 && (
               <>
-                <span className="block h-1.5 rounded-[3px] bg-[#ECEBE6] overflow-hidden mt-[11px]"><span className="block h-full bg-[#E85C2B]" style={{ width: `${pct}%` }} /></span>
+                <span className="block h-1.5 rounded-[3px] bg-[#E2DED4] overflow-hidden mt-[11px]"><span className="block h-full bg-[#E85C2B]" style={{ width: `${pct}%` }} /></span>
                 <div className="text-[11.5px] text-[#6E727A] mt-[7px]">
                   <span style={mono} className="text-[#C24619] font-[600]">{formatMoney(engage, devise)}</span> engagés
                   {restant != null && restant > 0 && <> · <span style={mono}>{formatMoney(restant, devise)}</span> restants</>}
@@ -269,7 +269,7 @@ export function MaLevee({
           </div>
         </div>
         {raise?.description && (
-          <div className="px-5 py-4 border-t border-[#ECEBE6] text-[13px] text-[#55585F] leading-[1.6]">
+          <div className="px-5 py-4 border-t border-[#E2DED4] text-[13px] text-[#55585F] leading-[1.6]">
             <span style={mono} className="block text-[9px] font-[600] text-[#8B8E96] tracking-[0.08em] mb-1.5">DESCRIPTION</span>
             {raise.description}
           </div>
@@ -297,13 +297,13 @@ export function MaLevee({
               <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Historique de financement</h2>
               <span className="text-[12.5px] text-[#9DA0A8]">{totalLabel}{closedRaises.length} tour(s) clôturé(s)</span>
             </div>
-            <div className="border border-[#ECEBE6] rounded-[6px] flex items-stretch mb-9 flex-col md:flex-row overflow-x-auto">
+            <div className="border border-[#E2DED4] rounded-[6px] flex items-stretch mb-9 flex-col md:flex-row overflow-x-auto">
               {rounds.map((rd, i) => (
                 <Fragment key={rd.r.id}>
                   {i > 0 && (
                     <div className="hidden md:flex items-center px-1.5 text-[#C7C9CF] text-[18px] justify-center">→</div>
                   )}
-                  <div className={"relative flex-1 min-w-[220px] p-[18px] group " + (i > 0 ? "border-t md:border-t-0 md:border-l border-[#ECEBE6] " : "") + (rd.kind === "current" ? "bg-[#FEFCFA]" : "")}>
+                  <div className={"relative flex-1 min-w-[220px] p-[18px] group " + (i > 0 ? "border-t md:border-t-0 md:border-l border-[#E2DED4] " : "") + (rd.kind === "current" ? "bg-[#FEFCFA]" : "")}>
                     {rd.kind === "closed" && <DeleteRoundButton id={rd.r.id} />}
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       {rd.kind === "closed" ? (
@@ -341,12 +341,12 @@ export function MaLevee({
             <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Documents clés</h2>
             <Link href="/data-room" className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">Voir la data room →</Link>
           </div>
-          <div className="border-t border-[#ECEBE6]">
+          <div className="border-t border-[#E2DED4]">
             {keyDocs.length === 0 ? (
               <p className="text-[12px] text-[#9DA0A8] py-4">Aucun document déposé. <Link href="/data-room" className="font-[600] text-[#C24619]">Déposer →</Link></p>
             ) : (
               keyDocs.map((d) => (
-                <Link key={d.id} href={`/visionneuse?doc=${d.id}`} className="flex items-center gap-2.5 py-3 border-b border-[#F1F0EC] last:border-0 hover:bg-[#FAFAF8]">
+                <Link key={d.id} href={`/visionneuse?doc=${d.id}`} className="flex items-center gap-2.5 py-3 border-b border-[#E8E5DC] last:border-0 hover:bg-[#FAFAF8]">
                   <span style={mono} className={"rounded-[3px] px-[5px] py-0.5 text-[8.5px] font-[600] " + DOC_BADGE(d.type)}>{d.type}</span>
                   <span className="flex-1 min-w-0 text-[13px] font-[600] truncate">{d.name}</span>
                   <span style={mono} className="text-[11px] text-[#9DA0A8] shrink-0">{d.vues > 0 ? `${d.vues} vue${d.vues > 1 ? "s" : ""}` : "0 vue"}</span>
@@ -359,14 +359,14 @@ export function MaLevee({
           <div className="flex items-baseline justify-between mb-2">
             <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Équipe sur la levée</h2>
           </div>
-          <div className="border-t border-[#ECEBE6]">
+          <div className="border-t border-[#E2DED4]">
             {team.length === 0 ? (
               <p className="text-[12px] text-[#9DA0A8] py-4">Vous êtes seul sur cette levée pour l&apos;instant.</p>
             ) : (
               team.map((m, i) => {
                 const tag = ROLE_TAG[m.role] ?? { label: m.role.toUpperCase(), cls: "text-[#8B8E96] bg-[#F1F0EB]" };
                 return (
-                  <div key={i} className="flex items-center gap-2.5 py-3 border-b border-[#F1F0EC] last:border-0">
+                  <div key={i} className="flex items-center gap-2.5 py-3 border-b border-[#E8E5DC] last:border-0">
                     <span className="grid place-items-center w-[30px] h-[30px] rounded-[6px] bg-[#1A1B1F] text-white text-[10px] font-[700] shrink-0">{initials(m.name)}</span>
                     <span className="flex-1 min-w-0">
                       <span className="block text-[13px] font-[600] truncate">{m.name}</span>
@@ -443,8 +443,8 @@ function VitrineBand({
       )}
 
       {/* En bref */}
-      <div className="border border-[#ECEBE6] rounded-[6px] overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[#ECEBE6] flex-wrap">
+      <div className="border border-[#E2DED4] rounded-[6px] overflow-hidden">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[#E2DED4] flex-wrap">
           <span className="flex items-baseline gap-2.5">
             <span className="text-[13.5px] font-[700]">En bref</span>
             <span className="text-[11.5px] text-[#9DA0A8]">ce qu&apos;un investisseur voit avant d&apos;ouvrir vos documents</span>
@@ -460,7 +460,7 @@ function VitrineBand({
             Aucun indicateur pour l&apos;instant. Cliquez sur « Éditer les indicateurs » pour ajouter ce qu&apos;un investisseur voit avant d&apos;ouvrir vos documents.
           </p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-[#ECEBE6]">
+          <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-[#E2DED4]">
             {rows.map((k, i) => (
               <div key={i} className="px-4 py-[15px]">
                 <div className="text-[11px] font-[600] text-[#8B8E96] mb-1.5">{k.l}</div>
@@ -619,20 +619,20 @@ function PipelineInvestisseurs({
           + Ajouter un investisseur
         </button>
       </div>
-      <div className="border-t border-[#ECEBE6] mb-8">
+      <div className="border-t border-[#E2DED4] mb-8">
         {investors.length === 0 ? (
           <p className="text-[12.5px] text-[#9DA0A8] py-6 text-center">
             Aucun investisseur suivi. Ajoutez ceux que vous approchez, avec leur ticket et leur statut.
           </p>
         ) : (
           <>
-            <div style={mono} className="grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 py-2 text-[9px] text-[#A0A3AB] tracking-[0.05em] border-b border-[#ECEBE6]">
+            <div style={mono} className="grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 py-2 text-[9px] text-[#A0A3AB] tracking-[0.05em] border-b border-[#E2DED4]">
               <span>INVESTISSEUR</span><span>TICKET</span><span>STATUT</span><span></span>
             </div>
             {investors.map((inv) => {
               const st = STATUT_PIPELINE.find((s) => s.key === inv.statut);
               return (
-                <div key={inv.id} className="grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 items-center py-3 border-b border-[#F1F0EC]">
+                <div key={inv.id} className="grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 items-center py-3 border-b border-[#E8E5DC]">
                   <span className="flex items-center gap-2.5 min-w-0">
                     <span className="grid place-items-center w-7 h-7 rounded-[6px] bg-[#1A1B1F] text-white text-[10px] font-[700] shrink-0">{initials(inv.nom)}</span>
                     <span className="min-w-0">
@@ -988,7 +988,7 @@ function PreparationCard({
   legende: string;
 }) {
   return (
-    <div className="border border-[#ECEBE6] rounded-[6px] p-5">
+    <div className="border border-[#E2DED4] rounded-[6px] p-5">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           <span className="grid place-items-center w-10 h-10 rounded-[6px] bg-[#1A1B1F] text-white font-[700]">{dealName.slice(0, 1)}</span>
@@ -1006,7 +1006,7 @@ function PreparationCard({
         </div>
       </div>
       {missing.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-[#F1F0EC]">
+        <div className="mt-4 pt-4 border-t border-[#E8E5DC]">
           <div style={mono} className="text-[9px] font-[600] text-[#8B8E96] tracking-[0.06em] mb-2.5">CE QU&apos;IL RESTE À FAIRE</div>
           <div className="flex flex-col gap-1.5">
             {missing.slice(0, 5).map((m, i) => (

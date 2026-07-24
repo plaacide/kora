@@ -231,14 +231,14 @@ export function Checklist({
       <PlainError message={error} />
 
       {/* Préparation — le score se recalcule à chaque changement. */}
-      <div className="border border-[#ECEBE6] rounded-[6px] p-4">
+      <div className="border border-[#E2DED4] rounded-[6px] p-4">
         <div className="flex items-baseline justify-between">
           <span className="text-[12.5px] font-[600] text-[#6E727A]">
             {t("readinessTitle")}
           </span>
           <span style={mono} className="text-[19px] tracking-[-0.03em]">{score}%</span>
         </div>
-        <span className="block h-1.5 rounded-[3px] bg-[#ECEBE6] overflow-hidden mt-2">
+        <span className="block h-1.5 rounded-[3px] bg-[#E2DED4] overflow-hidden mt-2">
           <span
             className={cn(
               "block h-full transition-all",
@@ -270,11 +270,11 @@ export function Checklist({
               {t(`categoryHints.${cat}`)}
             </p>
 
-            <div className="border border-[#ECEBE6] rounded-[6px] overflow-hidden">
+            <div className="border border-[#E2DED4] rounded-[6px] overflow-hidden">
               {list.map((i) => (
                 <div
                   key={i.id}
-                  className="flex items-start gap-3 px-4 py-3 border-b border-[#F1F0EC] last:border-0 hover:bg-[#FAFAF8] group"
+                  className="flex items-start gap-3 px-4 py-3 border-b border-[#E8E5DC] last:border-0 hover:bg-[#FAFAF8] group"
                 >
                   <button
                     onClick={() => cycle(i)}
@@ -350,7 +350,7 @@ export function Checklist({
                               return (
                                 <span
                                   key={id}
-                                  className="inline-flex items-center gap-1 rounded-[5px] border border-[#ECEBE6] bg-[#FAFAF8] pl-1.5 pr-1 py-0.5 text-[11px] text-[#55585F] max-w-[240px]"
+                                  className="inline-flex items-center gap-1 rounded-[5px] border border-[#E2DED4] bg-[#FAFAF8] pl-1.5 pr-1 py-0.5 text-[11px] text-[#55585F] max-w-[240px]"
                                 >
                                   <span className="truncate">
                                     {d ? `${folderIndex(d.index_path)} ${d.name}` : t("removedDoc")}
@@ -439,7 +439,7 @@ export function Checklist({
 
               {/* Ajout d'exigence personnalisée. */}
               {canEdit && (
-                <div className="px-4 py-2.5 bg-[#FAFAF8] border-t border-[#ECEBE6]">
+                <div className="px-4 py-2.5 bg-[#FAFAF8] border-t border-[#E2DED4]">
                   {adding === cat ? (
                     <div className="flex flex-col gap-1.5">
                       <input

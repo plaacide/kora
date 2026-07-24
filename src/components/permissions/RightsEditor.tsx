@@ -66,7 +66,7 @@ export function RightsEditor({
       {open && (
         <>
           <span className="fixed inset-0 z-[90]" onClick={() => setOpen(false)} />
-          <span className="absolute left-0 top-7 z-[91] w-40 rounded-[6px] border border-[#ECEBE6] bg-white shadow-[0_10px_30px_rgba(26,27,31,0.14)] py-1 flex flex-col">
+          <span className="absolute left-0 top-7 z-[91] w-40 rounded-[6px] border border-[#E2DED4] bg-white shadow-[0_10px_30px_rgba(26,27,31,0.14)] py-1 flex flex-col">
             {NIVEAUX.map((n) => (
               <button
                 key={n.value}

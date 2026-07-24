@@ -74,7 +74,7 @@ export function ShareButton({
       </button>
 
       <Modal open={open} onClose={() => setOpen(false)}>
-        <div className="px-6 pt-5 pb-4 border-b border-[#F1F0EC]">
+        <div className="px-6 pt-5 pb-4 border-b border-[#E8E5DC]">
           <div className="text-[16px] font-[700] text-[#1A1B1F]">Partager la data room</div>
         </div>
         <div className="px-6 py-5 flex flex-col gap-4">
@@ -136,7 +136,7 @@ export function ShareButton({
             </div>
           )}
         </div>
-        <div className="px-6 py-4 border-t border-[#F1F0EC] flex justify-end gap-2.5">
+        <div className="px-6 py-4 border-t border-[#E8E5DC] flex justify-end gap-2.5">
           <button onClick={() => setOpen(false)} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAFAF8]">
             Annuler
           </button>

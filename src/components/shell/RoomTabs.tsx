@@ -70,7 +70,7 @@ export function RoomTabs({
       </div>
 
       {/* Onglets */}
-      <div className="flex gap-[22px] border-b border-[#ECEBE6] text-[13px] font-[600] overflow-x-auto">
+      <div className="flex gap-[22px] border-b border-[#E2DED4] text-[13px] font-[600] overflow-x-auto">
         {TABS.map((tab) => {
           const active = pathname === tab.href;
           const count = tab.countKey ? counts?.[tab.countKey] : undefined;

@@ -107,7 +107,7 @@ export default async function PermissionsPage() {
         <ShareButton dealId={deal.id} label={t("invite")} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap" />
       </div>
 
-      <div style={mono} className="grid grid-cols-[2fr_1.1fr_1fr_1fr_80px] gap-3 px-2 pb-2 border-b border-[#ECEBE6] text-[9px] tracking-[0.08em] text-[#A0A3AB]">
+      <div style={mono} className="grid grid-cols-[2fr_1.1fr_1fr_1fr_80px] gap-3 px-2 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB]">
         <span>{t("colPerson")}</span><span>{t("colRights")}</span><span>{t("colFolders")}</span><span>{t("colLastVisit")}</span><span></span>
       </div>
 
@@ -115,7 +115,7 @@ export default async function PermissionsPage() {
         <p className="text-[12px] text-[#9DA0A8] text-center py-8">{t("noGuests")}</p>
       ) : (
         invites.map((i) => (
-          <div key={i.id} className="grid grid-cols-[2fr_1.1fr_1fr_1fr_80px] gap-3 items-center px-2 py-3.5 border-b border-[#F1F0EC] hover:bg-[#FAFAF8]">
+          <div key={i.id} className="grid grid-cols-[2fr_1.1fr_1fr_1fr_80px] gap-3 items-center px-2 py-3.5 border-b border-[#E8E5DC] hover:bg-[#FAFAF8]">
             <span className="flex items-center gap-2.5 min-w-0">
               <span className="grid place-items-center w-8 h-8 rounded-[6px] bg-[#1A1B1F] text-white text-[11px] font-[700] shrink-0">{initials(i.nom)}</span>
               <span className="min-w-0">

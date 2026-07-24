@@ -34,7 +34,7 @@ const BADGE: Record<BadgeType, string> = {
   PDF: "bg-[#FBEDE6] text-[#C0392B]",
   XLSX: "bg-[#E4F3EC] text-[#147A5C]",
   DOCX: "bg-[#E9F2FB] text-[#185FA5]",
-  DOC: "bg-[#F1F0EC] text-[#6E727A]",
+  DOC: "bg-[#E8E5DC] text-[#6E727A]",
 };
 
 function Badge({ type }: { type: BadgeType }) {
@@ -255,8 +255,8 @@ export async function AccueilFondateur({
       </div>
 
       {/* Résumé de la levée */}
-      <div className="border border-[#ECEBE6] rounded-[6px]">
-        <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-[#ECEBE6]">
+      <div className="border border-[#E2DED4] rounded-[6px]">
+        <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-[#E2DED4]">
           <div className="flex items-center gap-2.5">
             <span className="text-[14px] font-[700] text-[#1A1B1F]">
               {(estLevee ? t("currentRaise") : t("roomTitle"))} — {deal.name}
@@ -273,14 +273,14 @@ export async function AccueilFondateur({
           {/* Objectif de levée + soft-commitments (RÉELS, depuis la levée) —
               LEVÉE seulement : une diligence n'a ni montant cible ni engagés. */}
           {estLevee && (
-          <div className="px-[18px] py-4 border-r border-[#ECEBE6]">
+          <div className="px-[18px] py-4 border-r border-[#E2DED4]">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("objective")}</div>
             {objectifDefini ? (
               <>
                 <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
                   {objectifTxt}
                 </div>
-                <span className="block h-[5px] rounded-[2px] bg-[#ECEBE6] overflow-hidden mt-[9px]">
+                <span className="block h-[5px] rounded-[2px] bg-[#E2DED4] overflow-hidden mt-[9px]">
                   <span className="block h-full bg-[#E85C2B]" style={{ width: `${softPct}%` }} />
                 </span>
                 <div className="text-[11px] text-[#6E727A] mt-1.5">
@@ -299,7 +299,7 @@ export async function AccueilFondateur({
           </div>
           )}
           {/* Dossier prêt */}
-          <Link href="/checklist" className="px-[18px] py-4 border-r border-[#ECEBE6] hover:bg-[#FAFAF8] transition-colors">
+          <Link href="/checklist" className="px-[18px] py-4 border-r border-[#E2DED4] hover:bg-[#FAFAF8] transition-colors">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("readyTitle")}</div>
             <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
               {score}<span className="text-[13px] text-[#A0A3AB]">%</span>
@@ -310,7 +310,7 @@ export async function AccueilFondateur({
           </Link>
           {/* Investisseurs (levée) / Personnes (diligence) — chiffres RÉELS :
               acceptations / invitations. Plus de repli inventé. */}
-          <Link href={estLevee ? "/deal" : "/permissions"} className="px-[18px] py-4 border-r border-[#ECEBE6] hover:bg-[#FAFAF8] transition-colors">
+          <Link href={estLevee ? "/deal" : "/permissions"} className="px-[18px] py-4 border-r border-[#E2DED4] hover:bg-[#FAFAF8] transition-colors">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{estLevee ? t("investors") : t("people")}</div>
             {estLevee ? (
               <>
@@ -386,17 +386,17 @@ export async function AccueilFondateur({
           {visites.length === 0 ? (
             <p className="text-[12.5px] text-[#9DA0A8] py-3">{t("viewsEmpty")}</p>
           ) : (
-            <div className="border-t border-[#ECEBE6]">
-              <div className="flex items-center gap-3 py-2 font-mono text-[9px] font-[600] uppercase tracking-[0.05em] text-[#9DA0A8] border-b border-[#ECEBE6]">
+            <div className="border-t border-[#E2DED4]">
+              <div className="flex items-center gap-3 py-2 font-mono text-[9px] font-[600] uppercase tracking-[0.05em] text-[#9DA0A8] border-b border-[#E2DED4]">
                 <div className="flex-[1.2] min-w-0">{t("colWho")}</div>
                 <div className="flex-[1.6] min-w-0">{t("colDoc")}</div>
                 <div className="w-[64px] shrink-0">{t("colWhen")}</div>
                 <div className="w-[54px] shrink-0 text-right">{t("colDuration")}</div>
               </div>
               {visites.map((v, i) => (
-                <div key={i} className="flex items-center gap-3 py-2.5 border-b border-[#F1F0EC] hover:bg-[#FAFAF8]">
+                <div key={i} className="flex items-center gap-3 py-2.5 border-b border-[#E8E5DC] hover:bg-[#FAFAF8]">
                   <div className="flex-[1.2] min-w-0 flex items-center gap-2.5">
-                    <span className="grid place-items-center w-7 h-7 shrink-0 rounded-[6px] bg-[#F1F0EC] text-[10px] font-[700] text-[#6E727A] uppercase">
+                    <span className="grid place-items-center w-7 h-7 shrink-0 rounded-[6px] bg-[#E8E5DC] text-[10px] font-[700] text-[#6E727A] uppercase">
                       {v.qui.slice(0, 2)}
                     </span>
                     <span className="text-[12.5px] font-[550] text-[#1A1B1F] truncate">{v.qui}</span>
@@ -438,7 +438,7 @@ export async function AccueilFondateur({
                   <div key={i} className="flex items-center gap-2.5">
                     <Badge type={d.type} />
                     <span className="flex-1 min-w-0 text-[12px] text-[#33353B] truncate">{d.nom}</span>
-                    <span className="w-[80px] h-[6px] rounded-[3px] bg-[#F1F0EC] overflow-hidden">
+                    <span className="w-[80px] h-[6px] rounded-[3px] bg-[#E8E5DC] overflow-hidden">
                       <span className="block h-full bg-[#E85C2B]" style={{ width: `${Math.round((d.vues / maxVues) * 100)}%` }} />
                     </span>
                     <span className="w-5 text-right font-mono text-[11px] text-[#6E727A]">{d.vues}</span>
@@ -454,7 +454,7 @@ export async function AccueilFondateur({
               <div className="flex flex-col gap-2">
                 {topLecteurs.map((r, i) => (
                   <div key={i} className="flex items-center gap-2.5">
-                    <span className="grid place-items-center w-7 h-7 shrink-0 rounded-[6px] bg-[#F1F0EC] text-[10px] font-[700] text-[#6E727A] uppercase">
+                    <span className="grid place-items-center w-7 h-7 shrink-0 rounded-[6px] bg-[#E8E5DC] text-[10px] font-[700] text-[#6E727A] uppercase">
                       {r.qui.slice(0, 2)}
                     </span>
                     <span className="flex-1 text-[12.5px] font-[550] text-[#1A1B1F] truncate">{r.qui}</span>

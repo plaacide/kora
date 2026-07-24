@@ -35,7 +35,7 @@ export function Sidebar({
   return (
     <nav
       aria-label={t("mainNav")}
-      className="w-[226px] shrink-0 h-[calc(100vh-56px)] sticky top-[56px] overflow-y-auto border-r border-[#ECEBE6] bg-[#FAFAF8] px-3 pt-4 pb-5"
+      className="w-[226px] shrink-0 h-[calc(100vh-56px)] sticky top-[56px] overflow-y-auto border-r border-[#E2DED4] bg-[#FAF8F4] px-3 pt-4 pb-5"
     >
       {navFor(role, persona).map((group) => {
         // Handoff : pas d'en-tête sur les destinations principales (Accueil,

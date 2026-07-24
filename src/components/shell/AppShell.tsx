@@ -28,7 +28,7 @@ export function AppShell({
     deals.find((d) => d.id === currentDealId)?.name ?? deals[0]?.name ?? orgName;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F4F1EA]">
       <Topbar orgName={orgName} userEmail={userEmail} persona={persona} dealId={currentDealId ?? deals[0]?.id ?? ""} />
       <div className="flex">
         <Sidebar
@@ -37,9 +37,10 @@ export function AppShell({
           role={role}
           persona={persona}
         />
-        {/* Fond BLANC (handoff) : la zone de contenu est blanche, la sidebar
-            crème. Pas de fond papier. */}
-        <main className="flex-1 min-w-0 bg-white px-8 py-7 max-w-[1720px]">
+        {/* Fond craie #F4F1EA, le même que l'onboarding (handoff v2) : la
+            plateforme et l'inscription se lisent comme un seul produit. La
+            topbar reste blanche, comme le header d'onboarding. */}
+        <main className="flex-1 min-w-0 bg-[#F4F1EA] px-8 py-7 max-w-[1720px]">
           {/* La data room à 6 onglets : l'en-tête + les onglets s'affichent sur
               les routes de la salle (RoomTabs se masque ailleurs), pour l'équipe
               interne seulement — l'invité garde sa nav. */}

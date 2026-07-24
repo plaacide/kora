@@ -74,7 +74,7 @@ export default async function NdaPage() {
       )}
       <p className="text-[12.5px] text-[#6E727A] mb-4">{t("proofLine")}</p>
 
-      <div style={mono} className="grid grid-cols-[2fr_1.3fr_1.1fr_90px] gap-3 px-2 pb-2 border-b border-[#ECEBE6] text-[9px] tracking-[0.08em] text-[#A0A3AB]">
+      <div style={mono} className="grid grid-cols-[2fr_1.3fr_1.1fr_90px] gap-3 px-2 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB]">
         <span>{t("colSigner")}</span><span>{t("colSignedAt")}</span><span>{t("colFingerprint")}</span><span className="text-right">{t("colProof")}</span>
       </div>
 
@@ -82,7 +82,7 @@ export default async function NdaPage() {
         <p className="text-[12px] text-[#9DA0A8] text-center py-8">{t("empty")}</p>
       ) : (
         ndas.map((n) => (
-          <div key={n.id} className="grid grid-cols-[2fr_1.3fr_1.1fr_90px] gap-3 items-center px-2 py-3.5 border-b border-[#F1F0EC] hover:bg-[#FAFAF8]">
+          <div key={n.id} className="grid grid-cols-[2fr_1.3fr_1.1fr_90px] gap-3 items-center px-2 py-3.5 border-b border-[#E8E5DC] hover:bg-[#FAFAF8]">
             <span className="flex items-center gap-2.5 min-w-0">
               <span className="grid place-items-center w-8 h-8 rounded-[6px] bg-[#1A1B1F] text-white text-[11px] font-[700] shrink-0">{initials(n.signer_name)}</span>
               <span className="min-w-0">
