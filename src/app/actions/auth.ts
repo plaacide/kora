@@ -36,9 +36,11 @@ export async function signup(
 
   if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
 
-  // 5 créations de compte / heure / IP.
+  // 15 créations de compte / heure / IP. Assez large pour une phase de test
+  // intensif depuis une même IP ; l'inondation d'e-mails reste bornée par le
+  // plafond horaire de Supabase (côté serveur, qui fait foi).
   const ip = await clientIp();
-  if (!rateLimit(`signup:${ip}`, 5, 60 * 60 * 1000).ok) {
+  if (!rateLimit(`signup:${ip}`, 15, 60 * 60 * 1000).ok) {
     return { errorKey: "tooManyAttempts" };
   }
 
