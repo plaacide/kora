@@ -31,7 +31,9 @@
       "password": "Mot de passe",
       "passwordHint": "8 caractères min, avec une lettre et un chiffre.",
       "submit": "Créer mon compte",
-      "submitting": "Création…"
+      "submitting": "Création…",
+      "jobTitle": "Votre poste",
+      "jobTitlePlaceholder": "CEO, CFO, Directrice juridique…"
     },
     "login": {
       "title": "Se connecter",

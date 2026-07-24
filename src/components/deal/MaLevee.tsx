@@ -156,7 +156,7 @@ export function MaLevee({
   raise?: Raise | null;
   closedRaises?: Raise[];
   investors?: RaiseInvestor[];
-  team?: { name: string; role: string }[];
+  team?: { name: string; role: string; title?: string | null }[];
   keyDocs?: { id: string; name: string; type: string; vues: number }[];
   /** Réglage NDA de la data room — défaut du bouton Partager. */
   ndaDefault?: boolean;
@@ -368,8 +368,11 @@ export function MaLevee({
                 return (
                   <div key={i} className="flex items-center gap-2.5 py-3 border-b border-[#F1F0EC] last:border-0">
                     <span className="grid place-items-center w-[30px] h-[30px] rounded-[6px] bg-[#1A1B1F] text-white text-[10px] font-[700] shrink-0">{initials(m.name)}</span>
-                    <span className="flex-1 min-w-0 text-[13px] font-[600] truncate">{m.name}</span>
-                    <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-[3px] " + tag.cls}>{tag.label}</span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-[13px] font-[600] truncate">{m.name}</span>
+                      {m.title && <span className="block text-[11px] text-[#9DA0A8] truncate">{m.title}</span>}
+                    </span>
+                    <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-[3px] shrink-0 " + tag.cls}>{tag.label}</span>
                   </div>
                 );
               })

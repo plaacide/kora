@@ -31,7 +31,9 @@
       "password": "Password",
       "passwordHint": "8 characters min, with a letter and a digit.",
       "submit": "Create my account",
-      "submitting": "Creating…"
+      "submitting": "Creating…",
+      "jobTitle": "Your role",
+      "jobTitlePlaceholder": "CEO, CFO, Head of Legal…"
     },
     "login": {
       "title": "Log in",

@@ -67,7 +67,7 @@ export default async function DealPage() {
       // Équipe sur la levée = membres INTERNES de l'org (pas les invités).
       supabase
         .from("memberships")
-        .select("role, profiles!inner(full_name, email)")
+        .select("role, profiles!inner(full_name, email, job_title)")
         .eq("org_id", deal.org_id)
         .in("role", ["owner", "admin", "member"]),
       // Documents clés = documents réels du deal (les plus regardés d'abord).
@@ -97,11 +97,16 @@ export default async function DealPage() {
   const investisseurs = (investorsRes.data ?? []) as RaiseInvestor[];
 
   // Équipe : normalise l'embed (PostgREST renvoie un tableau pour le to-one).
-  type Prof = { full_name: string; email: string };
+  type Prof = { full_name: string; email: string; job_title?: string | null };
   const team = ((membres ?? []) as unknown as Array<{ role: string; profiles: Prof | Prof[] }>)
     .map((m) => {
       const p = Array.isArray(m.profiles) ? m.profiles[0] : m.profiles;
-      return { name: p?.full_name || (p?.email ?? "").split("@")[0] || "—", role: m.role };
+      return {
+        name: p?.full_name || (p?.email ?? "").split("@")[0] || "—",
+        role: m.role,
+        // Poste dans l'entreprise (CEO, CFO…), saisi à l'inscription.
+        title: p?.job_title ?? null,
+      };
     })
     .filter((m) => m.name !== "—");
 

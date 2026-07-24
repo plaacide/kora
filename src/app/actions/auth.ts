@@ -28,6 +28,7 @@ export async function signup(
 ): Promise<AuthState> {
   const parsed = signupSchema.safeParse({
     full_name: formData.get("full_name"),
+    job_title: formData.get("job_title") || undefined,
     email: formData.get("email"),
     password: formData.get("password"),
     locale: formData.get("locale") ?? "fr",
@@ -44,7 +45,7 @@ export async function signup(
     return { errorKey: "tooManyAttempts" };
   }
 
-  const { full_name, email, password, locale, account_type } = parsed.data;
+  const { full_name, job_title, email, password, locale, account_type } = parsed.data;
   // Flux implicite : le lien de confirmation doit s'ouvrir depuis n'importe
   // quel appareil, pas seulement celui qui s'est inscrit.
   const supabase = await createClient({ flowType: "implicit" });
@@ -60,11 +61,13 @@ export async function signup(
   // Le type de compte (investisseur/fondateur) pilote l'onboarding. On le pose
   // sur le profil via la clé privilégiée : le trigger a déjà créé le profil,
   // et l'utilisateur n'a pas forcément de session (email à confirmer).
+  // Le poste (CEO, CFO…) suit le même chemin : il s'affiche dans « Équipe sur
+  // la levée » et vaut aussi pour les membres d'équipe invités ensuite.
   if (data.user) {
     const admin = createAdminClient();
     await admin
       .from("profiles")
-      .update({ account_type })
+      .update({ account_type, ...(job_title ? { job_title } : {}) })
       .eq("id", data.user.id);
   }
 

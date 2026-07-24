@@ -76,6 +76,16 @@ export function SignupForm() {
 
         <div>
           <Input
+            label={t("jobTitle")}
+            name="job_title"
+            autoComplete="organization-title"
+            placeholder={t("jobTitlePlaceholder")}
+          />
+          <FieldError messages={state?.fieldErrors?.job_title} />
+        </div>
+
+        <div>
+          <Input
             label={t("email")}
             name="email"
             type="email"

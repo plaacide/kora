@@ -4,6 +4,9 @@ import * as z from "zod";
 // résolues côté client — les Server Actions ne connaissent pas la locale de rendu.
 export const signupSchema = z.object({
   full_name: z.string().trim().min(2, { error: "nameMin" }),
+  // Poste dans l'entreprise (CEO, CFO…). Optionnel : il s'affiche dans
+  // « Équipe sur la levée », mais ne doit bloquer aucune inscription.
+  job_title: z.string().trim().max(60).optional(),
   email: z.email({ error: "emailInvalid" }).trim(),
   password: z
     .string()
