@@ -126,8 +126,8 @@ export async function AccueilFondateur({
     supabase.rpc("deal_reading_time", { p_deal: deal.id }),
   ]);
 
-  const montant = (dealRow as { amount?: number | null; currency?: string | null } | null)
-    ?.amount;
+  // Seule la devise de la salle sert de repli : le MONTANT vient de la levée
+  // (cf. plus bas — pas de repli sur deals.amount, qui mentirait).
   const devise = (dealRow as { currency?: string | null } | null)?.currency ?? "";
 
   const liste = (exigences ?? []) as { label: string; status: string; folder_id: string | null }[];
@@ -232,7 +232,11 @@ export async function AccueilFondateur({
   const raiseRow = raiseRes.data as
     | { montant_cible: number | null; montant_engage: number | null; devise: string | null }
     | null;
-  const cible = raiseRow?.montant_cible ?? (typeof montant === "number" ? montant : null);
+  // PAS de repli sur `deals.amount` : sans levée, afficher un objectif tiré de
+  // la data room faisait croire à une levée inexistante (constaté sur
+  // CoolBricks — objectif affiché, aucune levée derrière). Sans levée, on
+  // affiche « à définir » et le lien pour en ouvrir une.
+  const cible = raiseRow?.montant_cible ?? null;
   const engage = raiseRow?.montant_engage ?? 0;
   const deviseVal = raiseRow?.devise || devise || "USD";
   const objectifDefini = typeof cible === "number" && cible > 0;
