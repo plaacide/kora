@@ -143,7 +143,7 @@ export function QaBoard({
 
         <div className="ml-auto flex gap-2">
           {items.length > 0 && (
-            <button onClick={exportCsv} className="border border-[#E4E2DC] rounded-[5px] px-3.5 py-2 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8]">
+            <button onClick={exportCsv} className="border border-[#E4E2DC] rounded-[5px] px-3.5 py-2 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]">
               {t("export")}
             </button>
           )}
@@ -154,13 +154,13 @@ export function QaBoard({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="border border-[#E2DED4] rounded-[6px] px-5 py-8 text-center">
+        <div className="bg-white border border-[#E2DED4] rounded-[6px] px-5 py-8 text-center">
           <p className="text-[12.5px] text-[#6E727A]">{t("empty")}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((q) => (
-            <div key={q.id} className="border border-[#E2DED4] rounded-[6px] p-4">
+            <div key={q.id} className="bg-white border border-[#E2DED4] rounded-[6px] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[13px] font-[600] leading-relaxed">{q.body}</p>
@@ -242,7 +242,7 @@ export function QaBoard({
           />
           <p className="text-[11px] text-[#9DA0A8] leading-relaxed">{t("askNote")}</p>
           <div className="flex justify-end gap-2">
-            <button onClick={() => setAskOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAFAF8]">
+            <button onClick={() => setAskOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAF8F4]">
               {t("cancel")}
             </button>
             <button

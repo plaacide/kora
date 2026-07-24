@@ -72,7 +72,7 @@ export function OuvrirLeveeButton({
           </div>
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
-            <button onClick={() => setOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAFAF8]">Annuler</button>
+            <button onClick={() => setOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAF8F4]">Annuler</button>
             <button onClick={submit} disabled={pending || name.trim().length < 2 || !dealId} className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60">
               {pending ? "Ouverture…" : "Ouvrir la levée"}
             </button>

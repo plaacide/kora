@@ -118,7 +118,7 @@ export default async function AuditPage() {
         <ExportButton rows={csvRows} label={t("export")} />
       </div>
 
-      <div style={mono} className="grid grid-cols-[104px_1.9fr_1.3fr_120px] gap-3 px-2 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB]">
+      <div style={mono} className="bg-white grid grid-cols-[104px_1.9fr_1.3fr_120px] gap-3 px-2 pt-3 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB]">
         <span>{t("colWhen")}</span><span>{t("colWhat")}</span><span>{t("colWho")}</span><span>{t("colHash")}</span>
       </div>
 
@@ -134,7 +134,7 @@ export default async function AuditPage() {
           ? t(`actions.${actionKey(e.action)}`)
           : e.action;
         return (
-          <div key={e.id} className="grid grid-cols-[104px_1.9fr_1.3fr_120px] gap-3 items-center px-2 py-3 border-b border-[#E8E5DC] text-[12.5px]">
+          <div key={e.id} className="bg-white grid grid-cols-[104px_1.9fr_1.3fr_120px] gap-3 items-center px-2 py-3 border-b border-[#E8E5DC] text-[12.5px]">
             <span style={mono} className="text-[11px] text-[#55585F]">{quand(e.created_at)}</span>
             <span className="min-w-0 flex items-center gap-2.5">
               <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-0.5 whitespace-nowrap uppercase " + (PILL[e.action] ?? PILL_DEFAULT)}>

@@ -30,7 +30,7 @@ const OBJ_BADGE: Record<string, { label: string; cls: string }> = {
   diligence: { label: "Diligence", cls: "text-[#185FA5] bg-[#E9F2FB]" },
 };
 
-const btnGhost = "rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAFAF8]";
+const btnGhost = "bg-white rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAF8F4]";
 const btnPrimary = "rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60";
 const champ = "h-9 w-full px-2.5 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none";
 
@@ -93,7 +93,7 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
         ))}
       </div>
 
-      <div style={mono} className="grid grid-cols-[2.4fr_0.9fr_1fr_150px] gap-3.5 px-2 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
+      <div style={mono} className="bg-white grid grid-cols-[2.4fr_0.9fr_1fr_150px] gap-3.5 px-2 pt-3 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
         <span>NOM</span><span>OBJECTIF</span><span>PROPRIÉTAIRE</span><span></span>
       </div>
 
@@ -103,7 +103,7 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
         filtered.map((r) => {
           const badge = OBJ_BADGE[r.objectif] ?? OBJ_BADGE.levee;
           return (
-            <div key={r.id} className="grid grid-cols-[2.4fr_0.9fr_1fr_150px] gap-3.5 items-center px-2 py-[15px] border-b border-[#E8E5DC] hover:bg-[#FAFAF8]">
+            <div key={r.id} className="bg-white grid grid-cols-[2.4fr_0.9fr_1fr_150px] gap-3.5 items-center px-2 py-[15px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4]">
               <button onClick={() => open(r.id)} disabled={pending} className="flex items-center gap-3 min-w-0 text-left">
                 <span className="grid place-items-center w-9 h-9 rounded-[6px] bg-[#FBEDE6] text-[#C24619] shrink-0">
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
@@ -283,11 +283,11 @@ function RoomActions({ room }: { room: Room }) {
         <>
           <span className="fixed inset-0 z-[90]" onClick={() => setMenu(false)} />
           <span className="absolute right-0 top-8 z-[91] w-44 rounded-[6px] border border-[#E2DED4] bg-white shadow-[0_10px_30px_rgba(26,27,31,0.14)] py-1 flex flex-col">
-            <button onClick={() => { setMenu(false); setName(room.name); setRenameOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAFAF8]">Renommer</button>
+            <button onClick={() => { setMenu(false); setName(room.name); setRenameOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">Renommer</button>
             {room.archived ? (
-              <button onClick={() => archiver(false)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAFAF8]">Désarchiver</button>
+              <button onClick={() => archiver(false)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">Désarchiver</button>
             ) : (
-              <button onClick={() => archiver(true)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAFAF8]">Archiver</button>
+              <button onClick={() => archiver(true)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">Archiver</button>
             )}
             <button onClick={() => { setMenu(false); setError(undefined); room.hasRaise ? setWarnOpen(true) : setDeleteOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#C0392B] hover:bg-[#FBEDE6]">Supprimer</button>
           </span>

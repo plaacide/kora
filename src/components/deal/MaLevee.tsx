@@ -131,7 +131,7 @@ const lab = "text-[11.5px] font-[600] text-[#6E727A] mb-1 block";
 const btnPrimary =
   "rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60";
 const btnGhost =
-  "rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAFAF8]";
+  "bg-white rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAF8F4]";
 
 export function MaLevee({
   dealName,
@@ -225,7 +225,7 @@ export function MaLevee({
       <VitrineBand dealId={dealId} audience={audience} indicateurs={raise.indicateurs ?? {}} />
 
       {/* Résumé de la levée — RÉEL */}
-      <div className="border border-[#E2DED4] rounded-[6px] mb-7">
+      <div className="bg-white border border-[#E2DED4] rounded-[6px] mb-7">
         <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr] divide-y md:divide-y-0 md:divide-x divide-[#E2DED4]">
           <div className="px-5 py-[18px]">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">Montant recherché</div>
@@ -297,7 +297,7 @@ export function MaLevee({
               <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Historique de financement</h2>
               <span className="text-[12.5px] text-[#9DA0A8]">{totalLabel}{closedRaises.length} tour(s) clôturé(s)</span>
             </div>
-            <div className="border border-[#E2DED4] rounded-[6px] flex items-stretch mb-9 flex-col md:flex-row overflow-x-auto">
+            <div className="bg-white border border-[#E2DED4] rounded-[6px] flex items-stretch mb-9 flex-col md:flex-row overflow-x-auto">
               {rounds.map((rd, i) => (
                 <Fragment key={rd.r.id}>
                   {i > 0 && (
@@ -346,7 +346,7 @@ export function MaLevee({
               <p className="text-[12px] text-[#9DA0A8] py-4">Aucun document déposé. <Link href="/data-room" className="font-[600] text-[#C24619]">Déposer →</Link></p>
             ) : (
               keyDocs.map((d) => (
-                <Link key={d.id} href={`/visionneuse?doc=${d.id}`} className="flex items-center gap-2.5 py-3 border-b border-[#E8E5DC] last:border-0 hover:bg-[#FAFAF8]">
+                <Link key={d.id} href={`/visionneuse?doc=${d.id}`} className="bg-white flex items-center gap-2.5 py-3 border-b border-[#E8E5DC] last:border-0 hover:bg-[#FAF8F4]">
                   <span style={mono} className={"rounded-[3px] px-[5px] py-0.5 text-[8.5px] font-[600] " + DOC_BADGE(d.type)}>{d.type}</span>
                   <span className="flex-1 min-w-0 text-[13px] font-[600] truncate">{d.name}</span>
                   <span style={mono} className="text-[11px] text-[#9DA0A8] shrink-0">{d.vues > 0 ? `${d.vues} vue${d.vues > 1 ? "s" : ""}` : "0 vue"}</span>
@@ -366,7 +366,7 @@ export function MaLevee({
               team.map((m, i) => {
                 const tag = ROLE_TAG[m.role] ?? { label: m.role.toUpperCase(), cls: "text-[#8B8E96] bg-[#F1F0EB]" };
                 return (
-                  <div key={i} className="flex items-center gap-2.5 py-3 border-b border-[#E8E5DC] last:border-0">
+                  <div key={i} className="bg-white flex items-center gap-2.5 py-3 border-b border-[#E8E5DC] last:border-0">
                     <span className="grid place-items-center w-[30px] h-[30px] rounded-[6px] bg-[#1A1B1F] text-white text-[10px] font-[700] shrink-0">{initials(m.name)}</span>
                     <span className="flex-1 min-w-0">
                       <span className="block text-[13px] font-[600] truncate">{m.name}</span>
@@ -432,7 +432,7 @@ function VitrineBand({
               <button
                 key={a}
                 onClick={() => setSel(a)}
-                className={"rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] border transition-colors " + (activeSel === a ? "border-[#E85C2B] bg-[#FEF8F4] text-[#C24619]" : "border-[#E4E2DC] text-[#55585F] hover:border-[#C9C6BD]")}
+                className={"rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] border transition-colors " + (activeSel === a ? "border-[#E85C2B] bg-[#FEF8F4] text-[#C24619]" : "bg-white border-[#E4E2DC] text-[#55585F] hover:border-[#C9C6BD]")}
               >
                 {labelOf(AUDIENCES, a) || a}
               </button>
@@ -443,13 +443,13 @@ function VitrineBand({
       )}
 
       {/* En bref */}
-      <div className="border border-[#E2DED4] rounded-[6px] overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[#E2DED4] flex-wrap">
+      <div className="bg-white border border-[#E2DED4] rounded-[6px] overflow-hidden">
+        <div className="bg-white flex items-center justify-between gap-3 px-4 py-3 border-b border-[#E2DED4] flex-wrap">
           <span className="flex items-baseline gap-2.5">
             <span className="text-[13.5px] font-[700]">En bref</span>
             <span className="text-[11.5px] text-[#9DA0A8]">ce qu&apos;un investisseur voit avant d&apos;ouvrir vos documents</span>
           </span>
-          <button onClick={() => setEditOpen(true)} className="flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3 py-1.5 text-[12px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] whitespace-nowrap">
+          <button onClick={() => setEditOpen(true)} className="flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3 py-1.5 text-[12px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4] whitespace-nowrap">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
             Éditer les indicateurs
           </button>
@@ -572,11 +572,11 @@ function VitrineEditor({
                     type="button"
                     onClick={() => edit(aud, i, { g: !r.g })}
                     title="Mettre en avant (vert)"
-                    className={"w-9 h-9 rounded-[5px] border text-[11px] font-[700] " + (r.g ? "border-[#147A5C] bg-[#E4F3EC] text-[#147A5C]" : "border-[#E4E2DC] text-[#9DA0A8]")}
+                    className={"w-9 h-9 rounded-[5px] border text-[11px] font-[700] " + (r.g ? "border-[#147A5C] bg-[#E4F3EC] text-[#147A5C]" : "bg-white border-[#E4E2DC] text-[#9DA0A8]")}
                   >
                     ✓
                   </button>
-                  <button type="button" onClick={() => remove(aud, i)} title="Retirer" className="w-9 h-9 rounded-[5px] border border-[#E4E2DC] text-[#9DA0A8] hover:text-[#C0392B] hover:border-[#E3B4AD]">×</button>
+                  <button type="button" onClick={() => remove(aud, i)} title="Retirer" className="bg-white w-9 h-9 rounded-[5px] border border-[#E4E2DC] text-[#9DA0A8] hover:text-[#C0392B] hover:border-[#E3B4AD]">×</button>
                 </div>
               ))}
               <button type="button" onClick={() => addRow(aud)} className="self-start text-[12px] font-[600] text-[#C24619] mt-0.5">+ Ajouter un indicateur</button>
@@ -626,13 +626,13 @@ function PipelineInvestisseurs({
           </p>
         ) : (
           <>
-            <div style={mono} className="grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 py-2 text-[9px] text-[#A0A3AB] tracking-[0.05em] border-b border-[#E2DED4]">
+            <div style={mono} className="bg-white grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 py-2 text-[9px] text-[#A0A3AB] tracking-[0.05em] border-b border-[#E2DED4]">
               <span>INVESTISSEUR</span><span>TICKET</span><span>STATUT</span><span></span>
             </div>
             {investors.map((inv) => {
               const st = STATUT_PIPELINE.find((s) => s.key === inv.statut);
               return (
-                <div key={inv.id} className="grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 items-center py-3 border-b border-[#E8E5DC]">
+                <div key={inv.id} className="bg-white grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 items-center py-3 border-b border-[#E8E5DC]">
                   <span className="flex items-center gap-2.5 min-w-0">
                     <span className="grid place-items-center w-7 h-7 rounded-[6px] bg-[#1A1B1F] text-white text-[10px] font-[700] shrink-0">{initials(inv.nom)}</span>
                     <span className="min-w-0">
@@ -783,7 +783,7 @@ function RaiseChips({
         </>
       )}
       {closedRaises.map((r) => (
-        <span key={r.id} className="flex items-center gap-2.5 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2.5 whitespace-nowrap">
+        <span key={r.id} className="bg-white flex items-center gap-2.5 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2.5 whitespace-nowrap">
           <span className="text-[13px] font-[650] text-[#6E727A]">{labelOf(STADE_RAISE, r.stade) || "Tour précédent"}</span>
           <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-[7px] py-0.5">CLÔTURÉE</span>
           <span style={mono} className="text-[11px] text-[#9DA0A8]">{formatMoney(r.montant_cible, r.devise)}</span>
@@ -947,7 +947,7 @@ function CloseRaiseButton({ dealId }: { dealId: string }) {
     <>
       <button
         onClick={() => { setError(undefined); setOpen(true); }}
-        className="flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2.5 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C24619] hover:text-[#C24619] whitespace-nowrap"
+        className="bg-white flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2.5 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C24619] hover:text-[#C24619] whitespace-nowrap"
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
         Clôturer la levée
@@ -988,7 +988,7 @@ function PreparationCard({
   legende: string;
 }) {
   return (
-    <div className="border border-[#E2DED4] rounded-[6px] p-5">
+    <div className="bg-white border border-[#E2DED4] rounded-[6px] p-5">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           <span className="grid place-items-center w-10 h-10 rounded-[6px] bg-[#1A1B1F] text-white font-[700]">{dealName.slice(0, 1)}</span>
@@ -1091,7 +1091,7 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAFAF8] whitespace-nowrap mt-1"
+        className="flex items-center gap-2 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4] whitespace-nowrap mt-1"
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
         Modifier la levée
@@ -1160,7 +1160,7 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
                     key={a.key}
                     type="button"
                     onClick={() => toggleAud(a.key)}
-                    className={"rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] border transition-colors " + (on ? "border-[#E85C2B] bg-[#FEF8F4] text-[#C24619]" : "border-[#E4E2DC] text-[#55585F] hover:border-[#C9C6BD]")}
+                    className={"rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] border transition-colors " + (on ? "border-[#E85C2B] bg-[#FEF8F4] text-[#C24619]" : "bg-white border-[#E4E2DC] text-[#55585F] hover:border-[#C9C6BD]")}
                   >
                     {a.label}
                   </button>

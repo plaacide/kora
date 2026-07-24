@@ -231,7 +231,7 @@ export function Checklist({
       <PlainError message={error} />
 
       {/* Préparation — le score se recalcule à chaque changement. */}
-      <div className="border border-[#E2DED4] rounded-[6px] p-4">
+      <div className="bg-white border border-[#E2DED4] rounded-[6px] p-4">
         <div className="flex items-baseline justify-between">
           <span className="text-[12.5px] font-[600] text-[#6E727A]">
             {t("readinessTitle")}
@@ -270,11 +270,11 @@ export function Checklist({
               {t(`categoryHints.${cat}`)}
             </p>
 
-            <div className="border border-[#E2DED4] rounded-[6px] overflow-hidden">
+            <div className="bg-white border border-[#E2DED4] rounded-[6px] overflow-hidden">
               {list.map((i) => (
                 <div
                   key={i.id}
-                  className="flex items-start gap-3 px-4 py-3 border-b border-[#E8E5DC] last:border-0 hover:bg-[#FAFAF8] group"
+                  className="bg-white flex items-start gap-3 px-4 py-3 border-b border-[#E8E5DC] last:border-0 hover:bg-[#FAF8F4] group"
                 >
                   <button
                     onClick={() => cycle(i)}

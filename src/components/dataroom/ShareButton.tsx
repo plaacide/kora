@@ -74,7 +74,7 @@ export function ShareButton({
       </button>
 
       <Modal open={open} onClose={() => setOpen(false)}>
-        <div className="px-6 pt-5 pb-4 border-b border-[#E8E5DC]">
+        <div className="bg-white px-6 pt-5 pb-4 border-b border-[#E8E5DC]">
           <div className="text-[16px] font-[700] text-[#1A1B1F]">Partager la data room</div>
         </div>
         <div className="px-6 py-5 flex flex-col gap-4">
@@ -86,7 +86,7 @@ export function ShareButton({
               onChange={(e) => setEmail(e.target.value)}
               placeholder="investisseur@fonds.com"
               autoFocus
-              className="h-9 px-3 text-[13px] border border-[#E4E2DC] rounded-[5px] focus:outline-none focus:border-[#C9C6BD]"
+              className="bg-white h-9 px-3 text-[13px] border border-[#E4E2DC] rounded-[5px] focus:outline-none focus:border-[#C9C6BD]"
             />
           </label>
 
@@ -110,7 +110,7 @@ export function ShareButton({
                 type="date"
                 value={expire}
                 onChange={(e) => setExpire(e.target.value)}
-                className="h-9 px-2.5 text-[13px] border border-[#E4E2DC] rounded-[5px] focus:outline-none focus:border-[#C9C6BD]"
+                className="bg-white h-9 px-2.5 text-[13px] border border-[#E4E2DC] rounded-[5px] focus:outline-none focus:border-[#C9C6BD]"
               />
               <span className="text-[11px] text-[#9DA0A8]">90 jours par défaut, prolongeable.</span>
             </label>
@@ -137,7 +137,7 @@ export function ShareButton({
           )}
         </div>
         <div className="px-6 py-4 border-t border-[#E8E5DC] flex justify-end gap-2.5">
-          <button onClick={() => setOpen(false)} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAFAF8]">
+          <button onClick={() => setOpen(false)} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAF8F4]">
             Annuler
           </button>
           <button
