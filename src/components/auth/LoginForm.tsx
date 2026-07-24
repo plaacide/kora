@@ -30,10 +30,10 @@ export function LoginForm({ notice }: { notice?: string } = {}) {
         </p>
       )}
       <div>
-        <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
+        <h1 className="font-display text-[32px] font-[700] tracking-[-0.025em] leading-tight">
           {t("title")}
         </h1>
-        <p className="mt-1 text-[12.5px] text-ink-secondary">
+        <p className="mt-2 text-[13px] text-[#4A4E63]">
           {t("noAccount")}{" "}
           <Link href="/inscription" className="font-medium">
             {t("signupLink")}

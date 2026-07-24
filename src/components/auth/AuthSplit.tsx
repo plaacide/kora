@@ -30,25 +30,28 @@ const OPPOSE = {
 
 export function AuthSplit({
   arcsCorner = "bottom-right",
+  formWidth = 392,
   panel,
   footer,
   children,
 }: {
   arcsCorner?: "bottom-right" | "top-left";
+  /** 392 pour la connexion, 452 pour l'inscription (handoff v2 §3). */
+  formWidth?: number;
   panel: React.ReactNode;
   footer?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen grid lg:grid-cols-[1fr_42%]">
-      {/* Colonne claire : logo puis formulaire */}
-      <div className="flex flex-col p-6 lg:p-10">
+    <div className="min-h-screen grid lg:grid-cols-[52%_48%]">
+      {/* Colonne claire : logo en haut, formulaire centré, pied de page. */}
+      <div className="flex flex-col bg-[#FAF8F4] p-6 lg:px-16 lg:py-13">
         <Link href="/" aria-label="Sanza" className="inline-block w-fit">
-          <SanzaLogo size={34} />
+          <SanzaLogo size={25} />
         </Link>
 
         <div className="flex-1 flex items-center justify-center py-10">
-          <div className="w-full max-w-[452px]">{children}</div>
+          <div className="w-full" style={{ maxWidth: formWidth }}>{children}</div>
         </div>
 
         {/* Pied de page (handoff v2 §2 et §3) : mention de copyright et choix

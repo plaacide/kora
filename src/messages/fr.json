@@ -22,7 +22,7 @@
   "auth": {
     "brandPitch": "Due diligence, Q&A, syndication et reporting LP — chiffré, filigrané, audité de bout en bout.",
     "signup": {
-      "title": "Créer un compte",
+      "title": "Créer votre compte",
       "haveAccount": "Déjà inscrit ?",
       "loginLink": "Se connecter",
       "fullName": "Nom complet",
@@ -36,7 +36,7 @@
       "jobTitlePlaceholder": "CEO, CFO, Directrice juridique…"
     },
     "login": {
-      "title": "Se connecter",
+      "title": "Bon retour",
       "noAccount": "Pas encore de compte ?",
       "signupLink": "Créer un compte",
       "email": "Email",

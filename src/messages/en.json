@@ -22,7 +22,7 @@
   "auth": {
     "brandPitch": "Due diligence, Q&A, syndication and LP reporting — encrypted, watermarked, audited end to end.",
     "signup": {
-      "title": "Create an account",
+      "title": "Create your account",
       "haveAccount": "Already registered?",
       "loginLink": "Log in",
       "fullName": "Full name",
@@ -36,7 +36,7 @@
       "jobTitlePlaceholder": "CEO, CFO, Head of Legal…"
     },
     "login": {
-      "title": "Log in",
+      "title": "Welcome back",
       "noAccount": "No account yet?",
       "signupLink": "Create an account",
       "email": "Email",

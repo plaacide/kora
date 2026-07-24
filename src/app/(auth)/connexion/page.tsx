@@ -22,13 +22,58 @@ export default async function ConnexionPage({
       arcsCorner="top-left"
       panel={
         <div>
-          <h2 className="text-[24px] font-[650] leading-tight tracking-[-0.02em]">
+          {/* Badge pill, titre 36px, puis carte produit en verre (handoff §3). */}
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/[0.07] border border-white/10 px-3 py-1.5 text-[11.5px] text-white/80">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#e85c2b]" />
+            Bêta privée · fondateurs
+          </span>
+
+          <h2 className="mt-5 text-[36px] font-[700] leading-[1.1] tracking-[-0.025em]">
             Le dealflow africain,{" "}
             <span className="text-[#e85c2b]">enfin structuré.</span>
           </h2>
-          <p className="mt-3 text-[13px] text-white/70 leading-relaxed">
-            240 investisseurs et 1 800 startups se rencontrent sur Sanza.
+          <p className="mt-3 text-[13.5px] text-white/70 leading-relaxed">
+            Votre data room, votre levée et vos investisseurs au même endroit.
           </p>
+
+          {/* Carte produit — exemple illustratif, pas des données réelles. */}
+          <div className="mt-6 rounded-[16px] border border-white/10 bg-white/[0.055] p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[14.5px] font-[650] truncate">Kalyx Foods</div>
+                <div style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="text-[10.5px] text-white/45 mt-0.5">
+                  SNZ-2026-014 · exemple
+                </div>
+              </div>
+              <span style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="shrink-0 text-[9px] font-[600] uppercase tracking-[0.06em] text-[#f08a5e] bg-[#e85c2b]/15 rounded-[4px] px-2 py-[3px]">
+                Série A
+              </span>
+            </div>
+
+            <div className="mt-4">
+              <div className="flex items-center justify-between text-[11.5px] text-white/60">
+                <span>Dossier complété</span>
+                <span style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="text-white/85">82 %</span>
+              </div>
+              <span className="block h-1.5 rounded-[3px] bg-white/10 overflow-hidden mt-2">
+                <span className="block h-full bg-[#e85c2b]" style={{ width: "82%" }} />
+              </span>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-3 gap-2">
+              {[
+                { v: "2,4 M$", l: "recherchés" },
+                { v: "14", l: "accès" },
+                { v: "6 j", l: "d'activité" },
+              ].map((m) => (
+                <div key={m.l}>
+                  <div style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="text-[15px] font-[600]">{m.v}</div>
+                  <div className="text-[10.5px] text-white/50 mt-0.5">{m.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="mt-5 flex flex-wrap gap-2">
             <Badge
               icon={
