@@ -9,16 +9,56 @@ import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
 import { cn } from "@/lib/cn";
 
+/**
+ * Icônes de rôle en TRAIT (handoff v2 §2 : zéro emoji). 19 px, stroke 2,
+ * `currentColor` — donc grises par défaut, orange quand la carte est active.
+ */
+function RoleIcon({ name }: { name: "investor" | "founder" | "sae" }) {
+  const common = {
+    width: 19,
+    height: 19,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+  };
+  if (name === "investor") {
+    // Histogramme : l'investisseur évalue des chiffres.
+    return (
+      <svg {...common}>
+        <path d="M5 20V10" /><path d="M12 20V4" /><path d="M19 20v-6" />
+      </svg>
+    );
+  }
+  if (name === "founder") {
+    // Pousse qui lève : la startup qui décolle, sans la fusée d'emoji.
+    return (
+      <svg {...common}>
+        <path d="M12 21V9" /><path d="M12 9a5 5 0 0 1 5-5h2v2a5 5 0 0 1-5 5h-2z" />
+        <path d="M12 13H10a5 5 0 0 1-5-5V6h2a5 5 0 0 1 5 5z" />
+      </svg>
+    );
+  }
+  // Cible : le programme accompagne un portefeuille.
+  return (
+    <svg {...common}>
+      <circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4" />
+    </svg>
+  );
+}
+
 const ROLES = [
-  { key: "investor", emoji: "📊", title: "Investisseur", desc: "Je cherche des opportunités d'investissement" },
-  { key: "founder", emoji: "🚀", title: "Fondateur", desc: "Je lève des fonds pour ma startup" },
-  { key: "sae", emoji: "🎯", title: "Programme", desc: "J'accompagne plusieurs startups" },
+  { key: "investor", title: "Investisseur", desc: "Je cherche des opportunités d'investissement" },
+  { key: "founder", title: "Fondateur", desc: "Je lève des fonds pour ma startup" },
+  { key: "sae", title: "Programme", desc: "J'accompagne plusieurs startups" },
 ] as const;
 
 export function SignupForm() {
   const [state, action, pending] = useActionState(signup, undefined);
   const t = useTranslations("auth.signup");
-  const tc = useTranslations("common");
   const locale = useLocale();
   const [role, setRole] = useState<"investor" | "founder" | "sae">("investor");
 
@@ -49,13 +89,16 @@ export function SignupForm() {
               onClick={() => setRole(r.key)}
               aria-pressed={role === r.key}
               className={cn(
-                "flex flex-col items-start gap-1 rounded-[10px] border-2 p-2.5 text-left transition-colors cursor-pointer",
+                "flex flex-col items-start gap-1.5 rounded-[10px] p-2.5 text-left transition-colors cursor-pointer",
+                // Carte active : bordure 1.5px orange + fond #FDF1EA (handoff §3).
                 role === r.key
-                  ? "border-primary bg-[rgba(232,92,43,0.06)]"
-                  : "border-line hover:border-line-strong",
+                  ? "border-[1.5px] border-[#E85C2B] bg-[#FDF1EA]"
+                  : "border-[1.5px] border-[#E2DED4] hover:border-[#C9C6BD]",
               )}
             >
-              <span className="text-[18px]">{r.emoji}</span>
+              <span className={role === r.key ? "text-[#E85C2B]" : "text-[#8B8FA3]"}>
+                <RoleIcon name={r.key} />
+              </span>
               <span className="text-[12.5px] font-[650]">{r.title}</span>
               <span className="text-[10.5px] text-ink-muted leading-tight">
                 {r.desc}
@@ -106,23 +149,10 @@ export function SignupForm() {
           <FieldError messages={state?.fieldErrors?.password} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="locale"
-            className="text-[11.5px] font-medium text-ink-secondary"
-          >
-            {tc("language")}
-          </label>
-          <select
-            id="locale"
-            name="locale"
-            defaultValue={locale}
-            className="h-8 px-2.5 text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none"
-          >
-            <option value="fr">{tc("french")}</option>
-            <option value="en">{tc("english")}</option>
-          </select>
-        </div>
+        {/* La langue n'est plus un champ du formulaire (handoff v2 §2) : elle se
+            choisit en pied de page. On transmet celle en cours pour que le
+            compte, et donc les e-mails, soient dans la bonne langue. */}
+        <input type="hidden" name="locale" value={locale} />
 
         <Button type="submit" variant="primary" loading={pending}>
           {pending ? t("submitting") : t("submit")}

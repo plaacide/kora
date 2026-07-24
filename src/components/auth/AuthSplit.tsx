@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SanzaLogo } from "@/components/ui/SanzaLogo";
 import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
+import { LocaleLinks } from "@/components/auth/LocaleLinks";
 
 /**
  * Gabarit auth : formulaire à GAUCHE sur fond clair, panneau Encre à DROITE.
@@ -47,7 +48,16 @@ export function AuthSplit({
         </Link>
 
         <div className="flex-1 flex items-center justify-center py-10">
-          <div className="w-full max-w-[380px]">{children}</div>
+          <div className="w-full max-w-[452px]">{children}</div>
+        </div>
+
+        {/* Pied de page (handoff v2 §2 et §3) : mention de copyright et choix
+            de langue, sorti du formulaire. Les liens Confidentialité / CGU /
+            Aide viendront quand ces pages existeront — on ne pointe pas vers
+            une page inexistante. */}
+        <div className="flex items-center justify-between gap-4 text-[12px] text-[#9B9EAE]">
+          <span>© 2026 Sanza</span>
+          <LocaleLinks />
         </div>
       </div>
 
