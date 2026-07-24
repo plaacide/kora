@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createBareClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 /**
@@ -17,13 +18,28 @@ import { cookies } from "next/headers";
 export async function createClient(
   options?: { flowType?: "pkce" | "implicit" },
 ) {
+  // ⚠️ Depuis @supabase/ssr 0.12, `createServerClient` ÉCRASE l'option :
+  // `auth: { ...options?.auth, flowType: "pkce", ... }` — notre « implicit »
+  // était ignoré en silence, et tous les liens e-mail repartaient en `pkce_`
+  // (donc « lien expiré » au premier clic). Rien ne le détecte au build.
+  //
+  // Pour les flux e-mail, on n'a besoin d'AUCUNE session ni cookie (l'action
+  // attend justement la confirmation par e-mail) : client nu supabase-js,
+  // réellement implicite, hors de portée de l'écrasement.
+  if (options?.flowType === "implicit") {
+    return createBareClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { flowType: "implicit", persistSession: false, autoRefreshToken: false } },
+    );
+  }
+
   const cookieStore = await cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      auth: options?.flowType ? { flowType: options.flowType } : undefined,
       cookies: {
         getAll() {
           return cookieStore.getAll();

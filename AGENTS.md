@@ -187,6 +187,16 @@ trompe — `/auth/confirm` renvoie `erreur=lien_expire` pour toute erreur de
 Tout appel qui DÉCLENCHE un e-mail (`signUp`, `resetPasswordForEmail`) doit
 donc utiliser `createClient({ flowType: "implicit" })`.
 
+⚠️ **Récidive (2026-07-24)** : `@supabase/ssr` 0.12 fait
+`auth: { ...options?.auth, flowType: "pkce", … }` — l'option passée est étalée
+AVANT le littéral, donc **écrasée en silence**. Le `flowType: "implicit"`
+transmis à `createServerClient` ne faisait plus rien, et tous les liens
+repartaient en `pkce_`. Le remède est dans `src/lib/supabase/server.ts` : en
+implicite, on n'utilise PLUS `@supabase/ssr` mais le client nu
+`@supabase/supabase-js` (aucune session/cookie n'est nécessaire pour ces
+flux). À re-vérifier à chaque montée de version de `@supabase/ssr` : relire un
+e-mail réel via l'API Resend et contrôler l'absence de préfixe `pkce_`.
+
 **Rien ne le détecte avant l'exécution**, et le journal Resend dit
 « delivered » : l'e-mail part, il arrive, c'est le lien qu'il contient qui est
 inutilisable. Pour vérifier, relire le lien réellement envoyé :
