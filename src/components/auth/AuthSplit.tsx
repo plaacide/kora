@@ -21,6 +21,12 @@ import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
  * Pas de plancher non plus : en dessous de `lg` (1024 px) le panneau est
  * masqué, et 42 % de 1024 laisse déjà 430 px, largement de quoi respirer.
  */
+/** Coin diamétralement opposé — les panneaux Encre portent 2 jeux d'arcs. */
+const OPPOSE = {
+  "bottom-right": "top-left",
+  "top-left": "bottom-right",
+} as const;
+
 export function AuthSplit({
   arcsCorner = "bottom-right",
   panel,
@@ -52,7 +58,9 @@ export function AuthSplit({
           Collé en bas, il se lisait comme un pied de page décoratif au lieu de
           répondre au regard qui vient de quitter le champ mot de passe. */}
       <div className="hidden lg:flex relative overflow-hidden flex-col justify-center p-10 lg:p-14 bg-encre text-white">
-        <ResonanceArcs corner={arcsCorner} />
+        {/* Panneau Encre : 2 jeux d'arcs en coins opposés (handoff v2 §4). */}
+        <ResonanceArcs corner={arcsCorner} size={620} />
+        <ResonanceArcs corner={OPPOSE[arcsCorner]} size={520} />
         <div className="relative z-10 max-w-md">{panel}</div>
         {footer && <div className="relative z-10 mt-6">{footer}</div>}
       </div>

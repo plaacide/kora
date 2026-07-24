@@ -4,6 +4,7 @@ import { getCurrentDeal } from "@/lib/current-deal";
 import { MaLevee } from "@/components/deal/MaLevee";
 import { MesLeveesBar, type LeveeChip } from "@/components/deal/MesLeveesBar";
 import { NewDataRoomButton } from "@/components/dataroom/RoomsList";
+import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 import type { Raise, RaiseInvestor } from "@/lib/raise";
 
 /**
@@ -25,7 +26,9 @@ export default async function DealPage() {
     return (
       <div className="flex flex-col gap-5 max-w-2xl text-[#1A1B1F]">
         <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">Ma levée</h1>
-        <div className="border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center">
+        <div className="relative overflow-hidden border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center">
+          {/* Écran vide : 1 jeu d'arcs, bas-droit (handoff v2 §4). */}
+          <ResonanceArcs corner="bottom-right" size={480} tone="light" />
           <span className="mx-auto grid place-items-center w-12 h-12 rounded-[8px] bg-[#FBEDE6] text-[#C24619] mb-4">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" /></svg>
           </span>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SanzaLogo } from "@/components/ui/SanzaLogo";
 import { EchoMotif } from "@/components/brand/EchoMotif";
+import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 
 /**
  * 404 de marque. Volontairement sobre : la page d'erreur n'est pas un endroit
@@ -8,8 +9,10 @@ import { EchoMotif } from "@/components/brand/EchoMotif";
  */
 export default function NotFound() {
   return (
-    <main className="min-h-screen bg-bg grid place-items-center px-6">
-      <div className="flex flex-col items-center gap-5 text-center max-w-md">
+    <main className="relative overflow-hidden min-h-screen bg-bg grid place-items-center px-6">
+      {/* Écran vide : 1 jeu d'arcs, bas-droit, 480 (handoff v2 §4). */}
+      <ResonanceArcs corner="bottom-right" size={480} tone="light" />
+      <div className="relative z-10 flex flex-col items-center gap-5 text-center max-w-md">
         <SanzaLogo size={30} />
         <EchoMotif />
         <div className="flex flex-col gap-2">

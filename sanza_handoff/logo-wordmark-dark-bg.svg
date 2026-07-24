@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="110" viewBox="0 0 360 110">
+  <rect width="360" height="110" fill="#171A2C"></rect>
+  <g font-family="&#39;Instrument Sans&#39;,ui-sans-serif,system-ui,sans-serif" font-weight="700" font-size="72" letter-spacing="-1">
+    <text x="10" y="80" fill="#FFFFFF">sanz</text>
+    <text x="197" y="80" fill="#F08A5E" opacity="0.35">a</text>
+    <text x="178" y="80" fill="#F08A5E" opacity="0.6">a</text>
+    <text x="160" y="80" fill="#FFFFFF">a</text>
+  </g>
+</svg>

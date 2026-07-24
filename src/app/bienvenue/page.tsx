@@ -35,8 +35,9 @@ export default async function BienvenuePage() {
 
   return (
     <main className="relative min-h-screen bg-encre text-white overflow-hidden grid place-items-center px-6">
-      <ResonanceArcs corner="top-left" />
-      <ResonanceArcs corner="bottom-right" />
+      {/* Deux jeux d'arcs en coins opposés, 640 / 680 (handoff v2 §6). */}
+      <ResonanceArcs corner="top-left" size={640} />
+      <ResonanceArcs corner="bottom-right" size={680} />
 
       <div className="relative z-10 w-full max-w-[480px] flex flex-col items-center text-center gap-5">
         <EchoMotif dark />

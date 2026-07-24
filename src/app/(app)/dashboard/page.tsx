@@ -13,6 +13,7 @@ import { Sparkline } from "@/components/dashboard/Sparkline";
 import { DealsTable, type DealRow } from "@/components/dashboard/DealsTable";
 import { NewDealButton } from "@/components/dataroom/NewDealButton";
 import { NewDataRoomButton } from "@/components/dataroom/RoomsList";
+import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 import { formatAmount, formatDate } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
 
@@ -78,7 +79,9 @@ export default async function DashboardPage() {
           <h1 className="font-display text-[27px] font-[700] tracking-[-0.02em]">Bonjour, {prenom}</h1>
           <p className="text-[13.5px] text-[#6E727A] mt-1">Créez votre première data room pour démarrer.</p>
         </div>
-        <div className="border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center max-w-2xl">
+        <div className="relative overflow-hidden border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center max-w-2xl">
+          {/* Écran vide : 1 jeu d'arcs, bas-droit (handoff v2 §4). */}
+          <ResonanceArcs corner="bottom-right" size={480} tone="light" />
           <span className="mx-auto grid place-items-center w-12 h-12 rounded-[8px] bg-[#FBEDE6] text-[#C24619] mb-4">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
           </span>

@@ -68,8 +68,8 @@ export function SanzaLogo({
     >
       sanz
       <span style={{ position: "relative", display: "inline-block" }}>
-        <Echo off="0.16em" op={0.3} color={echo} animate={animate} />
-        <Echo off="0.08em" op={0.55} color={echo} animate={animate} />
+        <Echo off="0.52em" op={0.3} color={echo} animate={animate} />
+        <Echo off="0.26em" op={0.55} color={echo} animate={animate} />
         <span style={{ position: "relative" }}>a</span>
       </span>
     </span>
