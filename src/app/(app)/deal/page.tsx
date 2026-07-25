@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal } from "@/lib/current-deal";
+import { isoDans } from "@/lib/echeance";
 import { MaLevee } from "@/components/deal/MaLevee";
 import { MesLeveesBar, type LeveeChip } from "@/components/deal/MesLeveesBar";
 import { NewDataRoomButton } from "@/components/dataroom/RoomsList";
@@ -46,7 +47,7 @@ export default async function DealPage() {
     );
   }
 
-  const [{ data: exigences }, raisesRes, investorsRes, { data: membres }, { data: docs }, { data: vues }, ndaRes] =
+  const [{ data: exigences }, raisesRes, investorsRes, { data: membres }, { data: docs }, { data: vues }, ndaRes, permsRes, derniereVueRes, lectureRes] =
     await Promise.all([
       supabase
         .from("checklist_items")
@@ -87,9 +88,35 @@ export default async function DealPage() {
         .in("action", ["document.page_viewed", "document.sheet_viewed"]),
       // Réglage NDA de la data room (tolérant si la colonne n'existe pas encore).
       supabase.from("deals").select("nda_required").eq("id", deal.id).maybeSingle(),
+      // §2.5 « Accès actifs » — source vérifiée : un droit NON nul et NON expiré
+      // sur la salle. Compter les invitations donnerait les envois, pas les accès.
+      supabase
+        .from("permissions")
+        .select("user_id, level, expires_at")
+        .eq("deal_id", deal.id)
+        .neq("level", "none")
+        // Filtre d'expiration côté base : lire l'horloge pendant le rendu est
+        // signalé par le compilateur React (cf. echeance.ts).
+        .or(`expires_at.is.null,expires_at.gt.${isoDans(0)}`),
+      // §2.5 « Dernière consultation » — dernier événement de lecture réel.
+      supabase
+        .from("audit_log")
+        .select("actor_email, target_id, created_at")
+        .eq("deal_id", deal.id)
+        .in("action", ["document.page_viewed", "document.sheet_viewed"])
+        .order("created_at", { ascending: false })
+        .limit(1),
+      // Durée mesurée, pas estimée (table page_dwell).
+      supabase.rpc("deal_reading_time", { p_deal: deal.id }),
     ]);
 
   const ndaDefault = !!(ndaRes.data as { nda_required?: boolean } | null)?.nda_required;
+
+  // §2.5 — accès actifs : personnes distinctes ayant un droit valide (les
+  // droits expirés sont déjà écartés par la requête).
+  const accesActifs = new Set(
+    ((permsRes.data ?? []) as { user_id: string }[]).map((p) => p.user_id),
+  ).size;
 
   const liste = (exigences ?? []) as { label: string; status: string; folder_id: string | null }[];
   const missing = liste
@@ -141,6 +168,23 @@ export default async function DealPage() {
   const etoiles = tousDocs.filter((d) => d.is_key);
   const keyDocs = (etoiles.length > 0 ? etoiles : [...tousDocs].sort((a, b) => b.vues - a.vues)).slice(0, 5);
 
+  // §2.5 — dernière consultation : qui, quel document, quand, et la durée
+  // MESURÉE (page_dwell). Rien n'est approché : sans événement, on n'affiche pas.
+  const ev = ((derniereVueRes.data ?? []) as { actor_email: string | null; target_id: string | null; created_at: string }[])[0];
+  const nomDoc = new Map(tousDocs.map((d) => [d.id, d.name]));
+  const dureeCouple = new Map(
+    ((lectureRes.data ?? []) as { actor_email: string | null; document_id: string; total_ms: number }[])
+      .map((r) => [`${(r.actor_email ?? "").toLowerCase()}|${r.document_id}`, r.total_ms]),
+  );
+  const derniereVue = ev
+    ? {
+        qui: (ev.actor_email ?? "").split("@")[0],
+        doc: nomDoc.get(ev.target_id ?? "") ?? null,
+        quand: ev.created_at,
+        ms: dureeCouple.get(`${(ev.actor_email ?? "").toLowerCase()}|${ev.target_id ?? ""}`) ?? null,
+      }
+    : null;
+
   // « Mes levées » : toutes les levées actives (une par data room). Sert la
   // barre de bascule + « + Nouvelle levée » (data rooms sans levée).
   const { data: activeRaises } = await supabase
@@ -173,6 +217,8 @@ export default async function DealPage() {
       ndaDefault={ndaDefault}
       dataRooms={dataRooms}
       roomsSansLevee={roomsSansLevee}
+      accesActifs={accesActifs}
+      derniereVue={derniereVue}
       />
     </>
   );

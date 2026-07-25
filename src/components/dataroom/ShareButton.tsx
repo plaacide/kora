@@ -25,10 +25,15 @@ export function ShareButton({
   label = "Partager",
   className,
   defaultNda = true,
+  disabled = false,
+  disabledTitle,
 }: {
   dealId: string;
   label?: string;
   className?: string;
+  /** Désactivé : on ne partage pas une data room vide (handoff §2.2). */
+  disabled?: boolean;
+  disabledTitle?: string;
   /** État initial de « exiger un NDA » — reprend le réglage de la data room. */
   defaultNda?: boolean;
 }) {
@@ -69,7 +74,7 @@ export function ShareButton({
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className={className}>
+      <button onClick={() => setOpen(true)} className={className} disabled={disabled} title={disabled ? disabledTitle : undefined}>
         {label}
       </button>
 
