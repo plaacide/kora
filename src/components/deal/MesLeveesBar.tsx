@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { setCurrentDeal } from "@/app/actions/deal-context";
@@ -28,6 +29,7 @@ export function MesLeveesBar({
   currentDealId: string;
   roomsSansLevee: { id: string; name: string }[];
 }) {
+  const t = useTranslations("deal.raise");
   const router = useRouter();
   const [pending, start] = useTransition();
 
@@ -42,12 +44,10 @@ export function MesLeveesBar({
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between gap-4 mb-2.5">
-        <h2 className="text-[12px] font-[600] uppercase tracking-[0.08em] text-[#9DA0A8]" style={mono}>
-          Mes levées
-        </h2>
+        <h2 className="text-[12px] font-[600] uppercase tracking-[0.08em] text-[#9DA0A8]" style={mono}>{t("myRaises")}</h2>
         <OuvrirLeveeButton
           deals={roomsSansLevee}
-          label="+ Nouvelle levée"
+          label={t("newRaise")}
           className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F] disabled:opacity-50"
         />
       </div>

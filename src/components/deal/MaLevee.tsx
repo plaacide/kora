@@ -3,6 +3,7 @@
 import { Fragment, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ShareButton } from "@/components/dataroom/ShareButton";
 import { OuvrirLeveeButton } from "@/components/deal/OuvrirLeveeButton";
 import { ChangerDataRoomButton } from "@/components/deal/ChangerDataRoomButton";
@@ -81,9 +82,9 @@ function DOC_BADGE(type: string): string {
 }
 
 const ROLE_TAG: Record<string, { label: string; cls: string }> = {
-  owner: { label: "OWNER", cls: "text-[#C24619] bg-[#FBEDE6]" },
-  admin: { label: "ÉDITEUR", cls: "text-[#33353B] bg-[#F1F0EB]" },
-  member: { label: "MEMBRE", cls: "text-[#8B8E96] bg-[#F1F0EB]" },
+  owner: { label: "roleOwner", cls: "text-[#C24619] bg-[#FBEDE6]" },
+  admin: { label: "roleEditor", cls: "text-[#33353B] bg-[#F1F0EB]" },
+  member: { label: "roleMember", cls: "text-[#8B8E96] bg-[#F1F0EB]" },
 };
 
 function moisAnnee(iso: string | null): string {
@@ -165,20 +166,19 @@ export function MaLevee({
   /** Data rooms sans levée active (pour « Changer la data room »). */
   roomsSansLevee?: { id: string; name: string }[];
 }) {
+  const t = useTranslations("deal.raise");
   // ----- Diligence : pilotage sans levée -----
   if (objectif === "diligence") {
     return (
       <div className="flex flex-col text-[#1A1B1F]">
         <div className="flex items-start justify-between gap-5 mb-6">
           <div>
-            <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">Ma data room</h1>
-            <p className="text-[13.5px] text-[#6E727A] mt-1">
-              Le pilotage de votre dossier de diligence : préparation, documents et qui a regardé quoi.
-            </p>
+            <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("myDataRoom")}</h1>
+            <p className="text-[13.5px] text-[#6E727A] mt-1">{t("diligenceSubtitle")}</p>
           </div>
-          <ShareButton dealId={dealId} defaultNda={ndaDefault} label="+ Inviter à consulter" className="shrink-0 whitespace-nowrap rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] mt-1" />
+          <ShareButton dealId={dealId} defaultNda={ndaDefault} label={t("inviteToView")} className="shrink-0 whitespace-nowrap rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] mt-1" />
         </div>
-        <PreparationCard dealName={dealName} readiness={readiness} missing={missing} legende="dossier de diligence" />
+        <PreparationCard dealName={dealName} readiness={readiness} missing={missing} legende={t("diligenceFile")} />
       </div>
     );
   }
@@ -196,13 +196,11 @@ export function MaLevee({
       {/* En-tête */}
       <div className="flex items-start justify-between gap-5 mb-4">
         <div>
-          <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{raise?.name || "Ma levée"}</h1>
-          <p className="text-[13.5px] text-[#6E727A] mt-1">
-            Le pilotage de votre tour de table : montant, échéance, audience et data room.
-          </p>
+          <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{raise?.name || t("myRaise")}</h1>
+          <p className="text-[13.5px] text-[#6E727A] mt-1">{t("pilotSubtitle")}</p>
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
-          <ShareButton dealId={dealId} defaultNda={ndaDefault} label="Partager" className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap mt-1" />
+          <ShareButton dealId={dealId} defaultNda={ndaDefault} label={t("share")} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap mt-1" />
           {raise && <ModifierLevee dealId={dealId} raise={raise} />}
         </div>
       </div>
@@ -213,10 +211,10 @@ export function MaLevee({
       {!raise ? (
         /* Aucune levée en cours (le fondateur a clôturé sans rouvrir). */
         <div className="border border-dashed border-[#D5D2CA] rounded-[6px] px-5 py-8 mb-7 text-center">
-          <p className="text-[13px] font-[600] text-[#1A1B1F]">Aucune levée sur cette data room</p>
-          <p className="text-[12px] text-[#9DA0A8] mt-1 mb-4">Ouvrez une levée pour renseigner montant, audience et indicateurs.</p>
+          <p className="text-[13px] font-[600] text-[#1A1B1F]">{t("noRaiseTitle")}</p>
+          <p className="text-[12px] text-[#9DA0A8] mt-1 mb-4">{t("noRaiseBody")}</p>
           <div className="flex justify-center">
-            <OuvrirLeveeButton deals={dataRooms} defaultDealId={dealId} label="Ouvrir une levée" className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />
+            <OuvrirLeveeButton deals={dataRooms} defaultDealId={dealId} label={t("openRaise")} className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />
           </div>
         </div>
       ) : (
@@ -228,9 +226,9 @@ export function MaLevee({
       <div className="bg-white border border-[#E2DED4] rounded-[6px] mb-7">
         <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr] divide-y md:divide-y-0 md:divide-x divide-[#E2DED4]">
           <div className="px-5 py-[18px]">
-            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">Montant recherché</div>
+            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("amountSought")}</div>
             <div style={mono} className="text-[26px] font-[600] tracking-[-0.02em]">
-              {cible != null ? formatMoney(cible, devise) : <span className="text-[#C7C9CF]">à renseigner</span>}
+              {cible != null ? formatMoney(cible, devise) : <span className="text-[#C7C9CF]">{t("toFill")}</span>}
             </div>
             {cible != null && cible > 0 && (
               <>
@@ -244,9 +242,9 @@ export function MaLevee({
             )}
           </div>
           <div className="px-5 py-[18px]">
-            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">Type de financement</div>
+            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("financingType")}</div>
             <div className="text-[15px] font-[650]">
-              {[labelOf(TYPE_TOUR, raise?.type_tour ?? null), labelOf(STADE_RAISE, raise?.stade ?? null)].filter(Boolean).join(" — ") || <span className="text-[#C7C9CF] font-[400]">à renseigner</span>}
+              {[labelOf(TYPE_TOUR, raise?.type_tour ?? null), labelOf(STADE_RAISE, raise?.stade ?? null)].filter(Boolean).join(" — ") || <span className="text-[#C7C9CF] font-[400]">{t("toFill")}</span>}
             </div>
             {raise?.valorisation_pre != null && (
               <div className="text-[12px] text-[#6E727A] mt-1">valorisation pré-money {formatMoney(raise.valorisation_pre, devise)}</div>
@@ -260,17 +258,17 @@ export function MaLevee({
             )}
           </div>
           <div className="px-5 py-[18px]">
-            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">Clôture visée</div>
+            <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("targetClose")}</div>
             <div className="text-[15px] font-[650]">
               {raise?.date_cloture
                 ? new Date(raise.date_cloture).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
-                : <span className="text-[#C7C9CF] font-[400]">à renseigner</span>}
+                : <span className="text-[#C7C9CF] font-[400]">{t("toFill")}</span>}
             </div>
           </div>
         </div>
         {raise?.description && (
           <div className="px-5 py-4 border-t border-[#E2DED4] text-[13px] text-[#55585F] leading-[1.6]">
-            <span style={mono} className="block text-[9px] font-[600] text-[#8B8E96] tracking-[0.08em] mb-1.5">DESCRIPTION</span>
+            <span style={mono} className="block text-[9px] font-[600] text-[#8B8E96] tracking-[0.08em] mb-1.5">{t("descriptionCaps")}</span>
             {raise.description}
           </div>
         )}
@@ -294,7 +292,7 @@ export function MaLevee({
         return (
           <>
             <div className="flex items-baseline justify-between mb-2">
-              <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Historique de financement</h2>
+              <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("history")}</h2>
               <span className="text-[12.5px] text-[#9DA0A8]">{totalLabel}{closedRaises.length} tour(s) clôturé(s)</span>
             </div>
             <div className="bg-white border border-[#E2DED4] rounded-[6px] flex items-stretch mb-9 flex-col md:flex-row overflow-x-auto">
@@ -311,10 +309,10 @@ export function MaLevee({
                           Clôturée{moisAnnee(rd.r.date_cloture) ? ` · ${moisAnnee(rd.r.date_cloture)}` : ""}
                         </span>
                       ) : (
-                        <span style={mono} className="text-[9px] font-[600] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-2 py-[3px] uppercase">En cours</span>
+                        <span style={mono} className="text-[9px] font-[600] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-2 py-[3px] uppercase">{t("ongoing")}</span>
                       )}
                       <span className="text-[13px] font-[650]">
-                        {labelOf(STADE_RAISE, rd.r.stade) || (rd.kind === "current" ? dealName : "Tour précédent")}
+                        {labelOf(STADE_RAISE, rd.r.stade) || (rd.kind === "current" ? dealName : t("prevRound"))}
                       </span>
                     </div>
                     {rd.kind === "closed" ? (
@@ -338,12 +336,12 @@ export function MaLevee({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-9 mb-9">
         <div>
           <div className="flex items-baseline justify-between mb-2">
-            <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Documents clés</h2>
-            <Link href="/data-room" className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">Voir la data room →</Link>
+            <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("keyDocs")}</h2>
+            <Link href="/data-room" className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">{t("seeDataRoom")} →</Link>
           </div>
           <div className="border-t border-[#E2DED4]">
             {keyDocs.length === 0 ? (
-              <p className="text-[12px] text-[#9DA0A8] py-4">Aucun document déposé. <Link href="/data-room" className="font-[600] text-[#C24619]">Déposer →</Link></p>
+              <p className="text-[12px] text-[#9DA0A8] py-4">{t("noDocs")} <Link href="/data-room" className="font-[600] text-[#C24619]">{t("upload")} →</Link></p>
             ) : (
               keyDocs.map((d) => (
                 <Link key={d.id} href={`/visionneuse?doc=${d.id}`} className="bg-white flex items-center gap-2.5 py-3 border-b border-[#E8E5DC] last:border-0 hover:bg-[#FAF8F4]">
@@ -357,11 +355,11 @@ export function MaLevee({
         </div>
         <div>
           <div className="flex items-baseline justify-between mb-2">
-            <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Équipe sur la levée</h2>
+            <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("team")}</h2>
           </div>
           <div className="border-t border-[#E2DED4]">
             {team.length === 0 ? (
-              <p className="text-[12px] text-[#9DA0A8] py-4">Vous êtes seul sur cette levée pour l&apos;instant.</p>
+              <p className="text-[12px] text-[#9DA0A8] py-4">{t("aloneOnRaise")}</p>
             ) : (
               team.map((m, i) => {
                 const tag = ROLE_TAG[m.role] ?? { label: m.role.toUpperCase(), cls: "text-[#8B8E96] bg-[#F1F0EB]" };
@@ -372,7 +370,7 @@ export function MaLevee({
                       <span className="block text-[13px] font-[600] truncate">{m.name}</span>
                       {m.title && <span className="block text-[11px] text-[#9DA0A8] truncate">{m.title}</span>}
                     </span>
-                    <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-[3px] shrink-0 " + tag.cls}>{tag.label}</span>
+                    <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-[3px] shrink-0 " + tag.cls}>{t(tag.label)}</span>
                   </div>
                 );
               })
@@ -386,10 +384,10 @@ export function MaLevee({
 
       {/* Data room attachée — RÉELLE */}
       <div className="flex items-baseline justify-between mb-2">
-        <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Data room attachée</h2>
+        <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("attachedDataRoom")}</h2>
         {raise?.id && <ChangerDataRoomButton raiseId={raise.id} rooms={roomsSansLevee} />}
       </div>
-      <PreparationCard dealName={dealName} readiness={readiness} missing={missing} legende="rattachée à cette levée" />
+      <PreparationCard dealName={dealName} readiness={readiness} missing={missing} legende={t("attachedToRaise")} />
     </div>
   );
 }
@@ -407,6 +405,7 @@ function VitrineBand({
   audience: string[];
   indicateurs: Vitrine;
 }) {
+  const t = useTranslations("deal.raise");
   const allAud = AUDIENCES.map((a) => a.key);
   const targeted = audience ?? [];
   const withIndics = allAud.filter((a) => (indicateurs[a]?.length ?? 0) > 0);
@@ -426,7 +425,7 @@ function VitrineBand({
       {/* Ligne d'audience (façon maquette) : sélectionner change les indicateurs vus. */}
       {shownKeys.length > 0 && (
         <div className="flex items-center gap-3 mb-3.5 flex-wrap">
-          <span className="text-[13px] font-[600] text-[#55585F]">Cette levée s&apos;adresse à</span>
+          <span className="text-[13px] font-[600] text-[#55585F]">{t("audienceLine")}</span>
           <div className="flex gap-1.5">
             {shownKeys.map((a) => (
               <button
@@ -438,7 +437,7 @@ function VitrineBand({
               </button>
             ))}
           </div>
-          <span className="ml-auto text-[11.5px] text-[#9DA0A8]">Détermine les indicateurs mis en avant</span>
+          <span className="ml-auto text-[11.5px] text-[#9DA0A8]">{t("audienceHint")}</span>
         </div>
       )}
 
@@ -446,13 +445,11 @@ function VitrineBand({
       <div className="bg-white border border-[#E2DED4] rounded-[6px] overflow-hidden">
         <div className="bg-white flex items-center justify-between gap-3 px-4 py-3 border-b border-[#E2DED4] flex-wrap">
           <span className="flex items-baseline gap-2.5">
-            <span className="text-[13.5px] font-[700]">En bref</span>
-            <span className="text-[11.5px] text-[#9DA0A8]">ce qu&apos;un investisseur voit avant d&apos;ouvrir vos documents</span>
+            <span className="text-[13.5px] font-[700]">{t("inBrief")}</span>
+            <span className="text-[11.5px] text-[#9DA0A8]">{t("inBriefHint")}</span>
           </span>
           <button onClick={() => setEditOpen(true)} className="flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3 py-1.5 text-[12px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4] whitespace-nowrap">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
-            Éditer les indicateurs
-          </button>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>{t("editIndicators")}</button>
         </div>
 
         {rows.length === 0 ? (
@@ -495,6 +492,7 @@ function VitrineEditor({
   initial: Vitrine;
   onClose: () => void;
 }) {
+  const t = useTranslations("deal.raise");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | undefined>();
@@ -538,7 +536,7 @@ function VitrineEditor({
   }
 
   return (
-    <Modal open onClose={onClose} title="Vitrine — indicateurs" width={620}>
+    <Modal open onClose={onClose} title={t("showcase")} width={620}>
       <div className="px-6 py-5 flex flex-col gap-5 max-h-[70vh] overflow-y-auto">
         <p className="text-[12px] text-[#6E727A] -mt-1">
           Ce que vos investisseurs voient avant d&apos;ouvrir les documents. Une ligne = un indicateur (libellé, valeur, précision).
@@ -553,7 +551,7 @@ function VitrineEditor({
                   onClick={() => loadTemplate(aud)}
                   className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]"
                 >
-                  {(data[aud] ?? []).length === 0 ? "Partir du modèle" : "Réinitialiser au modèle"}
+                  {(data[aud] ?? []).length === 0 ? t("fromTemplate") : t("resetTemplate")}
                 </button>
               )}
             </div>
@@ -565,18 +563,18 @@ function VitrineEditor({
             <div className="flex flex-col gap-2">
               {(data[aud] ?? []).map((r, i) => (
                 <div key={i} className="grid grid-cols-[1.1fr_0.9fr_1.1fr_auto_auto] gap-2 items-center">
-                  <input value={r.l} onChange={(e) => edit(aud, i, { l: e.target.value })} placeholder="Libellé" className={champ} />
-                  <input value={r.v} onChange={(e) => edit(aud, i, { v: e.target.value })} placeholder="Valeur" style={mono} className={champ} />
-                  <input value={r.s ?? ""} onChange={(e) => edit(aud, i, { s: e.target.value })} placeholder="Précision" className={champ} />
+                  <input value={r.l} onChange={(e) => edit(aud, i, { l: e.target.value })} placeholder={t("phLabel")} className={champ} />
+                  <input value={r.v} onChange={(e) => edit(aud, i, { v: e.target.value })} placeholder={t("phValue")} style={mono} className={champ} />
+                  <input value={r.s ?? ""} onChange={(e) => edit(aud, i, { s: e.target.value })} placeholder={t("phDetail")} className={champ} />
                   <button
                     type="button"
                     onClick={() => edit(aud, i, { g: !r.g })}
-                    title="Mettre en avant (vert)"
+                    title={t("highlight")}
                     className={"w-9 h-9 rounded-[5px] border text-[11px] font-[700] " + (r.g ? "border-[#147A5C] bg-[#E4F3EC] text-[#147A5C]" : "bg-white border-[#E4E2DC] text-[#9DA0A8]")}
                   >
                     ✓
                   </button>
-                  <button type="button" onClick={() => remove(aud, i)} title="Retirer" className="bg-white w-9 h-9 rounded-[5px] border border-[#E4E2DC] text-[#9DA0A8] hover:text-[#C0392B] hover:border-[#E3B4AD]">×</button>
+                  <button type="button" onClick={() => remove(aud, i)} title={t("remove")} className="bg-white w-9 h-9 rounded-[5px] border border-[#E4E2DC] text-[#9DA0A8] hover:text-[#C0392B] hover:border-[#E3B4AD]">×</button>
                 </div>
               ))}
               <button type="button" onClick={() => addRow(aud)} className="self-start text-[12px] font-[600] text-[#C24619] mt-0.5">+ Ajouter un indicateur</button>
@@ -587,8 +585,8 @@ function VitrineEditor({
         {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
 
         <div className="flex justify-end gap-2 pt-1">
-          <button onClick={onClose} className={btnGhost}>Annuler</button>
-          <button onClick={submit} disabled={pending} className={btnPrimary}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
+          <button onClick={onClose} className={btnGhost}>{t("cancel")}</button>
+          <button onClick={submit} disabled={pending} className={btnPrimary}>{pending ? t("saving") : t("save")}</button>
         </div>
       </div>
     </Modal>
@@ -608,13 +606,14 @@ function PipelineInvestisseurs({
   devise: string;
   investors: RaiseInvestor[];
 }) {
+  const t = useTranslations("deal.raise");
   // `null` = fermé, "new" = création, sinon l'investisseur en édition.
   const [editing, setEditing] = useState<RaiseInvestor | "new" | null>(null);
 
   return (
     <>
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-[15px] font-[700] tracking-[-0.01em]">Investisseurs sur cette levée</h2>
+        <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("investorsOnRaise")}</h2>
         <button onClick={() => setEditing("new")} className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
           + Ajouter un investisseur
         </button>
@@ -627,7 +626,7 @@ function PipelineInvestisseurs({
         ) : (
           <>
             <div style={mono} className="bg-white grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 py-2 text-[9px] text-[#A0A3AB] tracking-[0.05em] border-b border-[#E2DED4]">
-              <span>INVESTISSEUR</span><span>TICKET</span><span>STATUT</span><span></span>
+              <span>{t("colInvestor")}</span><span>{t("colTicket")}</span><span>{t("colStatus")}</span><span></span>
             </div>
             {investors.map((inv) => {
               const st = STATUT_PIPELINE.find((s) => s.key === inv.statut);
@@ -644,7 +643,7 @@ function PipelineInvestisseurs({
                   <span>
                     <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-[3px] " + toneCls(st?.tone ?? "gray")}>{(st?.label ?? inv.statut).toUpperCase()}</span>
                   </span>
-                  <button onClick={() => setEditing(inv)} className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F] justify-self-end">Modifier</button>
+                  <button onClick={() => setEditing(inv)} className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F] justify-self-end">{t("modify")}</button>
                 </div>
               );
             })}
@@ -672,6 +671,7 @@ function InvestorEditor({
   investor: RaiseInvestor | null;
   onClose: () => void;
 }) {
+  const t = useTranslations("deal.raise");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | undefined>();
@@ -686,7 +686,7 @@ function InvestorEditor({
       const res = await saveRaiseInvestor({
         dealId,
         id: investor?.id ?? null,
-        nom: nom.trim() || "Investisseur",
+        nom: nom.trim() || t("investor"),
         organisation: org.trim() || undefined,
         email: email.trim() || undefined,
         ticket: ticket ? Math.round(Number(ticket)) : null,
@@ -709,29 +709,29 @@ function InvestorEditor({
   }
 
   return (
-    <Modal open onClose={onClose} title={investor ? "Modifier l'investisseur" : "Ajouter un investisseur"} width={520}>
+    <Modal open onClose={onClose} title={investor ? t("editInvestor") : t("addInvestor")} width={520}>
       <div className="px-6 py-5 flex flex-col gap-4">
         <div>
-          <label className={lab}>Nom</label>
+          <label className={lab}>{t("name")}</label>
           <input value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Awa Ndiaye" className={champ} />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={lab}>Organisation</label>
+            <label className={lab}>{t("organisation")}</label>
             <input value={org} onChange={(e) => setOrg(e.target.value)} placeholder="Kola Ventures" className={champ} />
           </div>
           <div>
-            <label className={lab}>E-mail (optionnel)</label>
+            <label className={lab}>{t("emailOptional")}</label>
             <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="awa@kola.vc" className={champ} />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={lab}>Ticket envisagé</label>
-            <input type="number" min="0" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder="optionnel" style={mono} className={champ} />
+            <label className={lab}>{t("ticketPlanned")}</label>
+            <input type="number" min="0" value={ticket} onChange={(e) => setTicket(e.target.value)} placeholder={t("phOptional")} style={mono} className={champ} />
           </div>
           <div>
-            <label className={lab}>Statut</label>
+            <label className={lab}>{t("status")}</label>
             <select value={statut} onChange={(e) => setStatut(e.target.value)} className={champ}>
               {STATUT_PIPELINE.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
             </select>
@@ -742,11 +742,11 @@ function InvestorEditor({
 
         <div className="flex items-center justify-between pt-1">
           {investor ? (
-            <button onClick={remove} disabled={pending} className="text-[12.5px] font-[600] text-[#C0392B] hover:underline disabled:opacity-60">Retirer</button>
+            <button onClick={remove} disabled={pending} className="text-[12.5px] font-[600] text-[#C0392B] hover:underline disabled:opacity-60">{t("remove")}</button>
           ) : <span />}
           <div className="flex gap-2">
-            <button onClick={onClose} className={btnGhost}>Annuler</button>
-            <button onClick={submit} disabled={pending} className={btnPrimary}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
+            <button onClick={onClose} className={btnGhost}>{t("cancel")}</button>
+            <button onClick={submit} disabled={pending} className={btnPrimary}>{pending ? t("saving") : t("save")}</button>
           </div>
         </div>
       </div>
@@ -770,13 +770,14 @@ function RaiseChips({
   raise: Raise | null;
   closedRaises: Raise[];
 }) {
+  const t = useTranslations("deal.raise");
   return (
     <div className="flex gap-2 mb-6 flex-wrap items-center">
       {raise && (
         <>
           <span className="flex items-center gap-2.5 border border-[#1A1B1F] rounded-[5px] px-3.5 py-2.5 whitespace-nowrap">
             <span className="text-[13px] font-[650]">{dealName}</span>
-            <span style={mono} className="text-[9px] font-[600] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-[7px] py-0.5">EN COURS</span>
+            <span style={mono} className="text-[9px] font-[600] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-[7px] py-0.5">{t("ongoingCaps")}</span>
             <span style={mono} className="text-[11px] text-[#9DA0A8]">{formatMoney(raise.montant_cible, raise.devise)}</span>
           </span>
           <CloseRaiseButton dealId={dealId} />
@@ -784,8 +785,8 @@ function RaiseChips({
       )}
       {closedRaises.map((r) => (
         <span key={r.id} className="bg-white flex items-center gap-2.5 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2.5 whitespace-nowrap">
-          <span className="text-[13px] font-[650] text-[#6E727A]">{labelOf(STADE_RAISE, r.stade) || "Tour précédent"}</span>
-          <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-[7px] py-0.5">CLÔTURÉE</span>
+          <span className="text-[13px] font-[650] text-[#6E727A]">{labelOf(STADE_RAISE, r.stade) || t("prevRound")}</span>
+          <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-[7px] py-0.5">{t("closedCaps")}</span>
           <span style={mono} className="text-[11px] text-[#9DA0A8]">{formatMoney(r.montant_cible, r.devise)}</span>
         </span>
       ))}
@@ -799,6 +800,7 @@ function RaiseChips({
 
 /** Documenter une levée faite AVANT la plateforme (tour déjà clôturé). */
 function AddPastRaiseButton({ dealId }: { dealId: string }) {
+  const t = useTranslations("deal.raise");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
@@ -838,18 +840,18 @@ function AddPastRaiseButton({ dealId }: { dealId: string }) {
         + Tour passé
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Ajouter un tour passé" width={520}>
+      <Modal open={open} onClose={() => setOpen(false)} title={t("addPastRound")} width={520}>
         <div className="px-6 py-5 flex flex-col gap-4">
           <p className="text-[12px] text-[#6E727A] -mt-1">
             Une levée bouclée avant Sanza (Pre-Seed, Seed…). Elle rejoint votre historique de financement.
           </p>
           <div className="grid grid-cols-[1.4fr_0.8fr] gap-3">
             <div>
-              <label className={lab}>Montant levé</label>
+              <label className={lab}>{t("amountRaised")}</label>
               <input type="number" min="0" value={montant} onChange={(e) => setMontant(e.target.value)} placeholder="1500000" style={mono} className={champ} />
             </div>
             <div>
-              <label className={lab}>Devise</label>
+              <label className={lab}>{t("currency")}</label>
               <select value={devise} onChange={(e) => setDevise(e.target.value)} className={champ}>
                 {DEVISES.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
@@ -857,25 +859,25 @@ function AddPastRaiseButton({ dealId }: { dealId: string }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={lab}>Stade</label>
+              <label className={lab}>{t("stage")}</label>
               <select value={stade} onChange={(e) => setStade(e.target.value)} className={champ}>
                 <option value="">—</option>
                 {STADE_RAISE.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
               </select>
             </div>
             <div>
-              <label className={lab}>Date de clôture</label>
+              <label className={lab}>{t("closeDate")}</label>
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={champ} />
             </div>
           </div>
           <div>
-            <label className={lab}>Note (optionnelle)</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} placeholder="Investisseurs, contexte…" className="w-full px-2.5 py-2 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-none" />
+            <label className={lab}>{t("noteOptional")}</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} placeholder={t("phInvestorsContext")} className="w-full px-2.5 py-2 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-none" />
           </div>
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
-            <button onClick={() => setOpen(false)} className={btnGhost}>Annuler</button>
-            <button onClick={submit} disabled={pending} className={btnPrimary}>{pending ? "Ajout…" : "Ajouter le tour"}</button>
+            <button onClick={() => setOpen(false)} className={btnGhost}>{t("cancel")}</button>
+            <button onClick={submit} disabled={pending} className={btnPrimary}>{pending ? t("adding") : t("addRound")}</button>
           </div>
         </div>
       </Modal>
@@ -885,6 +887,7 @@ function AddPastRaiseButton({ dealId }: { dealId: string }) {
 
 /** Supprime un tour de l'historique (correction) — ✕ discret + popup. */
 function DeleteRoundButton({ id }: { id: string }) {
+  const t = useTranslations("deal.raise");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
@@ -903,22 +906,22 @@ function DeleteRoundButton({ id }: { id: string }) {
     <>
       <button
         onClick={() => { setError(undefined); setOpen(true); }}
-        aria-label="Supprimer ce tour"
+        aria-label={t("deleteRound")}
         className="absolute top-2.5 right-2.5 text-[#C7C9CF] hover:text-[#C0392B] opacity-0 group-hover:opacity-100 transition-opacity text-[15px] leading-none"
       >
         ×
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Supprimer ce tour" width={420}>
+      <Modal open={open} onClose={() => setOpen(false)} title={t("deleteRound")} width={420}>
         <div className="px-6 py-5">
           <p className="text-[13px] text-[#33353B] leading-relaxed">
             Retirer ce tour de l&apos;historique de financement&nbsp;? Cette action est définitive.
           </p>
           {error && <p className="text-[12px] text-[#C0392B] mt-2.5">{error}</p>}
           <div className="flex justify-end gap-2 mt-5">
-            <button onClick={() => setOpen(false)} className={btnGhost}>Annuler</button>
+            <button onClick={() => setOpen(false)} className={btnGhost}>{t("cancel")}</button>
             <button onClick={confirmer} disabled={pending} className="rounded-[5px] bg-[#C0392B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#A32D2D] disabled:opacity-60">
-              {pending ? "…" : "Supprimer"}
+              {pending ? "…" : t("delete")}
             </button>
           </div>
         </div>
@@ -929,6 +932,7 @@ function DeleteRoundButton({ id }: { id: string }) {
 
 /** Clôturer la levée en cours — bouton visible + popup in-app (pas de window.confirm). */
 function CloseRaiseButton({ dealId }: { dealId: string }) {
+  const t = useTranslations("deal.raise");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
@@ -949,20 +953,18 @@ function CloseRaiseButton({ dealId }: { dealId: string }) {
         onClick={() => { setError(undefined); setOpen(true); }}
         className="bg-white flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2.5 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C24619] hover:text-[#C24619] whitespace-nowrap"
       >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-        Clôturer la levée
-      </button>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>{t("closeRaise")}</button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Clôturer la levée" width={460}>
+      <Modal open={open} onClose={() => setOpen(false)} title={t("closeRaise")} width={460}>
         <div className="px-6 py-5">
           <p className="text-[13px] text-[#33353B] leading-relaxed">
-            Clôturer la levée en cours&nbsp;? Elle rejoindra l&apos;<span className="font-[700]">historique de financement</span> et ne sera plus modifiable. Vous pourrez ensuite ouvrir un nouveau tour.
+            {t("closeConfirm")}
           </p>
           {error && <p className="text-[12px] text-[#C0392B] mt-2.5">{error}</p>}
           <div className="flex justify-end gap-2 mt-5">
-            <button onClick={() => setOpen(false)} className={btnGhost}>Annuler</button>
+            <button onClick={() => setOpen(false)} className={btnGhost}>{t("cancel")}</button>
             <button onClick={confirmer} disabled={pending} className={btnPrimary}>
-              {pending ? "…" : "Clôturer la levée"}
+              {pending ? "…" : t("closeRaise")}
             </button>
           </div>
         </div>
@@ -987,6 +989,7 @@ function PreparationCard({
   missing: { label: string; folderId: string | null }[];
   legende: string;
 }) {
+  const t = useTranslations("deal.raise");
   return (
     <div className="bg-white border border-[#E2DED4] rounded-[6px] p-5">
       <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -999,26 +1002,26 @@ function PreparationCard({
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="text-[11px] font-[600] text-[#8B8E96]">Dossier prêt</div>
+            <div className="text-[11px] font-[600] text-[#8B8E96]">{t("readyFile")}</div>
             <div style={mono} className="text-[18px] font-[600]">{readiness}%</div>
           </div>
-          <Link href="/data-room" className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]">Ouvrir →</Link>
+          <Link href="/data-room" className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]">{t("open")} →</Link>
         </div>
       </div>
       {missing.length > 0 && (
         <div className="mt-4 pt-4 border-t border-[#E8E5DC]">
-          <div style={mono} className="text-[9px] font-[600] text-[#8B8E96] tracking-[0.06em] mb-2.5">CE QU&apos;IL RESTE À FAIRE</div>
+          <div style={mono} className="text-[9px] font-[600] text-[#8B8E96] tracking-[0.06em] mb-2.5">{t("remainingCaps")}</div>
           <div className="flex flex-col gap-1.5">
             {missing.slice(0, 5).map((m, i) => (
               <div key={m.label} className="flex items-center gap-3 text-[12.5px]">
-                <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-2 py-0.5 w-[52px] text-center">À FAIRE</span>
+                <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-2 py-0.5 w-[52px] text-center">{t("todoCaps")}</span>
                 <span className="flex-1 text-[#33353B]">{m.label}</span>
-                {i === 0 && <span style={mono} className="text-[9px] font-[600] text-[#C24619] bg-[#FBEDE6] rounded-[4px] px-2 py-0.5">PROCHAINE</span>}
-                <Link href={m.folderId ? `/data-room?dossier=${m.folderId}` : "/checklist"} className="text-[12px] font-[600] text-[#C24619]">Déposer</Link>
+                {i === 0 && <span style={mono} className="text-[9px] font-[600] text-[#C24619] bg-[#FBEDE6] rounded-[4px] px-2 py-0.5">{t("nextCaps")}</span>}
+                <Link href={m.folderId ? `/data-room?dossier=${m.folderId}` : "/checklist"} className="text-[12px] font-[600] text-[#C24619]">{t("upload")}</Link>
               </div>
             ))}
           </div>
-          <Link href="/checklist" className="inline-block mt-3 text-[12.5px] font-[600] text-[#C24619]">Ouvrir le suivi de la diligence →</Link>
+          <Link href="/checklist" className="inline-block mt-3 text-[12.5px] font-[600] text-[#C24619]">{t("openChecklist")} →</Link>
         </div>
       )}
     </div>
@@ -1027,6 +1030,7 @@ function PreparationCard({
 
 /** Bouton + modal d'édition de la levée. Écrit via `saveRaise` (RPC audité). */
 function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null }) {
+  const t = useTranslations("deal.raise");
   const router = useRouter();
   const sp = useSearchParams();
   // Ouverture automatique après « Créer ma levée » (?configurer=1) : le
@@ -1093,23 +1097,21 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
         onClick={() => setOpen(true)}
         className="flex items-center gap-2 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4] whitespace-nowrap mt-1"
       >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
-        Modifier la levée
-      </button>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>{t("editRaise")}</button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Modifier la levée" width={560}>
+      <Modal open={open} onClose={() => setOpen(false)} title={t("editRaise")} width={560}>
         <div className="px-6 py-5 flex flex-col gap-4">
           <div>
-            <label className={lab}>Nom de la levée</label>
-            <input value={leveeName} onChange={(e) => setLeveeName(e.target.value)} placeholder="Série A 2026" className={champ} />
+            <label className={lab}>{t("raiseName")}</label>
+            <input value={leveeName} onChange={(e) => setLeveeName(e.target.value)} placeholder={t("phRaiseName")} className={champ} />
           </div>
           <div className="grid grid-cols-[1.4fr_0.8fr] gap-3">
             <div>
-              <label className={lab}>Montant recherché</label>
+              <label className={lab}>{t("amountSought")}</label>
               <input type="number" min="0" value={cible} onChange={(e) => setCible(e.target.value)} placeholder="5000000" style={mono} className={champ} />
             </div>
             <div>
-              <label className={lab}>Devise</label>
+              <label className={lab}>{t("currency")}</label>
               <select value={devise} onChange={(e) => setDevise(e.target.value)} className={champ}>
                 {DEVISES.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
@@ -1117,21 +1119,21 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
           </div>
 
           <div>
-            <label className={lab}>Montant déjà engagé (soft-commitments)</label>
+            <label className={lab}>{t("committed")}</label>
             <input type="number" min="0" value={engage} onChange={(e) => setEngage(e.target.value)} placeholder="0" style={mono} className={champ} />
-            <p className="text-[11px] text-[#9DA0A8] mt-1">Sert à la jauge « engagés / recherchés » de l&apos;accueil.</p>
+            <p className="text-[11px] text-[#9DA0A8] mt-1">{t("committedHint")}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={lab}>Type de tour</label>
+              <label className={lab}>{t("roundType")}</label>
               <select value={typeTour} onChange={(e) => setTypeTour(e.target.value)} className={champ}>
                 <option value="">—</option>
                 {TYPE_TOUR.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
               </select>
             </div>
             <div>
-              <label className={lab}>Stade</label>
+              <label className={lab}>{t("stage")}</label>
               <select value={stade} onChange={(e) => setStade(e.target.value)} className={champ}>
                 <option value="">—</option>
                 {STADE_RAISE.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
@@ -1141,17 +1143,17 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={lab}>Valorisation pré-money</label>
-              <input type="number" min="0" value={valo} onChange={(e) => setValo(e.target.value)} placeholder="optionnel" style={mono} className={champ} />
+              <label className={lab}>{t("preMoney")}</label>
+              <input type="number" min="0" value={valo} onChange={(e) => setValo(e.target.value)} placeholder={t("phOptional")} style={mono} className={champ} />
             </div>
             <div>
-              <label className={lab}>Clôture visée</label>
+              <label className={lab}>{t("targetClose")}</label>
               <input type="date" value={cloture} onChange={(e) => setCloture(e.target.value)} className={champ} />
             </div>
           </div>
 
           <div>
-            <label className={lab}>Cette levée s&apos;adresse à</label>
+            <label className={lab}>{t("audienceLine")}</label>
             <div className="flex gap-1.5 flex-wrap">
               {AUDIENCES.map((a) => {
                 const on = audience.includes(a.key);
@@ -1170,8 +1172,8 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
           </div>
 
           <div>
-            <label className={lab}>Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Ce que finance cette levée, en quelques lignes." className="w-full px-2.5 py-2 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-none" />
+            <label className={lab}>{t("description")}</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder={t("phDescription")} className="w-full px-2.5 py-2 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-none" />
           </div>
 
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
@@ -1184,21 +1186,21 @@ function ModifierLevee({ dealId, raise }: { dealId: string; raise: Raise | null 
 
           <div className="flex items-center justify-between pt-1">
             {raise?.id && !confDel ? (
-              <button onClick={() => setConfDel(true)} className="text-[12.5px] font-[600] text-[#C0392B] hover:underline">Supprimer la levée</button>
+              <button onClick={() => setConfDel(true)} className="text-[12.5px] font-[600] text-[#C0392B] hover:underline">{t("deleteRaise")}</button>
             ) : <span />}
             <div className="flex gap-2">
               {confDel ? (
                 <>
-                  <button onClick={() => setConfDel(false)} className={btnGhost}>Annuler</button>
+                  <button onClick={() => setConfDel(false)} className={btnGhost}>{t("cancel")}</button>
                   <button onClick={supprimerLevee} disabled={pending} className="rounded-[5px] bg-[#C0392B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#A32D2D] disabled:opacity-60">
-                    {pending ? "…" : "Supprimer la levée"}
+                    {pending ? "…" : t("deleteRaise")}
                   </button>
                 </>
               ) : (
                 <>
-                  <button onClick={() => setOpen(false)} className={btnGhost}>Annuler</button>
+                  <button onClick={() => setOpen(false)} className={btnGhost}>{t("cancel")}</button>
                   <button onClick={submit} disabled={pending} className={btnPrimary}>
-                    {pending ? "Enregistrement…" : "Enregistrer"}
+                    {pending ? t("saving") : t("save")}
                   </button>
                 </>
               )}

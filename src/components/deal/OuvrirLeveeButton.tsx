@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/Modal";
@@ -14,7 +15,7 @@ import { setCurrentDeal } from "@/app/actions/deal-context";
 export function OuvrirLeveeButton({
   deals,
   defaultDealId,
-  label = "Ouvrir une levée",
+  label,
   className,
 }: {
   deals: { id: string; name: string }[];
@@ -22,6 +23,8 @@ export function OuvrirLeveeButton({
   label?: string;
   className?: string;
 }) {
+  const t = useTranslations("deal.raise");
+  const libelle = label ?? t("openRaise");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
@@ -48,33 +51,33 @@ export function OuvrirLeveeButton({
         onClick={() => { setError(undefined); setName(""); setDealId(defaultDealId ?? deals[0]?.id ?? ""); setOpen(true); }}
         className={className ?? "rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"}
       >
-        {label}
+        {libelle}
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Ouvrir une levée" width={480}>
+      <Modal open={open} onClose={() => setOpen(false)} title={t("openRaise")} width={480}>
         <div className="px-6 py-5 flex flex-col gap-4">
           <div>
-            <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1 block">Nom de la levée</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="Série A 2026" className={champ} />
+            <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1 block">{t("raiseNameLabel")}</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder={t("phRaiseName")} className={champ} />
           </div>
           <div>
-            <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1 block">Data room à attacher</label>
+            <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1 block">{t("roomToAttach")}</label>
             {deals.length === 0 ? (
-              <p className="text-[12px] text-[#9DA0A8]">Créez d&apos;abord une data room, puis ouvrez-y une levée.</p>
+              <p className="text-[12px] text-[#9DA0A8]">{t("createRoomFirst")}</p>
             ) : (
               <>
                 <select value={dealId} onChange={(e) => setDealId(e.target.value)} className={champ}>
                   {deals.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
-                <p className="text-[11px] text-[#9DA0A8] mt-1">La levée montrera les documents de cette data room à vos investisseurs.</p>
+                <p className="text-[11px] text-[#9DA0A8] mt-1">{t("attachHint")}</p>
               </>
             )}
           </div>
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
-            <button onClick={() => setOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAF8F4]">Annuler</button>
+            <button onClick={() => setOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAF8F4]">{t("cancel")}</button>
             <button onClick={submit} disabled={pending || name.trim().length < 2 || !dealId} className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60">
-              {pending ? "Ouverture…" : "Ouvrir la levée"}
+              {pending ? "Ouverture…" : t("openRaiseCta")}
             </button>
           </div>
         </div>

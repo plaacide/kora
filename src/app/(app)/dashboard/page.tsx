@@ -76,8 +76,8 @@ export default async function DashboardPage() {
     return (
       <div className="flex flex-col gap-6 text-[#1A1B1F]">
         <div>
-          <h1 className="font-display text-[27px] font-[700] tracking-[-0.02em]">Bonjour, {prenom}</h1>
-          <p className="text-[13.5px] text-[#6E727A] mt-1">Créez votre première data room pour démarrer.</p>
+          <h1 className="font-display text-[27px] font-[700] tracking-[-0.02em]">{t("greetingSimple", { name: prenom })}</h1>
+          <p className="text-[13.5px] text-[#6E727A] mt-1">{t("firstRoomSubtitle")}</p>
         </div>
         <div className="relative overflow-hidden border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center max-w-2xl">
           {/* Écran vide : 1 jeu d'arcs, bas-droit (handoff v2 §4). */}
@@ -85,12 +85,12 @@ export default async function DashboardPage() {
           <span className="mx-auto grid place-items-center w-12 h-12 rounded-[8px] bg-[#FBEDE6] text-[#C24619] mb-4">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
           </span>
-          <h2 className="text-[15px] font-[700]">Aucune data room pour l&apos;instant</h2>
+          <h2 className="text-[15px] font-[700]">{t("noRoomYet")}</h2>
           <p className="text-[12.5px] text-[#6E727A] mt-1.5 mb-5 max-w-md mx-auto leading-relaxed">
-            Une data room regroupe vos documents, votre levée et les accès de vos investisseurs. Créez-en une pour commencer — avec le modèle OHADA/UEMOA ou de zéro.
+            {t("firstRoomBody")}
           </p>
           <div className="flex justify-center">
-            <NewDataRoomButton label="Créer ma data room" />
+            <NewDataRoomButton label={t("createMyRoom")} />
           </div>
         </div>
       </div>

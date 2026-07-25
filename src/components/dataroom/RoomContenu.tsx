@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -44,6 +45,7 @@ export function RoomContenu({
   canEdit: boolean;
   initialFolderId?: string | null;
 }) {
+  const t = useTranslations("dataroom.room");
   const router = useRouter();
   const [courant, setCourant] = useState<string | null>(initialFolderId);
   const [nouvDossier, setNouvDossier] = useState(false);
@@ -100,25 +102,19 @@ export function RoomContenu({
       {/* Barre d'outils */}
       <div className="flex justify-end gap-2.5 mb-3.5">
         {canEdit && (
-          <button onClick={() => setNouvDossier((v) => !v)} className="border border-[#E4E2DC] rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]">
-            Créer un dossier
-          </button>
+          <button onClick={() => setNouvDossier((v) => !v)} className="border border-[#E4E2DC] rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]">{t("createFolder")}</button>
         )}
         {canEdit && (
           <button
             onClick={() => (courant ? uploadRef.current?.click() : setNouvDossier(true))}
             className="rounded-[5px] bg-[#E85C2B] px-3 py-[7px] text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]"
-          >
-            Ajouter des contenus
-          </button>
+          >{t("addContent")}</button>
         )}
       </div>
 
       {/* Fil d'Ariane de l'arborescence */}
       <div className="flex items-center gap-1.5 text-[12.5px] mb-3">
-        <button onClick={() => setCourant(null)} className={courant ? "text-[#9DA0A8] hover:text-[#1A1B1F]" : "font-[600] text-[#1A1B1F]"}>
-          Accueil
-        </button>
+        <button onClick={() => setCourant(null)} className={courant ? "text-[#9DA0A8] hover:text-[#1A1B1F]" : "font-[600] text-[#1A1B1F]"}>{t("home")}</button>
         {chemin.map((f) => (
           <span key={f.id} className="flex items-center gap-1.5">
             <span className="text-[#D5D2CA]">/</span>
@@ -135,26 +131,24 @@ export function RoomContenu({
             value={nom}
             onChange={(e) => setNom(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && ajouterDossier()}
-            placeholder="Nom du dossier"
+            placeholder={t("phFolderName")}
             autoFocus
             className="bg-white flex-1 max-w-[280px] h-8 px-2.5 text-[12.5px] border border-[#E4E2DC] rounded-[5px] focus:outline-none focus:border-[#C9C6BD]"
           />
-          <button onClick={ajouterDossier} disabled={busy || nom.trim().length < 2} className="rounded-[5px] bg-[#E85C2B] px-3 text-[12.5px] font-[600] text-white disabled:opacity-50">
-            Créer
-          </button>
+          <button onClick={ajouterDossier} disabled={busy || nom.trim().length < 2} className="rounded-[5px] bg-[#E85C2B] px-3 text-[12.5px] font-[600] text-white disabled:opacity-50">{t("create")}</button>
         </div>
       )}
 
       {/* En-tête de table */}
       <div style={mono} className="bg-white grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 px-2 pt-3 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
-        <span>INDEX</span><span>NOM</span><span>TYPE</span><span>DERNIÈRE MÀJ</span><span className="text-center">CLÉ</span>
+        <span>{t("colIndex")}</span><span>{t("colName")}</span><span>{t("colType")}</span><span>{t("colUpdated")}</span><span className="text-center">{t("colKey")}</span>
       </div>
 
       {sousDossiers.length === 0 && fichiers.length === 0 && (
         <p className="text-[12.5px] text-[#9DA0A8] py-6 text-center">
           {courant
-            ? "Ce dossier est vide — déposez vos fichiers ci-dessous."
-            : "Créez un dossier, puis déposez-y vos documents."}
+            ? t("folderEmpty")
+            : t("rootEmpty")}
         </p>
       )}
 
@@ -171,9 +165,9 @@ export function RoomContenu({
               <svg width="12" height="12" viewBox="0 0 24 24" fill="#7DA9D6"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8z" /></svg>
             </span>
             <span className="text-[13.5px] font-[600] truncate">{f.name}</span>
-            <span className="text-[11.5px] text-[#9DA0A8] shrink-0">{compte(f.id)} élément{compte(f.id) > 1 ? "s" : ""}</span>
+            <span className="text-[11.5px] text-[#9DA0A8] shrink-0">{t("itemsCount", { n: compte(f.id) })}</span>
           </span>
-          <span className="text-[12px] text-[#6E727A]">Dossier</span>
+          <span className="text-[12px] text-[#6E727A]">{t("folder")}</span>
           <span className="text-[12px] text-[#9DA0A8]">—</span>
           <span />
         </button>
@@ -195,8 +189,8 @@ export function RoomContenu({
             {canEdit ? (
               <button
                 onClick={() => basculerCle(d.id, !!d.is_key)}
-                title={d.is_key ? "Retirer des documents clés" : "Marquer comme document clé"}
-                aria-label="Document clé"
+                title={d.is_key ? t("unmarkKey") : t("markKey")}
+                aria-label={t("keyDocument")}
                 className="justify-self-center"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill={d.is_key ? "#E8A33D" : "none"} stroke={d.is_key ? "#E8A33D" : "#C7C9CF"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">

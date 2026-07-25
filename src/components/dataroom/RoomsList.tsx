@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ShareButton } from "@/components/dataroom/ShareButton";
@@ -35,13 +36,14 @@ const btnPrimary = "rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] 
 const champ = "h-9 w-full px-2.5 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none";
 
 const FILTERS: { key: string; label: string }[] = [
-  { key: "all", label: "Toutes" },
-  { key: "levee", label: "Levée" },
-  { key: "diligence", label: "Diligence" },
-  { key: "archived", label: "Archivées" },
+  { key: "all", label: "filterAll" },
+  { key: "levee", label: "filterRaise" },
+  { key: "diligence", label: "filterDiligence" },
+  { key: "archived", label: "filterArchived" },
 ];
 
 export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: string | null }) {
+  const t = useTranslations("dataroom.room");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [filter, setFilter] = useState("all");
@@ -68,9 +70,9 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
     <div className="flex flex-col text-[#1A1B1F]">
       <div className="flex items-start justify-between gap-5 mb-1.5">
         <div>
-          <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">Data room</h1>
+          <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("title")}</h1>
           <p className="text-[13.5px] text-[#6E727A] mt-1">
-            Vos data rooms — une par audience ou par étape. Chacune a ses accès, ses pièces et ses signatures.
+            {t("listSubtitle")}
           </p>
         </div>
         <NewDataRoomButton className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap mt-1" />
@@ -87,18 +89,18 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
               (filter === f.key ? "bg-[#F1F0EB] text-[#1A1B1F]" : "text-[#6E727A] hover:text-[#1A1B1F]")
             }
           >
-            {f.label}
+            {t(f.label)}
             <span style={mono} className="text-[#9DA0A8]">{count(f.key)}</span>
           </button>
         ))}
       </div>
 
       <div style={mono} className="bg-white grid grid-cols-[2.4fr_0.9fr_1fr_150px] gap-3.5 px-2 pt-3 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
-        <span>NOM</span><span>OBJECTIF</span><span>PROPRIÉTAIRE</span><span></span>
+        <span>{t("colName")}</span><span>{t("colObjective")}</span><span>{t("colOwner")}</span><span></span>
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-[12.5px] text-[#9DA0A8] py-10 text-center">Aucune data room pour ce filtre.</p>
+        <p className="text-[12.5px] text-[#9DA0A8] py-10 text-center">{t("noneForFilter")}</p>
       ) : (
         filtered.map((r) => {
           const badge = OBJ_BADGE[r.objectif] ?? OBJ_BADGE.levee;
@@ -111,11 +113,11 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
                 <span className="min-w-0">
                   <span className="flex items-center gap-2">
                     <span className={"text-[13.5px] font-[650] truncate " + (r.archived ? "text-[#8B8E96]" : "")}>{r.name}</span>
-                    {r.archived && <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-[6px] py-0.5 shrink-0">ARCHIVÉE</span>}
-                    {!r.archived && r.id === currentId && <span style={mono} className="text-[9px] font-[600] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-[6px] py-0.5 shrink-0">OUVERTE</span>}
+                    {r.archived && <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-[6px] py-0.5 shrink-0">{t("archivedCaps")}</span>}
+                    {!r.archived && r.id === currentId && <span style={mono} className="text-[9px] font-[600] text-[#147A5C] bg-[#E4F3EC] rounded-[4px] px-[6px] py-0.5 shrink-0">{t("openCaps")}</span>}
                   </span>
                   <span className="block text-[11.5px] text-[#9DA0A8]">
-                    {r.docs} document{r.docs > 1 ? "s" : ""} · {r.invites} invité{r.invites > 1 ? "s" : ""}
+                    {t("docsCount", { n: r.docs })} · {t("invitesCount", { n: r.invites })}
                   </span>
                 </span>
               </button>
@@ -124,7 +126,7 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
               </span>
               <span className="flex items-center gap-2">
                 <span className="grid place-items-center w-6 h-6 rounded-[5px] bg-[#1A1B1F] text-white text-[9px] font-[700]">{r.name.slice(0, 1).toUpperCase()}</span>
-                <span className="text-[12.5px] text-[#33353B]">Vous</span>
+                <span className="text-[12.5px] text-[#33353B]">{t("you")}</span>
               </span>
               <span className="flex items-center gap-3 justify-end">
                 <ShareButton dealId={r.id} className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]" />
@@ -145,7 +147,7 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
  * levée » on crée directement une LEVÉE, sans reparler de data room.
  */
 export function NewDataRoomButton({
-  label = "Nouvelle data room",
+  label,
   className,
   fixedObjectif,
 }: {
@@ -168,6 +170,7 @@ export function NewDataRoomButton({
 }
 
 function NewRoomModal({ onClose, fixedObjectif }: { onClose: () => void; fixedObjectif?: string }) {
+  const t = useTranslations("dataroom.room");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | undefined>();
@@ -194,16 +197,16 @@ function NewRoomModal({ onClose, fixedObjectif }: { onClose: () => void; fixedOb
     <Modal open onClose={onClose} title={titre} width={480}>
       <div className="px-6 py-5 flex flex-col gap-4">
         <div>
-          <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1 block">Nom de la data room</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="Due diligence, Data room Seed…" className={champ} />
-          <p className="text-[11px] text-[#9DA0A8] mt-1">Un contenant de documents. Vous pourrez y ouvrir une levée ensuite.</p>
+          <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1 block">{t("roomName")}</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder={t("phRoomName")} className={champ} />
+          <p className="text-[11px] text-[#9DA0A8] mt-1">{t("roomNameHint")}</p>
         </div>
         <div>
-          <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1.5 block">Point de départ</label>
+          <label className="text-[11.5px] font-[600] text-[#6E727A] mb-1.5 block">{t("startPoint")}</label>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { key: true, titre: "À partir d'un modèle", sous: "Arborescence OHADA/UEMOA et checklist de diligence pré-remplies." },
-              { key: false, titre: "Partir de zéro", sous: "Data room vide, vous montez les dossiers vous-même." },
+              { key: true, titre: t("templateTitle"), sous: t("templateBody") },
+              { key: false, titre: t("scratchTitle"), sous: t("scratchBody") },
             ].map((o) => {
               const actif = template === o.key;
               return (
@@ -222,7 +225,7 @@ function NewRoomModal({ onClose, fixedObjectif }: { onClose: () => void; fixedOb
         </div>
         {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
         <div className="flex justify-end gap-2 pt-1">
-          <button onClick={onClose} className={btnGhost}>Annuler</button>
+          <button onClick={onClose} className={btnGhost}>{t("cancel")}</button>
           <button onClick={submit} disabled={pending || name.trim().length < 2} className={btnPrimary}>
             {pending ? "Création…" : "Créer la data room"}
           </button>
@@ -234,6 +237,7 @@ function NewRoomModal({ onClose, fixedObjectif }: { onClose: () => void; fixedOb
 
 /** Menu ⋯ d'une salle : Renommer / Supprimer (RPC réels, popups in-app). */
 function RoomActions({ room }: { room: Room }) {
+  const t = useTranslations("dataroom.room");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [menu, setMenu] = useState(false);
@@ -274,7 +278,7 @@ function RoomActions({ room }: { room: Room }) {
     <span className="relative">
       <button
         onClick={() => { setError(undefined); setMenu((v) => !v); }}
-        aria-label="Actions de la data room"
+        aria-label={t("roomActions")}
         className="grid place-items-center w-7 h-7 rounded-[5px] text-[#A0A3AB] hover:bg-[#F1F0EB] hover:text-[#1A1B1F] text-[17px] leading-none"
       >
         ⋯
@@ -283,30 +287,30 @@ function RoomActions({ room }: { room: Room }) {
         <>
           <span className="fixed inset-0 z-[90]" onClick={() => setMenu(false)} />
           <span className="absolute right-0 top-8 z-[91] w-44 rounded-[6px] border border-[#E2DED4] bg-white shadow-[0_10px_30px_rgba(26,27,31,0.14)] py-1 flex flex-col">
-            <button onClick={() => { setMenu(false); setName(room.name); setRenameOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">Renommer</button>
+            <button onClick={() => { setMenu(false); setName(room.name); setRenameOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">{t("rename")}</button>
             {room.archived ? (
-              <button onClick={() => archiver(false)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">Désarchiver</button>
+              <button onClick={() => archiver(false)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">{t("unarchive")}</button>
             ) : (
-              <button onClick={() => archiver(true)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">Archiver</button>
+              <button onClick={() => archiver(true)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">{t("archive")}</button>
             )}
-            <button onClick={() => { setMenu(false); setError(undefined); room.hasRaise ? setWarnOpen(true) : setDeleteOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#C0392B] hover:bg-[#FBEDE6]">Supprimer</button>
+            <button onClick={() => { setMenu(false); setError(undefined); room.hasRaise ? setWarnOpen(true) : setDeleteOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#C0392B] hover:bg-[#FBEDE6]">{t("delete")}</button>
           </span>
         </>
       )}
 
-      <Modal open={renameOpen} onClose={() => setRenameOpen(false)} title="Renommer la data room" width={440}>
+      <Modal open={renameOpen} onClose={() => setRenameOpen(false)} title={t("renameRoom")} width={440}>
         <div className="px-6 py-5 flex flex-col gap-4">
           <input value={name} onChange={(e) => setName(e.target.value)} autoFocus className={champ} />
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
           <div className="flex justify-end gap-2">
-            <button onClick={() => setRenameOpen(false)} className={btnGhost}>Annuler</button>
-            <button onClick={renommer} disabled={pending || name.trim().length < 2} className={btnPrimary}>{pending ? "…" : "Renommer"}</button>
+            <button onClick={() => setRenameOpen(false)} className={btnGhost}>{t("cancel")}</button>
+            <button onClick={renommer} disabled={pending || name.trim().length < 2} className={btnPrimary}>{pending ? "…" : t("rename")}</button>
           </div>
         </div>
       </Modal>
 
       {/* Étape 1 (salles reliées à une levée) : avertir de la connexion. */}
-      <Modal open={warnOpen} onClose={() => setWarnOpen(false)} title="Cette data room est reliée à une levée" width={470}>
+      <Modal open={warnOpen} onClose={() => setWarnOpen(false)} title={t("linkedToRaise")} width={470}>
         <div className="px-6 py-5">
           <div className="flex gap-3">
             <span className="grid place-items-center w-9 h-9 rounded-[6px] bg-[#FBEDE6] text-[#C24619] shrink-0 mt-0.5">
@@ -317,24 +321,22 @@ function RoomActions({ room }: { room: Room }) {
             </p>
           </div>
           <div className="flex justify-end gap-2 mt-5">
-            <button onClick={() => setWarnOpen(false)} className={btnGhost}>Annuler</button>
-            <button onClick={() => { setWarnOpen(false); setDeleteOpen(true); }} className="rounded-[5px] border border-[#E3B4AD] bg-white px-4 py-2 text-[13px] font-[600] text-[#C0392B] hover:bg-[#FBEDE6]">
-              Continuer quand même
-            </button>
+            <button onClick={() => setWarnOpen(false)} className={btnGhost}>{t("cancel")}</button>
+            <button onClick={() => { setWarnOpen(false); setDeleteOpen(true); }} className="rounded-[5px] border border-[#E3B4AD] bg-white px-4 py-2 text-[13px] font-[600] text-[#C0392B] hover:bg-[#FBEDE6]">{t("continueAnyway")}</button>
           </div>
         </div>
       </Modal>
 
       {/* Étape 2 : confirmation finale de suppression. */}
-      <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)} title="Supprimer la data room" width={440}>
+      <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)} title={t("deleteRoom")} width={440}>
         <div className="px-6 py-5">
           <p className="text-[13px] text-[#33353B] leading-relaxed">
             Supprimer <span className="font-[700]">{room.name}</span> et tout son contenu (dossiers, documents, accès{room.hasRaise ? ", levée" : ""})&nbsp;? Cette action est définitive.
           </p>
           {error && <p className="text-[12px] text-[#C0392B] mt-2.5">{error}</p>}
           <div className="flex justify-end gap-2 mt-5">
-            <button onClick={() => setDeleteOpen(false)} className={btnGhost}>Annuler</button>
-            <button onClick={supprimer} disabled={pending} className="rounded-[5px] bg-[#C0392B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#A32D2D] disabled:opacity-60">{pending ? "…" : "Supprimer"}</button>
+            <button onClick={() => setDeleteOpen(false)} className={btnGhost}>{t("cancel")}</button>
+            <button onClick={supprimer} disabled={pending} className="rounded-[5px] bg-[#C0392B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#A32D2D] disabled:opacity-60">{pending ? "…" : t("delete")}</button>
           </div>
         </div>
       </Modal>

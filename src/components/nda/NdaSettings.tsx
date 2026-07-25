@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/Modal";
@@ -23,6 +24,7 @@ export function NdaSettings({
   label: string;
   editLabel: string;
 }) {
+  const t = useTranslations("nda");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [on, setOn] = useState(required);
@@ -69,7 +71,7 @@ export function NdaSettings({
         {editLabel}
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Modèle de NDA" width={620}>
+      <Modal open={open} onClose={() => setOpen(false)} title={t("templateTitle")} width={620}>
         <div className="px-6 py-5 flex flex-col gap-3">
           <p className="text-[12px] text-[#6E727A] -mt-1">
             Le texte de l&apos;accord que le signataire lit avant d&apos;accéder à la data room. Laissez vide pour utiliser le texte générique.
@@ -83,9 +85,9 @@ export function NdaSettings({
           />
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
-            <button onClick={() => setOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAFAF8]">Annuler</button>
+            <button onClick={() => setOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAFAF8]">{t("cancel")}</button>
             <button onClick={saveTemplate} disabled={pending} className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60">
-              {pending ? "Enregistrement…" : "Enregistrer le modèle"}
+              {pending ? "Enregistrement…" : t("saveTemplate")}
             </button>
           </div>
         </div>

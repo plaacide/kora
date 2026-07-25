@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
 import { getCurrentDeal } from "@/lib/current-deal";
@@ -17,6 +18,7 @@ import type { Raise, RaiseInvestor } from "@/lib/raise";
  * place les invitations réelles.
  */
 export default async function DealPage() {
+  const t = await getTranslations("deal.raise");
   const supabase = await createClient();
   await requireInternal(supabase);
 
@@ -25,19 +27,19 @@ export default async function DealPage() {
   if (!deal) {
     return (
       <div className="flex flex-col gap-5 max-w-2xl text-[#1A1B1F]">
-        <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">Ma levée</h1>
+        <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("myRaise")}</h1>
         <div className="relative overflow-hidden border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center">
           {/* Écran vide : 1 jeu d'arcs, bas-droit (handoff v2 §4). */}
           <ResonanceArcs corner="bottom-right" size={480} tone="light" />
           <span className="mx-auto grid place-items-center w-12 h-12 rounded-[8px] bg-[#FBEDE6] text-[#C24619] mb-4">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" /></svg>
           </span>
-          <h2 className="text-[15px] font-[700]">Aucune data room</h2>
+          <h2 className="text-[15px] font-[700]">{t("noDataRoom")}</h2>
           <p className="text-[12.5px] text-[#6E727A] mt-1.5 mb-5 max-w-md mx-auto leading-relaxed">
-            Une levée s&apos;attache à une data room (ses documents). Créez d&apos;abord une data room — vous y ouvrirez une levée ensuite.
+            {t("noRoomBody")}
           </p>
           <div className="flex justify-center">
-            <NewDataRoomButton label="Créer une data room" />
+            <NewDataRoomButton label={t("createDataRoom")} />
           </div>
         </div>
       </div>
@@ -150,7 +152,7 @@ export default async function DealPage() {
   const avecLevee = new Set<string>();
   const levees: LeveeChip[] = ((activeRaises ?? []) as { id: string; name: string | null; deal_id: string }[]).map((r) => {
     avecLevee.add(r.deal_id);
-    return { id: r.id, name: r.name || nomDeal.get(r.deal_id) || "Levée", dealId: r.deal_id, dealName: nomDeal.get(r.deal_id) ?? "" };
+    return { id: r.id, name: r.name || nomDeal.get(r.deal_id) || t("myRaise"), dealId: r.deal_id, dealName: nomDeal.get(r.deal_id) ?? "" };
   });
   const roomsSansLevee = deals.filter((d) => !avecLevee.has(d.id)).map((d) => ({ id: d.id, name: d.name }));
 
