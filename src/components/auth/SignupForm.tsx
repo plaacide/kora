@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
+import { POSTES, POSTE_AUTRE } from "@/lib/job-titles";
 import { SsoButtons } from "./SsoButtons";
 import { cn } from "@/lib/cn";
 
@@ -68,6 +69,16 @@ export function SignupForm() {
   const t = useTranslations("auth.signup");
   const locale = useLocale();
   const [role, setRole] = useState<"investor" | "founder" | "sae">("investor");
+  const [posteKey, setPosteKey] = useState("");
+  const [posteLibre, setPosteLibre] = useState("");
+
+  // Le poste transmis : le libellé traduit, ou la saisie libre si « Autre ».
+  const poste =
+    posteKey === POSTE_AUTRE
+      ? posteLibre.trim()
+      : posteKey
+        ? t(`jobTitles.${posteKey}`)
+        : "";
 
   return (
     <div className="flex flex-col gap-6">
@@ -93,7 +104,13 @@ export function SignupForm() {
             <button
               key={r.key}
               type="button"
-              onClick={() => setRole(r.key)}
+              // Changer de persona change la liste des postes : on repart de
+              // zéro, sinon la sélection pointe une option qui n'existe plus.
+              onClick={() => {
+                setRole(r.key);
+                setPosteKey("");
+                setPosteLibre("");
+              }}
               aria-pressed={role === r.key}
               className={cn(
                 "flex flex-col items-start gap-1.5 rounded-[10px] p-2.5 text-left transition-colors cursor-pointer",
@@ -129,12 +146,40 @@ export function SignupForm() {
         </div>
 
         <div>
-          <Input
-            label={t("jobTitle")}
-            name="job_title"
-            autoComplete="organization-title"
-            placeholder={t("jobTitlePlaceholder")}
-          />
+          {/* Poste : liste fermée plutôt que texte libre. Ce champ s'affiche
+              dans « Équipe sur la levée », que lit un investisseur — en libre,
+              on récoltait « ceo », « CEO & Founder » et « pdg » pour un même
+              poste. La liste suit la persona choisie plus haut, et « Autre »
+              rouvre un champ libre pour ne bloquer personne. */}
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[12px] font-[550] text-ink-secondary">{t("jobTitle")}</span>
+            <select
+              value={posteKey}
+              onChange={(e) => setPosteKey(e.target.value)}
+              className="bg-white h-10 px-3 text-[13px] border border-[#E2DED4] rounded-[6px] focus:outline-none focus:border-[#C9C6BD]"
+            >
+              <option value="">{t("jobTitleChoose")}</option>
+              {POSTES[role].map((k) => (
+                <option key={k} value={k}>{t(`jobTitles.${k}`)}</option>
+              ))}
+              <option value={POSTE_AUTRE}>{t(`jobTitles.${POSTE_AUTRE}`)}</option>
+            </select>
+          </label>
+
+          {posteKey === POSTE_AUTRE && (
+            <input
+              value={posteLibre}
+              onChange={(e) => setPosteLibre(e.target.value)}
+              placeholder={t("jobTitleOtherPlaceholder")}
+              autoComplete="organization-title"
+              autoFocus
+              className="bg-white mt-2 w-full h-10 px-3 text-[13px] border border-[#E2DED4] rounded-[6px] focus:outline-none focus:border-[#C9C6BD]"
+            />
+          )}
+
+          {/* Seul ce champ est soumis : le libellé final, dans la langue de
+              l'utilisateur — c'est ce que la table stockait déjà en libre. */}
+          <input type="hidden" name="job_title" value={poste} />
           <FieldError messages={state?.fieldErrors?.job_title} />
         </div>
 

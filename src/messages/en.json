@@ -37,7 +37,30 @@
       "submit": "Create my account",
       "submitting": "Creating…",
       "jobTitle": "Your role",
-      "jobTitlePlaceholder": "CEO, CFO, Head of Legal…"
+      "jobTitles": {
+        "ceo": "CEO",
+        "cofounder": "Co-founder",
+        "cto": "CTO",
+        "coo": "COO",
+        "cfo": "CFO",
+        "cmo": "CMO",
+        "headProduct": "Head of Product",
+        "headOps": "Head of Operations",
+        "partner": "Partner",
+        "principal": "Principal",
+        "investmentDirector": "Investment Director",
+        "analyst": "Analyst",
+        "headPortfolio": "Head of Portfolio",
+        "advisor": "Advisor",
+        "programDirector": "Program Director",
+        "programManager": "Program Manager",
+        "portfolioLead": "Portfolio Lead",
+        "mentor": "Mentor",
+        "operationsLead": "Operations Lead",
+        "other": "Other — specify"
+      },
+      "jobTitleChoose": "Choose your role",
+      "jobTitleOtherPlaceholder": "Your role"
     },
     "login": {
       "title": "Welcome back",

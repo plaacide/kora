@@ -37,7 +37,30 @@
       "submit": "Créer mon compte",
       "submitting": "Création…",
       "jobTitle": "Votre poste",
-      "jobTitlePlaceholder": "CEO, CFO, Directrice juridique…"
+      "jobTitles": {
+        "ceo": "CEO / Directeur général",
+        "cofounder": "Cofondateur / Cofondatrice",
+        "cto": "CTO / Directeur technique",
+        "coo": "COO / Directeur des opérations",
+        "cfo": "CFO / Directeur financier",
+        "cmo": "CMO / Directeur marketing",
+        "headProduct": "Responsable produit",
+        "headOps": "Responsable des opérations",
+        "partner": "Partner",
+        "principal": "Principal",
+        "investmentDirector": "Directeur d'investissement",
+        "analyst": "Analyste",
+        "headPortfolio": "Responsable de portefeuille",
+        "advisor": "Conseiller / Conseillère",
+        "programDirector": "Directeur de programme",
+        "programManager": "Chargé de programme",
+        "portfolioLead": "Responsable du portefeuille",
+        "mentor": "Mentor",
+        "operationsLead": "Responsable opérations",
+        "other": "Autre — préciser"
+      },
+      "jobTitleChoose": "Choisissez votre poste",
+      "jobTitleOtherPlaceholder": "Votre poste"
     },
     "login": {
       "title": "Bon retour",
