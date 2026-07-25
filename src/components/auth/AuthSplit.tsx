@@ -14,10 +14,11 @@ import { LocaleLinks } from "@/components/auth/LocaleLinks";
  * Le logo reste en haut à gauche, au-dessus du formulaire — c'est le premier
  * point de repère, il ne doit pas partir du côté décoratif.
  *
- * Largeur du panneau : 42 % de l'écran, comme OVHcloud — une PROPORTION, sans
- * plafond en pixels. Un plafond faisait rétrécir le panneau à 37,5 % sur un
- * écran de 1920 alors qu'il tenait ses 42 % sur un 1440 : la page ne se
- * ressemblait plus d'un poste à l'autre.
+ * Largeur du panneau : 48 % de l'écran — une PROPORTION, sans plafond en
+ * pixels. Un plafond faisait rétrécir le panneau sur un écran de 1920 alors
+ * qu'il tenait sa proportion sur un 1440 : la page ne se ressemblait plus d'un
+ * poste à l'autre. (Le commentaire disait 42 % : c'était la valeur d'une
+ * version antérieure, la grille est en 52/48 depuis.)
  *
  * Pas de plancher non plus : en dessous de `lg` (1024 px) le panneau est
  * masqué, et 42 % de 1024 laisse déjà 430 px, largement de quoi respirer.

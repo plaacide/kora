@@ -128,6 +128,31 @@
       "backToLogin": "Retour à la connexion",
       "panelTitle": "Presque terminé.",
       "panelBody": "Une fois enregistré, vous serez connecté directement."
+    },
+    "sso": {
+      "separator": "OU PAR EMAIL",
+      "failed": "La connexion a échoué. Réessayez."
+    },
+    "panel": {
+      "badge": "Bêta privée · fondateurs",
+      "headline": "Le dealflow africain,",
+      "headlineAccent": "enfin structuré.",
+      "sub": "Votre data room, votre levée et vos investisseurs au même endroit.",
+      "exampleRef": "SNZ-2026-014 · exemple",
+      "exampleStage": "Série A",
+      "fileDone": "Dossier complété",
+      "mSought": "recherchés",
+      "mAccess": "accès",
+      "mActivity": "d'activité",
+      "badgeKyc": "KYC vérifié",
+      "badgeDeals": "Deals suivis",
+      "signupHeadline": "Faites résonner vos deals.",
+      "featDocs": "Documents protégés",
+      "featDocsBody": "Filigrane au nom du lecteur, téléchargement bloqué, preuve de signature.",
+      "featRoom": "Data room structurée",
+      "featRoomBody": "Arborescence OHADA/UEMOA et suivi des pièces à fournir.",
+      "featWho": "Qui a lu quoi",
+      "featWhoBody": "Pages consultées, temps de lecture, journal d'audit inaltérable."
     }
   },
   "validation": {

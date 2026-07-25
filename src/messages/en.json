@@ -128,6 +128,31 @@
       "backToLogin": "Back to sign in",
       "panelTitle": "Almost done.",
       "panelBody": "Once saved, you'll be signed in straight away."
+    },
+    "sso": {
+      "separator": "OR WITH EMAIL",
+      "failed": "Sign-in failed. Please try again."
+    },
+    "panel": {
+      "badge": "Private beta · founders",
+      "headline": "African dealflow,",
+      "headlineAccent": "finally structured.",
+      "sub": "Your data room, your raise and your investors in one place.",
+      "exampleRef": "SNZ-2026-014 · example",
+      "exampleStage": "Series A",
+      "fileDone": "File completed",
+      "mSought": "sought",
+      "mAccess": "guests",
+      "mActivity": "of activity",
+      "badgeKyc": "KYC verified",
+      "badgeDeals": "Deals tracked",
+      "signupHeadline": "Make your deals resonate.",
+      "featDocs": "Protected documents",
+      "featDocsBody": "Watermarked with the reader's name, downloads blocked, proof of signature.",
+      "featRoom": "Structured data room",
+      "featRoomBody": "OHADA/WAEMU folder tree and tracking of required documents.",
+      "featWho": "Who read what",
+      "featWhoBody": "Pages viewed, reading time, tamper-proof audit log."
     }
   },
   "validation": {

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { AuthSplit } from "@/components/auth/AuthSplit";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { Mono } from "@/components/ui/Table";
@@ -28,7 +29,8 @@ function Feature({
   );
 }
 
-export default function InscriptionPage() {
+export default async function InscriptionPage() {
+  const t = await getTranslations("auth.panel");
   return (
     <AuthSplit
       arcsCorner="top-left"
@@ -37,23 +39,23 @@ export default function InscriptionPage() {
       panel={
         <div>
           <h2 className="text-[36px] font-[700] leading-[1.1] tracking-[-0.025em]">
-            Faites résonner vos deals.
+            {t("signupHeadline")}
           </h2>
           <div className="mt-6 flex flex-col gap-3">
             <Feature
               icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z" /><path d="M9 12l2 2 4-4" /></svg>}
-              title="Documents protégés"
-              text="Filigrane au nom du lecteur, téléchargement bloqué, preuve de signature."
+              title={t("featDocs")}
+              text={t("featDocsBody")}
             />
             <Feature
               icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" /></svg>}
-              title="Data room structurée"
-              text="Arborescence OHADA/UEMOA et suivi des pièces à fournir."
+              title={t("featRoom")}
+              text={t("featRoomBody")}
             />
             <Feature
               icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 17l6-6 4 4 7-7" /><path d="M21 8v4h-4" /></svg>}
-              title="Qui a lu quoi"
-              text="Pages consultées, temps de lecture, journal d'audit inaltérable."
+              title={t("featWho")}
+              text={t("featWhoBody")}
             />
           </div>
         </div>

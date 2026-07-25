@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 
 /**
@@ -45,16 +46,17 @@ function LogoLinkedIn() {
 export function SsoButtons({
   next = "/dashboard",
   role,
-  separatorLabel = "OU PAR EMAIL",
-  errorLabel = "La connexion a échoué. Réessayez.",
 }: {
   /** Destination après échange du code. */
   next?: string;
   /** Type de compte à poser — inscription seulement. */
   role?: "investor" | "founder" | "sae";
-  separatorLabel?: string;
-  errorLabel?: string;
 }) {
+  // Les libellés étaient des PROPS avec un défaut français. Aucun des deux
+  // appelants ne les passait : connexion comme inscription affichaient donc du
+  // français en dur, y compris en anglais. Le composant les résout lui-même —
+  // un défaut traduisible n'existe pas, seul un défaut dans UNE langue existe.
+  const t = useTranslations("auth.sso");
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState(false);
 
@@ -95,7 +97,7 @@ export function SsoButtons({
         </button>
       </div>
 
-      {error && <p className="text-[12px] text-[#C0392B]">{errorLabel}</p>}
+      {error && <p className="text-[12px] text-[#C0392B]">{t("failed")}</p>}
 
       <div className="flex items-center gap-3 py-0.5">
         <span className="h-px flex-1 bg-[#E2DED4]" />
@@ -103,7 +105,7 @@ export function SsoButtons({
           style={{ fontFamily: "var(--font-plex-mono), monospace" }}
           className="text-[10px] font-[600] uppercase tracking-[0.1em] text-[#8B8FA3]"
         >
-          {separatorLabel}
+          {t("separator")}
         </span>
         <span className="h-px flex-1 bg-[#E2DED4]" />
       </div>

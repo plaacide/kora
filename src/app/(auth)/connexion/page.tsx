@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { AuthSplit } from "@/components/auth/AuthSplit";
 import { LoginForm } from "@/components/auth/LoginForm";
 
@@ -16,6 +17,7 @@ export default async function ConnexionPage({
   searchParams: Promise<{ erreur?: string }>;
 }) {
   const { erreur } = await searchParams;
+  const t = await getTranslations("auth.panel");
 
   return (
     <AuthSplit
@@ -25,15 +27,15 @@ export default async function ConnexionPage({
           {/* Badge pill, titre 36px, puis carte produit en verre (handoff §3). */}
           <span className="inline-flex items-center gap-2 rounded-full bg-white/[0.07] border border-white/10 px-3 py-1.5 text-[11.5px] text-white/80">
             <span className="w-1.5 h-1.5 rounded-full bg-[#e85c2b]" />
-            Bêta privée · fondateurs
+            {t("badge")}
           </span>
 
           <h2 className="mt-5 text-[36px] font-[700] leading-[1.1] tracking-[-0.025em]">
-            Le dealflow africain,{" "}
-            <span className="text-[#e85c2b]">enfin structuré.</span>
+            {t("headline")}{" "}
+            <span className="text-[#e85c2b]">{t("headlineAccent")}</span>
           </h2>
           <p className="mt-3 text-[13.5px] text-white/70 leading-relaxed">
-            Votre data room, votre levée et vos investisseurs au même endroit.
+            {t("sub")}
           </p>
 
           {/* Carte produit — exemple illustratif, pas des données réelles. */}
@@ -42,17 +44,17 @@ export default async function ConnexionPage({
               <div className="min-w-0">
                 <div className="text-[14.5px] font-[650] truncate">Kalyx Foods</div>
                 <div style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="text-[10.5px] text-white/45 mt-0.5">
-                  SNZ-2026-014 · exemple
+                  {t("exampleRef")}
                 </div>
               </div>
               <span style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="shrink-0 text-[9px] font-[600] uppercase tracking-[0.06em] text-[#f08a5e] bg-[#e85c2b]/15 rounded-[4px] px-2 py-[3px]">
-                Série A
+                {t("exampleStage")}
               </span>
             </div>
 
             <div className="mt-4">
               <div className="flex items-center justify-between text-[11.5px] text-white/60">
-                <span>Dossier complété</span>
+                <span>{t("fileDone")}</span>
                 <span style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="text-white/85">82 %</span>
               </div>
               <span className="block h-1.5 rounded-[3px] bg-white/10 overflow-hidden mt-2">
@@ -62,9 +64,9 @@ export default async function ConnexionPage({
 
             <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-3 gap-2">
               {[
-                { v: "2,4 M$", l: "recherchés" },
-                { v: "14", l: "accès" },
-                { v: "6 j", l: "d'activité" },
+                { v: "2,4 M$", l: t("mSought") },
+                { v: "14", l: t("mAccess") },
+                { v: "6 j", l: t("mActivity") },
               ].map((m) => (
                 <div key={m.l}>
                   <div style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="text-[15px] font-[600]">{m.v}</div>
@@ -79,13 +81,13 @@ export default async function ConnexionPage({
               icon={
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z" /><path d="M9 12l2 2 4-4" /></svg>
               }
-              label="KYC vérifié"
+              label={t("badgeKyc")}
             />
             <Badge
               icon={
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20h-20" /></svg>
               }
-              label="Deals suivis"
+              label={t("badgeDeals")}
             />
           </div>
         </div>
