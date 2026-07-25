@@ -9,6 +9,7 @@ import { ShareButton } from "@/components/dataroom/ShareButton";
 import { OuvrirLeveeButton } from "@/components/deal/OuvrirLeveeButton";
 import { ChangerDataRoomButton } from "@/components/deal/ChangerDataRoomButton";
 import { Modal } from "@/components/ui/Modal";
+import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 import {
   saveRaise,
   saveRaiseInvestor,
@@ -193,6 +194,8 @@ export function MaLevee({
   // être appelé dans le même ordre à chaque rendu.
   const [signalEdition, setSignalEdition] = useState(0);
   const ouvrirEdition = () => setSignalEdition((n) => n + 1);
+  const [signalInvest, setSignalInvest] = useState(0);
+  const ouvrirInvestisseur = () => setSignalInvest((n) => n + 1);
 
   // ----- Diligence : pilotage sans levée -----
   if (objectif === "diligence") {
@@ -256,6 +259,16 @@ export function MaLevee({
           {raise && <ModifierLevee dealId={dealId} raise={raise} signalOuverture={signalEdition} />}
         </div>
       </div>
+
+      {enMiseEnRoute && raise && (
+        <MiseEnRoute
+          missing={missing}
+          raise={raise}
+          investors={investors}
+          onEditerLevee={ouvrirEdition}
+          onAjouterInvestisseur={ouvrirInvestisseur}
+        />
+      )}
 
       {/* Levées : courante (+ Clôturer), clôturées, et « Nouvelle levée ». */}
       <RaiseChips dealName={dealName} dealId={dealId} raise={raise} closedRaises={closedRaises} />
@@ -525,7 +538,7 @@ export function MaLevee({
       </div>
 
       {/* Pipeline investisseur curé (éditable) */}
-      <PipelineInvestisseurs dealId={dealId} devise={devise} investors={investors} />
+      <PipelineInvestisseurs dealId={dealId} devise={devise} investors={investors} signalOuverture={signalInvest} />
       </>
       )}
 
@@ -535,6 +548,115 @@ export function MaLevee({
         {raise?.id && <ChangerDataRoomButton raiseId={raise.id} rooms={roomsSansLevee} />}
       </div>
       <PreparationCard dealName={dealName} readiness={readiness} missing={missing} legende={t("attachedToRaise")} />
+    </div>
+  );
+}
+
+/**
+ * Bandeau « Mise en route » (§2.3) — carte Encre dans une page claire, donc
+ * arcs réduits (200–260) conformément aux règles de ResonanceArcs.
+ *
+ * Les trois étapes sont DÉRIVÉES des données déjà chargées, jamais saisies :
+ * pièces socle depuis `missing`, clôture et indicateurs depuis la levée,
+ * premier investisseur depuis le pipeline. Le bandeau disparaît au-delà du
+ * seuil ; il n'est pas repliable et ne stocke aucun état de fermeture.
+ */
+function MiseEnRoute({
+  missing,
+  raise,
+  investors,
+  onEditerLevee,
+  onAjouterInvestisseur,
+}: {
+  missing: { label: string; folderId: string | null }[];
+  raise: Raise;
+  investors: RaiseInvestor[];
+  onEditerLevee: () => void;
+  onAjouterInvestisseur: () => void;
+}) {
+  const t = useTranslations("deal.raise");
+
+  const SOCLE = 5;
+  const restantSocle = Math.min(missing.length, SOCLE);
+  const faitesSocle = SOCLE - restantSocle;
+  const aIndicateurs = Object.values(raise.indicateurs ?? {}).some((l) => (l?.length ?? 0) > 0);
+
+  const etapes = [
+    { fait: restantSocle === 0, titre: t("setupStep1"), corps: t("setupStep1Body"), cta: t("setupStep1Cta"),
+      compte: t("setupCount", { done: faitesSocle }) },
+    { fait: !!raise.date_cloture && aIndicateurs, titre: t("setupStep2"), corps: t("setupStep2Body"), cta: t("setupStep2Cta"), compte: "" },
+    { fait: investors.length > 0, titre: t("setupStep3"), corps: t("setupStep3Body"), cta: t("setupStep3Cta"), compte: "" },
+  ];
+  const indexCourant = Math.max(0, etapes.findIndex((e) => !e.fait));
+  const courante = etapes[indexCourant];
+  const premiereManquante = missing[0];
+
+  return (
+    <div className="relative overflow-hidden bg-[#1A1B1F] rounded-[8px] px-7 py-[26px] mb-7">
+      <ResonanceArcs corner="bottom-right" size={240} tone="dark" />
+      <div className="relative z-10 grid gap-7 md:grid-cols-[1.25fr_1fr] items-start">
+        <div>
+          <div style={mono} className="text-[10px] font-[600] uppercase tracking-[0.1em] text-[#F08A5E] mb-2.5">
+            {t("setupOvertitle", { n: indexCourant + 1 })}
+          </div>
+          <h2 className="text-[21px] font-[700] tracking-[-0.02em] text-white">{courante.titre}</h2>
+          <p className="text-[13px] text-white/65 leading-relaxed mt-2 max-w-md">{courante.corps}</p>
+          <div className="flex items-center gap-2.5 mt-5 flex-wrap">
+            {indexCourant === 0 ? (
+              <Link
+                href={premiereManquante?.folderId ? `/data-room?dossier=${premiereManquante.folderId}` : "/data-room"}
+                className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
+              >
+                {courante.cta}
+              </Link>
+            ) : (
+              <button
+                onClick={indexCourant === 1 ? onEditerLevee : onAjouterInvestisseur}
+                className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
+              >
+                {courante.cta}
+              </button>
+            )}
+            <Link
+              href="/data-room"
+              className="rounded-[5px] border border-white/15 bg-white/[0.06] px-4 py-2.5 text-[13px] font-[600] text-white/85 hover:bg-white/[0.10]"
+            >
+              {t("setupSecondary")}
+            </Link>
+          </div>
+        </div>
+
+        <ol className="flex flex-col gap-1.5">
+          {etapes.map((e, i) => {
+            const active = i === indexCourant;
+            return (
+              <li
+                key={e.titre}
+                className={
+                  "flex items-center gap-3 rounded-[6px] px-3.5 py-3 border " +
+                  (active
+                    ? "bg-[rgba(232,92,43,0.12)] border-[rgba(232,92,43,0.28)]"
+                    : "bg-transparent border-white/10")
+                }
+              >
+                {e.fait ? (
+                  <span className="grid place-items-center w-5 h-5 rounded-full bg-[#E85C2B] text-white shrink-0">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5" /></svg>
+                  </span>
+                ) : (
+                  <span className={"w-5 h-5 rounded-full border-[1.5px] shrink-0 " + (active ? "border-[#E85C2B]" : "border-white/25")} aria-hidden />
+                )}
+                <span className="flex-1 min-w-0">
+                  <span className={"block text-[12.5px] font-[600] truncate " + (e.fait || active ? "text-white" : "text-white/50")}>{e.titre}</span>
+                </span>
+                {e.compte && (
+                  <span style={mono} className="text-[10.5px] text-white/45 shrink-0">{e.compte}</span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
     </div>
   );
 }
@@ -748,14 +870,22 @@ function PipelineInvestisseurs({
   dealId,
   devise,
   investors,
+  signalOuverture = 0,
 }: {
   dealId: string;
   devise: string;
   investors: RaiseInvestor[];
+  signalOuverture?: number;
 }) {
   const t = useTranslations("deal.raise");
   // `null` = fermé, "new" = création, sinon l'investisseur en édition.
   const [editing, setEditing] = useState<RaiseInvestor | "new" | null>(null);
+  // Ouverture déclenchée par le bandeau de mise en route (§2.3).
+  const [signalVu, setSignalVu] = useState(signalOuverture);
+  if (signalOuverture !== signalVu) {
+    setSignalVu(signalOuverture);
+    setEditing("new");
+  }
 
   return (
     <>

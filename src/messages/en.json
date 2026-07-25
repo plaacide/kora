@@ -849,7 +849,20 @@
       "activeAccess": "Active access",
       "lastView": "Last view",
       "noView": "No view yet",
-      "missingPieces": "{n, plural, one {# missing document} other {# missing documents}}"
+      "missingPieces": "{n, plural, one {# missing document} other {# missing documents}}",
+      "setupOvertitle": "GETTING STARTED · {n} OF 3",
+      "setupStep1": "Upload your core documents",
+      "setupStep1Body": "The five documents an investor opens first. Without them, your file cannot be read.",
+      "setupStep1Cta": "Upload a document",
+      "setupStep2": "Fill in your raise",
+      "setupStep2Body": "Close date and highlighted indicators: what an investor looks at before your documents.",
+      "setupStep2Cta": "Complete the raise",
+      "setupStep3": "Invite a first investor",
+      "setupStep3Body": "Track those you approach, with their ticket and status.",
+      "setupStep3Cta": "Add an investor",
+      "setupSecondary": "Open the data room",
+      "setupDone": "Everything is in place",
+      "setupCount": "{done} of 5"
     }
   },
   "versions": {
