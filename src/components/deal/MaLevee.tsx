@@ -4,6 +4,7 @@ import { Fragment, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { joursRestants } from "@/lib/echeance";
 import { ShareButton } from "@/components/dataroom/ShareButton";
 import { OuvrirLeveeButton } from "@/components/deal/OuvrirLeveeButton";
@@ -114,6 +115,35 @@ function moisAnnee(iso: string | null): string {
 }
 
 /** Pile d'avatars carrés d'investisseurs (3 max + « +N »), style maquette. */
+/**
+ * Glyphes de contrôle en SVG, trait 2px — jamais un caractère typographique.
+ * Un « + » ou un « × » de police change de dessin, de graisse et d'alignement
+ * d'une plateforme à l'autre, et n'obéit pas à `stroke-width`.
+ */
+function IconePlus() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function IconeCroix() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+function IconeFleche() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
 function AvatarStack({ investors }: { investors: RaiseInvestor[] }) {
   if (investors.length === 0) return null;
   const shown = investors.slice(0, 3);
@@ -384,14 +414,14 @@ export function MaLevee({
           <div className="px-5 py-[18px]">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("amountSought")}</div>
             <div style={mono} className="text-[26px] font-[600] tracking-[-0.02em]">
-              {cible != null ? formatMoney(cible, devise) : <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><span aria-hidden>+</span> {t("addAmount")}</button>}
+              {cible != null ? formatMoney(cible, devise) : <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><IconePlus /> {t("addAmount")}</button>}
             </div>
             {cible != null && cible > 0 && (
               <>
                 <span className="block h-1.5 rounded-[3px] bg-[#E2DED4] overflow-hidden mt-[11px]"><span className="block h-full bg-[#E85C2B]" style={{ width: `${pct}%` }} /></span>
                 <div className="text-[11.5px] text-[#6E727A] mt-[7px]">
-                  <span style={mono} className="text-[#C24619] font-[600]">{formatMoney(engage, devise)}</span> engagés
-                  {restant != null && restant > 0 && <> · <span style={mono}>{formatMoney(restant, devise)}</span> restants</>}
+                  <span style={mono} className="text-[#C24619] font-[600]">{formatMoney(engage, devise)}</span> {t("committedSuffix")}
+                  {restant != null && restant > 0 && <> · <span style={mono}>{formatMoney(restant, devise)}</span> {t("remainingSuffix")}</>}
                   {" "}· {pct} %
                 </div>
               </>
@@ -400,10 +430,10 @@ export function MaLevee({
           <div className="px-5 py-[18px]">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("financingType")}</div>
             <div className="text-[15px] font-[650]">
-              {[labelOf(TYPE_TOUR, raise?.type_tour ?? null), labelOf(STADE_RAISE, raise?.stade ?? null)].filter(Boolean).join(" — ") || <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><span aria-hidden>+</span> {t("addType")}</button>}
+              {[labelOf(TYPE_TOUR, raise?.type_tour ?? null), labelOf(STADE_RAISE, raise?.stade ?? null)].filter(Boolean).join(" — ") || <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><IconePlus /> {t("addType")}</button>}
             </div>
             {raise?.valorisation_pre != null && (
-              <div className="text-[12px] text-[#6E727A] mt-1">valorisation pré-money {formatMoney(raise.valorisation_pre, devise)}</div>
+              <div className="text-[12px] text-[#6E727A] mt-1">{t("preMoney", { montant: formatMoney(raise.valorisation_pre, devise) })}</div>
             )}
             {audience.length > 0 && (
               <div className="flex gap-1.5 mt-2.5 flex-wrap">
@@ -418,7 +448,7 @@ export function MaLevee({
             <div className="text-[15px] font-[650]">
               {raise?.date_cloture
                 ? new Date(raise.date_cloture).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
-                : <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><span aria-hidden>+</span> {t("addDate")}</button>}
+                : <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><IconePlus /> {t("addDate")}</button>}
             </div>
           </div>
         </div>
@@ -455,7 +485,7 @@ export function MaLevee({
               {rounds.map((rd, i) => (
                 <Fragment key={rd.r.id}>
                   {i > 0 && (
-                    <div className="hidden md:flex items-center px-1.5 text-[#C7C9CF] text-[18px] justify-center">→</div>
+                    <div className="hidden md:flex items-center px-1.5 text-[#C7C9CF] justify-center" aria-hidden><IconeFleche /></div>
                   )}
                   <div className={"relative flex-1 min-w-[220px] p-[18px] group " + (i > 0 ? "border-t md:border-t-0 md:border-l border-[#E2DED4] " : "") + (rd.kind === "current" ? "bg-[#FEFCFA]" : "")}>
                     {rd.kind === "closed" && <DeleteRoundButton id={rd.r.id} />}
@@ -753,9 +783,7 @@ function VitrineBand({
         </div>
 
         {rows.length === 0 ? (
-          <p className="text-[12.5px] text-[#9DA0A8] px-4 py-6 text-center">
-            Aucun indicateur pour l&apos;instant. Cliquez sur « Éditer les indicateurs » pour ajouter ce qu&apos;un investisseur voit avant d&apos;ouvrir vos documents.
-          </p>
+          <EmptyState inset title={t("noIndicatorsTitle")} description={t("noIndicatorsBody")} />
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-[#E2DED4]">
             {rows.map((k, i) => (
@@ -874,7 +902,7 @@ function VitrineEditor({
                   >
                     ✓
                   </button>
-                  <button type="button" onClick={() => remove(aud, i)} title={t("remove")} className="bg-white w-9 h-9 rounded-[5px] border border-[#E4E2DC] text-[#9DA0A8] hover:text-[#C0392B] hover:border-[#E3B4AD]">×</button>
+                  <button type="button" onClick={() => remove(aud, i)} title={t("remove")} className="bg-white grid place-items-center w-9 h-9 rounded-[5px] border border-[#E4E2DC] text-[#9DA0A8] hover:text-[#C0392B] hover:border-[#E3B4AD]"><IconeCroix /></button>
                 </div>
               ))}
               <button type="button" onClick={() => addRow(aud)} className="self-start text-[12px] font-[600] text-[#C24619] mt-0.5">+ Ajouter un indicateur</button>
@@ -928,9 +956,7 @@ function PipelineInvestisseurs({
       </div>
       <div className="border-t border-[#E2DED4] mb-8">
         {investors.length === 0 ? (
-          <p className="text-[12.5px] text-[#9DA0A8] py-6 text-center">
-            Aucun investisseur suivi. Ajoutez ceux que vous approchez, avec leur ticket et leur statut.
-          </p>
+          <EmptyState inset title={t("noInvestorsTitle")} description={t("noInvestorsBody")} />
         ) : (
           <>
             <div style={mono} className="bg-white grid grid-cols-[1.7fr_0.8fr_1fr_auto] gap-3 py-2 text-[9px] text-[#A0A3AB] tracking-[0.05em] border-b border-[#E2DED4]">

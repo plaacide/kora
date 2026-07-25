@@ -965,7 +965,7 @@
       "committed": "Montant déjà engagé (soft-commitments)",
       "committedHint": "Sert à la jauge « engagés / recherchés » de l’accueil.",
       "roundType": "Type de tour",
-      "preMoney": "Valorisation pré-money",
+      "preMoney": "valorisation pré-money {montant}",
       "deleteRaise": "Supprimer la levée",
       "showcase": "Vitrine — indicateurs",
       "highlight": "Mettre en avant (vert)",
@@ -1054,7 +1054,13 @@
       "pathStep2Body": "Montant, audience, investisseurs — une fois la salle en place.",
       "previewTitle": "À quoi ça ressemblera",
       "previewTag": "APERÇU ILLUSTRATIF",
-      "previewNote": "Exemple — aucune de ces valeurs n'est la vôtre."
+      "previewNote": "Exemple — aucune de ces valeurs n'est la vôtre.",
+      "committedSuffix": "engagés",
+      "remainingSuffix": "restants",
+      "noIndicatorsTitle": "Aucun indicateur pour l'instant",
+      "noIndicatorsBody": "Ajoutez ce qu'un investisseur voit avant d'ouvrir vos documents.",
+      "noInvestorsTitle": "Aucun investisseur suivi",
+      "noInvestorsBody": "Ajoutez ceux que vous approchez, avec leur ticket et leur statut."
     }
   },
   "versions": {

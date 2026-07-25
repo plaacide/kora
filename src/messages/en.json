@@ -965,7 +965,7 @@
       "committed": "Amount already committed (soft-commitments)",
       "committedHint": "Feeds the “committed / target” gauge on the home screen.",
       "roundType": "Round type",
-      "preMoney": "Pre-money valuation",
+      "preMoney": "pre-money valuation {montant}",
       "deleteRaise": "Delete the raise",
       "showcase": "Showcase — indicators",
       "highlight": "Highlight (green)",
@@ -1054,7 +1054,13 @@
       "pathStep2Body": "Amount, audience, investors — once the room exists.",
       "previewTitle": "What it will look like",
       "previewTag": "ILLUSTRATIVE PREVIEW",
-      "previewNote": "Example — none of these figures are yours."
+      "previewNote": "Example — none of these figures are yours.",
+      "committedSuffix": "committed",
+      "remainingSuffix": "remaining",
+      "noIndicatorsTitle": "No indicators yet",
+      "noIndicatorsBody": "Add what an investor sees before opening your documents.",
+      "noInvestorsTitle": "No investors tracked",
+      "noInvestorsBody": "Add the ones you are approaching, with their ticket and status."
     }
   },
   "versions": {
