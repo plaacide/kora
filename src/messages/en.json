@@ -210,7 +210,13 @@
       "profileDone": "Profile completed",
       "profileNote": "This is your business card. The completeness of your <b>file</b> builds up afterwards: it measures the documents actually provided, and that is the one investors read.",
       "back": "Back",
-      "defaultWorkspace": "My startup"
+      "defaultWorkspace": "My startup",
+      "timeline": "Target timeline",
+      "timelineHint": "When do you hope to close?",
+      "q3_2026": "Q3 2026",
+      "q4_2026": "Q4 2026",
+      "q1_2027": "Q1 2027",
+      "later": "Later"
     },
     "investor": {
       "stepProfileTitle": "Your profile",

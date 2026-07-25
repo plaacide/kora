@@ -210,7 +210,13 @@
       "profileDone": "Fiche complétée",
       "profileNote": "C'est votre carte de visite. La complétude de votre <b>dossier</b>, elle, se construit ensuite : elle mesure les pièces réellement fournies, et c'est celle que les investisseurs regardent.",
       "back": "Retour",
-      "defaultWorkspace": "Ma startup"
+      "defaultWorkspace": "Ma startup",
+      "timeline": "Calendrier visé",
+      "timelineHint": "Quand espérez-vous clôturer ?",
+      "q3_2026": "Q3 2026",
+      "q4_2026": "Q4 2026",
+      "q1_2027": "Q1 2027",
+      "later": "Plus tard"
     },
     "investor": {
       "stepProfileTitle": "Votre profil",

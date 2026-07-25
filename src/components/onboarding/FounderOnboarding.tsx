@@ -6,9 +6,10 @@ import { OnboardingShell, AsideEncre, AsideClair } from "./OnboardingShell";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PlainError } from "@/components/auth/FormError";
+import { SelectChips } from "./SelectChips";
 import { saveStartup, completeOnboarding } from "@/app/actions/onboarding";
 import { cn } from "@/lib/cn";
-import { PAYS, SECTEURS, STADES } from "@/lib/onboarding-options";
+import { PAYS, SECTEURS, STADES, HORIZONS } from "@/lib/onboarding-options";
 
 /** Longueur maximale de la phrase de présentation (handoff v2 §5). */
 const PHRASE_MAX = 120;
@@ -72,6 +73,7 @@ export function FounderOnboarding() {
   const [oneLiner, setOneLiner] = useState("");
   const [amount, setAmount] = useState("");
   const [arr, setArr] = useState("");
+  const [horizon, setHorizon] = useState<string[]>([]);
   const [error, setError] = useState<string | undefined>();
   const [pending, start] = useTransition();
 
@@ -119,6 +121,7 @@ export function FounderOnboarding() {
       const res = await saveStartup({
         amount: amount ? Number(amount) : null,
         arr: arr ? Number(arr) : null,
+        horizon: horizon[0],
       });
       if (!res.ok) return setError(res.error);
       await completeOnboarding(name.trim() || t("defaultWorkspace"));
@@ -241,6 +244,18 @@ export function FounderOnboarding() {
           <input type="number" min="0" value={arr} onChange={(e) => setArr(e.target.value)} placeholder="850000"
             className="h-8 px-2.5 font-mono text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none" />
         </div>
+      </div>
+
+      {/* Calendrier visé (V2 §5). Un fondateur qui vise Q4 2026 et un autre qui
+          vise « plus tard » ne se préparent pas au même rythme — et c'est la
+          seule question de cet écran dont la réponse ne se déduit d'aucune
+          autre. Choix unique : viser deux trimestres n'a pas de sens. */}
+      <div className="mt-4 flex flex-col gap-2">
+        <div className="flex items-baseline justify-between">
+          <label className="text-[11.5px] font-medium text-ink-secondary">{t("timeline")}</label>
+          <span className="text-[10.5px] text-ink-muted">{t("timelineHint")}</span>
+        </div>
+        <SelectChips options={HORIZONS.map((h) => ({ value: h.value, label: t(h.key) }))} value={horizon} onChange={setHorizon} />
       </div>
 
       {/* Pas de zone de dépôt ici : l'upload vit dans la data room, qui n'existe

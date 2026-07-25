@@ -38,6 +38,8 @@ export async function saveStartup(input: {
   arr?: number | null;
   /** 'levee' | 'diligence' — pilote l'écran et les données collectées. */
   objectif?: string;
+  /** Trimestre de clôture visé — « Q4 2026 », « later »… */
+  horizon?: string;
 }): Promise<Result> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("save_startup", {
@@ -49,6 +51,7 @@ export async function saveStartup(input: {
     p_amount: input.amount ?? null,
     p_arr: input.arr ?? null,
     p_objectif: input.objectif ?? null,
+    p_horizon: input.horizon ?? null,
   });
   if (error) return { ok: false, error: error.message };
   return { ok: true };

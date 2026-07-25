@@ -73,3 +73,17 @@ export const GEOGRAPHIES: readonly OptionOnboarding[] = [
   { value: "Afrique du Nord", key: "nord" },
   { value: "Afrique australe", key: "australe" },
 ];
+
+/**
+ * Calendrier visé pour la levée (V2 §5).
+ *
+ * La valeur persistée est le trimestre lui-même — « Q3 2026 » se lit sans
+ * traduction et se trie. Seul « later » est une clé : « plus tard » n'a pas
+ * d'écriture neutre.
+ */
+export const HORIZONS: readonly OptionOnboarding[] = [
+  { value: "Q3 2026", key: "q3_2026" },
+  { value: "Q4 2026", key: "q4_2026" },
+  { value: "Q1 2027", key: "q1_2027" },
+  { value: "later", key: "later" },
+];
