@@ -13,6 +13,7 @@ import { Sparkline } from "@/components/dashboard/Sparkline";
 import { DealsTable, type DealRow } from "@/components/dashboard/DealsTable";
 import { NewDealButton } from "@/components/dataroom/NewDealButton";
 import { NewDataRoomButton } from "@/components/dataroom/RoomsList";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 import { formatAmount, formatDate } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
@@ -400,11 +401,12 @@ export default async function DashboardPage() {
               </Link>
             ))}
             {tasks.length === 0 && (
-              <CardBody>
-                <p className="text-[12px] text-ink-muted text-center py-2">
-                  {t("todoEmpty")}
-                </p>
-              </CardBody>
+              <EmptyState
+                inset
+                title={t("todoEmptyTitle")}
+                description={t("todoEmptyBody")}
+                icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>}
+              />
             )}
           </Card>
 
@@ -438,12 +440,16 @@ export default async function DashboardPage() {
                 </div>
               </div>
             ))}
+            {/* Aucune action : le journal se remplit tout seul. On dit ce qui
+                 le remplira plutôt que d'offrir un bouton qui n'existerait
+                 que pour meubler (handoff §3). */}
             {(activity ?? []).length === 0 && (
-              <CardBody>
-                <p className="text-[12px] text-ink-muted text-center py-2">
-                  {t("noActivity")}
-                </p>
-              </CardBody>
+              <EmptyState
+                inset
+                title={t("noActivityTitle")}
+                description={t("noActivityBody")}
+                icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>}
+              />
             )}
             <div className="px-4 py-2.5 bg-bg border-t border-separator-soft">
               <Link

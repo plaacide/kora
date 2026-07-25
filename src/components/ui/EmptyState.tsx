@@ -16,6 +16,11 @@ import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
  * Décor : les arcs viennent de `ResonanceArcs`, aux tailles prescrites — 480
  * en ton clair sur un écran vide pleine page, 240 en ton sombre sur une carte
  * Encre. Jamais derrière une liste dense : `arcs` est donc opt-in.
+ *
+ * `inset` sert les vides logés DANS un conteneur déjà bordé (une carte du
+ * tableau de bord). Sans lui, on empilerait deux cadres et deux fonds blancs.
+ * Le composant reste le même — c'est le seul moyen d'avoir une grammaire
+ * unique sans réécrire un vide à la main à chaque emplacement.
  */
 export function EmptyState({
   icon,
@@ -25,6 +30,7 @@ export function EmptyState({
   secondaryAction,
   tone = "light",
   arcs = false,
+  inset = false,
 }: {
   icon?: React.ReactNode;
   title: string;
@@ -33,14 +39,17 @@ export function EmptyState({
   secondaryAction?: React.ReactNode;
   tone?: "light" | "dark";
   arcs?: boolean;
+  /** Logé dans un conteneur déjà bordé : ni cadre, ni fond, moins de marge. */
+  inset?: boolean;
 }) {
   const sombre = tone === "dark";
 
   return (
     <div
       className={
-        "relative overflow-hidden rounded-[8px] px-6 py-10 text-center " +
-        (sombre ? "bg-[#1A1B1F]" : "bg-white border border-[#E2DED4]")
+        "relative overflow-hidden text-center " +
+        (inset ? "px-5 py-7 " : "rounded-[8px] px-6 py-10 ") +
+        (sombre ? "bg-[#1A1B1F]" : inset ? "" : "bg-white border border-[#E2DED4]")
       }
     >
       {arcs && (
@@ -55,7 +64,8 @@ export function EmptyState({
         {icon && (
           <span
             className={
-              "grid place-items-center w-12 h-12 rounded-[8px] mb-4 " +
+              "grid place-items-center rounded-[8px] " +
+              (inset ? "w-9 h-9 mb-2.5 " : "w-12 h-12 mb-4 ") +
               (sombre ? "bg-white/10 text-[#F08A5E]" : "bg-[#FBEDE6] text-[#C24619]")
             }
             aria-hidden

@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { formatAmount } from "@/lib/format";
 import type { DealRef } from "@/lib/current-deal";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 /**
  * Accueil du FONDATEUR — refonte fidèle au handoff app v5 (§2).
@@ -384,7 +385,12 @@ export async function AccueilFondateur({
             </Link>
           </div>
           {visites.length === 0 ? (
-            <p className="text-[12.5px] text-[#9DA0A8] py-3">{t("viewsEmpty")}</p>
+            <EmptyState
+              inset
+              title={t("viewsEmptyTitle")}
+              description={t("viewsEmptyBody")}
+              icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>}
+            />
           ) : (
             <div className="border-t border-[#E2DED4]">
               <div className="bg-white flex items-center gap-3 py-2 font-mono text-[9px] font-[600] uppercase tracking-[0.05em] text-[#9DA0A8] border-b border-[#E2DED4]">

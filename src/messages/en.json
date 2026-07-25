@@ -367,10 +367,8 @@
     "expiringBody": "Some rights are about to lapse. Extend them before access closes.",
     "extendAccess": "Extend access",
     "todoTitle": "To do",
-    "todoEmpty": "Nothing to do — all caught up.",
     "todoAnswerQa": "Answer an investor question",
     "recentActivity": "Recent activity",
-    "noActivity": "No activity yet.",
     "seeAudit": "See full log",
     "createMyRoom": "Create my data room",
     "greetingSimple": "Hello, {name}",
@@ -384,7 +382,11 @@
     "stepUpload": "Upload your documents",
     "stepUploadBody": "Articles, financials, cap table: the core an investor opens first.",
     "stepInvite": "Invite an investor",
-    "stepInviteBody": "Watermarked access, NDA if you require it, and you see who reads what."
+    "stepInviteBody": "Watermarked access, NDA if you require it, and you see who reads what.",
+    "todoEmptyTitle": "Nothing to handle today",
+    "todoEmptyBody": "Milestones coming due and unanswered investor questions will appear here.",
+    "noActivityTitle": "No activity yet",
+    "noActivityBody": "This list fills itself as soon as a guest opens a document or signs an NDA."
   },
   "stages": {
     "sourcing": "Sourcing",
@@ -1211,7 +1213,6 @@
     "missingTitle": "Still to provide",
     "missingMore": "and {n} more →",
     "viewsTitle": "Who viewed your dossier",
-    "viewsEmpty": "No one has opened your documents yet. Your invitees' views will appear here.",
     "viewedBy": "{who} viewed",
     "accessTitle": "Who has access",
     "accessEmpty": "No investor invited yet.",
@@ -1265,7 +1266,9 @@
     "people": "People",
     "peopleAccepted": "{n} with access",
     "subtitleDiligence": "Where your data room stands, and who's reading your documents.",
-    "noInvites": "no investor invited yet"
+    "noInvites": "no investor invited yet",
+    "viewsEmptyTitle": "Nobody has opened your documents yet",
+    "viewsEmptyBody": "As soon as an investor reads a document, you will see here who, what and for how long."
   },
   "welcome": {
     "title": "Welcome to Sanza, {name}",

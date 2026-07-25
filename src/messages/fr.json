@@ -367,10 +367,8 @@
     "expiringBody": "Des droits arrivent à échéance. Prolongez-les avant que l'accès ne se ferme.",
     "extendAccess": "Prolonger les accès",
     "todoTitle": "À traiter",
-    "todoEmpty": "Rien à traiter — tout est à jour.",
     "todoAnswerQa": "Répondre à une question d'investisseur",
     "recentActivity": "Activité récente",
-    "noActivity": "Aucune activité pour l'instant.",
     "seeAudit": "Voir le journal complet",
     "createMyRoom": "Créer ma data room",
     "greetingSimple": "Bonjour, {name}",
@@ -384,7 +382,11 @@
     "stepUpload": "Déposer vos pièces",
     "stepUploadBody": "Statuts, financiers, cap table : le socle qu'un investisseur ouvre en premier.",
     "stepInvite": "Inviter un investisseur",
-    "stepInviteBody": "Accès filigrané, NDA si vous l'exigez, et vous voyez qui lit quoi."
+    "stepInviteBody": "Accès filigrané, NDA si vous l'exigez, et vous voyez qui lit quoi.",
+    "todoEmptyTitle": "Rien à traiter aujourd'hui",
+    "todoEmptyBody": "Les jalons à échéance et les questions d'investisseurs sans réponse apparaîtront ici.",
+    "noActivityTitle": "Aucune activité pour l'instant",
+    "noActivityBody": "Cette liste se remplit toute seule dès qu'un invité ouvre un document ou signe un NDA."
   },
   "stages": {
     "sourcing": "Sourcing",
@@ -1211,7 +1213,6 @@
     "missingTitle": "Ce qu'il reste à fournir",
     "missingMore": "et {n} autre(s) →",
     "viewsTitle": "Qui a consulté votre dossier",
-    "viewsEmpty": "Personne n'a encore ouvert vos documents. Les consultations de vos invités apparaîtront ici.",
     "viewedBy": "{who} a consulté",
     "accessTitle": "Qui a accès",
     "accessEmpty": "Aucun investisseur invité pour l'instant.",
@@ -1265,7 +1266,9 @@
     "people": "Personnes",
     "peopleAccepted": "{n} avec accès validé",
     "subtitleDiligence": "Voici l'état de votre dossier et qui consulte vos documents.",
-    "noInvites": "aucun investisseur invité"
+    "noInvites": "aucun investisseur invité",
+    "viewsEmptyTitle": "Personne n'a encore ouvert vos documents",
+    "viewsEmptyBody": "Dès qu'un investisseur consultera une pièce, vous verrez ici qui, quoi et combien de temps."
   },
   "welcome": {
     "title": "Bienvenue sur Sanza, {name}",
