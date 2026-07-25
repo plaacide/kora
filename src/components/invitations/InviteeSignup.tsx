@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { createInvitedAccount } from "@/app/actions/invitations";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { PlainError } from "@/components/auth/FormError";
 
@@ -103,9 +104,8 @@ export function InviteeSignup({
       </div>
 
       <div>
-        <Input
+        <PasswordInput
           label={labels.password}
-          type="password"
           value={pwd}
           onChange={(e) => setPwd(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && valider()}

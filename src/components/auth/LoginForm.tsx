@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { login } from "@/app/actions/auth";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
 
@@ -56,10 +57,9 @@ export function LoginForm({ notice }: { notice?: string } = {}) {
         </div>
 
         <div>
-          <Input
+          <PasswordInput
             label={t("password")}
             name="password"
-            type="password"
             autoComplete="current-password"
           />
           <FieldError messages={state?.fieldErrors?.password} />

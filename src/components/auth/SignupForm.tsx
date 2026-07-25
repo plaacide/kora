@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { signup } from "@/app/actions/auth";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
 import { cn } from "@/lib/cn";
@@ -139,10 +140,9 @@ export function SignupForm() {
         </div>
 
         <div>
-          <Input
+          <PasswordInput
             label={t("password")}
             name="password"
-            type="password"
             autoComplete="new-password"
             hint={t("passwordHint")}
           />

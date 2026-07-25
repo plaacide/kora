@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { updatePassword } from "@/app/actions/auth";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
 
@@ -25,10 +26,9 @@ export function ResetPasswordForm() {
         <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />
 
         <div>
-          <Input
+          <PasswordInput
             label={t("password")}
             name="password"
-            type="password"
             autoComplete="new-password"
             hint={t("passwordHint")}
           />
@@ -36,10 +36,9 @@ export function ResetPasswordForm() {
         </div>
 
         <div>
-          <Input
+          <PasswordInput
             label={t("confirm")}
             name="confirm"
-            type="password"
             autoComplete="new-password"
           />
           <FieldError messages={state?.fieldErrors?.confirm} />
