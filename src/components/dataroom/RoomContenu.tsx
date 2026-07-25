@@ -36,6 +36,7 @@ export function RoomContenu({
   folders,
   documents,
   canEdit,
+  attendues = {},
   initialFolderId = null,
 }: {
   orgId: string;
@@ -43,6 +44,8 @@ export function RoomContenu({
   folders: FolderRow[];
   documents: DocRow[];
   canEdit: boolean;
+  /** Pièces attendues par dossier, issues du modèle de checklist appliqué. */
+  attendues?: Record<string, number>;
   initialFolderId?: string | null;
 }) {
   const t = useTranslations("dataroom.room");
@@ -75,6 +78,25 @@ export function RoomContenu({
     documents.filter((d) => d.folder_id === fid).length;
 
   const dossierCourant = courant ? byId.get(courant) ?? null : null;
+
+  // « Salle vide » : l'arborescence est là, aucun document nulle part. C'est le
+  // seul cas où l'on prend toute la place pour appeler au dépôt — dès qu'un
+  // fichier existe, la liste reprend la main.
+  const salleVide = courant === null && documents.length === 0 && sousDossiers.length > 0;
+
+  /** Documents réellement présents dans un dossier ET ses descendants. */
+  const compteDocs = (fid: string): number => {
+    const enfants = folders.filter((f) => f.parent_id === fid);
+    return (
+      documents.filter((d) => d.folder_id === fid).length +
+      enfants.reduce((n, f) => n + compteDocs(f.id), 0)
+    );
+  };
+  /** Pièces attendues sur un dossier ET ses descendants. */
+  const compteAttendues = (fid: string): number => {
+    const enfants = folders.filter((f) => f.parent_id === fid);
+    return (attendues[fid] ?? 0) + enfants.reduce((n, f) => n + compteAttendues(f.id), 0);
+  };
 
   async function basculerCle(docId: string, actuel: boolean) {
     const res = await setDocumentKey(docId, !actuel);
@@ -144,7 +166,44 @@ export function RoomContenu({
         <span>{t("colIndex")}</span><span>{t("colName")}</span><span>{t("colType")}</span><span>{t("colUpdated")}</span><span className="text-center">{t("colKey")}</span>
       </div>
 
-      {sousDossiers.length === 0 && fichiers.length === 0 && (
+      {/* Data room créée mais VIDE (handoff §4.3) — l'arborescence existe, il n'y
+          a rien dedans. Le risque est qu'on ne voie pas où déposer : d'où une
+          zone d'appel explicite, puis la liste des dossiers annotée du nombre
+          de pièces attendues, avec un « Déposer » sur chaque ligne. */}
+      {salleVide && (
+        <div className="border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-9 text-center mt-3">
+          <span className="mx-auto flex flex-col gap-[3px] items-center w-fit mb-4" aria-hidden>
+            {[0.28, 0.5, 1].map((o, i) => (
+              <span key={i} className="flex gap-[3px]" style={{ opacity: o }}>
+                <span className="block w-[26px] h-[5px] rounded-full bg-[#E85C2B]" />
+                <span className="block w-[13px] h-[5px] rounded-full bg-[#E85C2B]" />
+              </span>
+            ))}
+          </span>
+          <h2 className="text-[15px] font-[700] text-[#1A1B1F]">{t("waitingTitle")}</h2>
+          <p className="text-[12.5px] text-[#6E727A] mt-1.5 max-w-md mx-auto leading-relaxed">
+            {t("waitingBody")}
+          </p>
+          {canEdit && (
+            <div className="flex items-center justify-center gap-2.5 mt-5 flex-wrap">
+              <button
+                onClick={() => setCourant(sousDossiers[0]?.id ?? null)}
+                className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
+              >
+                {t("waitingUpload")}
+              </button>
+              <button
+                onClick={() => setNouvDossier(true)}
+                className="border border-[#E4E2DC] rounded-[5px] px-4 py-2.5 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]"
+              >
+                {t("createFolder")}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {sousDossiers.length === 0 && fichiers.length === 0 && !salleVide && (
         <p className="text-[12.5px] text-[#9DA0A8] py-6 text-center">
           {courant
             ? t("folderEmpty")
@@ -165,10 +224,20 @@ export function RoomContenu({
               <svg width="12" height="12" viewBox="0 0 24 24" fill="#7DA9D6"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8z" /></svg>
             </span>
             <span className="text-[13.5px] font-[600] truncate">{f.name}</span>
-            <span className="text-[11.5px] text-[#9DA0A8] shrink-0">{t("itemsCount", { n: compte(f.id) })}</span>
+            <span className="text-[11.5px] text-[#9DA0A8] shrink-0">
+              {compteAttendues(f.id) > 0
+                ? t("expectedCount", { n: compteDocs(f.id), total: compteAttendues(f.id) })
+                : t("itemsCount", { n: compte(f.id) })}
+            </span>
           </span>
           <span className="text-[12px] text-[#6E727A]">{t("folder")}</span>
-          <span className="text-[12px] text-[#9DA0A8]">—</span>
+          <span className="text-[12px] text-[#9DA0A8]">
+            {canEdit && salleVide ? (
+              <span className="text-[#C24619] font-[600] underline underline-offset-2">{t("dropHere")}</span>
+            ) : (
+              "\u2014"
+            )}
+          </span>
           <span />
         </button>
       ))}

@@ -90,6 +90,7 @@ export default async function DataRoomPage({
     { data: accessRows },
     { data: viewEvents },
     { data: templates },
+    { data: exigences },
   ] = await Promise.all([
     supabase
       .from("folders")
@@ -118,6 +119,10 @@ export default async function DataRoomPage({
       .from("folder_templates")
       .select("id, folder_name, title, description, body")
       .order("position"),
+    // Pièces ATTENDUES par dossier — elles viennent du modèle de checklist
+    // réellement appliqué à cette data room, jamais d'un nombre écrit en dur
+    // (handoff §4.3). Sans modèle, la liste est vide et on n'annonce rien.
+    supabase.from("checklist_items").select("folder_id").eq("deal_id", deal.id)
   ]);
 
   // Rattachés par nom de dossier : les modèles sont globaux, jamais copiés
@@ -212,12 +217,19 @@ export default async function DataRoomPage({
 
   // Onglet « Contenu » de la data room (handoff §3b) : l'en-tête et les onglets
   // sont fournis par RoomTabs (shell), la page ne rend que la table du contenu.
+  // Agrégat : nombre de pièces attendues par dossier.
+  const attendues: Record<string, number> = {};
+  for (const e of (exigences ?? []) as { folder_id: string | null }[]) {
+    if (e.folder_id) attendues[e.folder_id] = (attendues[e.folder_id] ?? 0) + 1;
+  }
+
   return (
     <RoomContenu
       key={deal.id}
       orgId={orgId}
       dealId={deal.id}
       folders={folders ?? []}
+      attendues={attendues}
       documents={docs}
       initialFolderId={dossier ?? null}
       canEdit={canEdit}

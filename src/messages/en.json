@@ -237,11 +237,19 @@
     "recentActivity": "Recent activity",
     "noActivity": "No activity yet.",
     "seeAudit": "See full log",
-    "firstRoomSubtitle": "Create your first data room to get started.",
-    "noRoomYet": "No data room yet",
     "createMyRoom": "Create my data room",
-    "firstRoomBody": "A data room holds your documents, your raise and your investors’ access. Create one to get started — from the OHADA/WAEMU template or from scratch.",
-    "greetingSimple": "Hello, {name}"
+    "greetingSimple": "Hello, {name}",
+    "emptySubtitle": "Your workspace is empty — and that is normal. One single thing to do today.",
+    "firstStepOver": "FIRST STEP",
+    "firstStepTitle": "Create your data room",
+    "firstStepBody": "It is the vault where your documents will live. You will then open your raise in it, and invite investors once the file stands up.",
+    "firstStepNote": "3 minutes · you can change everything afterwards",
+    "stepRoom": "Create the data room",
+    "stepRoomBody": "The OHADA/WAEMU template lays out the folders for you.",
+    "stepUpload": "Upload your documents",
+    "stepUploadBody": "Articles, financials, cap table: the core an investor opens first.",
+    "stepInvite": "Invite an investor",
+    "stepInviteBody": "Watermarked access, NDA if you require it, and you see who reads what."
   },
   "stages": {
     "sourcing": "Sourcing",
@@ -459,7 +467,12 @@
       "scratchBody": "Empty data room — you build the folders yourself.",
       "docsCount": "{n, plural, one {# document} other {# documents}}",
       "invitesCount": "{n, plural, one {# guest} other {# guests}}",
-      "itemsCount": "{n, plural, one {# item} other {# items}}"
+      "itemsCount": "{n, plural, one {# item} other {# items}}",
+      "waitingTitle": "Your folders are waiting for their first document",
+      "waitingBody": "The folder tree is ready. Open a folder and drop your files in — articles, financials, cap table first: that is what an investor opens first.",
+      "waitingUpload": "Upload a document",
+      "expectedCount": "{n} of {total} expected documents",
+      "dropHere": "Upload"
     },
     "shareModal": {
       "title": "Share the data room",
@@ -891,7 +904,14 @@
       "setupStep3Cta": "Add an investor",
       "setupSecondary": "Open the data room",
       "setupDone": "Everything is in place",
-      "setupCount": "{done} of 5"
+      "setupCount": "{done} of 5",
+      "pathStep1": "Create the data room",
+      "pathStep1Body": "The vault where your documents will live.",
+      "pathStep2": "Open the raise",
+      "pathStep2Body": "Amount, audience, investors — once the room exists.",
+      "previewTitle": "What it will look like",
+      "previewTag": "ILLUSTRATIVE PREVIEW",
+      "previewNote": "Example — none of these figures are yours."
     }
   },
   "versions": {

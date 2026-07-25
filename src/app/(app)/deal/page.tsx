@@ -18,6 +18,8 @@ import type { Raise, RaiseInvestor } from "@/lib/raise";
  * par personne) et la vitrine d'indicateurs restent à venir ; on affiche à la
  * place les invitations réelles.
  */
+const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
+
 export default async function DealPage() {
   const t = await getTranslations("deal.raise");
   const supabase = await createClient();
@@ -27,20 +29,82 @@ export default async function DealPage() {
   const dataRooms = deals.map((d) => ({ id: d.id, name: d.name }));
   if (!deal) {
     return (
-      <div className="flex flex-col gap-5 max-w-2xl text-[#1A1B1F]">
+      // Levée sans data room — première connexion (handoff §4.2).
+      //
+      // On garde le titre, le message et l'action de l'écran existant, et on
+      // remplace le seul cadre pointillé par ce qui manquait : le PARCOURS (on
+      // ne peut pas ouvrir une levée avant d'avoir la salle) et un aperçu de
+      // l'écran d'arrivée. L'aperçu est un GABARIT, pas de fausses valeurs :
+      // il montre la forme de l'écran sans inventer un montant qui n'existe
+      // pas — la règle produit interdit une donnée fabriquée, même en démo.
+      <div className="flex flex-col gap-5 text-[#1A1B1F]">
         <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("myRaise")}</h1>
-        <div className="relative overflow-hidden border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center">
-          {/* Écran vide : 1 jeu d'arcs, bas-droit (handoff v2 §4). */}
-          <ResonanceArcs corner="bottom-right" size={480} tone="light" />
-          <span className="mx-auto grid place-items-center w-12 h-12 rounded-[8px] bg-[#FBEDE6] text-[#C24619] mb-4">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" /></svg>
-          </span>
-          <h2 className="text-[15px] font-[700]">{t("noDataRoom")}</h2>
-          <p className="text-[12.5px] text-[#6E727A] mt-1.5 mb-5 max-w-md mx-auto leading-relaxed">
-            {t("noRoomBody")}
-          </p>
-          <div className="flex justify-center">
-            <NewDataRoomButton label={t("createDataRoom")} />
+
+        <div className="grid gap-4 lg:grid-cols-[1.05fr_1fr] items-start">
+          <div className="relative overflow-hidden bg-white border border-[#E2DED4] rounded-[8px] px-6 py-7">
+            <ResonanceArcs corner="bottom-right" size={480} tone="light" />
+            <div className="relative z-10">
+              <h2 className="text-[15px] font-[700]">{t("noDataRoom")}</h2>
+              <p className="text-[12.5px] text-[#6E727A] mt-1.5 leading-relaxed">{t("noRoomBody")}</p>
+
+              <ol className="flex flex-col gap-3.5 mt-6">
+                {[
+                  { n: 1, actif: true, titre: t("pathStep1"), corps: t("pathStep1Body") },
+                  { n: 2, actif: false, titre: t("pathStep2"), corps: t("pathStep2Body") },
+                ].map((e) => (
+                  <li key={e.n} className="flex gap-3" style={e.actif ? undefined : { opacity: 0.6 }}>
+                    <span
+                      style={mono}
+                      className={
+                        "grid place-items-center w-6 h-6 shrink-0 rounded-full text-[10.5px] font-[600] " +
+                        (e.actif ? "bg-[#171A2C] text-white" : "bg-[#F1F0EB] text-[#8B8FA3]")
+                      }
+                    >
+                      {e.n}
+                    </span>
+                    <span>
+                      <span className="block text-[13px] font-[600]">{e.titre}</span>
+                      <span className="block text-[12px] text-[#6E727A] mt-0.5 leading-relaxed">{e.corps}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="mt-6">
+                <NewDataRoomButton label={t("createDataRoom")} />
+              </div>
+            </div>
+          </div>
+
+          {/* Aperçu explicitement illustratif : aucune valeur, que des formes. */}
+          <div className="relative overflow-hidden rounded-[8px] bg-[#171A2C] px-6 py-6" aria-hidden>
+            <ResonanceArcs corner="top-right" size={240} tone="dark" subtle />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[13px] font-[700] text-white">{t("previewTitle")}</span>
+                <span style={mono} className="text-[8.5px] font-[600] tracking-[0.12em] text-[#F08A5E] border border-[#F08A5E]/35 rounded-[3px] px-1.5 py-[3px] whitespace-nowrap">
+                  {t("previewTag")}
+                </span>
+              </div>
+
+              <div className="mt-5 rounded-[6px] bg-white/[0.06] px-4 py-4">
+                <div className="h-2 w-24 rounded-full bg-white/20" />
+                <div className="h-4 w-40 rounded-[3px] bg-white/30 mt-3" />
+                <div className="h-1.5 w-full rounded-full bg-white/10 mt-4 overflow-hidden">
+                  <div className="h-full w-[38%] rounded-full bg-[#E85C2B]/70" />
+                </div>
+                <div className="grid grid-cols-3 gap-2.5 mt-4">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="rounded-[4px] bg-white/[0.05] px-2.5 py-2.5">
+                      <div className="h-1.5 w-8 rounded-full bg-white/15" />
+                      <div className="h-2.5 w-12 rounded-[2px] bg-white/25 mt-2" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-[11px] text-white/40 mt-3.5 leading-relaxed">{t("previewNote")}</p>
+            </div>
           </div>
         </div>
       </div>

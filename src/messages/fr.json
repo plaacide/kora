@@ -237,11 +237,19 @@
     "recentActivity": "Activité récente",
     "noActivity": "Aucune activité pour l'instant.",
     "seeAudit": "Voir le journal complet",
-    "firstRoomSubtitle": "Créez votre première data room pour démarrer.",
-    "noRoomYet": "Aucune data room pour l’instant",
     "createMyRoom": "Créer ma data room",
-    "firstRoomBody": "Une data room regroupe vos documents, votre levée et les accès de vos investisseurs. Créez-en une pour commencer — avec le modèle OHADA/UEMOA ou de zéro.",
-    "greetingSimple": "Bonjour, {name}"
+    "greetingSimple": "Bonjour, {name}",
+    "emptySubtitle": "Votre espace est vide — et c'est normal. Une seule chose à faire aujourd'hui.",
+    "firstStepOver": "PREMIER PAS",
+    "firstStepTitle": "Créez votre data room",
+    "firstStepBody": "C'est le coffre où vivront vos documents. Vous y ouvrirez ensuite votre levée, et vous inviterez vos investisseurs quand le dossier tiendra debout.",
+    "firstStepNote": "3 minutes · vous pourrez tout modifier ensuite",
+    "stepRoom": "Créer la data room",
+    "stepRoomBody": "Le modèle OHADA/UEMOA pose l'arborescence pour vous.",
+    "stepUpload": "Déposer vos pièces",
+    "stepUploadBody": "Statuts, financiers, cap table : le socle qu'un investisseur ouvre en premier.",
+    "stepInvite": "Inviter un investisseur",
+    "stepInviteBody": "Accès filigrané, NDA si vous l'exigez, et vous voyez qui lit quoi."
   },
   "stages": {
     "sourcing": "Sourcing",
@@ -459,7 +467,12 @@
       "scratchBody": "Data room vide, vous montez les dossiers vous-même.",
       "docsCount": "{n, plural, one {# document} other {# documents}}",
       "invitesCount": "{n, plural, one {# invité} other {# invités}}",
-      "itemsCount": "{n, plural, one {# élément} other {# éléments}}"
+      "itemsCount": "{n, plural, one {# élément} other {# éléments}}",
+      "waitingTitle": "Vos dossiers attendent leur premier document",
+      "waitingBody": "L'arborescence est prête. Ouvrez un dossier et déposez-y vos pièces — statuts, financiers, cap table d'abord : c'est ce qu'un investisseur ouvre en premier.",
+      "waitingUpload": "Déposer un document",
+      "expectedCount": "{n} sur {total} pièces attendues",
+      "dropHere": "Déposer"
     },
     "shareModal": {
       "title": "Partager la data room",
@@ -891,7 +904,14 @@
       "setupStep3Cta": "Ajouter un investisseur",
       "setupSecondary": "Ouvrir la data room",
       "setupDone": "Tout est en place",
-      "setupCount": "{done} sur 5"
+      "setupCount": "{done} sur 5",
+      "pathStep1": "Créer la data room",
+      "pathStep1Body": "Le coffre où vivront vos documents.",
+      "pathStep2": "Ouvrir la levée",
+      "pathStep2Body": "Montant, audience, investisseurs — une fois la salle en place.",
+      "previewTitle": "À quoi ça ressemblera",
+      "previewTag": "APERÇU ILLUSTRATIF",
+      "previewNote": "Exemple — aucune de ces valeurs n'est la vôtre."
     }
   },
   "versions": {

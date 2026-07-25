@@ -18,6 +18,8 @@ import { formatAmount, formatDate } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
 
 /** next-intl interdit les points dans les clés (ils expriment l'imbrication). */
+const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
+
 function actionKey(action: string): string {
   return action.replace(/\./g, "_");
 }
@@ -71,27 +73,67 @@ export default async function DashboardPage() {
         <AccueilFondateur supabase={supabase} deal={dealCourant} prenom={prenom} userId={user.id} />
       );
     }
-    // Fondateur SANS data room : accueil de bienvenue avec le bon flux de
-    // création (pas le tableau de bord des fonds, ni un « Nouveau deal » VC/XOF).
+    // Fondateur SANS data room — première connexion (handoff §4.1).
+    //
+    // Un fondateur qui arrive ici n'a rien à consulter : lui montrer des
+    // compteurs à zéro serait lui montrer son propre échec. On affiche donc
+    // UNE seule chose à faire, en grand, sur fond Encre — et en dessous le
+    // chemin complet, pour qu'il sache où il met les pieds. Les étapes 2 et 3
+    // sont atténuées : elles se décrivent, elles ne s'actionnent pas encore.
+    const etapes = [
+      { n: 1, titre: t("stepRoom"), corps: t("stepRoomBody") },
+      { n: 2, titre: t("stepUpload"), corps: t("stepUploadBody") },
+      { n: 3, titre: t("stepInvite"), corps: t("stepInviteBody") },
+    ];
     return (
       <div className="flex flex-col gap-6 text-[#1A1B1F]">
         <div>
           <h1 className="font-display text-[27px] font-[700] tracking-[-0.02em]">{t("greetingSimple", { name: prenom })}</h1>
-          <p className="text-[13.5px] text-[#6E727A] mt-1">{t("firstRoomSubtitle")}</p>
+          <p className="text-[13.5px] text-[#6E727A] mt-1">{t("emptySubtitle")}</p>
         </div>
-        <div className="relative overflow-hidden border border-dashed border-[#D5D2CA] rounded-[8px] px-6 py-12 text-center max-w-2xl">
-          {/* Écran vide : 1 jeu d'arcs, bas-droit (handoff v2 §4). */}
-          <ResonanceArcs corner="bottom-right" size={480} tone="light" />
-          <span className="mx-auto grid place-items-center w-12 h-12 rounded-[8px] bg-[#FBEDE6] text-[#C24619] mb-4">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
-          </span>
-          <h2 className="text-[15px] font-[700]">{t("noRoomYet")}</h2>
-          <p className="text-[12.5px] text-[#6E727A] mt-1.5 mb-5 max-w-md mx-auto leading-relaxed">
-            {t("firstRoomBody")}
-          </p>
-          <div className="flex justify-center">
-            <NewDataRoomButton label={t("createMyRoom")} />
+
+        <div className="relative overflow-hidden rounded-[10px] bg-[#171A2C] px-8 py-10 md:px-11 md:py-12">
+          <ResonanceArcs corner="top-right" size={560} tone="dark" />
+          <div className="relative z-10 max-w-xl">
+            <span style={mono} className="text-[9.5px] font-[600] tracking-[0.14em] text-[#F08A5E]">
+              {t("firstStepOver")}
+            </span>
+            <h2 className="font-display text-[26px] md:text-[30px] font-[700] tracking-[-0.02em] text-white mt-2.5">
+              {t("firstStepTitle")}
+            </h2>
+            <p className="text-[13.5px] text-white/65 mt-3 leading-relaxed">{t("firstStepBody")}</p>
+            <div className="flex items-center gap-4 mt-7 flex-wrap">
+              <NewDataRoomButton
+                label={t("createMyRoom")}
+                className="rounded-[6px] bg-[#E85C2B] px-5 py-3 text-[13.5px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap"
+              />
+              <span className="text-[12px] text-white/45">{t("firstStepNote")}</span>
+            </div>
           </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          {etapes.map((e) => (
+            <div
+              key={e.n}
+              // Seule l'étape en cours est à pleine intensité : les suivantes
+              // informent sans réclamer d'attention.
+              style={e.n === 1 ? undefined : { opacity: 0.65 }}
+              className="bg-white border border-[#E2DED4] rounded-[8px] px-4 py-4"
+            >
+              <span
+                style={mono}
+                className={
+                  "inline-grid place-items-center w-6 h-6 rounded-full text-[10.5px] font-[600] " +
+                  (e.n === 1 ? "bg-[#171A2C] text-white" : "bg-[#F1F0EB] text-[#8B8FA3]")
+                }
+              >
+                {e.n}
+              </span>
+              <h3 className="text-[13px] font-[600] mt-2.5">{e.titre}</h3>
+              <p className="text-[12px] text-[#6E727A] mt-1 leading-relaxed">{e.corps}</p>
+            </div>
+          ))}
         </div>
       </div>
     );
