@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { OnboardingShell } from "./OnboardingShell";
 import { SelectChips } from "./SelectChips";
 import { Button } from "@/components/ui/Button";
@@ -10,20 +11,21 @@ import {
   saveInvestorProfile,
   completeOnboarding,
 } from "@/app/actions/onboarding";
-
-/** Rail des étapes (handoff v2 §5). */
-const ETAPES = [
-  { title: "Votre profil", subtitle: "Type de fonds et organisation" },
-  { title: "Votre thèse", subtitle: "Secteurs, stades et tickets" },
-  { title: "Vos deals", subtitle: "Après l'inscription" },
-];
-
-const TYPES = ["Fonds VC", "Business angel", "DFI", "Family office", "Corporate"];
-const SECTORS = ["Agritech", "Fintech", "Santé", "Logistique", "Énergie", "Éducation"];
-const GEOS = ["Afrique de l'Ouest", "Afrique de l'Est", "Afrique du Nord", "Afrique australe"];
-const STAGES = ["Pré-seed", "Seed", "Série A", "Série B+"];
+import { TYPES_INVESTISSEUR, SECTEURS_THESE, GEOGRAPHIES, STADES } from "@/lib/onboarding-options";
 
 export function InvestorOnboarding({ firstName }: { firstName: string }) {
+  const t = useTranslations("onboarding.investor");
+  const to = useTranslations("onboarding.options");
+
+  /** Rail des étapes (handoff v2 §5). */
+  const ETAPES = [
+    { title: t("stepProfileTitle"), subtitle: t("stepProfileSub") },
+    { title: t("stepThesisTitle"), subtitle: t("stepThesisSub") },
+    { title: t("stepDealsTitle"), subtitle: t("stepDealsSub") },
+  ];
+  /** Libellés traduits, valeurs persistées inchangées. */
+  const libelle = (o: { value: string; key: string }) => ({ value: o.value, label: to(o.key) });
+
   const [step, setStep] = useState(1);
   const [type, setType] = useState<string[]>([]);
   const [org, setOrg] = useState("");
@@ -52,7 +54,7 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
       const res = await saveInvestorProfile({ sectors, geographies: geos, stages });
       if (!res.ok) return setError(res.error);
       // L'espace de travail de l'investisseur = son organisation.
-      await completeOnboarding(org.trim() || `${firstName} — investissement`);
+      await completeOnboarding(org.trim() || `${firstName} \u2014 ${t("workspaceSuffix")}`);
     });
   }
 
@@ -60,10 +62,10 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
     return (
       <OnboardingShell step={1} total={2} steps={ETAPES}>
         <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
-          Votre profil d&apos;investisseur
+          {t("profileTitle")}
         </h1>
         <p className="text-[12.5px] text-ink-secondary mt-1">
-          Pour ne vous montrer que les deals pertinents.
+          {t("profileSubtitle")}
         </p>
 
         <PlainError message={error} />
@@ -71,21 +73,21 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
         <div className="mt-6 flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <label className="text-[12px] font-[550] text-ink-secondary">
-              Type d&apos;investisseur
+              {t("investorType")}
             </label>
-            <SelectChips options={TYPES} value={type} onChange={setType} />
+            <SelectChips options={TYPES_INVESTISSEUR.map(libelle)} value={type} onChange={setType} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <Input
-              label="Organisation"
+              label={t("organisation")}
               value={org}
               onChange={(e) => setOrg(e.target.value)}
-              placeholder="Amani Capital"
+              placeholder={t("organisationPh")}
             />
             <div className="flex flex-col gap-1.5">
               <label className="text-[11.5px] font-medium text-ink-secondary">
-                Ticket moyen (USD)
+                {t("avgTicket")}
               </label>
               <input
                 type="number"
@@ -106,7 +108,7 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
             loading={pending}
             disabled={type.length === 0}
           >
-            Continuer →
+            {`${t("continue")} \u2192`}
           </Button>
         </div>
       </OnboardingShell>
@@ -116,26 +118,26 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
   return (
     <OnboardingShell step={2} total={2} steps={ETAPES}>
       <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
-        Votre thèse d&apos;investissement
+        {t("thesisTitle")}
       </h1>
       <p className="text-[12.5px] text-ink-secondary mt-1">
-        Sélectionnez tout ce qui s&apos;applique.
+        {t("thesisSubtitle")}
       </p>
 
       <PlainError message={error} />
 
       <div className="mt-6 flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <label className="text-[12px] font-[550] text-ink-secondary">Secteurs</label>
-          <SelectChips options={SECTORS} value={sectors} onChange={setSectors} multi />
+          <label className="text-[12px] font-[550] text-ink-secondary">{t("sectors")}</label>
+          <SelectChips options={SECTEURS_THESE.map(libelle)} value={sectors} onChange={setSectors} multi />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-[12px] font-[550] text-ink-secondary">Géographies</label>
-          <SelectChips options={GEOS} value={geos} onChange={setGeos} multi />
+          <label className="text-[12px] font-[550] text-ink-secondary">{t("geographies")}</label>
+          <SelectChips options={GEOGRAPHIES.map(libelle)} value={geos} onChange={setGeos} multi />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-[12px] font-[550] text-ink-secondary">Stades</label>
-          <SelectChips options={STAGES} value={stages} onChange={setStages} multi />
+          <label className="text-[12px] font-[550] text-ink-secondary">{t("stages")}</label>
+          <SelectChips options={STADES.map(libelle)} value={stages} onChange={setStages} multi />
         </div>
       </div>
 
@@ -145,10 +147,10 @@ export function InvestorOnboarding({ firstName }: { firstName: string }) {
           onClick={() => setStep(1)}
           className="text-[12.5px] font-medium text-ink-secondary hover:text-ink cursor-pointer"
         >
-          ← Retour
+          {`\u2190 ${t("back")}`}
         </button>
         <Button variant="primary" onClick={finish} loading={pending}>
-          Terminer
+          {t("finish")}
         </Button>
       </div>
     </OnboardingShell>

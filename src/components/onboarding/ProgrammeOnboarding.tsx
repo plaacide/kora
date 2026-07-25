@@ -1,17 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { OnboardingShell } from "./OnboardingShell";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PlainError } from "@/components/auth/FormError";
 import { completeOnboarding } from "@/app/actions/onboarding";
-
-/** Rail des étapes (handoff v2 §5). */
-const ETAPES = [
-  { title: "Votre programme", subtitle: "Nom et périmètre" },
-  { title: "Votre cohorte", subtitle: "Après l'inscription" },
-];
 
 /**
  * Onboarding d'un PROGRAMME — incubateur, accélérateur, structure
@@ -25,6 +20,14 @@ const ETAPES = [
  * remplir des colonnes que personne ne lit.
  */
 export function ProgrammeOnboarding() {
+  const t = useTranslations("onboarding.programme");
+
+  /** Rail des étapes (handoff v2 §5). */
+  const ETAPES = [
+    { title: t("stepProgrammeTitle"), subtitle: t("stepProgrammeSub") },
+    { title: t("stepCohortTitle"), subtitle: t("stepCohortSub") },
+  ];
+
   const [nom, setNom] = useState("");
   const [erreur, setErreur] = useState<string | undefined>();
   const [encours, demarrer] = useTransition();
@@ -44,21 +47,20 @@ export function ProgrammeOnboarding() {
   return (
     <OnboardingShell step={1} total={1} steps={ETAPES}>
       <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
-        Votre programme
+        {t("title")}
       </h1>
       <p className="text-[13px] text-ink-secondary leading-relaxed mt-2">
-        Le nom sous lequel vos startups vous verront quand vous les inviterez à
-        rejoindre votre cohorte.
+        {t("subtitle")}
       </p>
 
       <div className="mt-6 flex flex-col gap-4">
         <Input
-          label="Nom du programme"
+          label={t("nameLabel")}
           name="nom"
           value={nom}
           onChange={(e) => setNom(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && valider()}
-          placeholder="Incubateur…"
+          placeholder={t("namePh")}
           autoFocus
         />
 
@@ -66,15 +68,12 @@ export function ProgrammeOnboarding() {
 
         <div className="rounded-[10px] border border-line bg-surface-2 px-4 py-3.5">
           <p className="text-[12.5px] text-ink leading-relaxed">
-            Vous verrez, pour chaque startup de votre cohorte, son stade, le
-            montant recherché, sa préparation et les pièces qu’il lui reste à
-            fournir — <strong className="font-[650]">jamais ses documents</strong>.
-            Chaque startup accepte elle-même de vous rejoindre.
+            {t.rich("note", { b: (c) => <strong className="font-[650]">{c}</strong> })}
           </p>
         </div>
 
         <Button onClick={valider} disabled={encours || nom.trim().length < 2}>
-          {encours ? "…" : "Créer mon espace"}
+          {encours ? t("submitting") : t("submit")}
         </Button>
       </div>
     </OnboardingShell>

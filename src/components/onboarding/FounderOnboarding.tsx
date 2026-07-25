@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { OnboardingShell, AsideEncre, AsideClair } from "./OnboardingShell";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PlainError } from "@/components/auth/FormError";
 import { saveStartup, completeOnboarding } from "@/app/actions/onboarding";
 import { cn } from "@/lib/cn";
+import { PAYS, SECTEURS, STADES } from "@/lib/onboarding-options";
 
-const COUNTRIES = ["Côte d'Ivoire", "Sénégal", "Bénin", "Mali", "Togo", "Burkina Faso", "Cameroun", "Nigeria", "Autre"];
-const SECTORS = ["Agritech", "Fintech", "Santé", "Logistique", "Énergie", "Éducation", "Autre"];
-const STAGES = ["Pré-seed", "Seed", "Série A", "Série B+"];
 /** Longueur maximale de la phrase de présentation (handoff v2 §5). */
 const PHRASE_MAX = 120;
 
@@ -19,11 +18,14 @@ function Select({
   value,
   onChange,
   options,
+  vide,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
-  options: string[];
+  /** Valeur persistée + libellé affiché : les deux ne se confondent pas. */
+  options: readonly { value: string; label: string }[];
+  vide: string;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -33,10 +35,10 @@ function Select({
         onChange={(e) => onChange(e.target.value)}
         className="h-8 px-2.5 text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none"
       >
-        <option value="">—</option>
+        <option value="">{vide}</option>
         {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
+          <option key={o.value} value={o.value}>
+            {o.label}
           </option>
         ))}
       </select>
@@ -44,27 +46,23 @@ function Select({
   );
 }
 
-/** Rail de gauche : la 3ᵉ étape se fait APRÈS l'inscription (handoff §5). */
-const ETAPES_FONDATEUR = [
-  { title: "Votre startup", subtitle: "Identité, secteur et objectif" },
-  { title: "Votre levée", subtitle: "Montant recherché et revenus" },
-  { title: "Votre data room", subtitle: "Après l'inscription" },
-];
-
-const OBJECTIFS = [
-  {
-    key: "levee",
-    titre: "Lever des fonds",
-    sous: "Partager avec des investisseurs. Montant, préparation, qui regarde quoi.",
-  },
-  {
-    key: "diligence",
-    titre: "Due diligence / audit",
-    sous: "Partager avec une banque, un partenaire ou un auditeur. Sans montant ni levée.",
-  },
-] as const;
-
 export function FounderOnboarding() {
+  const t = useTranslations("onboarding.founder");
+  const to = useTranslations("onboarding.options");
+
+  /** Rail de gauche : la 3ᵉ étape se fait APRÈS l'inscription (handoff §5). */
+  const ETAPES_FONDATEUR = [
+    { title: t("stepStartupTitle"), subtitle: t("stepStartupSub") },
+    { title: t("stepRaiseTitle"), subtitle: t("stepRaiseSub") },
+    { title: t("stepRoomTitle"), subtitle: t("stepRoomSub") },
+  ];
+  const OBJECTIFS = [
+    { key: "levee", titre: t("objLevee"), sous: t("objLeveeSub") },
+    { key: "diligence", titre: t("objDiligence"), sous: t("objDiligenceSub") },
+  ];
+  /** Libellés traduits, valeurs persistées inchangées. */
+  const libelle = (o: { value: string; key: string }) => ({ value: o.value, label: to(o.key) });
+
   const [step, setStep] = useState(1);
   const [objectif, setObjectif] = useState("");
   const [name, setName] = useState("");
@@ -109,7 +107,7 @@ export function FounderOnboarding() {
       setError(undefined);
       // Diligence : pas d'écran « levée », on termine directement.
       if (objectif === "diligence") {
-        await completeOnboarding(name.trim() || "Ma startup");
+        await completeOnboarding(name.trim() || t("defaultWorkspace"));
         return;
       }
       setStep(2);
@@ -123,7 +121,7 @@ export function FounderOnboarding() {
         arr: arr ? Number(arr) : null,
       });
       if (!res.ok) return setError(res.error);
-      await completeOnboarding(name.trim() || "Ma startup");
+      await completeOnboarding(name.trim() || t("defaultWorkspace"));
     });
   }
 
@@ -134,22 +132,21 @@ export function FounderOnboarding() {
         total={totalSteps}
         steps={ETAPES_FONDATEUR}
         aside={
-          <AsideEncre title="Bon à savoir">
-            Votre fiche reste modifiable à tout moment. Renseignez ce que vous
-            savez aujourd&apos;hui — vous compléterez le reste plus tard.
+          <AsideEncre title={t("asideTitle")}>
+            {t("asideBody")}
           </AsideEncre>
         }
       >
-        <h1 className="font-display text-[24px] font-[700] tracking-[-0.02em]">Votre startup</h1>
+        <h1 className="font-display text-[24px] font-[700] tracking-[-0.02em]">{t("stepStartupTitle")}</h1>
         <p className="text-[12.5px] text-ink-secondary mt-1">
-          Ces informations composent votre fiche visible par vos destinataires.
+          {t("startupSubtitle")}
         </p>
 
         <PlainError message={error} />
 
         {/* Objectif de la data room : pilote l'écran et les données collectées. */}
         <div className="mt-6">
-          <label className="text-[11.5px] font-medium text-ink-secondary">Pourquoi ouvrez-vous une data room&nbsp;?</label>
+          <label className="text-[11.5px] font-medium text-ink-secondary">{t("whyRoom")}</label>
           <div className="mt-2 grid grid-cols-2 gap-3">
             {OBJECTIFS.map((o) => {
               const actif = objectif === o.key;
@@ -175,15 +172,15 @@ export function FounderOnboarding() {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <Input label="Nom de la startup" value={name} onChange={(e) => setName(e.target.value)} placeholder="Kalyx Foods" />
-          <Select label="Pays" value={country} onChange={setCountry} options={COUNTRIES} />
-          <Select label="Secteur" value={sector} onChange={setSector} options={SECTORS} />
-          <Select label="Stade" value={stage} onChange={setStage} options={STAGES} />
+          <Input label={t("startupName")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("startupNamePh")} />
+          <Select label={t("country")} value={country} onChange={setCountry} options={PAYS.map(libelle)} vide={to("none")} />
+          <Select label={t("sector")} value={sector} onChange={setSector} options={SECTEURS.map(libelle)} vide={to("none")} />
+          <Select label={t("stage")} value={stage} onChange={setStage} options={STADES.map(libelle)} vide={to("none")} />
         </div>
 
         <div className="mt-3 flex flex-col gap-1.5">
           <div className="flex items-baseline justify-between">
-            <label className="text-[11.5px] font-medium text-ink-secondary">En une phrase</label>
+            <label className="text-[11.5px] font-medium text-ink-secondary">{t("oneLiner")}</label>
             {/* Compteur de caractères (handoff §5) : il vire à l'orange dans les
                 dix derniers, pour prévenir avant de buter sur la limite. */}
             <span
@@ -201,14 +198,14 @@ export function FounderOnboarding() {
             onChange={(e) => setOneLiner(e.target.value.slice(0, PHRASE_MAX))}
             maxLength={PHRASE_MAX}
             rows={2}
-            placeholder="Ce que fait votre startup, en une ligne."
+            placeholder={t("oneLinerPh")}
             className="px-2.5 py-2 text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none resize-none"
           />
         </div>
 
         <div className="mt-8 pt-6 border-t border-[#F0EDE4] flex justify-end">
           <Button variant="primary" onClick={next1} loading={pending} disabled={name.trim().length < 2 || !objectif}>
-            {objectif === "diligence" ? "Terminer" : "Continuer →"}
+            {objectif === "diligence" ? t("finish") : `${t("continue")} \u2192`}
           </Button>
         </div>
       </OnboardingShell>
@@ -221,30 +218,26 @@ export function FounderOnboarding() {
       total={2}
       steps={ETAPES_FONDATEUR}
       aside={
-        <AsideClair title="Fiche et dossier, deux choses">
-          La <strong className="font-[650]">fiche</strong> est votre carte de
-          visite : nom, secteur, montant. Le{" "}
-          <strong className="font-[650]">dossier</strong>, lui, ce sont les
-          pièces que vous déposerez ensuite — c&apos;est celui que les
-          investisseurs regardent.
+        <AsideClair title={t("aside2Title")}>
+          {t.rich("aside2Body", { b: (c) => <strong className="font-[650]">{c}</strong> })}
         </AsideClair>
       }
     >
-      <h1 className="font-display text-[24px] font-[700] tracking-[-0.02em]">Votre levée</h1>
+      <h1 className="font-display text-[24px] font-[700] tracking-[-0.02em]">{t("stepRaiseTitle")}</h1>
       <p className="text-[12.5px] text-ink-secondary mt-1">
-        Ces montants figurent sur votre fiche, visible des investisseurs.
+        {t("raiseSubtitle")}
       </p>
 
       <PlainError message={error} />
 
       <div className="mt-6 grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11.5px] font-medium text-ink-secondary">Montant recherché (USD)</label>
+          <label className="text-[11.5px] font-medium text-ink-secondary">{t("amount")}</label>
           <input type="number" min="0" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="4200000"
             className="h-8 px-2.5 font-mono text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11.5px] font-medium text-ink-secondary">Revenus annuels ARR (USD)</label>
+          <label className="text-[11.5px] font-medium text-ink-secondary">{t("arr")}</label>
           <input type="number" min="0" value={arr} onChange={(e) => setArr(e.target.value)} placeholder="850000"
             className="h-8 px-2.5 font-mono text-[12.5px] bg-surface text-ink rounded-field border border-line focus:border-accent focus:outline-none" />
         </div>
@@ -260,26 +253,23 @@ export function FounderOnboarding() {
           secteur ne rend pas un dossier présentable à un investisseur. */}
       <div className="mt-4 bg-bg border border-line rounded-[10px] p-3.5">
         <div className="flex items-center justify-between text-[12px] font-[550]">
-          <span>Fiche complétée</span>
+          <span>{t("profileDone")}</span>
           <span className="font-mono">{completude}%</span>
         </div>
         <span className="block h-1.5 rounded-full bg-line overflow-hidden mt-2">
           <span className={cn("block h-full bg-primary transition-all")} style={{ width: `${completude}%` }} />
         </span>
         <p className="text-[11px] text-ink-muted mt-2">
-          C&apos;est votre carte de visite. La complétude de votre{" "}
-          <strong className="font-[650]">dossier</strong>, elle, se construit
-          ensuite : elle mesure les pièces réellement fournies, et c&apos;est
-          celle que les investisseurs regardent.
+          {t.rich("profileNote", { b: (c) => <strong className="font-[650]">{c}</strong> })}
         </p>
       </div>
 
       <div className="mt-8 pt-6 border-t border-[#F0EDE4] flex items-center justify-between">
         <button type="button" onClick={() => setStep(1)} className="text-[12.5px] font-medium text-ink-secondary hover:text-ink cursor-pointer">
-          ← Retour
+          {`\u2190 ${t("back")}`}
         </button>
         <Button variant="primary" onClick={finish} loading={pending}>
-          Terminer
+          {t("finish")}
         </Button>
       </div>
     </OnboardingShell>

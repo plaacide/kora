@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 import { SanzaLogo } from "@/components/ui/SanzaLogo";
 
 export default async function BienvenuePage() {
+  const t = await getTranslations("welcome");
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,14 +25,14 @@ export default async function BienvenuePage() {
 
   const items = isInvestor
     ? [
-        { done: true, label: "Profil investisseur", note: "Complet" },
-        { done: true, label: "Thèse d'investissement", note: "Complète" },
-        { done: false, label: "Inviter votre équipe", note: "Optionnel" },
+        { done: true, label: t("investorProfile"), note: t("investorProfileNote") },
+        { done: true, label: t("investorThesis"), note: t("investorThesisNote") },
+        { done: false, label: t("inviteTeam"), note: t("inviteTeamNote") },
       ]
     : [
-        { done: true, label: "Fiche startup", note: "Complète" },
-        { done: true, label: "Votre levée", note: "Renseignée" },
-        { done: false, label: "Compléter la data room", note: "Recommandé" },
+        { done: true, label: t("startupProfile"), note: t("startupProfileNote") },
+        { done: true, label: t("raise"), note: t("raiseNote") },
+        { done: false, label: t("completeRoom"), note: t("completeRoomNote") },
       ];
 
   return (
@@ -44,12 +46,10 @@ export default async function BienvenuePage() {
 
         <div>
           <h1 className="text-[38px] font-[700] tracking-[-0.025em] leading-tight">
-            Bienvenue sur Sanza, {firstName}
+            {t("title", { name: firstName })}
           </h1>
           <p className="text-[14px] text-white/70 mt-3 leading-relaxed max-w-[520px] mx-auto">
-            {isInvestor
-              ? "Votre profil est prêt. Des deals correspondent déjà à votre thèse — parcourez le dealroom."
-              : "Votre fiche est prête. Complétez maintenant votre dossier : chaque pièce fournie fait monter sa complétude, et c'est elle que les investisseurs regardent."}
+            {isInvestor ? t("bodyInvestor") : t("bodyFounder")}
           </p>
         </div>
 
@@ -88,14 +88,14 @@ export default async function BienvenuePage() {
             href="/dashboard"
             className="inline-flex items-center justify-center bg-[#E85C2B] text-white font-[600] text-[13.5px] rounded-[10px] px-5 py-3 hover:bg-[#D24E1F] transition-colors"
           >
-            Accéder au dealroom →
+            {`${t("ctaDealroom")} \u2192`}
           </Link>
           {!isInvestor && (
             <Link
               href="/data-room"
               className="inline-flex items-center justify-center border border-white/15 bg-white/[0.055] text-white font-[600] text-[13.5px] rounded-[10px] px-5 py-3 hover:bg-white/[0.09] transition-colors"
             >
-              Déposer mes documents
+              {t("ctaUpload")}
             </Link>
           )}
         </div>

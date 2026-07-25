@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { SanzaLogo } from "@/components/ui/SanzaLogo";
 import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 
@@ -56,6 +59,7 @@ export function OnboardingShell({
   aside?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("onboarding.shell");
   const pct = Math.round((step / total) * 100);
 
   return (
@@ -64,13 +68,13 @@ export function OnboardingShell({
         <SanzaLogo size={20} />
         <div className="flex items-center gap-3.5">
           <span style={mono} className="text-[11px] text-[#8B8FA3] uppercase tracking-[0.06em]">
-            Étape {step} / {total}
+            {t("stepOf", { step, total })}
           </span>
           <span className="block w-[140px] h-1 rounded-full bg-[#E8E5DC] overflow-hidden">
             <span className="block h-full bg-[#E85C2B] transition-all" style={{ width: `${pct}%` }} />
           </span>
           <Link href="/dashboard" className="text-[12.5px] font-[600] text-[#8B8FA3] hover:text-[#4A4E63]">
-            Enregistrer et quitter
+            {t("saveAndQuit")}
           </Link>
         </div>
       </header>
@@ -82,7 +86,7 @@ export function OnboardingShell({
           <aside className="hidden md:flex flex-col gap-6">
             <div>
               <div style={mono} className="text-[10.5px] font-[600] uppercase tracking-[0.1em] text-[#8B8FA3] mb-4">
-                Votre inscription
+                {t("yourSignup")}
               </div>
               <ol className="relative flex flex-col gap-5">
                 {steps.map((s, i) => {
