@@ -35,18 +35,23 @@ function RoleIcon({ name }: { name: "investor" | "founder" | "sae" }) {
     );
   }
   if (name === "founder") {
-    // Pousse qui lève : la startup qui décolle, sans la fusée d'emoji.
+    // Fusée, en trait — l'équivalent dessiné du 🚀 d'origine. Une pousse de
+    // plante évoquait l'agritech, pas une levée de fonds.
     return (
       <svg {...common}>
-        <path d="M12 21V9" /><path d="M12 9a5 5 0 0 1 5-5h2v2a5 5 0 0 1-5 5h-2z" />
-        <path d="M12 13H10a5 5 0 0 1-5-5V6h2a5 5 0 0 1 5 5z" />
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91 0z" />
+        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+        <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+        <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
       </svg>
     );
   }
-  // Cible : le programme accompagne un portefeuille.
+  // Cible : le programme vise un portefeuille. Trois anneaux + centre, sinon
+  // deux cercles se lisaient comme un simple point.
   return (
     <svg {...common}>
-      <circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4" />
+      <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
     </svg>
   );
 }
