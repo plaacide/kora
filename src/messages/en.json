@@ -60,7 +60,14 @@
         "other": "Other — specify"
       },
       "jobTitleChoose": "Choose your role",
-      "jobTitleOtherPlaceholder": "Your role"
+      "jobTitleOtherPlaceholder": "Your role",
+      "youAre": "You are…",
+      "roleInvestor": "Investor",
+      "roleInvestorSub": "I am looking for investment opportunities",
+      "roleFounder": "Founder",
+      "roleFounderSub": "I am raising funds for my startup",
+      "roleSae": "Programme",
+      "roleSaeSub": "I support several startups"
     },
     "login": {
       "title": "Welcome back",

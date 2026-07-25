@@ -58,17 +58,19 @@ function RoleIcon({ name }: { name: "investor" | "founder" | "sae" }) {
   );
 }
 
-const ROLES = [
-  { key: "investor", title: "Investisseur", desc: "Je cherche des opportunités d'investissement" },
-  { key: "founder", title: "Fondateur", desc: "Je lève des fonds pour ma startup" },
-  { key: "sae", title: "Programme", desc: "J'accompagne plusieurs startups" },
-] as const;
-
 export function SignupForm() {
   const [state, action, pending] = useActionState(signup, undefined);
   const t = useTranslations("auth.signup");
   const locale = useLocale();
   const [role, setRole] = useState<"investor" | "founder" | "sae">("investor");
+  // Les trois personas. Déclarées ici et non au niveau du module : leurs
+  // libellés viennent de next-intl, qui n'existe qu'à l'intérieur du rendu.
+  const ROLES = [
+    { key: "investor", title: t("roleInvestor"), desc: t("roleInvestorSub") },
+    { key: "founder", title: t("roleFounder"), desc: t("roleFounderSub") },
+    { key: "sae", title: t("roleSae"), desc: t("roleSaeSub") },
+  ] as const;
+
   const [posteKey, setPosteKey] = useState("");
   const [posteLibre, setPosteLibre] = useState("");
 
@@ -97,7 +99,7 @@ export function SignupForm() {
       {/* Sélecteur de persona : aiguille l'onboarding. */}
       <div className="flex flex-col gap-2">
         <span className="text-[12px] font-[550] text-ink-secondary">
-          Vous êtes…
+          {t("youAre")}
         </span>
         <div className="grid grid-cols-3 gap-2">
           {ROLES.map((r) => (
