@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { ShareButton } from "@/components/dataroom/ShareButton";
 import { RevokeButton } from "@/components/permissions/RevokeButton";
 import { RightsEditor } from "@/components/permissions/RightsEditor";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Locale } from "@/i18n/locales";
 
 /**
@@ -112,7 +113,12 @@ export default async function PermissionsPage() {
       </div>
 
       {invites.length === 0 ? (
-        <p className="text-[12px] text-[#9DA0A8] text-center py-8">{t("noGuests")}</p>
+        <EmptyState
+          title={t("emptyTitle")}
+          description={t("emptyBody")}
+          icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>}
+          action={<ShareButton dealId={deal.id} label={t("invite")} className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />}
+        />
       ) : (
         invites.map((i) => (
           <div key={i.id} className="bg-white grid grid-cols-[2fr_1.1fr_1fr_1fr_80px] gap-3 items-center px-2 py-3.5 border-b border-[#E8E5DC] hover:bg-[#FAF8F4]">

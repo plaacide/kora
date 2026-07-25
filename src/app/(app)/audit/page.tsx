@@ -2,6 +2,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireInternal } from "@/lib/access";
 import { ExportButton, type AuditCsvRow } from "@/components/audit/ExportButton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Locale } from "@/i18n/locales";
 
 /**
@@ -153,7 +154,11 @@ export default async function AuditPage() {
       })}
 
       {(entries ?? []).length === 0 && (
-        <p className="text-[12px] text-[#9DA0A8] text-center py-8">{t("empty")}</p>
+        <EmptyState
+          title={t("emptyTitle")}
+          description={t("emptyBody")}
+          icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 2" /><circle cx="12" cy="12" r="9" /></svg>}
+        />
       )}
     </div>
   );

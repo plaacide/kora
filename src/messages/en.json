@@ -12,7 +12,11 @@
     "save": "Save",
     "language": "Language",
     "french": "Français",
-    "english": "English"
+    "english": "English",
+    "loadErrorTitle": "This screen could not be displayed",
+    "loadErrorBody": "Your data is intact — it is the display that failed. Try again; if it persists, tell us.",
+    "retry": "Try again",
+    "backHome": "Back to home"
   },
   "home": {
     "subtitle": "Secure data room for African transactions. E0 foundation — groundwork in place.",
@@ -331,7 +335,9 @@
       "raise_moved": "Raise moved to another data room"
     },
     "entries": "entries",
-    "export": "Export"
+    "export": "Export",
+    "emptyTitle": "The log is still empty",
+    "emptyBody": "It fills itself: every upload, access and read leaves a chained fingerprint here."
   },
   "dataroom": {
     "title": "Data room",
@@ -454,6 +460,27 @@
       "docsCount": "{n, plural, one {# document} other {# documents}}",
       "invitesCount": "{n, plural, one {# guest} other {# guests}}",
       "itemsCount": "{n, plural, one {# item} other {# items}}"
+    },
+    "shareModal": {
+      "title": "Share the data room",
+      "guestEmail": "Guest email",
+      "phGuestEmail": "investor@fund.com",
+      "accessLevel": "Access level",
+      "expiresOn": "Expires on",
+      "expiresHint": "90 days by default, extendable.",
+      "ndaToggle": "Require an NDA signature.",
+      "ndaToggleBody": "The proof (timestamp, IP, fingerprint) stays attached to their record and visible under “Signatures”.",
+      "mailFailed": "The email did not go out — send this link:",
+      "cancel": "Cancel",
+      "sending": "Sending…",
+      "sendInvite": "Send the invitation",
+      "shareCta": "Share",
+      "lvlWatermark": "Watermarked",
+      "lvlWatermarkHint": "Read-only, watermarked with their name.",
+      "lvlView": "Read-only",
+      "lvlViewHint": "Viewing without download.",
+      "lvlDownload": "Download",
+      "lvlDownloadHint": "Can download the files."
     }
   },
   "invitations": {
@@ -546,7 +573,9 @@
     "colLastVisit": "Last visit",
     "noGuests": "No guests yet.",
     "revoke": "Revoke",
-    "revokeConfirm": "Revoke {name}’s access? They will no longer be able to open your documents."
+    "revokeConfirm": "Revoke {name}’s access? They will no longer be able to open your documents.",
+    "emptyTitle": "Nobody has access yet",
+    "emptyBody": "Invite an investor: you will see their rights, the folders they can open and their last visit here."
   },
   "viewer": {
     "title": "Viewer",
@@ -989,7 +1018,9 @@
       "draft": "Draft",
       "internal_review": "Internal review",
       "published": "Published"
-    }
+    },
+    "emptyTitle": "No question yet",
+    "emptyBody": "Your investors' questions will land here. You draft an answer, then publish it."
   },
   "tips": {
     "dashboard": "An overview of your activity: active deals, tasks to handle and the team's latest actions.",

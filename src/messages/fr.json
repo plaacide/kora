@@ -12,7 +12,11 @@
     "save": "Enregistrer",
     "language": "Langue",
     "french": "Français",
-    "english": "English"
+    "english": "English",
+    "loadErrorTitle": "Cet écran n'a pas pu s'afficher",
+    "loadErrorBody": "Vos données sont intactes — c'est l'affichage qui a échoué. Réessayez ; si cela persiste, dites-le-nous.",
+    "retry": "Réessayer",
+    "backHome": "Retour à l'accueil"
   },
   "home": {
     "subtitle": "Data room sécurisée pour les transactions africaines. Socle E0 — fondations en place.",
@@ -331,7 +335,9 @@
       "raise_moved": "Levée rattachée à une autre data room"
     },
     "entries": "entrées",
-    "export": "Exporter"
+    "export": "Exporter",
+    "emptyTitle": "Le journal est encore vide",
+    "emptyBody": "Il se remplit tout seul : chaque dépôt, chaque accès et chaque lecture y laisse une empreinte chaînée."
   },
   "dataroom": {
     "title": "Data room",
@@ -454,6 +460,27 @@
       "docsCount": "{n, plural, one {# document} other {# documents}}",
       "invitesCount": "{n, plural, one {# invité} other {# invités}}",
       "itemsCount": "{n, plural, one {# élément} other {# éléments}}"
+    },
+    "shareModal": {
+      "title": "Partager la data room",
+      "guestEmail": "Email de l'invité",
+      "phGuestEmail": "investisseur@fonds.com",
+      "accessLevel": "Niveau d'accès",
+      "expiresOn": "Expire le",
+      "expiresHint": "90 jours par défaut, prolongeable.",
+      "ndaToggle": "Exiger la signature d'un NDA.",
+      "ndaToggleBody": "La preuve (horodatage, IP, empreinte) restera attachée à sa fiche et visible dans « Signatures ».",
+      "mailFailed": "L'e-mail n'est pas parti — transmettez ce lien :",
+      "cancel": "Annuler",
+      "sending": "Envoi…",
+      "sendInvite": "Envoyer l'invitation",
+      "shareCta": "Partager",
+      "lvlWatermark": "Filigrané",
+      "lvlWatermarkHint": "Lecture seule, filigrane à son nom.",
+      "lvlView": "Lecture seule",
+      "lvlViewHint": "Consultation sans téléchargement.",
+      "lvlDownload": "Télécharger",
+      "lvlDownloadHint": "Peut télécharger les fichiers."
     }
   },
   "invitations": {
@@ -546,7 +573,9 @@
     "colLastVisit": "Dernière visite",
     "noGuests": "Aucun invité pour l'instant.",
     "revoke": "Révoquer",
-    "revokeConfirm": "Révoquer l’accès de {name} ? Cette personne ne pourra plus ouvrir vos documents."
+    "revokeConfirm": "Révoquer l’accès de {name} ? Cette personne ne pourra plus ouvrir vos documents.",
+    "emptyTitle": "Personne n'a encore accès",
+    "emptyBody": "Invitez un investisseur : vous verrez ici ses droits, les dossiers qu'il peut ouvrir et sa dernière visite."
   },
   "viewer": {
     "title": "Visionneuse",
@@ -989,7 +1018,9 @@
       "draft": "Brouillon",
       "internal_review": "Revue interne",
       "published": "Publiée"
-    }
+    },
+    "emptyTitle": "Aucune question pour l'instant",
+    "emptyBody": "Les questions de vos investisseurs arriveront ici. Vous y répondrez en brouillon, puis publierez la réponse."
   },
   "tips": {
     "dashboard": "Vue d'ensemble de votre activité : deals actifs, tâches à traiter et dernières actions de l'équipe.",

@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { askQuestion, saveAnswer, setAnswerStatus } from "@/app/actions/qa";
 import { Modal } from "@/components/ui/Modal";
 import { PlainError } from "@/components/auth/FormError";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/cn";
 
 export type AnswerStatus = "draft" | "internal_review" | "published";
@@ -154,9 +155,16 @@ export function QaBoard({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-white border border-[#E2DED4] rounded-[6px] px-5 py-8 text-center">
-          <p className="text-[12.5px] text-[#6E727A]">{t("empty")}</p>
-        </div>
+        <EmptyState
+          title={t("emptyTitle")}
+          description={t("emptyBody")}
+          icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>}
+          action={
+            <button onClick={() => setAskOpen(true)} className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]">
+              {t("ask")}
+            </button>
+          }
+        />
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((q) => (
