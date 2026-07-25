@@ -45,10 +45,17 @@ export function SanzaLogo({
   size = 22,
   dark = false,
   animate = false,
+  markOnly = false,
 }: {
   size?: number;
   dark?: boolean;
   animate?: boolean;
+  /**
+   * Le « a » vibrant SEUL, sans « sanz » devant — la signature réduite, pour
+   * l'écran de chargement. C'est bien le même dessin : les décalages d'écho
+   * ne sont définis qu'ici, et ne doivent jamais être recopiés ailleurs.
+   */
+  markOnly?: boolean;
 }) {
   const main = dark ? "#ffffff" : "#171a2c";
   const echo = dark ? "#f08a5e" : "#e85c2b";
@@ -66,7 +73,7 @@ export function SanzaLogo({
         lineHeight: 1,
       }}
     >
-      sanz
+      {!markOnly && "sanz"}
       <span style={{ position: "relative", display: "inline-block" }}>
         <Echo off="0.52em" op={0.3} color={echo} animate={animate} />
         <Echo off="0.26em" op={0.55} color={echo} animate={animate} />

@@ -129,7 +129,14 @@ export function RoomContenu({
         {canEdit && (
           <button
             onClick={() => (courant ? uploadRef.current?.click() : setNouvDossier(true))}
-            className="rounded-[5px] bg-[#E85C2B] px-3 py-[7px] text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]"
+            // Salle vide : la zone d'appel plus bas porte déjà l'action
+            // principale. Deux boutons orange sur le même écran, c'est deux
+            // fois aucune priorité — celui-ci recule au second plan.
+            className={
+              salleVide
+                ? "border border-[#E4E2DC] rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]"
+                : "rounded-[5px] bg-[#E85C2B] px-3 py-[7px] text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]"
+            }
           >{t("addContent")}</button>
         )}
       </div>
@@ -192,12 +199,10 @@ export function RoomContenu({
               >
                 {t("waitingUpload")}
               </button>
-              <button
-                onClick={() => setNouvDossier(true)}
-                className="border border-[#E4E2DC] rounded-[5px] px-4 py-2.5 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]"
-              >
-                {t("createFolder")}
-              </button>
+              {/* La spec prévoyait un second bouton, « Importer depuis Drive ».
+                  C'est la Proposition §5.3, non implémentée : aucune
+                  intégration Drive n'existe. Un seul bouton, donc — et
+                  « Créer un dossier » est déjà dans la barre d'outils. */}
             </div>
           )}
         </div>
