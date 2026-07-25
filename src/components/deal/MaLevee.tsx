@@ -221,6 +221,26 @@ export function MaLevee({
   const restant = cible != null ? cible - engage : null;
   const audience = raise?.audience ?? [];
   const enMiseEnRoute = readiness < SEUIL_MISE_EN_ROUTE;
+
+  // « Autour de la levée » : trois sections indépendantes. Une section est
+  // AMORCÉE quand elle est vide (on invite à la remplir) et AFFICHÉE quand
+  // elle a du contenu. Hors mode roadmap, tout s'affiche : au-delà du seuil,
+  // une section vide est une information en soi.
+  // Seul membre = le fondateur lui-même : l'équipe n'est pas « constituée ».
+  const docsVides = keyDocs.length === 0;
+  const equipeVide = team.length <= 1;
+  const investisseursVides = investors.length === 0;
+  const montrerDocs = !enMiseEnRoute || !docsVides;
+  const montrerEquipe = !enMiseEnRoute || !equipeVide;
+  const montrerInvestisseurs = !enMiseEnRoute || !investisseursVides;
+  const amorces = [
+    docsVides && { t: t("aroundDocs"), b: t("aroundDocsBody"), href: "/data-room", cta: t("upload"),
+      d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6" },
+    equipeVide && { t: t("aroundTeam"), b: t("aroundTeamBody"), href: "/permissions", cta: t("share"),
+      d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" },
+    investisseursVides && { t: t("aroundInvestors"), b: t("aroundInvestorsBody"), href: "#investisseurs", cta: t("addInvestor"),
+      d: "M5 20V10 M12 20V4 M19 20v-6" },
+  ].filter(Boolean) as { t: string; b: string; href: string; cta: string; d: string }[];
   const jours = raise?.date_cloture ? joursRestants(raise.date_cloture) : null;
 
   return (
@@ -269,6 +289,33 @@ export function MaLevee({
           onAjouterInvestisseur={ouvrirInvestisseur}
         />
       )}
+
+      {/* Sous le seuil, la liste des pièces manquantes est LA raison d'être de
+          l'écran : elle doit se lire sans défiler (V2 §2). Elle vivait plus
+          bas, poussée hors de vue par la vitrine et le résumé — deux blocs qui
+          n'ont rien à dire tant que le dossier est vide. */}
+      {enMiseEnRoute && missing.length > 0 && (
+        <div className="mb-7">
+          <h2 className="text-[15px] font-[700] tracking-[-0.01em] mb-2">{t("remainingTitle")}</h2>
+          <div className="bg-white border border-[#E2DED4] rounded-[6px] overflow-hidden">
+            {missing.slice(0, 5).map((m, i) => (
+              <div key={m.label} className="flex items-center gap-3 px-4 py-3 border-b border-[#E8E5DC] last:border-0 text-[12.5px]">
+                {i === 0 && <span style={mono} className="text-[9px] font-[600] text-[#C24619] bg-[#FBEDE6] rounded-[4px] px-2 py-0.5 shrink-0">{t("nextCaps")}</span>}
+                <span className="flex-1 text-[#33353B] truncate">{m.label}</span>
+                <Link
+                  href={m.folderId ? `/data-room?dossier=${m.folderId}` : "/data-room"}
+                  className={i === 0
+                    ? "shrink-0 rounded-[5px] bg-[#E85C2B] px-3 py-1.5 text-[12px] font-[600] text-white hover:bg-[#D24E1F]"
+                    : "shrink-0 text-[12px] font-[600] text-[#C24619] hover:text-[#1A1B1F]"}
+                >
+                  {t("upload")}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       {/* Levées : courante (+ Clôturer), clôturées, et « Nouvelle levée ». */}
       <RaiseChips dealName={dealName} dealId={dealId} raise={raise} closedRaises={closedRaises} />
@@ -385,28 +432,6 @@ export function MaLevee({
       </>
       )}
 
-      {enMiseEnRoute && missing.length > 0 && (
-        <div className="mb-7">
-          <h2 className="text-[15px] font-[700] tracking-[-0.01em] mb-2">{t("remainingTitle")}</h2>
-          <div className="bg-white border border-[#E2DED4] rounded-[6px] overflow-hidden">
-            {missing.slice(0, 5).map((m, i) => (
-              <div key={m.label} className="flex items-center gap-3 px-4 py-3 border-b border-[#E8E5DC] last:border-0 text-[12.5px]">
-                {i === 0 && <span style={mono} className="text-[9px] font-[600] text-[#C24619] bg-[#FBEDE6] rounded-[4px] px-2 py-0.5 shrink-0">{t("nextCaps")}</span>}
-                <span className="flex-1 text-[#33353B] truncate">{m.label}</span>
-                <Link
-                  href={m.folderId ? `/data-room?dossier=${m.folderId}` : "/data-room"}
-                  className={i === 0
-                    ? "shrink-0 rounded-[5px] bg-[#E85C2B] px-3 py-1.5 text-[12px] font-[600] text-white hover:bg-[#D24E1F]"
-                    : "shrink-0 text-[12px] font-[600] text-[#C24619] hover:text-[#1A1B1F]"}
-                >
-                  {t("upload")}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Historique de financement — rail de tours (clôturés → en cours),
           fidèle à la maquette. N'apparaît que si au moins un tour est clôturé. */}
       {closedRaises.length > 0 && (() => {
@@ -463,18 +488,16 @@ export function MaLevee({
         );
       })()}
 
-      {enMiseEnRoute && keyDocs.length === 0 && team.length <= 1 && investors.length === 0 ? (
+      {/* « Autour de la levée » — chaque section se replie INDÉPENDAMMENT
+          (V2 §2). La condition était combinée : un fondateur ayant déposé un
+          document mais encore seul et sans investisseur voyait les trois
+          sections réelles, dont deux vides. On n'amorce donc que ce qui est
+          effectivement vide, et on affiche en vrai ce qui ne l'est pas. */}
+      {enMiseEnRoute && amorces.length > 0 && (
         <div className="mb-9">
           <h2 className="text-[15px] font-[700] tracking-[-0.01em] mb-2">{t("aroundRaise")}</h2>
           <div className="bg-white border border-[#E2DED4] rounded-[6px] overflow-hidden">
-            {[
-              { t: t("aroundDocs"), b: t("aroundDocsBody"), href: "/data-room", cta: t("upload"),
-                d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6" },
-              { t: t("aroundTeam"), b: t("aroundTeamBody"), href: "/permissions", cta: t("share"),
-                d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" },
-              { t: t("aroundInvestors"), b: t("aroundInvestorsBody"), href: "#investisseurs", cta: t("addInvestor"),
-                d: "M5 20V10 M12 20V4 M19 20v-6" },
-            ].map((l) => (
+            {amorces.map((l) => (
               <div key={l.t} className="flex items-center gap-3 px-4 py-3.5 border-b border-[#E8E5DC] last:border-0">
                 <span className="grid place-items-center w-8 h-8 rounded-[6px] bg-[#F1F0EB] text-[#8B8E96] shrink-0">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={l.d} /></svg>
@@ -488,10 +511,14 @@ export function MaLevee({
             ))}
           </div>
         </div>
-      ) : (
-      <>
-      {/* Documents clés + Équipe sur la levée — données réelles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-9 mb-9">
+      )}
+
+      {/* Documents clés + Équipe sur la levée — données réelles. Chacune ne
+          s'affiche que si elle a quelque chose à montrer, ou hors mode
+          roadmap où le squelette complet a du sens. */}
+      {(montrerDocs || montrerEquipe) && (
+      <div className={"grid grid-cols-1 gap-9 mb-9 " + (montrerDocs && montrerEquipe ? "md:grid-cols-2" : "")}>
+        {montrerDocs && (
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("keyDocs")}</h2>
@@ -511,6 +538,8 @@ export function MaLevee({
             )}
           </div>
         </div>
+        )}
+        {montrerEquipe && (
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("team")}</h2>
@@ -535,11 +564,13 @@ export function MaLevee({
             )}
           </div>
         </div>
+        )}
       </div>
+      )}
 
       {/* Pipeline investisseur curé (éditable) */}
-      <PipelineInvestisseurs dealId={dealId} devise={devise} investors={investors} signalOuverture={signalInvest} />
-      </>
+      {montrerInvestisseurs && (
+        <PipelineInvestisseurs dealId={dealId} devise={devise} investors={investors} signalOuverture={signalInvest} />
       )}
 
       {/* Data room attachée — RÉELLE */}
