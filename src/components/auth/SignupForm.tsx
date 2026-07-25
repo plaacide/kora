@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
+import { SsoButtons } from "./SsoButtons";
 import { cn } from "@/lib/cn";
 
 /**
@@ -113,6 +114,10 @@ export function SignupForm() {
           ))}
         </div>
       </div>
+
+      {/* SSO d'abord (handoff v2 §3). Le rôle choisi ci-dessus est transmis :
+          au retour, il fixe le type de compte comme le ferait le formulaire. */}
+      <SsoButtons next="/onboarding" role={role} />
 
       <form action={action} className="flex flex-col gap-4">
         <input type="hidden" name="account_type" value={role} />

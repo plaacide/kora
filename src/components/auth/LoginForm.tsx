@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
+import { SsoButtons } from "./SsoButtons";
 
 export function LoginForm({ notice }: { notice?: string } = {}) {
   const [state, action, pending] = useActionState(login, undefined);
@@ -41,6 +42,9 @@ export function LoginForm({ notice }: { notice?: string } = {}) {
           </Link>
         </p>
       </div>
+
+      {/* SSO d'abord, puis « OU PAR EMAIL » (handoff v2 §3). */}
+      <SsoButtons next="/dashboard" />
 
       <form action={action} className="flex flex-col gap-4">
         <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />

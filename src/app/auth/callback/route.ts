@@ -1,6 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { originFromHeaders } from "@/lib/app-origin";
+
+/** Types de compte acceptés depuis l'URL — jamais la valeur brute. */
+const ROLES = ["investor", "founder", "sae"] as const;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -37,10 +41,28 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
     return NextResponse.redirect(`${origin}/connexion?erreur=session_absente`);
+  }
+
+  // Inscription par Google / LinkedIn : le type de compte choisi sur l'écran
+  // arrive en paramètre. On ne l'écrase JAMAIS s'il est déjà posé — sinon une
+  // simple reconnexion depuis l'écran d'inscription changerait le persona d'un
+  // compte existant, et donc tout son parcours.
+  const role = searchParams.get("role");
+  const userId = data.user?.id;
+  if (userId && role && (ROLES as readonly string[]).includes(role)) {
+    const admin = createAdminClient();
+    const { data: profil } = await admin
+      .from("profiles")
+      .select("account_type")
+      .eq("id", userId)
+      .maybeSingle();
+    if (!(profil as { account_type?: string | null } | null)?.account_type) {
+      await admin.from("profiles").update({ account_type: role }).eq("id", userId);
+    }
   }
 
   return NextResponse.redirect(`${origin}${destination}`);
