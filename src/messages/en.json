@@ -426,7 +426,11 @@
     "todoEmptyTitle": "Nothing to handle today",
     "todoEmptyBody": "Milestones coming due and unanswered investor questions will appear here.",
     "noActivityTitle": "No activity yet",
-    "noActivityBody": "This list fills itself as soon as a guest opens a document or signs an NDA."
+    "noActivityBody": "This list fills itself as soon as a guest opens a document or signs an NDA.",
+    "demoTitle": "Rather explore first?",
+    "demoBody": "Two minutes to see what an investor will see of your file, before you upload anything.",
+    "demoCta": "Watch the demo",
+    "demoModalTitle": "Sanza in two minutes"
   },
   "stages": {
     "sourcing": "Sourcing",

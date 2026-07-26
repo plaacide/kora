@@ -41,14 +41,17 @@ export default async function DealPage() {
       <div className="flex flex-col gap-5 text-[#1A1B1F]">
         <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("myRaise")}</h1>
 
-        <div className="grid gap-4 lg:grid-cols-[1.05fr_1fr] items-start">
-          <div className="relative overflow-hidden bg-white border border-[#E2DED4] rounded-[8px] px-6 py-7">
-            <ResonanceArcs corner="bottom-right" size={480} tone="light" />
-            <div className="relative z-10">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="relative overflow-hidden h-full flex flex-col bg-white border border-[#E2DED4] rounded-[8px] px-6 py-7">
+            {/* 320 et non 480 : à 480 les arcs débordaient au MILIEU de la
+                carte et se lisaient comme une tache, au lieu de se loger dans
+                le coin. La taille se règle sur le conteneur, pas sur l'écran. */}
+            <ResonanceArcs corner="bottom-right" size={220} tone="light" subtle />
+            <div className="relative z-10 flex flex-col flex-1">
               <h2 className="text-[15px] font-[700]">{t("noDataRoom")}</h2>
-              <p className="text-[12.5px] text-[#6E727A] mt-1.5 leading-relaxed">{t("noRoomBody")}</p>
+              <p className="text-[12.5px] text-[#6E727A] mt-1.5 leading-relaxed max-w-md">{t("noRoomBody")}</p>
 
-              <ol className="flex flex-col gap-3.5 mt-6">
+              <ol className="flex flex-col gap-3.5 mt-6 flex-1">
                 {[
                   { n: 1, actif: true, titre: t("pathStep1"), corps: t("pathStep1Body") },
                   { n: 2, actif: false, titre: t("pathStep2"), corps: t("pathStep2Body") },
@@ -84,9 +87,9 @@ export default async function DealPage() {
               L'étiquette et la mention disent explicitement que rien ici n'est
               à l'utilisateur — c'est cette marque, et non l'absence de
               chiffres, qui empêche de confondre l'exemple avec ses données. */}
-          <div className="relative overflow-hidden rounded-[8px] bg-[#171A2C] px-6 py-6">
+          <div className="relative overflow-hidden h-full flex flex-col rounded-[8px] bg-[#171A2C] px-6 py-6">
             <ResonanceArcs corner="top-right" size={240} tone="dark" subtle />
-            <div className="relative z-10">
+            <div className="relative z-10 flex flex-col flex-1">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-[13px] font-[700] text-white">{t("previewTitle")}</span>
                 <span style={mono} className="text-[8.5px] font-[600] tracking-[0.12em] text-[#F08A5E] border border-[#F08A5E]/35 rounded-[3px] px-1.5 py-[3px] whitespace-nowrap">
@@ -94,7 +97,7 @@ export default async function DealPage() {
                 </span>
               </div>
 
-              <div className="mt-5 rounded-[6px] bg-white/[0.06] px-4 py-4">
+              <div className="mt-5 rounded-[6px] bg-white/[0.06] px-4 py-4 flex-1">
                 <div className="flex items-start justify-between gap-3">
                   <span className="text-[13.5px] font-[650] text-white truncate">{t("previewCompany")}</span>
                   <span style={mono} className="shrink-0 text-[9px] font-[600] uppercase tracking-[0.06em] text-[#F08A5E] bg-[#E85C2B]/15 rounded-[4px] px-2 py-[3px]">
@@ -103,7 +106,7 @@ export default async function DealPage() {
                 </div>
 
                 <div className="text-[10.5px] text-white/45 mt-3">{t("amountSought")}</div>
-                <div style={mono} className="text-[22px] font-[600] tracking-[-0.02em] text-white mt-0.5">
+                <div style={mono} className="text-[22px] font-[600] tracking-[-0.03em] text-white mt-0.5">
                   {t("previewAmount")}
                 </div>
                 <span className="block h-1.5 rounded-full bg-white/10 overflow-hidden mt-2.5">

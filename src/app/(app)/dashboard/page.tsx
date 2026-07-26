@@ -14,6 +14,7 @@ import { DealsTable, type DealRow } from "@/components/dashboard/DealsTable";
 import { NewDealButton } from "@/components/dataroom/NewDealButton";
 import { NewDataRoomButton } from "@/components/dataroom/RoomsList";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { DemoVideoButton } from "@/components/dashboard/DemoVideoButton";
 import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 import { formatAmount, formatDate } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
@@ -81,6 +82,8 @@ export default async function DashboardPage() {
     // UNE seule chose à faire, en grand, sur fond Encre — et en dessous le
     // chemin complet, pour qu'il sache où il met les pieds. Les étapes 2 et 3
     // sont atténuées : elles se décrivent, elles ne s'actionnent pas encore.
+    // Vidéo de démonstration : absente tant qu'aucun fichier n'est configuré.
+    const demoVideo = process.env.NEXT_PUBLIC_DEMO_VIDEO;
     const etapes = [
       { n: 1, titre: t("stepRoom"), corps: t("stepRoomBody") },
       { n: 2, titre: t("stepUpload"), corps: t("stepUploadBody") },
@@ -112,6 +115,24 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* « Explorer d'abord » — la vidéo de présentation. Le bloc n'existe
+            QUE si une vidéo est configurée : un bouton qui n'ouvre rien vaut
+            moins que pas de bouton. Elle vit dans public/, pas sur YouTube —
+            la CSP pose `frame-src 'none'`, qui bloque les iframes. */}
+        {demoVideo && (
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-white border border-[#E2DED4] rounded-[8px] px-5 py-4">
+            <div className="min-w-0">
+              <h3 className="text-[13.5px] font-[700]">{t("demoTitle")}</h3>
+              <p className="text-[12px] text-[#6E727A] mt-0.5 leading-relaxed">{t("demoBody")}</p>
+            </div>
+            <DemoVideoButton
+              src={demoVideo}
+              poster={process.env.NEXT_PUBLIC_DEMO_POSTER}
+              className="shrink-0 border border-[#E4E2DC] rounded-[5px] px-4 py-2.5 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]"
+            />
+          </div>
+        )}
 
         <div className="grid gap-3 md:grid-cols-3">
           {etapes.map((e) => (
