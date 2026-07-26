@@ -656,7 +656,13 @@
       "waitingBody": "L'arborescence est prête. Ouvrez un dossier et déposez-y vos pièces — statuts, financiers, cap table d'abord : c'est ce qu'un investisseur ouvre en premier.",
       "waitingUpload": "Déposer un document",
       "expectedCount": "{n} sur {total} pièces attendues",
-      "dropHere": "Déposer"
+      "dropHere": "Déposer",
+      "renameFolderTitle": "Renommer le dossier",
+      "deleteFolderTitle": "Supprimer le dossier",
+      "deleteFolderBody": "« {nom} » et tout ce qu'il contient seront supprimés. Cette action est définitive.",
+      "confirmDelete": "Supprimer définitivement",
+      "save": "Enregistrer",
+      "folderActions": "Actions du dossier"
     },
     "shareModal": {
       "title": "Partager la data room",

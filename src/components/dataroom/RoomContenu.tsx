@@ -5,7 +5,8 @@ import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { folderIndex } from "@/lib/folder-index";
 import { createFolder } from "@/app/actions/deals";
-import { setDocumentKey } from "@/app/actions/crud";
+import { setDocumentKey, renameFolder, deleteFolder } from "@/app/actions/crud";
+import { Modal } from "@/components/ui/Modal";
 import { Uploader } from "./Uploader";
 import { DocViewerModal } from "@/components/viewer/DocViewerModal";
 import type { FolderRow, DocRow } from "./DataRoom";
@@ -55,6 +56,12 @@ export function RoomContenu({
   const [nom, setNom] = useState("");
   const [busy, setBusy] = useState(false);
   const uploadRef = useRef<HTMLButtonElement>(null);
+  // Renommer et supprimer un dossier existaient déjà en action serveur, mais
+  // seul l'ancien écran les appelait — il n'est plus rendu. Les voici sur
+  // l'écran réellement affiché.
+  const [renomme, setRenomme] = useState<{ id: string; nom: string } | null>(null);
+  const [supprime, setSupprime] = useState<{ id: string; nom: string } | null>(null);
+  const [erreur, setErreur] = useState<string | undefined>();
 
   const byId = useMemo(() => new Map(folders.map((f) => [f.id, f])), [folders]);
 
@@ -101,6 +108,31 @@ export function RoomContenu({
   async function basculerCle(docId: string, actuel: boolean) {
     const res = await setDocumentKey(docId, !actuel);
     if (res.ok) router.refresh();
+  }
+
+  async function confirmerRenommage() {
+    if (!renomme || renomme.nom.trim().length < 2) return;
+    setBusy(true);
+    setErreur(undefined);
+    const res = await renameFolder(renomme.id, renomme.nom.trim());
+    setBusy(false);
+    if (!res.ok) return setErreur(res.error);
+    setRenomme(null);
+    router.refresh();
+  }
+
+  async function confirmerSuppression() {
+    if (!supprime) return;
+    setBusy(true);
+    setErreur(undefined);
+    const res = await deleteFolder(supprime.id);
+    setBusy(false);
+    if (!res.ok) return setErreur(res.error);
+    // On remonte d'un cran : rester dans un dossier qui n'existe plus
+    // afficherait une vue vide sans expliquer pourquoi.
+    if (courant === supprime.id) setCourant(byId.get(supprime.id)?.parent_id ?? null);
+    setSupprime(null);
+    router.refresh();
   }
 
   async function ajouterDossier() {
@@ -218,13 +250,12 @@ export function RoomContenu({
 
       {/* Dossiers */}
       {sousDossiers.map((f) => (
-        <button
+        <div
           key={f.id}
-          onClick={() => setCourant(f.id)}
-          className="bg-white w-full grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4] text-left"
+          className="group bg-white grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4]"
         >
           <span style={mono} className="text-[11px] text-[#9DA0A8]">{folderIndex(f.index_path)}</span>
-          <span className="flex items-center gap-[11px] min-w-0">
+          <button onClick={() => setCourant(f.id)} className="flex items-center gap-[11px] min-w-0 text-left w-full">
             <span className="grid place-items-center w-[26px] h-5 rounded-[4px] bg-[#EEF4FB] shrink-0">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="#7DA9D6"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8z" /></svg>
             </span>
@@ -234,7 +265,7 @@ export function RoomContenu({
                 ? t("expectedCount", { n: compteDocs(f.id), total: compteAttendues(f.id) })
                 : t("itemsCount", { n: compte(f.id) })}
             </span>
-          </span>
+          </button>
           <span className="text-[12px] text-[#6E727A]">{t("folder")}</span>
           <span className="text-[12px] text-[#9DA0A8]">
             {canEdit && salleVide ? (
@@ -243,8 +274,37 @@ export function RoomContenu({
               "\u2014"
             )}
           </span>
-          <span />
-        </button>
+          {/* Commandes du dossier. Révélées au survol et au focus clavier :
+              visibles en permanence sur chaque ligne, elles feraient une
+              colonne de bruit ; cachées au focus, elles seraient inatteignables
+              sans souris. */}
+          {canEdit ? (
+            <span className="flex items-center gap-0.5 justify-self-center opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+              <button
+                onClick={() => setRenomme({ id: f.id, nom: f.name })}
+                title={t("rename")}
+                aria-label={`${t("rename")} — ${f.name}`}
+                className="grid place-items-center w-6 h-6 rounded-[4px] text-[#9DA0A8] hover:text-[#1A1B1F] hover:bg-[#F1F0EB]"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setSupprime({ id: f.id, nom: f.name })}
+                title={t("delete")}
+                aria-label={`${t("delete")} — ${f.name}`}
+                className="grid place-items-center w-6 h-6 rounded-[4px] text-[#9DA0A8] hover:text-[#C0392B] hover:bg-[#FBE6E0]"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                </svg>
+              </button>
+            </span>
+          ) : (
+            <span />
+          )}
+        </div>
       ))}
 
       {/* Fichiers */}
@@ -304,6 +364,39 @@ export function RoomContenu({
           />
         </div>
       )}
+
+      {/* Renommer — un simple champ, validé par Entrée. */}
+      <Modal open={!!renomme} onClose={() => { setRenomme(null); setErreur(undefined); }} title={t("renameFolderTitle")}>
+        <div className="px-6 py-5">
+          <input
+            value={renomme?.nom ?? ""}
+            onChange={(e) => setRenomme((r) => (r ? { ...r, nom: e.target.value } : r))}
+            onKeyDown={(e) => e.key === "Enter" && confirmerRenommage()}
+            autoFocus
+            className="bg-white w-full h-9 px-3 text-[13px] border border-[#E4E2DC] rounded-[5px] focus:outline-none focus:border-[#C9C6BD]"
+          />
+          {erreur && <p className="text-[12px] text-[#A32D2D] mt-2">{erreur}</p>}
+        </div>
+        <div className="px-6 py-4 border-t border-[#E8E5DC] flex justify-end gap-2.5">
+          <button onClick={() => { setRenomme(null); setErreur(undefined); }} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAF8F4]">{t("cancel")}</button>
+          <button onClick={confirmerRenommage} disabled={busy || (renomme?.nom.trim().length ?? 0) < 2} className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-50">{t("save")}</button>
+        </div>
+      </Modal>
+
+      {/* Supprimer — on NOMME ce qui disparaît. « Êtes-vous sûr ? » ne dit pas
+          qu'un dossier emporte tout son contenu. */}
+      <Modal open={!!supprime} onClose={() => { setSupprime(null); setErreur(undefined); }} title={t("deleteFolderTitle")}>
+        <div className="px-6 py-5">
+          <p className="text-[13px] text-[#33353B] leading-relaxed">
+            {t("deleteFolderBody", { nom: supprime?.nom ?? "" })}
+          </p>
+          {erreur && <p className="text-[12px] text-[#A32D2D] mt-2">{erreur}</p>}
+        </div>
+        <div className="px-6 py-4 border-t border-[#E8E5DC] flex justify-end gap-2.5">
+          <button onClick={() => { setSupprime(null); setErreur(undefined); }} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAF8F4]">{t("cancel")}</button>
+          <button onClick={confirmerSuppression} disabled={busy} className="rounded-[5px] bg-[#C0392B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#A32D2D] disabled:opacity-50">{t("confirmDelete")}</button>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -324,6 +324,7 @@ export function MaLevee({
         <MiseEnRoute
           missing={missing}
           nbDocuments={nbDocuments}
+          nbAccesActifs={accesActifs}
           socleTotal={socleTotal}
           socleFaits={socleFaits}
           raise={raise}
@@ -618,6 +619,7 @@ export function MaLevee({
 function MiseEnRoute({
   missing,
   nbDocuments,
+  nbAccesActifs,
   socleTotal,
   socleFaits,
   raise,
@@ -628,6 +630,7 @@ function MiseEnRoute({
 }: {
   missing: { label: string; folderId: string | null }[];
   nbDocuments: number;
+  nbAccesActifs: number;
   socleTotal: number;
   socleFaits: number;
   raise: Raise;
@@ -668,7 +671,14 @@ function MiseEnRoute({
       corps: t("setupStep2Body"),
       cta: raise.date_cloture ? t("setupStep2CtaIndicators") : t("setupStep2Cta"),
       compte: "" },
-    { fait: investors.length > 0, titre: t("setupStep3"), corps: t("setupStep3Body"), cta: t("setupStep3Cta"), compte: "" },
+    // « Invitez un premier investisseur » ne comptait que le PIPELINE
+    // (`raise_investors`), une liste de suivi tenue à la main. Un fondateur
+    // qui avait réellement partagé sa data room voyait donc l'étape rester
+    // vide : il avait fait mieux que ce qu'on lui demandait, et on le lui
+    // reprochait. Un accès accordé compte au moins autant qu'une ligne de
+    // suivi — l'étape se coche pour l'un ou l'autre.
+    { fait: investors.length > 0 || nbAccesActifs > 0,
+      titre: t("setupStep3"), corps: t("setupStep3Body"), cta: t("setupStep3Cta"), compte: "" },
   ];
   const indexCourant = Math.max(0, etapes.findIndex((e) => !e.fait));
   const courante = etapes[indexCourant];

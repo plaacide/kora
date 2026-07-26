@@ -656,7 +656,13 @@
       "waitingBody": "The folder tree is ready. Open a folder and drop your files in — articles, financials, cap table first: that is what an investor opens first.",
       "waitingUpload": "Upload a document",
       "expectedCount": "{n} of {total} expected documents",
-      "dropHere": "Upload"
+      "dropHere": "Upload",
+      "renameFolderTitle": "Rename folder",
+      "deleteFolderTitle": "Delete folder",
+      "deleteFolderBody": "“{nom}” and everything inside it will be deleted. This cannot be undone.",
+      "confirmDelete": "Delete permanently",
+      "save": "Save",
+      "folderActions": "Folder actions"
     },
     "shareModal": {
       "title": "Share the data room",
