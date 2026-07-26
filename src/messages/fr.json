@@ -1062,7 +1062,7 @@
       "missingPieces": "{n, plural, one {# pièce manquante} other {# pièces manquantes}}",
       "setupOvertitle": "MISE EN ROUTE · {n} SUR 3",
       "setupStep1": "Déposez vos pièces socle",
-      "setupStep1Body": "Les cinq pièces qu'un investisseur ouvre en premier. Sans elles, votre dossier ne se lit pas.",
+      "setupStep1Body": "Les premières pièces qu'un investisseur ouvre. Sans elles, votre dossier ne se lit pas.",
       "setupStep1Cta": "Déposer une pièce",
       "setupStep2": "Renseignez votre levée",
       "setupStep2Body": "Date de clôture et indicateurs mis en avant : ce qu'un investisseur regarde avant vos documents.",
@@ -1072,7 +1072,7 @@
       "setupStep3Cta": "Ajouter un investisseur",
       "setupSecondary": "Ouvrir la data room",
       "setupDone": "Tout est en place",
-      "setupCount": "{done} sur 5",
+      "setupCount": "{done} sur {total}",
       "pathStep1": "Créer la data room",
       "pathStep1Body": "Le coffre où vivront vos documents.",
       "pathStep2": "Ouvrir la levée",
@@ -1085,7 +1085,8 @@
       "noIndicatorsTitle": "Aucun indicateur pour l'instant",
       "noIndicatorsBody": "Ajoutez ce qu'un investisseur voit avant d'ouvrir vos documents.",
       "noInvestorsTitle": "Aucun investisseur suivi",
-      "noInvestorsBody": "Ajoutez ceux que vous approchez, avec leur ticket et leur statut."
+      "noInvestorsBody": "Ajoutez ceux que vous approchez, avec leur ticket et leur statut.",
+      "setupStep2CtaIndicators": "Ajouter les indicateurs"
     }
   },
   "versions": {

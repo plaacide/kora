@@ -1062,7 +1062,7 @@
       "missingPieces": "{n, plural, one {# missing document} other {# missing documents}}",
       "setupOvertitle": "GETTING STARTED · {n} OF 3",
       "setupStep1": "Upload your core documents",
-      "setupStep1Body": "The five documents an investor opens first. Without them, your file cannot be read.",
+      "setupStep1Body": "The first documents an investor opens. Without them, your file cannot be read.",
       "setupStep1Cta": "Upload a document",
       "setupStep2": "Fill in your raise",
       "setupStep2Body": "Close date and highlighted indicators: what an investor looks at before your documents.",
@@ -1072,7 +1072,7 @@
       "setupStep3Cta": "Add an investor",
       "setupSecondary": "Open the data room",
       "setupDone": "Everything is in place",
-      "setupCount": "{done} of 5",
+      "setupCount": "{done} of {total}",
       "pathStep1": "Create the data room",
       "pathStep1Body": "The vault where your documents will live.",
       "pathStep2": "Open the raise",
@@ -1085,7 +1085,8 @@
       "noIndicatorsTitle": "No indicators yet",
       "noIndicatorsBody": "Add what an investor sees before opening your documents.",
       "noInvestorsTitle": "No investors tracked",
-      "noInvestorsBody": "Add the ones you are approaching, with their ticket and status."
+      "noInvestorsBody": "Add the ones you are approaching, with their ticket and status.",
+      "setupStep2CtaIndicators": "Add the indicators"
     }
   },
   "versions": {

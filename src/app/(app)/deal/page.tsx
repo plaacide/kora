@@ -187,6 +187,17 @@ export default async function DealPage() {
     .filter((i) => i.status !== "done")
     .map((i) => ({ label: i.label, folderId: i.folder_id }));
 
+  // Le « socle » du bandeau de mise en route : les premières exigences de la
+  // checklist, dans l'ordre du modèle (category, position) — donc celles que
+  // le modèle lui-même juge prioritaires. C'est un ENSEMBLE identifié, pas un
+  // plafond : on compte celles qui sont réellement fournies.
+  //
+  // Le total n'est pas figé à 5. Une data room créée sans modèle n'a aucune
+  // exigence : annoncer « 0 sur 5 » y serait un chiffre inventé.
+  const socle = liste.slice(0, 5);
+  const socleTotal = socle.length;
+  const socleFaits = socle.filter((i) => i.status === "done").length;
+
   const raises = (raisesRes.data ?? []) as Raise[];
   const enCours = raises.find((r) => r.statut === "en_cours") ?? null;
   const cloturees = raises.filter((r) => r.statut === "cloturee");
@@ -272,6 +283,8 @@ export default async function DealPage() {
       dealId={deal.id}
       readiness={deal.readiness_score ?? 0}
       missing={missing}
+      socleTotal={socleTotal}
+      socleFaits={socleFaits}
       objectif={deal.objectif}
       raise={enCours}
       closedRaises={cloturees}

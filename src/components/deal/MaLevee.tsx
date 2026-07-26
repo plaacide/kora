@@ -189,6 +189,8 @@ export function MaLevee({
   objectif = "levee",
   raise = null,
   closedRaises = [],
+  socleTotal = 0,
+  socleFaits = 0,
   investors = [],
   team = [],
   keyDocs = [],
@@ -202,6 +204,9 @@ export function MaLevee({
   dealId: string;
   readiness: number;
   missing: { label: string; folderId: string | null }[];
+  /** Socle = premières exigences du modèle. Total réel, jamais figé à 5. */
+  socleTotal?: number;
+  socleFaits?: number;
   objectif?: string;
   raise?: Raise | null;
   closedRaises?: Raise[];
@@ -225,6 +230,8 @@ export function MaLevee({
   const [signalEdition, setSignalEdition] = useState(0);
   const ouvrirEdition = () => setSignalEdition((n) => n + 1);
   const [signalInvest, setSignalInvest] = useState(0);
+  const [signalVitrine, setSignalVitrine] = useState(0);
+  const ouvrirVitrine = () => setSignalVitrine((n) => n + 1);
   const ouvrirInvestisseur = () => setSignalInvest((n) => n + 1);
 
   // ----- Diligence : pilotage sans levée -----
@@ -313,9 +320,12 @@ export function MaLevee({
       {enMiseEnRoute && raise && (
         <MiseEnRoute
           missing={missing}
+          socleTotal={socleTotal}
+          socleFaits={socleFaits}
           raise={raise}
           investors={investors}
           onEditerLevee={ouvrirEdition}
+          onEditerIndicateurs={ouvrirVitrine}
           onAjouterInvestisseur={ouvrirInvestisseur}
         />
       )}
@@ -406,7 +416,7 @@ export function MaLevee({
       )}
 
       {/* Vitrine — indicateurs par audience (éditable) */}
-      <VitrineBand dealId={dealId} audience={audience} indicateurs={raise.indicateurs ?? {}} />
+      <VitrineBand dealId={dealId} audience={audience} indicateurs={raise.indicateurs ?? {}} signalOuverture={signalVitrine} />
 
       {/* Résumé de la levée — RÉEL */}
       <div className="bg-white border border-[#E2DED4] rounded-[6px] mb-7">
@@ -624,28 +634,46 @@ export function MaLevee({
  */
 function MiseEnRoute({
   missing,
+  socleTotal,
+  socleFaits,
   raise,
   investors,
   onEditerLevee,
+  onEditerIndicateurs,
   onAjouterInvestisseur,
 }: {
   missing: { label: string; folderId: string | null }[];
+  socleTotal: number;
+  socleFaits: number;
   raise: Raise;
   investors: RaiseInvestor[];
   onEditerLevee: () => void;
+  onEditerIndicateurs: () => void;
   onAjouterInvestisseur: () => void;
 }) {
   const t = useTranslations("deal.raise");
 
-  const SOCLE = 5;
-  const restantSocle = Math.min(missing.length, SOCLE);
-  const faitesSocle = SOCLE - restantSocle;
+  // Le socle est fourni par le serveur : les premières exigences du modèle,
+  // avec leur statut réel. L'ancien calcul plafonnait le total de pièces
+  // manquantes à 5 et en déduisait les faites — le compteur restait donc bloqué
+  // sur « 0 sur 5 » tant qu'il restait plus de cinq pièces au total, quoi que
+  // le fondateur dépose. Il ne mesurait pas ce qu'il annonçait.
+  const socleComplet = socleTotal > 0 && socleFaits >= socleTotal;
   const aIndicateurs = Object.values(raise.indicateurs ?? {}).some((l) => (l?.length ?? 0) > 0);
 
   const etapes = [
-    { fait: restantSocle === 0, titre: t("setupStep1"), corps: t("setupStep1Body"), cta: t("setupStep1Cta"),
-      compte: t("setupCount", { done: faitesSocle }) },
-    { fait: !!raise.date_cloture && aIndicateurs, titre: t("setupStep2"), corps: t("setupStep2Body"), cta: t("setupStep2Cta"), compte: "" },
+    { fait: socleComplet, titre: t("setupStep1"), corps: t("setupStep1Body"), cta: t("setupStep1Cta"),
+      compte: socleTotal > 0 ? t("setupCount", { done: socleFaits, total: socleTotal }) : "" },
+    // L'étape 2 exige DEUX choses éditées à deux endroits : la date de clôture
+    // (modal « Modifier la levée ») et les indicateurs de vitrine (éditeur de
+    // la vitrine). Le bouton menait toujours au premier — un fondateur ayant
+    // déjà renseigné sa date remplissait le modal en boucle sans jamais cocher
+    // l'étape. Le libellé et l'action suivent maintenant ce qui manque.
+    { fait: !!raise.date_cloture && aIndicateurs,
+      titre: t("setupStep2"),
+      corps: t("setupStep2Body"),
+      cta: raise.date_cloture ? t("setupStep2CtaIndicators") : t("setupStep2Cta"),
+      compte: "" },
     { fait: investors.length > 0, titre: t("setupStep3"), corps: t("setupStep3Body"), cta: t("setupStep3Cta"), compte: "" },
   ];
   const indexCourant = Math.max(0, etapes.findIndex((e) => !e.fait));
@@ -672,7 +700,13 @@ function MiseEnRoute({
               </Link>
             ) : (
               <button
-                onClick={indexCourant === 1 ? onEditerLevee : onAjouterInvestisseur}
+                onClick={
+                  indexCourant === 1
+                    ? raise.date_cloture
+                      ? onEditerIndicateurs
+                      : onEditerLevee
+                    : onAjouterInvestisseur
+                }
                 className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
               >
                 {courante.cta}
@@ -730,10 +764,13 @@ function VitrineBand({
   dealId,
   audience,
   indicateurs,
+  signalOuverture = 0,
 }: {
   dealId: string;
   audience: string[];
   indicateurs: Vitrine;
+  /** Incrémenté par le bandeau de mise en route pour ouvrir l'éditeur. */
+  signalOuverture?: number;
 }) {
   const t = useTranslations("deal.raise");
   const allAud = AUDIENCES.map((a) => a.key);
@@ -747,6 +784,13 @@ function VitrineBand({
   const editKeys = targeted.length ? targeted : allAud;
   const [sel, setSel] = useState("");
   const [editOpen, setEditOpen] = useState(false);
+  // Ajustement PENDANT le rendu (et non dans un effet) : c'est le motif déjà
+  // employé pour les deux autres éditeurs de cet écran.
+  const [signalVu, setSignalVu] = useState(signalOuverture);
+  if (signalOuverture !== signalVu) {
+    setSignalVu(signalOuverture);
+    setEditOpen(true);
+  }
   const activeSel = shownKeys.includes(sel) ? sel : shownKeys[0] ?? "";
   const rows = (activeSel && indicateurs[activeSel]) || [];
 
