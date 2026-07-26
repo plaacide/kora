@@ -31,7 +31,10 @@ const INACTIVITE_MS = 120_000;
 export function SurveyGate({ enfant }: { enfant: (fermer: () => void) => React.ReactNode }) {
   const pathname = usePathname();
   const [ouvert, setOuvert] = useState(false);
-  const derniereInteraction = useRef(Date.now());
+  // Initialisé à 0, pas à `Date.now()` : appeler une fonction impure pendant
+  // le rendu est interdit par `react-hooks/purity`, et le rendu peut être
+  // rejoué. L'horloge démarre au montage, dans l'effet ci-dessous.
+  const derniereInteraction = useRef(0);
   const minutes = useRef(0);
 
   // Toute interaction repousse l'horloge d'inactivité. `passive` : ces
@@ -41,6 +44,9 @@ export function SurveyGate({ enfant }: { enfant: (fermer: () => void) => React.R
     const vu = () => {
       derniereInteraction.current = Date.now();
     };
+    // Arriver sur un écran EST une interaction : sans cela, le compteur
+    // resterait gelé jusqu'au premier clic.
+    vu();
     const evenements = ["pointerdown", "keydown", "scroll", "focus"] as const;
     for (const e of evenements) window.addEventListener(e, vu, { passive: true });
     return () => {
