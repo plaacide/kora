@@ -49,7 +49,14 @@ export function DemoVideoButton({
               poster={poster}
               controls
               autoPlay
+              // `muted` est INDISPENSABLE, pas décoratif : Safari refuse toute
+              // lecture automatique sur un média non muet, et le refus est
+              // SILENCIEUX — on obtient un rectangle noir avec des contrôles,
+              // ce qui se lit comme « la vidéo ne charge pas ». La démo n'a de
+              // toute façon aucune piste audio.
+              muted
               playsInline
+              preload="metadata"
               className="block w-full max-h-[70vh]"
             />
           )}
