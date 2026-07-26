@@ -34,6 +34,8 @@ export function InviteeSignup({
     weak: string;
     generic: string;
     incomplete: string;
+    tooMany: (minutes: number) => string;
+    invalid: string;
   };
 }) {
   const [nom, setNom] = useState("");
@@ -70,7 +72,14 @@ export function InviteeSignup({
           setDejaInscrit(true);
           return;
         }
-        setErreur(res.error === "weak_password" ? labels.weak : labels.generic);
+        // Chaque cause a son message. Les faire toutes tomber sur « échec,
+        // réessayez » rendait l'écran inexploitable : on ne savait pas s'il
+        // fallait attendre, changer de mot de passe, ou redemander un lien.
+        if (res.error === "weak_password") setErreur(labels.weak);
+        else if (res.error === "too_many_attempts")
+          setErreur(labels.tooMany(Math.ceil((res.retryAfter ?? 3600) / 60)));
+        else if (res.error === "invalid_invitation") setErreur(labels.invalid);
+        else setErreur(labels.generic);
       } catch {
         // L'action ne devrait plus jeter, mais si le réseau coupe pendant
         // l'appel, l'invité doit voir quelque chose plutôt qu'un écran figé.

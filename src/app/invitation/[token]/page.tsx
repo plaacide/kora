@@ -74,6 +74,8 @@ export default async function InvitationPage({
           weak: t("newWeak"),
           generic: t("newGeneric"),
           incomplete: t("newIncomplete"),
+          tooMany: (minutes: number) => t("newTooMany", { minutes }),
+          invalid: t("newInvalid"),
         }}
       />,
     );

@@ -742,7 +742,9 @@
     "newExists": "Cette adresse a déjà un compte Sanza.",
     "newWeak": "Mot de passe trop faible : 8 caractères minimum, une lettre et un chiffre.",
     "newGeneric": "La création du compte a échoué. Réessayez dans un instant.",
-    "newIncomplete": "Entrez votre nom et un mot de passe d'au moins 8 caractères."
+    "newIncomplete": "Entrez votre nom et un mot de passe d'au moins 8 caractères.",
+    "newTooMany": "Trop de tentatives depuis cet appareil. Réessayez dans {minutes} minutes.",
+    "newInvalid": "Cette invitation n'est plus valide. Demandez au fondateur de vous en renvoyer une."
   },
   "permissions": {
     "title": "Permissions",

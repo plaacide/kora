@@ -100,10 +100,26 @@ export async function createInvitedAccount(input: {
   token: string;
   fullName: string;
   password: string;
-}): Promise<{ ok: boolean; error?: string; exists?: boolean }> {
+}): Promise<{ ok: boolean; error?: string; exists?: boolean; retryAfter?: number }> {
+  // Deux limiteurs, parce qu'ils protègent de deux choses différentes.
+  //
+  // Le seuil précédent — 6 par heure et par IP — punissait les mauvaises
+  // personnes : un cabinet d'investissement dont plusieurs associés sont
+  // invités sort par une seule adresse publique, et le septième se voyait
+  // refuser l'entrée. Un fondateur qui teste son propre lien s'y bloquait
+  // aussi, ce qui a été constaté.
+  //
+  // L'abus réel ne vise pas une IP mais un JETON : c'est lui qui donne accès à
+  // des documents. On le limite donc serré, et l'IP largement.
   const ip = await clientIp();
-  if (!rateLimit(`invite-signup:${ip}`, 6, 60 * 60 * 1000).ok) {
-    return { ok: false, error: "too_many_attempts" };
+  const parJeton = rateLimit(`invite-signup-token:${input.token}`, 10, 60 * 60 * 1000);
+  const parIp = rateLimit(`invite-signup-ip:${ip}`, 40, 60 * 60 * 1000);
+  if (!parJeton.ok || !parIp.ok) {
+    return {
+      ok: false,
+      error: "too_many_attempts",
+      retryAfter: Math.max(parJeton.retryAfter, parIp.retryAfter),
+    };
   }
 
   const nom = input.fullName.trim();
