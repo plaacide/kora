@@ -4,6 +4,7 @@ import { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import { cleStockage } from "@/lib/storage-key";
 import { registerDocument } from "@/app/actions/deals";
 import { cn } from "@/lib/cn";
 
@@ -42,7 +43,13 @@ export const Uploader = forwardRef<HTMLButtonElement, UploaderProps>(
       for (const file of Array.from(files)) {
         // Chemin : {org_id}/{deal_id}/{uuid}/{nom} — la policy Storage vérifie
         // l'appartenance à l'org via le 1er segment.
-        const key = `${orgId}/${dealId}/${crypto.randomUUID()}/${file.name}`;
+        //
+        // Le nom est ASSAINI pour la clé, jamais pour l'affichage. Supabase
+        // refuse les caractères non-ASCII : un tiret cadratin, une apostrophe
+        // typographique ou un accent suffisaient à faire échouer le dépôt sur
+        // « Invalid key », sans dire lequel. Le nom d'origine part intact dans
+        // `documents.name` juste en dessous.
+        const key = `${orgId}/${dealId}/${crypto.randomUUID()}/${cleStockage(file.name)}`;
 
         const { error: upErr } = await supabase.storage
           .from("documents")

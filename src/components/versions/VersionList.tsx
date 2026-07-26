@@ -11,6 +11,7 @@ import { Chip } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
 import { PlainError } from "@/components/auth/FormError";
 import { cn } from "@/lib/cn";
+import { cleStockage } from "@/lib/storage-key";
 
 export interface VersionRow {
   id: string;
@@ -63,7 +64,9 @@ export function VersionList({
 
     const file = files[0];
     const supabase = createClient();
-    const key = `${orgId}/${dealId}/${crypto.randomUUID()}/${file.name}`;
+    // Même assainissement que le dépôt initial : Supabase refuse les
+    // caractères non-ASCII dans une clé. Le nom lisible reste en base.
+    const key = `${orgId}/${dealId}/${crypto.randomUUID()}/${cleStockage(file.name)}`;
 
     const { error: upErr } = await supabase.storage
       .from("documents")
