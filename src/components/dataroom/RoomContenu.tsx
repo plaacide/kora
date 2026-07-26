@@ -5,7 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { folderIndex } from "@/lib/folder-index";
 import { createFolder } from "@/app/actions/deals";
-import { setDocumentKey, renameFolder, deleteFolder } from "@/app/actions/crud";
+import { setDocumentKey, renameFolder, deleteFolder, folderDeleteImpact, type ImpactSuppression } from "@/app/actions/crud";
 import { Modal } from "@/components/ui/Modal";
 import { Uploader } from "./Uploader";
 import { DocViewerModal } from "@/components/viewer/DocViewerModal";
@@ -61,6 +61,10 @@ export function RoomContenu({
   // l'écran réellement affiché.
   const [renomme, setRenomme] = useState<{ id: string; nom: string } | null>(null);
   const [supprime, setSupprime] = useState<{ id: string; nom: string } | null>(null);
+  // `undefined` = on charge, `null` = échec de lecture. Distinguer les deux
+  // évite d'afficher « 0 document » pendant que le compte arrive : ce serait
+  // un chiffre faux au moment précis où l'utilisateur décide.
+  const [impact, setImpact] = useState<ImpactSuppression | null | undefined>(undefined);
   const [erreur, setErreur] = useState<string | undefined>();
 
   const byId = useMemo(() => new Map(folders.map((f) => [f.id, f])), [folders]);
@@ -121,11 +125,20 @@ export function RoomContenu({
     router.refresh();
   }
 
+  async function ouvrirSuppression(id: string, nom: string) {
+    setSupprime({ id, nom });
+    setImpact(undefined);
+    setErreur(undefined);
+    setImpact(await folderDeleteImpact(id));
+  }
+
   async function confirmerSuppression() {
     if (!supprime) return;
     setBusy(true);
     setErreur(undefined);
-    const res = await deleteFolder(supprime.id);
+    // Cascade explicite : la fonction refuse par défaut un dossier non vide.
+    // On ne l'autorise qu'ici, après avoir montré ce qu'elle emporte.
+    const res = await deleteFolder(supprime.id, true);
     setBusy(false);
     if (!res.ok) return setErreur(res.error);
     // On remonte d'un cran : rester dans un dossier qui n'existe plus
@@ -291,7 +304,7 @@ export function RoomContenu({
                 </svg>
               </button>
               <button
-                onClick={() => setSupprime({ id: f.id, nom: f.name })}
+                onClick={() => void ouvrirSuppression(f.id, f.name)}
                 title={t("delete")}
                 aria-label={`${t("delete")} — ${f.name}`}
                 className="grid place-items-center w-6 h-6 rounded-[4px] text-[#9DA0A8] hover:text-[#C0392B] hover:bg-[#FBE6E0]"
@@ -387,14 +400,58 @@ export function RoomContenu({
           qu'un dossier emporte tout son contenu. */}
       <Modal open={!!supprime} onClose={() => { setSupprime(null); setErreur(undefined); }} title={t("deleteFolderTitle")}>
         <div className="px-6 py-5">
-          <p className="text-[13px] text-[#33353B] leading-relaxed">
-            {t("deleteFolderBody", { nom: supprime?.nom ?? "" })}
-          </p>
+          {/* Le vide et le plein ne posent pas la même question. Un dossier
+              vide n'a pas besoin d'un inventaire ; un dossier plein ne doit
+              PAS être effacé sur un « êtes-vous sûr » qui ne dit rien. */}
+          {impact === undefined ? (
+            <p className="text-[13px] text-[#9DA0A8]">{t("deleting")}</p>
+          ) : impact && (impact.documents > 0 || impact.sousDossiers > 0) ? (
+            <>
+              <p className="text-[13px] text-[#33353B] leading-relaxed">
+                {t("deleteFolderBody", { nom: supprime?.nom ?? "" })}
+              </p>
+
+              <div className="mt-3.5 rounded-[6px] border border-[#E4E2DC] bg-[#FAF8F4] px-4 py-3">
+                <div style={mono} className="text-[9px] font-[600] tracking-[0.08em] text-[#8B8FA3] uppercase">
+                  {t("deleteImpactTitle")}
+                </div>
+                <ul className="mt-2 flex flex-col gap-1 text-[12.5px] text-[#33353B]">
+                  {impact.sousDossiers > 0 && <li>{t("impactSubfolders", { n: impact.sousDossiers })}</li>}
+                  {impact.documents > 0 && <li>{t("impactDocuments", { n: impact.documents })}</li>}
+                  {impact.accesPerdus > 0 && <li>{t("impactAccess", { n: impact.accesPerdus })}</li>}
+                </ul>
+              </div>
+
+              {/* La due diligence à part, et en clair : c'est LA crainte
+                  légitime, et la réponse est rassurante — rien n'est détruit,
+                  seules des preuves redeviennent à fournir. */}
+              <div className="mt-2.5 rounded-[6px] border border-[#E2DED4] bg-white px-4 py-3">
+                <div style={mono} className="text-[9px] font-[600] tracking-[0.08em] text-[#8B8FA3] uppercase">
+                  {t("impactChecklistTitle")}
+                </div>
+                <ul className="mt-2 flex flex-col gap-1 text-[12.5px] text-[#33353B]">
+                  {impact.exigencesLiees === 0 && impact.exigencesARefaire === 0 && (
+                    <li className="text-[#6E727A]">{t("impactChecklistNone")}</li>
+                  )}
+                  {impact.exigencesLiees > 0 && <li>{t("impactChecklistKept", { n: impact.exigencesLiees })}</li>}
+                  {impact.exigencesARefaire > 0 && (
+                    <li className="text-[#C24619]">{t("impactChecklistRedo", { n: impact.exigencesARefaire })}</li>
+                  )}
+                </ul>
+              </div>
+
+              <p className="text-[12px] text-[#8B8FA3] mt-3">{t("deleteIrreversible")}</p>
+            </>
+          ) : (
+            <p className="text-[13px] text-[#33353B] leading-relaxed">
+              {t("deleteFolderEmpty", { nom: supprime?.nom ?? "" })}
+            </p>
+          )}
           {erreur && <p className="text-[12px] text-[#A32D2D] mt-2">{erreur}</p>}
         </div>
         <div className="px-6 py-4 border-t border-[#E8E5DC] flex justify-end gap-2.5">
           <button onClick={() => { setSupprime(null); setErreur(undefined); }} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAF8F4]">{t("cancel")}</button>
-          <button onClick={confirmerSuppression} disabled={busy} className="rounded-[5px] bg-[#C0392B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#A32D2D] disabled:opacity-50">{t("confirmDelete")}</button>
+          <button onClick={confirmerSuppression} disabled={busy || impact === undefined} className="rounded-[5px] bg-[#C0392B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#A32D2D] disabled:opacity-50">{t("confirmDelete")}</button>
         </div>
       </Modal>
     </div>

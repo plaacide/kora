@@ -662,7 +662,18 @@
       "deleteFolderBody": "“{nom}” and everything inside it will be deleted. This cannot be undone.",
       "confirmDelete": "Delete permanently",
       "save": "Save",
-      "folderActions": "Folder actions"
+      "folderActions": "Folder actions",
+      "deleteFolderEmpty": "“{nom}” will be deleted. This cannot be undone.",
+      "deleteImpactTitle": "What the deletion takes with it",
+      "impactSubfolders": "{n, plural, =1 {1 subfolder} other {# subfolders}}",
+      "impactDocuments": "{n, plural, =1 {1 document} other {# documents}}",
+      "impactAccess": "{n, plural, =1 {1 guest access} other {# guest accesses}}",
+      "impactChecklistTitle": "Your due diligence",
+      "impactChecklistKept": "{n, plural, =1 {1 requirement loses its folder link but stays in your checklist} other {# requirements lose their folder link but stay in your checklist}}",
+      "impactChecklistRedo": "{n, plural, =1 {1 requirement goes back to “to provide”: its only proof is here} other {# requirements go back to “to provide”: their only proofs are here}}",
+      "impactChecklistNone": "No requirement is affected.",
+      "deleteIrreversible": "This cannot be undone.",
+      "deleting": "Deleting…"
     },
     "shareModal": {
       "title": "Share the data room",

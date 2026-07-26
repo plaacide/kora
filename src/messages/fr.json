@@ -662,7 +662,18 @@
       "deleteFolderBody": "« {nom} » et tout ce qu'il contient seront supprimés. Cette action est définitive.",
       "confirmDelete": "Supprimer définitivement",
       "save": "Enregistrer",
-      "folderActions": "Actions du dossier"
+      "folderActions": "Actions du dossier",
+      "deleteFolderEmpty": "« {nom} » sera supprimé. Cette action est définitive.",
+      "deleteImpactTitle": "Ce que la suppression emporte",
+      "impactSubfolders": "{n, plural, =1 {1 sous-dossier} other {# sous-dossiers}}",
+      "impactDocuments": "{n, plural, =1 {1 document} other {# documents}}",
+      "impactAccess": "{n, plural, =1 {1 accès invité} other {# accès invités}}",
+      "impactChecklistTitle": "Votre due diligence",
+      "impactChecklistKept": "{n, plural, =1 {1 exigence perd son dossier de rattachement, mais reste dans votre checklist} other {# exigences perdent leur dossier de rattachement, mais restent dans votre checklist}}",
+      "impactChecklistRedo": "{n, plural, =1 {1 exigence repassera « à fournir » : sa seule preuve est ici} other {# exigences repasseront « à fournir » : leurs seules preuves sont ici}}",
+      "impactChecklistNone": "Aucune exigence n'est affectée.",
+      "deleteIrreversible": "Cette action est définitive.",
+      "deleting": "Suppression…"
     },
     "shareModal": {
       "title": "Partager la data room",

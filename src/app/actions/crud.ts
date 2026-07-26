@@ -103,9 +103,46 @@ export async function renameFolder(
   return { ok: true };
 }
 
-export async function deleteFolder(folderId: string): Promise<Result> {
+export interface ImpactSuppression {
+  sousDossiers: number;
+  documents: number;
+  exigencesLiees: number;
+  exigencesARefaire: number;
+  accesPerdus: number;
+}
+
+/**
+ * Ce que la suppression emporterait. Lu AVANT de confirmer, pour que la
+ * question nomme des nombres au lieu de demander « êtes-vous sûr ».
+ */
+export async function folderDeleteImpact(
+  folderId: string,
+): Promise<ImpactSuppression | null> {
   const supabase = await createClient();
-  const { error } = await supabase.rpc("delete_folder", { p_folder: folderId });
+  const { data, error } = await supabase.rpc("folder_delete_impact", {
+    p_folder: folderId,
+  });
+  if (error) return null;
+  const r = (data as unknown as Array<Record<string, number>> | null)?.[0];
+  if (!r) return null;
+  return {
+    sousDossiers: r.sous_dossiers ?? 0,
+    documents: r.documents ?? 0,
+    exigencesLiees: r.exigences_liees ?? 0,
+    exigencesARefaire: r.exigences_a_refaire ?? 0,
+    accesPerdus: r.acces_perdus ?? 0,
+  };
+}
+
+export async function deleteFolder(
+  folderId: string,
+  cascade = false,
+): Promise<Result> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_folder", {
+    p_folder: folderId,
+    p_cascade: cascade,
+  });
   if (error) return { ok: false, error: error.message };
   refresh();
   return { ok: true };
