@@ -57,6 +57,58 @@ export async function saveStartup(input: {
   return { ok: true };
 }
 
+/**
+ * Programme — étape 03 : structure. Crée l'organisation au premier appel,
+ * la met à jour aux suivants. N'achève PAS l'onboarding (cf. migration) :
+ * un abandon après cette étape ne perd rien, et le rechargement reprend ici.
+ */
+export async function saveProgramme(input: {
+  name: string;
+  type?: string;
+  country?: string;
+  website?: string;
+  volume?: number | null;
+}): Promise<Result> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("save_programme", {
+    p_name: input.name,
+    p_type: input.type ?? null,
+    p_country: input.country ?? null,
+    p_website: input.website ?? null,
+    p_volume: input.volume ?? null,
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+/** Programme — étape 04 : première cohorte. Renvoie son id pour l'étape 05. */
+export async function createFirstCohort(input: {
+  name: string;
+  seats?: number | null;
+  startsOn?: string | null;
+  endsOn?: string | null;
+  goal?: string;
+}): Promise<Result & { cohortId?: string }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("create_cohort", {
+    p_name: input.name,
+    p_seats: input.seats ?? null,
+    p_starts_on: input.startsOn ?? null,
+    p_ends_on: input.endsOn ?? null,
+    p_goal: input.goal ?? null,
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, cohortId: (data as { id: string } | null)?.id };
+}
+
+/** Programme — étape 06 : bienvenue. Marque l'onboarding fini, puis /bienvenue. */
+export async function finishProgrammeOnboarding(): Promise<Result> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("finish_programme_onboarding", {});
+  if (error) return { ok: false, error: error.message };
+  redirect("/bienvenue");
+}
+
 /** Termine : crée l'espace de travail + marque onboardé, puis /bienvenue. */
 /**
  * Termine l'inscription. `createRoom` décide si la data room (et la levée) est
