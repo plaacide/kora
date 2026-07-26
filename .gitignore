@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Worktrees git créés par l'outillage : une copie complète du dépôt.
+# Les suivre ferait un dépôt imbriqué, et doublerait tout parcours de src/.
+.claude/worktrees/
