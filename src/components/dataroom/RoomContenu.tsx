@@ -5,7 +5,16 @@ import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { folderIndex } from "@/lib/folder-index";
 import { createFolder } from "@/app/actions/deals";
-import { setDocumentKey, renameFolder, deleteFolder, folderDeleteImpact, type ImpactSuppression } from "@/app/actions/crud";
+import {
+  setDocumentKey,
+  renameFolder,
+  deleteFolder,
+  deleteDocument,
+  folderDeleteImpact,
+  documentDeleteImpact,
+  type ImpactSuppression,
+  type ImpactDocument,
+} from "@/app/actions/crud";
 import { Modal } from "@/components/ui/Modal";
 import { Uploader } from "./Uploader";
 import { DocViewerModal } from "@/components/viewer/DocViewerModal";
@@ -65,6 +74,10 @@ export function RoomContenu({
   // évite d'afficher « 0 document » pendant que le compte arrive : ce serait
   // un chiffre faux au moment précis où l'utilisateur décide.
   const [impact, setImpact] = useState<ImpactSuppression | null | undefined>(undefined);
+  // Supprimer un DOCUMENT était, comme renommer un dossier, resté dans le
+  // composant orphelin : l'action existait, l'écran ne l'appelait pas.
+  const [supprimeDoc, setSupprimeDoc] = useState<{ id: string; nom: string } | null>(null);
+  const [impactDoc, setImpactDoc] = useState<ImpactDocument | null | undefined>(undefined);
   const [erreur, setErreur] = useState<string | undefined>();
 
   const byId = useMemo(() => new Map(folders.map((f) => [f.id, f])), [folders]);
@@ -148,6 +161,24 @@ export function RoomContenu({
     router.refresh();
   }
 
+  async function ouvrirSuppressionDoc(id: string, nom: string) {
+    setSupprimeDoc({ id, nom });
+    setImpactDoc(undefined);
+    setErreur(undefined);
+    setImpactDoc(await documentDeleteImpact(id));
+  }
+
+  async function confirmerSuppressionDoc() {
+    if (!supprimeDoc) return;
+    setBusy(true);
+    setErreur(undefined);
+    const res = await deleteDocument(supprimeDoc.id);
+    setBusy(false);
+    if (!res.ok) return setErreur(res.error);
+    setSupprimeDoc(null);
+    router.refresh();
+  }
+
   async function ajouterDossier() {
     if (nom.trim().length < 2) return;
     setBusy(true);
@@ -214,7 +245,7 @@ export function RoomContenu({
       )}
 
       {/* En-tête de table */}
-      <div style={mono} className="bg-white grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 px-2 pt-3 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
+      <div style={mono} className="bg-white grid grid-cols-[44px_1fr_90px_120px_72px] gap-3 px-2 pt-3 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB] items-center">
         <span>{t("colIndex")}</span><span>{t("colName")}</span><span>{t("colType")}</span><span>{t("colUpdated")}</span><span className="text-center">{t("colKey")}</span>
       </div>
 
@@ -265,7 +296,7 @@ export function RoomContenu({
       {sousDossiers.map((f) => (
         <div
           key={f.id}
-          className="group bg-white grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4]"
+          className="group bg-white grid grid-cols-[44px_1fr_90px_120px_72px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4]"
         >
           <span style={mono} className="text-[11px] text-[#9DA0A8]">{folderIndex(f.index_path)}</span>
           <button onClick={() => setCourant(f.id)} className="flex items-center gap-[11px] min-w-0 text-left w-full">
@@ -324,7 +355,7 @@ export function RoomContenu({
       {fichiers.map((d) => {
         const b = badge(d.name);
         return (
-          <div key={d.id} className="bg-white grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4]">
+          <div key={d.id} className="group bg-white grid grid-cols-[44px_1fr_90px_120px_72px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4]">
             <span style={mono} className="text-[11px] text-[#9DA0A8]">{folderIndex(d.index_path)}</span>
             {/* Ouvre EN PLACE : consulter trois pièces d'affilée ne fait plus
                 trois allers-retours, et le dossier reste sous les yeux. Un
@@ -344,16 +375,31 @@ export function RoomContenu({
             <span className="text-[12px] text-[#6E727A]">{b.t}</span>
             <span className="text-[12px] text-[#9DA0A8]">{d.modified ?? "—"}</span>
             {canEdit ? (
-              <button
-                onClick={() => basculerCle(d.id, !!d.is_key)}
-                title={d.is_key ? t("unmarkKey") : t("markKey")}
-                aria-label={t("keyDocument")}
-                className="justify-self-center"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill={d.is_key ? "#E8A33D" : "none"} stroke={d.is_key ? "#E8A33D" : "#C7C9CF"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
-                </svg>
-              </button>
+              <span className="flex items-center gap-1 justify-self-center">
+                <button
+                  onClick={() => basculerCle(d.id, !!d.is_key)}
+                  title={d.is_key ? t("unmarkKey") : t("markKey")}
+                  aria-label={t("keyDocument")}
+                  className="grid place-items-center w-6 h-6 rounded-[4px]"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={d.is_key ? "#E8A33D" : "none"} stroke={d.is_key ? "#E8A33D" : "#C7C9CF"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
+                  </svg>
+                </button>
+                {/* Supprimer un document : l'action existait depuis toujours,
+                    mais seul l'écran orphelin l'appelait. Révélée au survol et
+                    au focus, comme pour les dossiers. */}
+                <button
+                  onClick={() => void ouvrirSuppressionDoc(d.id, d.name)}
+                  title={t("delete")}
+                  aria-label={`${t("delete")} — ${d.name}`}
+                  className="grid place-items-center w-6 h-6 rounded-[4px] text-[#C7C9CF] hover:text-[#C0392B] hover:bg-[#FBE6E0] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                  </svg>
+                </button>
+              </span>
             ) : (
               d.is_key ? (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#E8A33D" stroke="#E8A33D" strokeWidth="1.7" className="justify-self-center"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" /></svg>
@@ -393,6 +439,46 @@ export function RoomContenu({
         <div className="px-6 py-4 border-t border-[#E8E5DC] flex justify-end gap-2.5">
           <button onClick={() => { setRenomme(null); setErreur(undefined); }} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAF8F4]">{t("cancel")}</button>
           <button onClick={confirmerRenommage} disabled={busy || (renomme?.nom.trim().length ?? 0) < 2} className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-50">{t("save")}</button>
+        </div>
+      </Modal>
+
+      {/* Supprimer un DOCUMENT. Même principe que pour un dossier : ce qui
+          compte n'est pas le fichier, c'est ce qu'il prouve. Une pièce peut
+          être la seule preuve d'une exigence de due diligence — l'effacer la
+          fait retomber « à fournir », deux écrans plus loin. */}
+      <Modal
+        open={!!supprimeDoc}
+        onClose={() => { setSupprimeDoc(null); setErreur(undefined); }}
+        title={t("deleteDoc")}
+      >
+        <div className="px-6 py-5">
+          <p className="text-[13px] text-[#33353B] leading-relaxed">
+            {t("deleteDocBody", { nom: supprimeDoc?.nom ?? "" })}
+          </p>
+          {impactDoc === undefined ? (
+            <p className="text-[12.5px] text-[#9DA0A8] mt-3">{t("deleting")}</p>
+          ) : impactDoc && impactDoc.exigencesLiees > 0 ? (
+            <div className="mt-3.5 rounded-[6px] border border-[#E2DED4] bg-white px-4 py-3">
+              <div style={mono} className="text-[9px] font-[600] tracking-[0.08em] text-[#8B8FA3] uppercase">
+                {t("impactChecklistTitle")}
+              </div>
+              <ul className="mt-2 flex flex-col gap-1 text-[12.5px] text-[#33353B]">
+                <li>{t("impactDocProof", { n: impactDoc.exigencesLiees })}</li>
+                {impactDoc.exigencesARefaire > 0 && (
+                  <li className="text-[#C24619]">
+                    {t("impactDocRedo", { n: impactDoc.exigencesARefaire })}
+                  </li>
+                )}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-[12.5px] text-[#6E727A] mt-3">{t("impactDocNone")}</p>
+          )}
+          {erreur && <p className="text-[12px] text-[#A32D2D] mt-2">{erreur}</p>}
+        </div>
+        <div className="px-6 py-4 border-t border-[#E8E5DC] flex justify-end gap-2.5">
+          <button onClick={() => { setSupprimeDoc(null); setErreur(undefined); }} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAF8F4]">{t("cancel")}</button>
+          <button onClick={confirmerSuppressionDoc} disabled={busy || impactDoc === undefined} className="rounded-[5px] bg-[#C0392B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#A32D2D] disabled:opacity-50">{t("confirmDelete")}</button>
         </div>
       </Modal>
 

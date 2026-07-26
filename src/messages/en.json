@@ -673,7 +673,12 @@
       "impactChecklistRedo": "{n, plural, =1 {1 requirement goes back to “to provide”: its only proof is here} other {# requirements go back to “to provide”: their only proofs are here}}",
       "impactChecklistNone": "No requirement is affected.",
       "deleteIrreversible": "This cannot be undone.",
-      "deleting": "Deleting…"
+      "deleting": "Deleting…",
+      "deleteDoc": "Delete document",
+      "deleteDocBody": "“{nom}” will be removed from the data room. This cannot be undone.",
+      "impactDocProof": "{n, plural, =1 {This document is proof for 1 requirement} other {This document is proof for # requirements}}",
+      "impactDocRedo": "{n, plural, =1 {1 of them goes back to “to provide”: this is its only proof} other {# of them go back to “to provide”: this is their only proof}}",
+      "impactDocNone": "This document is not proof for any requirement."
     },
     "shareModal": {
       "title": "Share the data room",

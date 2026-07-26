@@ -673,7 +673,12 @@
       "impactChecklistRedo": "{n, plural, =1 {1 exigence repassera « à fournir » : sa seule preuve est ici} other {# exigences repasseront « à fournir » : leurs seules preuves sont ici}}",
       "impactChecklistNone": "Aucune exigence n'est affectée.",
       "deleteIrreversible": "Cette action est définitive.",
-      "deleting": "Suppression…"
+      "deleting": "Suppression…",
+      "deleteDoc": "Supprimer le document",
+      "deleteDocBody": "« {nom} » sera supprimé de la data room. Cette action est définitive.",
+      "impactDocProof": "{n, plural, =1 {Ce document sert de preuve à 1 exigence} other {Ce document sert de preuve à # exigences}}",
+      "impactDocRedo": "{n, plural, =1 {1 d'entre elles repassera « à fournir » : c'est sa seule preuve} other {# d'entre elles repasseront « à fournir » : c'est leur seule preuve}}",
+      "impactDocNone": "Ce document n'est la preuve d'aucune exigence."
     },
     "shareModal": {
       "title": "Partager la data room",

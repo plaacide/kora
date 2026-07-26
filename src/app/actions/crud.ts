@@ -187,6 +187,28 @@ export async function moveDocument(
  * avec la clé privilégiée. Si la purge échoue, la base reste cohérente et
  * il ne reste qu'un objet orphelin, jamais l'inverse.
  */
+export interface ImpactDocument {
+  exigencesLiees: number;
+  exigencesARefaire: number;
+}
+
+/** Ce que la suppression d'un document ferait à la due diligence. */
+export async function documentDeleteImpact(
+  docId: string,
+): Promise<ImpactDocument | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("document_delete_impact", {
+    p_doc: docId,
+  });
+  if (error) return null;
+  const r = (data as unknown as Array<Record<string, number>> | null)?.[0];
+  if (!r) return null;
+  return {
+    exigencesLiees: r.exigences_liees ?? 0,
+    exigencesARefaire: r.exigences_a_refaire ?? 0,
+  };
+}
+
 export async function deleteDocument(docId: string): Promise<Result> {
   const supabase = await createClient();
 
