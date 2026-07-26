@@ -248,7 +248,13 @@
       "q3_2026": "Q3 2026",
       "q4_2026": "Q4 2026",
       "q1_2027": "Q1 2027",
-      "later": "Plus tard"
+      "later": "Plus tard",
+      "roomWhen": "Votre data room",
+      "roomNow": "La créer maintenant",
+      "roomNowSub": "L'arborescence OHADA/UEMOA est posée pour vous, vous déposez tout de suite.",
+      "roomLater": "Plus tard",
+      "roomLaterSub": "Vous la créerez depuis votre accueil, avec le nom et le modèle de votre choix.",
+      "objectifOptional": "Modifiable à tout moment depuis votre data room."
     },
     "investor": {
       "stepProfileTitle": "Votre profil",

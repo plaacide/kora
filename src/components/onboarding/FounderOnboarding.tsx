@@ -74,6 +74,9 @@ export function FounderOnboarding() {
   const [amount, setAmount] = useState("");
   const [arr, setArr] = useState("");
   const [horizon, setHorizon] = useState<string[]>([]);
+  // La data room n'est plus créée d'office : le fondateur décide. À « plus
+  // tard », il la crée depuis son accueil, avec le nom et le modèle qu'il veut.
+  const [creerSalle, setCreerSalle] = useState(true);
   const [error, setError] = useState<string | undefined>();
   const [pending, start] = useTransition();
 
@@ -109,7 +112,7 @@ export function FounderOnboarding() {
       setError(undefined);
       // Diligence : pas d'écran « levée », on termine directement.
       if (objectif === "diligence") {
-        await completeOnboarding(name.trim() || t("defaultWorkspace"));
+        await completeOnboarding(name.trim() || t("defaultWorkspace"), creerSalle);
         return;
       }
       setStep(2);
@@ -124,7 +127,7 @@ export function FounderOnboarding() {
         horizon: horizon[0],
       });
       if (!res.ok) return setError(res.error);
-      await completeOnboarding(name.trim() || t("defaultWorkspace"));
+      await completeOnboarding(name.trim() || t("defaultWorkspace"), creerSalle);
     });
   }
 
@@ -150,6 +153,7 @@ export function FounderOnboarding() {
         {/* Objectif de la data room : pilote l'écran et les données collectées. */}
         <div className="mt-6">
           <label className="text-[11.5px] font-medium text-ink-secondary">{t("whyRoom")}</label>
+          <p className="text-[11px] text-ink-muted mt-0.5">{t("objectifOptional")}</p>
           <div className="mt-2 grid grid-cols-2 gap-3">
             {OBJECTIFS.map((o) => {
               const actif = objectif === o.key;
@@ -206,8 +210,42 @@ export function FounderOnboarding() {
           />
         </div>
 
+        {/* Quand créer la data room. L'inscription la créait AUTOMATIQUEMENT,
+            ce qui rendait inatteignable l'accueil « Créez votre data room » —
+            l'application annonçait alors une étape déjà faite. Le fondateur
+            tranche lui-même. */}
+        <div className="mt-6">
+          <label className="text-[11.5px] font-medium text-ink-secondary">{t("roomWhen")}</label>
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            {[
+              { v: true, titre: t("roomNow"), sous: t("roomNowSub") },
+              { v: false, titre: t("roomLater"), sous: t("roomLaterSub") },
+            ].map((o) => {
+              const actif = creerSalle === o.v;
+              return (
+                <button
+                  key={String(o.v)}
+                  type="button"
+                  onClick={() => setCreerSalle(o.v)}
+                  aria-pressed={actif}
+                  className={cn(
+                    "text-left rounded-[10px] border p-3 transition-colors",
+                    actif ? "border-accent bg-accent/5 ring-1 ring-accent" : "border-line bg-surface hover:border-ink-muted",
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] font-[650] text-ink">{o.titre}</span>
+                    <span className={cn("w-3.5 h-3.5 rounded-full border flex-none", actif ? "border-accent bg-accent" : "border-line")} />
+                  </div>
+                  <p className="text-[11px] text-ink-muted mt-1 leading-snug">{o.sous}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="mt-8 pt-6 border-t border-[#F0EDE4] flex justify-end">
-          <Button variant="primary" onClick={next1} loading={pending} disabled={name.trim().length < 2 || !objectif}>
+          <Button variant="primary" onClick={next1} loading={pending} disabled={name.trim().length < 2}>
             {objectif === "diligence" ? t("finish") : `${t("continue")} \u2192`}
           </Button>
         </div>

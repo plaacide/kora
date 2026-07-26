@@ -58,10 +58,20 @@ export async function saveStartup(input: {
 }
 
 /** Termine : crée l'espace de travail + marque onboardé, puis /bienvenue. */
-export async function completeOnboarding(orgName: string): Promise<Result> {
+/**
+ * Termine l'inscription. `createRoom` décide si la data room (et la levée) est
+ * créée dans la foulée : c'est un choix du fondateur, plus un automatisme.
+ * À false, il arrive sur « PREMIER PAS · Créez votre data room » et choisit
+ * lui-même le nom et le modèle de dossiers.
+ */
+export async function completeOnboarding(
+  orgName: string,
+  createRoom = true,
+): Promise<Result> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("complete_onboarding", {
     p_org_name: orgName,
+    p_create_room: createRoom,
   });
   if (error) return { ok: false, error: error.message };
   redirect("/bienvenue");

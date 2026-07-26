@@ -248,7 +248,13 @@
       "q3_2026": "Q3 2026",
       "q4_2026": "Q4 2026",
       "q1_2027": "Q1 2027",
-      "later": "Later"
+      "later": "Later",
+      "roomWhen": "Your data room",
+      "roomNow": "Create it now",
+      "roomNowSub": "The OHADA/WAEMU folder tree is laid out for you, you can upload right away.",
+      "roomLater": "Later",
+      "roomLaterSub": "You will create it from your home screen, with the name and template you choose.",
+      "objectifOptional": "Changeable at any time from your data room."
     },
     "investor": {
       "stepProfileTitle": "Your profile",
