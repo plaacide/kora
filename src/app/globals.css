@@ -386,3 +386,21 @@
     animation: none;
   }
 }
+
+/* ── Enquête produit : entrée du carton (handoff §3) ────────────────────
+   La SEULE animation du carton. Il monte de 14 px en se révélant ; tout le
+   reste — changement d'écran, sélection — est instantané. Un panneau qui
+   s'anime à chaque étape donne l'impression d'attendre. */
+@keyframes szrise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sz-enquete {
+  animation: szrise 0.34s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Mouvement réduit : rien à ajouter ici. La règle globale plus haut ramène
+   déjà toute animation à 0,001 ms — plus strict que ce que demande le
+   handoff (« pas de translation »), et déjà la politique du projet. Une
+   seconde règle ici ferait deux vérités pour un seul comportement. */
