@@ -15,6 +15,7 @@ import { NewDealButton } from "@/components/dataroom/NewDealButton";
 import { NewDataRoomButton } from "@/components/dataroom/RoomsList";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { DemoVideoButton } from "@/components/dashboard/DemoVideoButton";
+import { demoVideoPath, demoPosterPath } from "@/lib/demo-video";
 import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 import { formatAmount, formatDate } from "@/lib/format";
 import type { Locale } from "@/i18n/locales";
@@ -82,8 +83,10 @@ export default async function DashboardPage() {
     // UNE seule chose à faire, en grand, sur fond Encre — et en dessous le
     // chemin complet, pour qu'il sache où il met les pieds. Les étapes 2 et 3
     // sont atténuées : elles se décrivent, elles ne s'actionnent pas encore.
-    // Vidéo de démonstration : absente tant qu'aucun fichier n'est configuré.
-    const demoVideo = process.env.NEXT_PUBLIC_DEMO_VIDEO;
+    // Vidéo de démonstration : le fichier est vérifié sur le disque. Sans lui,
+    // le bloc n'est pas rendu — un bouton qui ouvrirait un 404 est pire qu'un
+    // bouton absent.
+    const demoVideo = demoVideoPath();
     const etapes = [
       { n: 1, titre: t("stepRoom"), corps: t("stepRoomBody") },
       { n: 2, titre: t("stepUpload"), corps: t("stepUploadBody") },
@@ -152,7 +155,7 @@ export default async function DashboardPage() {
             </div>
             <DemoVideoButton
               src={demoVideo}
-              poster={process.env.NEXT_PUBLIC_DEMO_POSTER}
+              poster={demoPosterPath()}
               className="shrink-0 border border-[#E4E2DC] bg-white rounded-[6px] px-5 py-3 text-[13.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]"
             />
           </div>
