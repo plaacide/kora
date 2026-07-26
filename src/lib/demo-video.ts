@@ -18,9 +18,18 @@ import { join } from "node:path";
  */
 const CANDIDATS = ["demo.mp4", "demo-sanza.mp4", "demo.webm"] as const;
 
+/** Le chemin désigne-t-il un fichier réellement présent dans `public/` ? */
+function servi(chemin: string): boolean {
+  return existsSync(join(process.cwd(), "public", chemin.replace(/^\//, "")));
+}
+
 export function demoVideoPath(): string | null {
+  // La variable est une PRÉFÉRENCE, pas une vérité. Elle était crue sur
+  // parole : une valeur pointant un fichier absent affichait donc le bloc et
+  // ouvrait un lecteur qui cherchait un 404 — noir, sans fin, sans message.
+  // C'est exactement le défaut que ce module existe pour empêcher.
   const explicite = process.env.NEXT_PUBLIC_DEMO_VIDEO;
-  if (explicite) return explicite;
+  if (explicite && servi(explicite)) return explicite;
 
   for (const nom of CANDIDATS) {
     if (existsSync(join(process.cwd(), "public", nom))) return `/${nom}`;
@@ -30,8 +39,10 @@ export function demoVideoPath(): string | null {
 
 /** Vignette optionnelle, affichée avant la lecture. Même logique. */
 export function demoPosterPath(): string | undefined {
+  // Même règle que pour la vidéo : une variable qui désigne un fichier absent
+  // est ignorée, pas suivie.
   const explicite = process.env.NEXT_PUBLIC_DEMO_POSTER;
-  if (explicite) return explicite;
+  if (explicite && servi(explicite)) return explicite;
 
   for (const nom of ["demo.jpg", "demo.png", "demo-poster.jpg"]) {
     if (existsSync(join(process.cwd(), "public", nom))) return `/${nom}`;
