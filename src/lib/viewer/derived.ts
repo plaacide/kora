@@ -47,6 +47,15 @@ export function sheetKey(versionId: string): string {
  * filigranée porte l'e-mail du lecteur et la date, elle est propre à une
  * consultation et ne doit jamais être réutilisée pour quelqu'un d'autre.
  */
+/**
+ * Échelles de rendu autorisées. Elles vivent ICI parce qu'elles entrent dans
+ * la clé de cache : définies à deux endroits, un écart d'une décimale créerait
+ * deux caches distincts sans que rien ne le signale — le préchauffage
+ * remplirait l'un et la lecture chercherait dans l'autre.
+ */
+export const SCALE_FULL = 1.6;
+export const SCALE_THUMB = 0.22;
+
 export function pageKey(versionId: string, page: number, scale: number): string {
   return `${base(versionId)}/p${page}@${scale}.png`;
 }

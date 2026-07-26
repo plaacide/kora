@@ -1,6 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { prechaufferVersion } from "@/lib/viewer/precompute";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import * as z from "zod";
 
@@ -103,6 +106,25 @@ export async function registerDocument(input: {
   });
 
   if (error) return { ok: false, error: error.message };
+
+  // Préchauffage APRÈS la réponse : le dépôt ne doit pas attendre un rendu PDF
+  // ni une conversion LibreOffice. `after` de Next est fait pour ça — le
+  // travail s'exécute une fois la réponse partie, sans bloquer le fondateur.
+  //
+  // C'est le bon moment, et le seul : ici c'est le FONDATEUR qui agit sur SON
+  // dossier, donc rien à inscrire au journal de lecture. Précharger côté
+  // lecteur aurait fabriqué des consultations fictives.
+  after(async () => {
+    // Client ADMIN, pas celui de la requête : `after` s'exécute une fois la
+    // réponse partie, le contexte de cookies n'est alors plus garanti. Les
+    // droits ont déjà été vérifiés par la RPC juste au-dessus.
+    const { data: v } = await createAdminClient()
+      .from("document_versions")
+      .select("id")
+      .eq("storage_key", input.storageKey)
+      .maybeSingle();
+    if (v?.id) await prechaufferVersion(v.id as string);
+  });
 
   revalidatePath("/data-room");
   return { ok: true };

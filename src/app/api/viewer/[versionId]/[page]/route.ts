@@ -12,15 +12,10 @@ import {
   pdfKey,
   pageKey,
   metaKey,
+  SCALE_FULL,
+  SCALE_THUMB,
 } from "@/lib/viewer/derived";
 
-/**
- * Échelles de rendu autorisées. Liste fermée volontairement : l'échelle entre
- * dans la clé de cache, et une valeur libre laisserait n'importe qui remplir
- * le stockage avec des variantes d'une même page.
- */
-const SCALE_FULL = 1.6;
-const SCALE_THUMB = 0.22;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
