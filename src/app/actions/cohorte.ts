@@ -48,7 +48,7 @@ export async function inviteToCohort(email: string): Promise<CohorteResult> {
 
   // Comme pour les invitations investisseur : un échec d'envoi n'invalide pas
   // le rattachement, qui existe en base. Le lien reste transmissible à la main.
-  revalidatePath("/cohorte");
+  revalidatePath("/cohortes");
   return {
     ok: true,
     link,
@@ -79,7 +79,7 @@ export async function revokeCohortLink(
     p_link: linkId,
   });
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/cohorte");
+  revalidatePath("/cohortes");
   revalidatePath("/portefeuille");
   return { ok: true };
 }

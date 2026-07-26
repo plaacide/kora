@@ -336,7 +336,7 @@
       "help": "Help",
       "roadmap": "Roadmap",
       "nda": "Signed agreements",
-      "cohort": "Cohort",
+      "cohort": "My cohorts",
       "contacts": "Contacts"
     },
     "founder": {
@@ -1428,5 +1428,23 @@
     "thanksTitle": "Thank you — noted.",
     "thanksBody": "We read every answer. If your remark becomes a change, you will see it in “Roadmap”.",
     "close": "Close"
+  },
+  "cohorts": {
+    "title": "My cohorts",
+    "new": "New cohort",
+    "archives": "Archives",
+    "summary": "{cohortes, plural, =1 {1 active cohort} other {# active cohorts}} · {entreprises, plural, =1 {1 company} other {# companies}} · {salles, plural, =1 {1 data room} other {# data rooms}}",
+    "running": "RUNNING",
+    "starting": "STARTING",
+    "colSought": "Sought",
+    "colReadiness": "Average readiness",
+    "colFollowUp": "To follow up",
+    "colShowcase": "In the showcase",
+    "companies": "{n, plural, =1 {1 company} other {# companies}}",
+    "rooms": "{n, plural, =1 {1 data room} other {# data rooms}}",
+    "listed": "{n} of {total}",
+    "noDates": "dates to be set",
+    "emptyTitle": "No cohort yet",
+    "emptyBody": "A cohort brings together the companies you support over a period. It decides who appears in your showcase."
   }
 }

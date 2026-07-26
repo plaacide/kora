@@ -137,7 +137,7 @@ export default async function PortefeuillePage() {
                 elle-même : vous verrez alors sa préparation, jamais ses
                 documents.
               </p>
-              <Link href="/cohorte" className="sz-cta text-[13px] px-4 py-2">
+              <Link href="/cohortes" className="sz-cta text-[13px] px-4 py-2">
                 Inviter une startup
               </Link>
             </div>

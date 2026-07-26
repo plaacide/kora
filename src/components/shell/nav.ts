@@ -52,7 +52,11 @@ const HORS_SUJET_FONDATEUR = ["/pipeline", "/readiness"];
  * a le droit de voir est plus sûr — un écran ajouté demain n'apparaîtra pas
  * chez lui par accident.
  */
-const ECRANS_PROGRAMME = ["/portefeuille", "/cohorte", "/securite", "/roadmap"];
+// Les règles §1 prévoient aussi `/dealroom` et `/rapports`. Ils ne sont PAS
+// listés ici : leurs écrans n'existent pas encore, et la règle produit du
+// dépôt interdit un lien de navigation vers une page inexistante. Ils
+// s'ajouteront avec leurs écrans.
+const ECRANS_PROGRAMME = ["/portefeuille", "/cohortes", "/securite", "/roadmap"];
 
 /**
  * Écrans devenus des ONGLETS de la data room (handoff §3b) : ils vivent dans
@@ -178,7 +182,7 @@ export const navGroups: NavGroup[] = [
     key: "cohort",
     items: [
       { key: "portfolio", href: "/portefeuille", internalOnly: true, saeOnly: true },
-      { key: "cohort", href: "/cohorte", internalOnly: true, saeOnly: true },
+      { key: "cohort", href: "/cohortes", internalOnly: true, saeOnly: true },
     ],
   },
   {

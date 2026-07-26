@@ -9,7 +9,16 @@ import { CohorteForm, type LienCohorte } from "@/components/cohorte/CohorteForm"
  * Ici on gère la relation, là-bas on la pilote. Mélanger les deux ferait un
  * écran qui répond mal à deux questions au lieu de bien à une.
  */
-export default async function CohortePage() {
+export default async function CohortePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  // L'écran `/cohorte` devient le DÉTAIL d'une cohorte (règles §1). Il listait
+  // tous les liens de l'organisation ; il ne montre plus que ceux de la
+  // cohorte demandée — sans quoi un programme à trois cohortes verrait les
+  // trois mélangées sur chacune.
+  const { id: cohorteId } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -19,6 +28,9 @@ export default async function CohortePage() {
     supabase
       .from("cohort_links")
       .select("id, email, status, created_at, organizations!cohort_links_startup_org_id_fkey(name)")
+      // Sans ce filtre, un programme à trois cohortes verrait les trois
+      // mélangées sur chacune — l'écran mentirait sur ce qu'il montre.
+      .eq("cohort_id", cohorteId)
       .order("created_at", { ascending: false }),
     // Le palier vit sur l'organisation. On lit celle du membre — l'écran est
     // réservé au programme, il n'en a qu'une.

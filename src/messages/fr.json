@@ -336,7 +336,7 @@
       "help": "Aide",
       "roadmap": "Roadmap",
       "nda": "Accords signés",
-      "cohort": "Cohorte",
+      "cohort": "Mes cohortes",
       "contacts": "Contacts"
     },
     "founder": {
@@ -1428,5 +1428,23 @@
     "thanksTitle": "Merci — c'est noté.",
     "thanksBody": "Nous lisons chaque réponse. Si votre remarque devient une modification, vous le verrez dans « Roadmap ».",
     "close": "Fermer"
+  },
+  "cohorts": {
+    "title": "Mes cohortes",
+    "new": "Nouvelle cohorte",
+    "archives": "Archives",
+    "summary": "{cohortes, plural, =1 {1 cohorte active} other {# cohortes actives}} · {entreprises, plural, =1 {1 entreprise} other {# entreprises}} · {salles, plural, =1 {1 data room} other {# data rooms}}",
+    "running": "EN COURS",
+    "starting": "DÉMARRAGE",
+    "colSought": "Recherché",
+    "colReadiness": "Préparation moyenne",
+    "colFollowUp": "À relancer",
+    "colShowcase": "Dans la vitrine",
+    "companies": "{n, plural, =1 {1 entreprise} other {# entreprises}}",
+    "rooms": "{n, plural, =1 {1 data room} other {# data rooms}}",
+    "listed": "{n} sur {total}",
+    "noDates": "dates à définir",
+    "emptyTitle": "Aucune cohorte pour l'instant",
+    "emptyBody": "Une cohorte réunit les entreprises que vous accompagnez sur une période. C'est elle qui décide qui apparaît dans votre vitrine."
   }
 }
