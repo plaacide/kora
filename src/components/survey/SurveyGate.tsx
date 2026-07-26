@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { lireEtatEnquete, pingUsage } from "@/app/actions/survey";
 import { interfaceOccupee } from "@/lib/ui-busy";
+import { SurveyFlow } from "./SurveyFlow";
 import {
   PING_MS,
   REESSAI_MS,
@@ -28,14 +29,14 @@ import {
 /** Le temps ne compte que si l'utilisateur a fait quelque chose récemment. */
 const INACTIVITE_MS = 120_000;
 
-export function SurveyGate({ enfant }: { enfant: (fermer: () => void) => React.ReactNode }) {
+export function SurveyGate() {
   const pathname = usePathname();
   const [ouvert, setOuvert] = useState(false);
   // Initialisé à 0, pas à `Date.now()` : appeler une fonction impure pendant
   // le rendu est interdit par `react-hooks/purity`, et le rendu peut être
   // rejoué. L'horloge démarre au montage, dans l'effet ci-dessous.
   const derniereInteraction = useRef(0);
-  const minutes = useRef(0);
+  const [contexte, setContexte] = useState<{ minutes: number; pays: string | null } | null>(null);
 
   // Toute interaction repousse l'horloge d'inactivité. `passive` : ces
   // écouteurs sont sur tout le document, ils ne doivent jamais retarder un
@@ -62,9 +63,7 @@ export function SurveyGate({ enfant }: { enfant: (fermer: () => void) => React.R
     const battement = setInterval(() => {
       if (document.visibilityState !== "visible") return;
       if (Date.now() - derniereInteraction.current > INACTIVITE_MS) return;
-      void pingUsage().then((m) => {
-        minutes.current = m;
-      });
+      void pingUsage();
     }, PING_MS);
     return () => clearInterval(battement);
   }, []);
@@ -106,7 +105,7 @@ export function SurveyGate({ enfant }: { enfant: (fermer: () => void) => React.R
       // pendant. Sans ce second contrôle, le carton apparaîtrait par-dessus.
       if (!momentPropice()) return;
 
-      minutes.current = etat.minutes;
+      setContexte({ minutes: etat.minutes, pays: etat.pays });
       setOuvert(true);
     };
 
@@ -117,6 +116,12 @@ export function SurveyGate({ enfant }: { enfant: (fermer: () => void) => React.R
     };
   }, [ouvert, momentPropice]);
 
-  if (!ouvert) return null;
-  return <>{enfant(() => setOuvert(false))}</>;
+  if (!ouvert || !contexte) return null;
+  return (
+    <SurveyFlow
+      minutes={contexte.minutes}
+      pays={contexte.pays}
+      onFermer={() => setOuvert(false)}
+    />
+  );
 }

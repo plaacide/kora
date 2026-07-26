@@ -24,6 +24,8 @@ export interface EtatEnquete {
   refuseDefinitivement: boolean;
   /** Dernière invitation, en millisecondes depuis l'époque, ou null. */
   dernierePropositionMs: number | null;
+  /** Pays de la startup — décide de la devise de l'écran 3. */
+  pays: string | null;
 }
 
 /** État d'éligibilité, relu à chaque montée en charge du compteur. */
@@ -50,7 +52,17 @@ export async function lireEtatEnquete(): Promise<EtatEnquete | null> {
     survey_last_prompt_at: string | null;
   };
 
+  // Le pays vient de la startup du fondateur, pas de l'organisation :
+  // `organizations.default_currency` vaut XOF pour tout le monde, personne ne
+  // l'a jamais renseignée.
+  const { data: startup } = await supabase
+    .from("startups")
+    .select("country")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
   return {
+    pays: (startup as { country: string | null } | null)?.country ?? null,
     minutes: Math.floor((p.usage_seconds ?? 0) / 60),
     dejaRepondu: !!p.survey_completed_at,
     refuseDefinitivement: !!p.survey_dismissed_forever,

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
+import { SurveyGate } from "@/components/survey/SurveyGate";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { personaFor } from "@/lib/persona";
 import { joursRestants } from "@/lib/echeance";
@@ -127,6 +128,11 @@ export default async function AppLayout({
         </div>
       )}
       {children}
+      {/* Enquête produit. Montée ici, donc présente sur tous les écrans de
+          l'application — mais elle décide seule de ne rien afficher : la liste
+          blanche de routes et les états de blocage vivent dans la porte, pas
+          ici. */}
+      <SurveyGate />
     </AppShell>
   );
 }
