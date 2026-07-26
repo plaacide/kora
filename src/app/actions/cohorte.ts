@@ -17,12 +17,22 @@ export interface CohorteResult {
   error?: string;
 }
 
-/** Le programme invite une startup à rejoindre sa cohorte. */
-export async function inviteToCohort(email: string): Promise<CohorteResult> {
+/**
+ * Le programme invite une startup à rejoindre sa cohorte.
+ *
+ * `cohortId` cible une cohorte nommée (étape 05 de l'onboarding, ou depuis le
+ * détail d'une cohorte). Absent, l'invitation reste rattachée au programme sans
+ * cohorte précise — le flux général existant.
+ */
+export async function inviteToCohort(
+  email: string,
+  cohortId?: string,
+): Promise<CohorteResult> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("invite_to_cohort", {
     p_email: email,
+    p_cohort: cohortId ?? null,
   });
   if (error) return { ok: false, error: error.message };
 
