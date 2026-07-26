@@ -254,7 +254,9 @@
       "roomNowSub": "L'arborescence OHADA/UEMOA est posée pour vous, vous déposez tout de suite.",
       "roomLater": "Plus tard",
       "roomLaterSub": "Vous la créerez depuis votre accueil, avec le nom et le modèle de votre choix.",
-      "objectifOptional": "Modifiable à tout moment depuis votre data room."
+      "objectifOptional": "Modifiable à tout moment depuis votre data room.",
+      "raiseOptional": "Tous ces champs sont facultatifs — vous les renseignerez quand vous voudrez.",
+      "fillLater": "Remplir plus tard"
     },
     "investor": {
       "stepProfileTitle": "Votre profil",

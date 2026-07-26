@@ -254,7 +254,9 @@
       "roomNowSub": "The OHADA/WAEMU folder tree is laid out for you, you can upload right away.",
       "roomLater": "Later",
       "roomLaterSub": "You will create it from your home screen, with the name and template you choose.",
-      "objectifOptional": "Changeable at any time from your data room."
+      "objectifOptional": "Changeable at any time from your data room.",
+      "raiseOptional": "All these fields are optional — you can fill them in whenever you want.",
+      "fillLater": "Fill in later"
     },
     "investor": {
       "stepProfileTitle": "Your profile",

@@ -268,6 +268,7 @@ export function FounderOnboarding() {
       <p className="text-[12.5px] text-ink-secondary mt-1">
         {t("raiseSubtitle")}
       </p>
+      <p className="text-[11.5px] text-ink-muted mt-1">{t("raiseOptional")}</p>
 
       <PlainError message={error} />
 
@@ -321,8 +322,12 @@ export function FounderOnboarding() {
         <button type="button" onClick={() => setStep(1)} className="text-[12.5px] font-medium text-ink-secondary hover:text-ink cursor-pointer">
           {`\u2190 ${t("back")}`}
         </button>
+        {/* Un seul bouton, dont le LIBELLÉ suit l'état : « Remplir plus tard »
+            tant que rien n'est saisi, « Terminer » dès qu'un champ l'est. Deux
+            boutons côte à côte auraient fait le même geste, et en afficher un
+            conditionnellement aurait décalé l'autre au chargement. */}
         <Button variant="primary" onClick={finish} loading={pending}>
-          {t("finish")}
+          {amount || arr || horizon.length > 0 ? t("finish") : t("fillLater")}
         </Button>
       </div>
     </OnboardingShell>
