@@ -2,12 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { folderIndex } from "@/lib/folder-index";
 import { createFolder } from "@/app/actions/deals";
 import { setDocumentKey } from "@/app/actions/crud";
 import { Uploader } from "./Uploader";
+import { DocViewerModal } from "@/components/viewer/DocViewerModal";
 import type { FolderRow, DocRow } from "./DataRoom";
 
 /**
@@ -253,11 +253,21 @@ export function RoomContenu({
         return (
           <div key={d.id} className="bg-white grid grid-cols-[44px_1fr_90px_120px_40px] gap-3 items-center px-2 py-[13px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4]">
             <span style={mono} className="text-[11px] text-[#9DA0A8]">{folderIndex(d.index_path)}</span>
-            <Link href={`/visionneuse?doc=${d.id}`} className="flex items-center gap-[11px] min-w-0">
+            {/* Ouvre EN PLACE : consulter trois pièces d'affilée ne fait plus
+                trois allers-retours, et le dossier reste sous les yeux. Un
+                document sans version ou non prévisualisable retombe sur le
+                lien classique — c'est le composant qui décide. */}
+            <DocViewerModal
+              versionId={d.version_id}
+              name={d.name}
+              index={d.index_path}
+              docId={d.id}
+              className="flex items-center gap-[11px] min-w-0 text-left w-full"
+            >
               <span style={mono} className={"rounded-[4px] px-[5px] py-0.5 text-[8.5px] font-[600] shrink-0 " + b.cls}>{b.t}</span>
               <span className="text-[13.5px] font-[600] truncate">{d.name}</span>
               {d.views > 0 && <span style={mono} className="text-[11px] text-[#9DA0A8] shrink-0">{d.views} vues</span>}
-            </Link>
+            </DocViewerModal>
             <span className="text-[12px] text-[#6E727A]">{b.t}</span>
             <span className="text-[12px] text-[#9DA0A8]">{d.modified ?? "—"}</span>
             {canEdit ? (

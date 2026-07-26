@@ -813,7 +813,8 @@
       "officeNotReadyHint": "Ce fichier sera bientôt lisible ici. En attendant, demandez une version PDF au fondateur.",
       "officeFailedHint": "Réessayez dans un instant. Si le problème persiste, signalez-le au fondateur.",
       "sheetFailedHint": "Le fichier est peut-être protégé par un mot de passe ou corrompu. Signalez-le au fondateur."
-    }
+    },
+    "openFullPage": "Ouvrir en pleine page"
   },
   "security": {
     "title": "Sécurité",

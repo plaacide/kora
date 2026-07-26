@@ -813,7 +813,8 @@
       "officeNotReadyHint": "This file will soon be readable here. Meanwhile, ask the founder for a PDF.",
       "officeFailedHint": "Try again shortly. If it keeps failing, let the founder know.",
       "sheetFailedHint": "The file may be password-protected or corrupted. Let the founder know."
-    }
+    },
+    "openFullPage": "Open full page"
   },
   "security": {
     "title": "Security",
