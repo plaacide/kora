@@ -1094,7 +1094,17 @@
       "noIndicatorsBody": "Add what an investor sees before opening your documents.",
       "noInvestorsTitle": "No investors tracked",
       "noInvestorsBody": "Add the ones you are approaching, with their ticket and status.",
-      "setupStep2CtaIndicators": "Add the indicators"
+      "setupStep2CtaIndicators": "Add the indicators",
+      "previewCompany": "Kalyx Foods",
+      "previewStage": "Series A",
+      "previewAmount": "$2.4M",
+      "previewCommitted": "$910k committed · 38%",
+      "previewKpiArr": "ARR",
+      "previewKpiArrValue": "$850k",
+      "previewKpiGrowth": "Growth",
+      "previewKpiGrowthValue": "+120%",
+      "previewKpiClients": "Customers",
+      "previewKpiClientsValue": "1,400"
     }
   },
   "versions": {

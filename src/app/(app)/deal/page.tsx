@@ -34,9 +34,10 @@ export default async function DealPage() {
       // On garde le titre, le message et l'action de l'écran existant, et on
       // remplace le seul cadre pointillé par ce qui manquait : le PARCOURS (on
       // ne peut pas ouvrir une levée avant d'avoir la salle) et un aperçu de
-      // l'écran d'arrivée. L'aperçu est un GABARIT, pas de fausses valeurs :
-      // il montre la forme de l'écran sans inventer un montant qui n'existe
-      // pas — la règle produit interdit une donnée fabriquée, même en démo.
+      // l'écran d'arrivée, chiffré comme la maquette. La règle « jamais de
+      // données inventées » vise ce qui se fait passer POUR celles de
+      // l'utilisateur : un exemple nommément marqué n'en relève pas, et le
+      // panneau de connexion en montre déjà un.
       <div className="flex flex-col gap-5 text-[#1A1B1F]">
         <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("myRaise")}</h1>
 
@@ -76,8 +77,14 @@ export default async function DealPage() {
             </div>
           </div>
 
-          {/* Aperçu explicitement illustratif : aucune valeur, que des formes. */}
-          <div className="relative overflow-hidden rounded-[8px] bg-[#171A2C] px-6 py-6" aria-hidden>
+          {/* Aperçu illustratif, avec de vrais chiffres — comme la maquette, et
+              comme la carte d'exemple du panneau de connexion. Il porte la même
+              entreprise fictive (Kalyx Foods) que celle-ci : un seul exemple
+              dans tout le produit se reconnaît, deux sèment le doute.
+              L'étiquette et la mention disent explicitement que rien ici n'est
+              à l'utilisateur — c'est cette marque, et non l'absence de
+              chiffres, qui empêche de confondre l'exemple avec ses données. */}
+          <div className="relative overflow-hidden rounded-[8px] bg-[#171A2C] px-6 py-6">
             <ResonanceArcs corner="top-right" size={240} tone="dark" subtle />
             <div className="relative z-10">
               <div className="flex items-center justify-between gap-3">
@@ -88,16 +95,31 @@ export default async function DealPage() {
               </div>
 
               <div className="mt-5 rounded-[6px] bg-white/[0.06] px-4 py-4">
-                <div className="h-2 w-24 rounded-full bg-white/20" />
-                <div className="h-4 w-40 rounded-[3px] bg-white/30 mt-3" />
-                <div className="h-1.5 w-full rounded-full bg-white/10 mt-4 overflow-hidden">
-                  <div className="h-full w-[38%] rounded-full bg-[#E85C2B]/70" />
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-[13.5px] font-[650] text-white truncate">{t("previewCompany")}</span>
+                  <span style={mono} className="shrink-0 text-[9px] font-[600] uppercase tracking-[0.06em] text-[#F08A5E] bg-[#E85C2B]/15 rounded-[4px] px-2 py-[3px]">
+                    {t("previewStage")}
+                  </span>
                 </div>
-                <div className="grid grid-cols-3 gap-2.5 mt-4">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="rounded-[4px] bg-white/[0.05] px-2.5 py-2.5">
-                      <div className="h-1.5 w-8 rounded-full bg-white/15" />
-                      <div className="h-2.5 w-12 rounded-[2px] bg-white/25 mt-2" />
+
+                <div className="text-[10.5px] text-white/45 mt-3">{t("amountSought")}</div>
+                <div style={mono} className="text-[22px] font-[600] tracking-[-0.02em] text-white mt-0.5">
+                  {t("previewAmount")}
+                </div>
+                <span className="block h-1.5 rounded-full bg-white/10 overflow-hidden mt-2.5">
+                  <span className="block h-full w-[38%] rounded-full bg-[#E85C2B]" />
+                </span>
+                <div className="text-[11px] text-white/55 mt-1.5">{t("previewCommitted")}</div>
+
+                <div className="grid grid-cols-3 gap-2.5 mt-4 pt-4 border-t border-white/10">
+                  {[
+                    { l: t("previewKpiArr"), v: t("previewKpiArrValue") },
+                    { l: t("previewKpiGrowth"), v: t("previewKpiGrowthValue") },
+                    { l: t("previewKpiClients"), v: t("previewKpiClientsValue") },
+                  ].map((k) => (
+                    <div key={k.l}>
+                      <div className="text-[9.5px] text-white/40 uppercase tracking-[0.06em]">{k.l}</div>
+                      <div style={mono} className="text-[14px] font-[600] text-white mt-1">{k.v}</div>
                     </div>
                   ))}
                 </div>
