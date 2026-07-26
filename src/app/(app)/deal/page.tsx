@@ -38,97 +38,109 @@ export default async function DealPage() {
       // données inventées » vise ce qui se fait passer POUR celles de
       // l'utilisateur : un exemple nommément marqué n'en relève pas, et le
       // panneau de connexion en montre déjà un.
-      <div className="flex flex-col gap-5 text-[#1A1B1F]">
-        <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("myRaise")}</h1>
+      <div className="flex flex-col gap-4 text-[#1A1B1F]">
+        <div>
+          <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("myRaise")}</h1>
+          <p className="text-[13.5px] text-[#6E727A] mt-1">{t("emptySubtitle")}</p>
+        </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="relative overflow-hidden h-full flex flex-col bg-white border border-[#E2DED4] rounded-[8px] px-6 py-7">
-            {/* 320 et non 480 : à 480 les arcs débordaient au MILIEU de la
-                carte et se lisaient comme une tache, au lieu de se loger dans
-                le coin. La taille se règle sur le conteneur, pas sur l'écran. */}
-            <ResonanceArcs corner="bottom-right" size={220} tone="light" subtle />
-            <div className="relative z-10 flex flex-col flex-1">
-              <h2 className="text-[15px] font-[700]">{t("noDataRoom")}</h2>
-              <p className="text-[12.5px] text-[#6E727A] mt-1.5 leading-relaxed max-w-md">{t("noRoomBody")}</p>
+        {/* Les deux panneaux sont JOINTS, pas deux cartes séparées : la
+            maquette en fait un seul objet, le clair et l'Encre partageant la
+            même bordure. Un espace entre eux les aurait fait lire comme deux
+            informations sans rapport. */}
+        <div className="grid lg:grid-cols-2 rounded-[10px] overflow-hidden border border-[#E2DED4]">
+          <div className="bg-white px-8 py-9 flex flex-col">
+            <span style={mono} className="text-[10px] font-[600] tracking-[0.12em] text-[#A0A3AB]">
+              {t("noRaiseOver")}
+            </span>
+            <h2 className="font-display text-[21px] font-[700] tracking-[-0.02em] mt-3">
+              {t("firstRaiseTitle")}
+            </h2>
+            <p className="text-[13px] text-[#6E727A] mt-2.5 leading-relaxed">{t("firstRaiseBody")}</p>
 
-              <ol className="flex flex-col gap-3.5 mt-6 flex-1">
-                {[
-                  { n: 1, actif: true, titre: t("pathStep1"), corps: t("pathStep1Body") },
-                  { n: 2, actif: false, titre: t("pathStep2"), corps: t("pathStep2Body") },
-                ].map((e) => (
-                  <li key={e.n} className="flex gap-3" style={e.actif ? undefined : { opacity: 0.6 }}>
-                    <span
-                      style={mono}
-                      className={
-                        "grid place-items-center w-6 h-6 shrink-0 rounded-full text-[10.5px] font-[600] " +
-                        (e.actif ? "bg-[#171A2C] text-white" : "bg-[#F1F0EB] text-[#8B8FA3]")
-                      }
-                    >
-                      {e.n}
+            <ol className="relative flex flex-col gap-5 mt-7">
+              {[
+                { n: 1, actif: true, titre: t("pathStep1"), corps: t("pathStep1Body") },
+                { n: 2, actif: false, titre: t("pathStep2"), corps: t("pathStep2Body") },
+              ].map((e, i, tab) => (
+                <li key={e.n} className="relative flex gap-3.5">
+                  {/* Trait vertical reliant les deux pastilles : il dit que
+                      c'est UNE séquence, pas deux options au choix. */}
+                  {i < tab.length - 1 && (
+                    <span className="absolute left-[13px] top-7 bottom-[-20px] w-0.5 bg-[#E2DED4]" aria-hidden />
+                  )}
+                  <span
+                    style={mono}
+                    className={
+                      "grid place-items-center w-7 h-7 shrink-0 rounded-full text-[11px] font-[700] " +
+                      (e.actif
+                        ? "bg-[#E85C2B] text-white"
+                        : "border-[1.5px] border-[#D9D5CB] bg-white text-[#A0A3AB]")
+                    }
+                  >
+                    {e.n}
+                  </span>
+                  <span className="pt-0.5">
+                    <span className={"block text-[13.5px] font-[650] " + (e.actif ? "text-[#1A1B1F]" : "text-[#8B8FA3]")}>
+                      {e.titre}
                     </span>
-                    <span>
-                      <span className="block text-[13px] font-[600]">{e.titre}</span>
-                      <span className="block text-[12px] text-[#6E727A] mt-0.5 leading-relaxed">{e.corps}</span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
+                    <span className="block text-[12.5px] text-[#8B8FA3] mt-0.5 leading-snug">{e.corps}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
 
-              <div className="mt-6">
-                <NewDataRoomButton label={t("createDataRoom")} />
-              </div>
+            <div className="flex items-center gap-4 mt-8 flex-wrap">
+              <NewDataRoomButton
+                label={t("createDataRoom")}
+                className="rounded-[6px] bg-[#E85C2B] px-5 py-3 text-[13.5px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap"
+              />
+              <span className="text-[12.5px] text-[#8B8FA3]">{t("createRoomNote")}</span>
             </div>
           </div>
 
-          {/* Aperçu illustratif, avec de vrais chiffres — comme la maquette, et
-              comme la carte d'exemple du panneau de connexion. Il porte la même
-              entreprise fictive (Kalyx Foods) que celle-ci : un seul exemple
-              dans tout le produit se reconnaît, deux sèment le doute.
-              L'étiquette et la mention disent explicitement que rien ici n'est
-              à l'utilisateur — c'est cette marque, et non l'absence de
-              chiffres, qui empêche de confondre l'exemple avec ses données. */}
-          <div className="relative overflow-hidden h-full flex flex-col rounded-[8px] bg-[#171A2C] px-6 py-6">
-            <ResonanceArcs corner="top-right" size={240} tone="dark" subtle />
+          {/* Aperçu illustratif chiffré, comme la maquette. La règle « jamais
+              de données inventées » vise ce qui se fait passer POUR celles de
+              l'utilisateur ; un exemple nommément marqué n'en relève pas. */}
+          <div className="relative overflow-hidden bg-[#171A2C] px-8 py-9 flex flex-col">
+            <ResonanceArcs corner="bottom-right" size={300} tone="dark" subtle />
             <div className="relative z-10 flex flex-col flex-1">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-[13px] font-[700] text-white">{t("previewTitle")}</span>
-                <span style={mono} className="text-[8.5px] font-[600] tracking-[0.12em] text-[#F08A5E] border border-[#F08A5E]/35 rounded-[3px] px-1.5 py-[3px] whitespace-nowrap">
-                  {t("previewTag")}
-                </span>
-              </div>
+              <span style={mono} className="text-[10px] font-[600] tracking-[0.12em] text-[#F08A5E]">
+                {t("previewOver")}
+              </span>
 
-              <div className="mt-5 rounded-[6px] bg-white/[0.06] px-4 py-4 flex-1">
+              <div className="mt-5 rounded-[10px] bg-white/[0.055] border border-white/10 px-5 py-5">
                 <div className="flex items-start justify-between gap-3">
-                  <span className="text-[13.5px] font-[650] text-white truncate">{t("previewCompany")}</span>
-                  <span style={mono} className="shrink-0 text-[9px] font-[600] uppercase tracking-[0.06em] text-[#F08A5E] bg-[#E85C2B]/15 rounded-[4px] px-2 py-[3px]">
-                    {t("previewStage")}
+                  <span className="text-[15px] font-[700] text-white truncate">{t("previewRound")}</span>
+                  <span style={mono} className="shrink-0 text-[9px] font-[700] tracking-[0.08em] text-[#5FD3A6] bg-[#5FD3A6]/15 rounded-[4px] px-2 py-[4px]">
+                    {t("previewBadge")}
                   </span>
                 </div>
+                <div style={mono} className="text-[12px] text-white/45 mt-1">{t("previewClosing")}</div>
 
-                <div className="text-[10.5px] text-white/45 mt-3">{t("amountSought")}</div>
-                <div style={mono} className="text-[22px] font-[600] tracking-[-0.03em] text-white mt-0.5">
+                <div style={mono} className="text-[30px] font-[600] tracking-[-0.03em] text-white mt-4">
                   {t("previewAmount")}
                 </div>
-                <span className="block h-1.5 rounded-full bg-white/10 overflow-hidden mt-2.5">
-                  <span className="block h-full w-[38%] rounded-full bg-[#E85C2B]" />
+                <span className="block h-1.5 rounded-full bg-white/10 overflow-hidden mt-3">
+                  <span className="block h-full w-[62%] rounded-full bg-[#E85C2B]" />
                 </span>
-                <div className="text-[11px] text-white/55 mt-1.5">{t("previewCommitted")}</div>
+                <div className="text-[12.5px] text-white/55 mt-2">{t("previewCommitted")}</div>
 
-                <div className="grid grid-cols-3 gap-2.5 mt-4 pt-4 border-t border-white/10">
+                <div className="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-white/10">
                   {[
-                    { l: t("previewKpiArr"), v: t("previewKpiArrValue") },
-                    { l: t("previewKpiGrowth"), v: t("previewKpiGrowthValue") },
-                    { l: t("previewKpiClients"), v: t("previewKpiClientsValue") },
+                    { v: t("previewKpiInvestorsValue"), l: t("previewKpiInvestors") },
+                    { v: t("previewKpiReadyValue"), l: t("previewKpiReady") },
+                    { v: t("previewKpiAccessValue"), l: t("previewKpiAccess") },
                   ].map((k) => (
                     <div key={k.l}>
-                      <div className="text-[9.5px] text-white/40 uppercase tracking-[0.06em]">{k.l}</div>
-                      <div style={mono} className="text-[14px] font-[600] text-white mt-1">{k.v}</div>
+                      <div className="text-[17px] font-[700] text-white">{k.v}</div>
+                      <div className="text-[11.5px] text-white/45 mt-0.5 leading-snug">{k.l}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <p className="text-[11px] text-white/40 mt-3.5 leading-relaxed">{t("previewNote")}</p>
+              <p className="text-[12px] text-white/45 mt-4 leading-relaxed">{t("previewNote")}</p>
             </div>
           </div>
         </div>

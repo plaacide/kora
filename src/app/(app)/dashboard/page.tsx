@@ -116,24 +116,6 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* « Explorer d'abord » — la vidéo de présentation. Le bloc n'existe
-            QUE si une vidéo est configurée : un bouton qui n'ouvre rien vaut
-            moins que pas de bouton. Elle vit dans public/, pas sur YouTube —
-            la CSP pose `frame-src 'none'`, qui bloque les iframes. */}
-        {demoVideo && (
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-white border border-[#E2DED4] rounded-[8px] px-5 py-4">
-            <div className="min-w-0">
-              <h3 className="text-[13.5px] font-[700]">{t("demoTitle")}</h3>
-              <p className="text-[12px] text-[#6E727A] mt-0.5 leading-relaxed">{t("demoBody")}</p>
-            </div>
-            <DemoVideoButton
-              src={demoVideo}
-              poster={process.env.NEXT_PUBLIC_DEMO_POSTER}
-              className="shrink-0 border border-[#E4E2DC] rounded-[5px] px-4 py-2.5 text-[13px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]"
-            />
-          </div>
-        )}
-
         <div className="grid gap-3 md:grid-cols-3">
           {etapes.map((e) => (
             <div
@@ -157,6 +139,25 @@ export default async function DashboardPage() {
             </div>
           ))}
         </div>
+
+        {/* « Explorer d'abord » — sous un filet, comme la maquette : c'est une
+            porte de sortie, pas une quatrième étape du parcours.
+            Le bloc n'existe QUE si une démo est configurée : un bouton qui
+            n'ouvrirait rien vaut moins que pas de bouton. */}
+        {demoVideo && (
+          <div className="border-t border-[#E2DED4] pt-5 flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="text-[14px] font-[700]">{t("demoTitle")}</h3>
+              <p className="text-[12.5px] text-[#6E727A] mt-1 leading-relaxed">{t("demoBody")}</p>
+            </div>
+            <DemoVideoButton
+              src={demoVideo}
+              poster={process.env.NEXT_PUBLIC_DEMO_POSTER}
+              className="shrink-0 border border-[#E4E2DC] bg-white rounded-[6px] px-5 py-3 text-[13.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]"
+            />
+          </div>
+        )}
+
       </div>
     );
   }
