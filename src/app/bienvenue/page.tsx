@@ -23,16 +23,64 @@ export default async function BienvenuePage() {
   const isInvestor =
     (profile as { account_type?: string } | null)?.account_type === "investor";
 
+  // ÉTAT RÉEL, pas une liste figée. Cet écran annonçait « Fiche complète » et
+  // « Levée renseignée » quoi qu'il arrive — or ces deux étapes sont devenues
+  // facultatives, et la data room est devenue un choix. Il affirmait donc des
+  // choses fausses, et proposait « Déposer mes documents » à un fondateur qui
+  // n'a pas de salle.
+  const { data: membership } = await supabase
+    .from("memberships")
+    .select("org_id")
+    .eq("user_id", user.id)
+    .order("created_at")
+    .limit(1)
+    .maybeSingle();
+  const orgId = (membership as { org_id?: string } | null)?.org_id;
+
+  const [{ data: startup }, { data: salles }, { data: profilInv }] = await Promise.all([
+    supabase
+      .from("startups")
+      .select("readiness, objectif, amount_sought_usd")
+      .eq("owner_id", user.id)
+      .maybeSingle(),
+    orgId
+      ? supabase.from("deals").select("id").eq("org_id", orgId).limit(1)
+      : Promise.resolve({ data: [] }),
+    supabase
+      .from("investor_profiles")
+      .select("investor_type, sectors")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+  ]);
+
+  const aUneSalle = ((salles ?? []) as { id: string }[]).length > 0;
+  const fiche = (startup as { readiness?: number } | null)?.readiness ?? 0;
+  const ficheComplete = fiche >= 100;
+  const objectif = (startup as { objectif?: string } | null)?.objectif ?? "levee";
+  const leveeRenseignee =
+    (startup as { amount_sought_usd?: number | null } | null)?.amount_sought_usd != null;
+
+  const inv = profilInv as { investor_type?: string | null; sectors?: string[] | null } | null;
+
   const items = isInvestor
     ? [
-        { done: true, label: t("investorProfile"), note: t("investorProfileNote") },
-        { done: true, label: t("investorThesis"), note: t("investorThesisNote") },
+        { done: !!inv?.investor_type, label: t("investorProfile"),
+          note: inv?.investor_type ? t("investorProfileNote") : t("investorProfileNoteTodo") },
+        { done: (inv?.sectors?.length ?? 0) > 0, label: t("investorThesis"),
+          note: (inv?.sectors?.length ?? 0) > 0 ? t("investorThesisNote") : t("investorThesisNoteTodo") },
         { done: false, label: t("inviteTeam"), note: t("inviteTeamNote") },
       ]
     : [
-        { done: true, label: t("startupProfile"), note: t("startupProfileNote") },
-        { done: true, label: t("raise"), note: t("raiseNote") },
-        { done: false, label: t("completeRoom"), note: t("completeRoomNote") },
+        { done: ficheComplete, label: t("startupProfile"),
+          note: ficheComplete ? t("startupProfileNoteDone") : `${fiche} %` },
+        // La levée ne concerne pas un dossier de diligence : on ne l'affiche
+        // pas plutôt que d'annoncer une étape qui n'existe pas pour lui.
+        ...(objectif === "diligence"
+          ? []
+          : [{ done: leveeRenseignee, label: t("raise"),
+               note: leveeRenseignee ? t("raiseNoteDone") : t("raiseNoteTodo") }]),
+        { done: aUneSalle, label: t("roomTitle"),
+          note: aUneSalle ? t("roomNoteDone") : t("roomNoteTodo") },
       ];
 
   return (
@@ -49,7 +97,7 @@ export default async function BienvenuePage() {
             {t("title", { name: firstName })}
           </h1>
           <p className="text-[14px] text-white/70 mt-3 leading-relaxed max-w-[520px] mx-auto">
-            {isInvestor ? t("bodyInvestor") : t("bodyFounder")}
+            {isInvestor ? t("bodyInvestor") : aUneSalle ? t("bodyFounder") : t("bodyFounderNoRoom")}
           </p>
         </div>
 
@@ -90,12 +138,15 @@ export default async function BienvenuePage() {
           >
             {`${t("ctaDealroom")} \u2192`}
           </Link>
+          {/* Sans data room, /data-room n'a rien à montrer : on renvoie à
+              l'accueil, d'où la salle se crée — la règle produit interdit un
+              lien vers un écran qui ne peut rien afficher. */}
           {!isInvestor && (
             <Link
-              href="/data-room"
+              href={aUneSalle ? "/data-room" : "/dashboard"}
               className="inline-flex items-center justify-center border border-white/15 bg-white/[0.055] text-white font-[600] text-[13.5px] rounded-[10px] px-5 py-3 hover:bg-white/[0.09] transition-colors"
             >
-              {t("ctaUpload")}
+              {aUneSalle ? t("ctaUpload") : t("ctaCreateRoom")}
             </Link>
           )}
         </div>

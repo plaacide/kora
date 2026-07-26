@@ -1328,12 +1328,19 @@
     "inviteTeam": "Inviter votre équipe",
     "inviteTeamNote": "Optionnel",
     "startupProfile": "Fiche startup",
-    "startupProfileNote": "Complète",
     "raise": "Votre levée",
-    "raiseNote": "Renseignée",
-    "completeRoom": "Compléter la data room",
-    "completeRoomNote": "Recommandé",
     "ctaDealroom": "Accéder au dealroom",
-    "ctaUpload": "Déposer mes documents"
+    "ctaUpload": "Déposer mes documents",
+    "startupProfileNoteDone": "Complète",
+    "startupProfileNoteTodo": "À compléter",
+    "raiseNoteDone": "Renseignée",
+    "raiseNoteTodo": "À renseigner",
+    "roomTitle": "Votre data room",
+    "roomNoteDone": "Créée",
+    "roomNoteTodo": "À créer",
+    "investorProfileNoteTodo": "À compléter",
+    "investorThesisNoteTodo": "À compléter",
+    "ctaCreateRoom": "Créer ma data room",
+    "bodyFounderNoRoom": "Votre fiche est prête. Créez maintenant votre data room : c'est le coffre où vivront vos documents, et vous en choisissez le nom et le modèle de dossiers."
   }
 }

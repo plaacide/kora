@@ -1328,12 +1328,19 @@
     "inviteTeam": "Invite your team",
     "inviteTeamNote": "Optional",
     "startupProfile": "Startup profile",
-    "startupProfileNote": "Complete",
     "raise": "Your raise",
-    "raiseNote": "Filled in",
-    "completeRoom": "Complete the data room",
-    "completeRoomNote": "Recommended",
     "ctaDealroom": "Go to the dealroom",
-    "ctaUpload": "Upload my documents"
+    "ctaUpload": "Upload my documents",
+    "startupProfileNoteDone": "Complete",
+    "startupProfileNoteTodo": "To complete",
+    "raiseNoteDone": "Filled in",
+    "raiseNoteTodo": "To fill in",
+    "roomTitle": "Your data room",
+    "roomNoteDone": "Created",
+    "roomNoteTodo": "To create",
+    "investorProfileNoteTodo": "To complete",
+    "investorThesisNoteTodo": "To complete",
+    "ctaCreateRoom": "Create my data room",
+    "bodyFounderNoRoom": "Your profile is ready. Now create your data room: it is the vault where your documents will live, and you choose its name and folder template."
   }
 }
