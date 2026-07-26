@@ -99,7 +99,7 @@ export default async function DashboardPage() {
           <p className="text-[13.5px] text-[#6E727A] mt-1">{t("emptySubtitle")}</p>
         </div>
 
-        <div className="relative overflow-hidden rounded-[10px] bg-[#171A2C] px-8 py-10 md:px-11 md:py-12">
+        <div className="relative overflow-hidden rounded-[10px] bg-[#1A1B1F] px-8 py-10 md:px-11 md:py-12">
           <ResonanceArcs corner="top-right" size={560} tone="dark" />
           <div className="relative z-10 max-w-xl">
             <span style={mono} className="text-[9.5px] font-[600] tracking-[0.14em] text-[#F08A5E]">
@@ -132,7 +132,7 @@ export default async function DashboardPage() {
                 style={mono}
                 className={
                   "inline-grid place-items-center w-6 h-6 rounded-full text-[10.5px] font-[600] " +
-                  (e.n === 1 ? "bg-[#171A2C] text-white" : "bg-[#F1F0EB] text-[#8B8FA3]")
+                  (e.n === 1 ? "bg-[#1A1B1F] text-white" : "bg-[#F1F0EB] text-[#8B8FA3]")
                 }
               >
                 {e.n}

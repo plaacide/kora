@@ -102,7 +102,7 @@ export default async function DealPage() {
           {/* Aperçu illustratif chiffré, comme la maquette. La règle « jamais
               de données inventées » vise ce qui se fait passer POUR celles de
               l'utilisateur ; un exemple nommément marqué n'en relève pas. */}
-          <div className="relative overflow-hidden bg-[#171A2C] px-8 py-9 flex flex-col">
+          <div className="relative overflow-hidden bg-[#1A1B1F] px-8 py-9 flex flex-col">
             <ResonanceArcs corner="bottom-right" size={300} tone="dark" subtle />
             <div className="relative z-10 flex flex-col flex-1">
               <span style={mono} className="text-[10px] font-[600] tracking-[0.12em] text-[#F08A5E]">
