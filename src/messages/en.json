@@ -430,7 +430,10 @@
     "demoTitle": "Rather explore first?",
     "demoBody": "Two minutes to see what an investor will see of your file, before you upload anything.",
     "demoCta": "Watch the demo",
-    "demoModalTitle": "Sanza in two minutes"
+    "demoModalTitle": "Sanza in two minutes",
+    "demoLoading": "Loading the video…",
+    "demoFailed": "The video could not load here.",
+    "demoOpenDirect": "Open it in a new tab"
   },
   "stages": {
     "sourcing": "Sourcing",

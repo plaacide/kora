@@ -430,7 +430,10 @@
     "demoTitle": "Vous préférez explorer d'abord ?",
     "demoBody": "Deux minutes pour voir ce qu'un investisseur verra de votre dossier, avant de déposer quoi que ce soit.",
     "demoCta": "Voir la démo",
-    "demoModalTitle": "Sanza en deux minutes"
+    "demoModalTitle": "Sanza en deux minutes",
+    "demoLoading": "Chargement de la vidéo…",
+    "demoFailed": "La vidéo n'a pas pu se charger ici.",
+    "demoOpenDirect": "L'ouvrir dans un nouvel onglet"
   },
   "stages": {
     "sourcing": "Sourcing",

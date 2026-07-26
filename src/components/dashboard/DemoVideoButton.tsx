@@ -27,6 +27,10 @@ export function DemoVideoButton({
 }) {
   const t = useTranslations("dashboard");
   const [open, setOpen] = useState(false);
+  // Trois états seulement, et aucun n'est muet : on charge, on lit, ou on a
+  // échoué et on dit comment contourner. Un lecteur qui tourne indéfiniment
+  // sans rien annoncer est le pire des trois.
+  const [etat, setEtat] = useState<"charge" | "pret" | "echec">("charge");
 
   return (
     <>
@@ -39,8 +43,36 @@ export function DemoVideoButton({
         </span>
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title={t("demoModalTitle")} width={880}>
-        <div className="bg-black">
+      <Modal
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          setEtat("charge");
+        }}
+        title={t("demoModalTitle")}
+        width={880}
+      >
+        <div className="relative bg-black min-h-[220px]">
+          {open && etat === "charge" && (
+            <div className="absolute inset-0 grid place-items-center text-[13px] text-white/60 pointer-events-none">
+              {t("demoLoading")}
+            </div>
+          )}
+
+          {open && etat === "echec" && (
+            <div className="absolute inset-0 grid place-items-center gap-2 text-center px-6">
+              <p className="text-[13px] text-white/70">{t("demoFailed")}</p>
+              <a
+                href={src}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[13px] font-[600] text-[#F08A5E] underline underline-offset-2"
+              >
+                {t("demoOpenDirect")}
+              </a>
+            </div>
+          )}
+
           {/* Monté seulement à l'ouverture : rien n'est téléchargé tant que la
               modale est fermée. */}
           {open && (
@@ -57,7 +89,9 @@ export function DemoVideoButton({
               muted
               playsInline
               preload="metadata"
-              className="block w-full max-h-[70vh]"
+              onLoadedData={() => setEtat("pret")}
+              onError={() => setEtat("echec")}
+              className="relative block w-full max-h-[70vh]"
             />
           )}
         </div>
