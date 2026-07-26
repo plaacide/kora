@@ -34,7 +34,8 @@ export function InviteeSignup({
     weak: string;
     generic: string;
     incomplete: string;
-    tooMany: (minutes: number) => string;
+    /** Gabarit contenant « {minutes} », interpolé ici. */
+    tooMany: string;
     invalid: string;
   };
 }) {
@@ -77,7 +78,12 @@ export function InviteeSignup({
         // fallait attendre, changer de mot de passe, ou redemander un lien.
         if (res.error === "weak_password") setErreur(labels.weak);
         else if (res.error === "too_many_attempts")
-          setErreur(labels.tooMany(Math.ceil((res.retryAfter ?? 3600) / 60)));
+          setErreur(
+            labels.tooMany.replace(
+              "{minutes}",
+              String(Math.ceil((res.retryAfter ?? 3600) / 60)),
+            ),
+          );
         else if (res.error === "invalid_invitation") setErreur(labels.invalid);
         else setErreur(labels.generic);
       } catch {

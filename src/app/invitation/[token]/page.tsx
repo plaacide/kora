@@ -74,7 +74,10 @@ export default async function InvitationPage({
           weak: t("newWeak"),
           generic: t("newGeneric"),
           incomplete: t("newIncomplete"),
-          tooMany: (minutes: number) => t("newTooMany", { minutes }),
+          // Un GABARIT, pas une fonction : une fonction ne franchit pas la
+          // frontière serveur → client, React ne sait pas la sérialiser et la
+          // page rend une erreur 500. Le trou est invisible au build.
+          tooMany: t.raw("newTooMany") as string,
           invalid: t("newInvalid"),
         }}
       />,
