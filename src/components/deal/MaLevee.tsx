@@ -194,6 +194,7 @@ export function MaLevee({
   investors = [],
   team = [],
   keyDocs = [],
+  nbDocuments = 0,
   ndaDefault = true,
   dataRooms = [],
   roomsSansLevee = [],
@@ -213,6 +214,8 @@ export function MaLevee({
   investors?: RaiseInvestor[];
   team?: { name: string; role: string; title?: string | null }[];
   keyDocs?: { id: string; name: string; type: string; vues: number }[];
+  /** Documents réellement présents dans la data room, toutes catégories. */
+  nbDocuments?: number;
   /** Réglage NDA de la data room — défaut du bouton Partager. */
   ndaDefault?: boolean;
   /** Data rooms de l'org (pour « Ouvrir une levée » → choix de la data room). */
@@ -320,6 +323,7 @@ export function MaLevee({
       {enMiseEnRoute && raise && (
         <MiseEnRoute
           missing={missing}
+          nbDocuments={nbDocuments}
           socleTotal={socleTotal}
           socleFaits={socleFaits}
           raise={raise}
@@ -330,32 +334,11 @@ export function MaLevee({
         />
       )}
 
-      {/* Sous le seuil, la liste des pièces manquantes est LA raison d'être de
-          l'écran : elle doit se lire sans défiler (V2 §2). Elle vivait plus
-          bas, poussée hors de vue par la vitrine et le résumé — deux blocs qui
-          n'ont rien à dire tant que le dossier est vide. */}
-      {enMiseEnRoute && missing.length > 0 && (
-        <div className="mb-7">
-          <h2 className="text-[15px] font-[700] tracking-[-0.01em] mb-2">{t("remainingTitle")}</h2>
-          <div className="bg-white border border-[#E2DED4] rounded-[6px] overflow-hidden">
-            {missing.slice(0, 5).map((m, i) => (
-              <div key={m.label} className="flex items-center gap-3 px-4 py-3 border-b border-[#E8E5DC] last:border-0 text-[12.5px]">
-                {i === 0 && <span style={mono} className="text-[9px] font-[600] text-[#C24619] bg-[#FBEDE6] rounded-[4px] px-2 py-0.5 shrink-0">{t("nextCaps")}</span>}
-                <span className="flex-1 text-[#33353B] truncate">{m.label}</span>
-                <Link
-                  href={m.folderId ? `/data-room?dossier=${m.folderId}` : "/data-room"}
-                  className={i === 0
-                    ? "shrink-0 rounded-[5px] bg-[#E85C2B] px-3 py-1.5 text-[12px] font-[600] text-white hover:bg-[#D24E1F]"
-                    : "shrink-0 text-[12px] font-[600] text-[#C24619] hover:text-[#1A1B1F]"}
-                >
-                  {t("upload")}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
+      {/* « Ce qu'il reste à fournir » a été retiré : le bandeau de mise en
+          route porte déjà la même information, en mieux — les mêmes pièces
+          socle, avec leur compte et l'action qui les débloque. Deux listes
+          identiques à trois centimètres l'une de l'autre faisaient douter
+          qu'elles parlent de la même chose. */}
 
       {/* Levées : courante (+ Clôturer), clôturées, et « Nouvelle levée ». */}
       <RaiseChips dealName={dealName} dealId={dealId} raise={raise} closedRaises={closedRaises} />
@@ -634,6 +617,7 @@ export function MaLevee({
  */
 function MiseEnRoute({
   missing,
+  nbDocuments,
   socleTotal,
   socleFaits,
   raise,
@@ -643,6 +627,7 @@ function MiseEnRoute({
   onAjouterInvestisseur,
 }: {
   missing: { label: string; folderId: string | null }[];
+  nbDocuments: number;
   socleTotal: number;
   socleFaits: number;
   raise: Raise;
@@ -662,7 +647,16 @@ function MiseEnRoute({
   const aIndicateurs = Object.values(raise.indicateurs ?? {}).some((l) => (l?.length ?? 0) > 0);
 
   const etapes = [
-    { fait: socleComplet, titre: t("setupStep1"), corps: t("setupStep1Body"), cta: t("setupStep1Cta"),
+    // Déposer un fichier NE COCHE PAS une exigence : il faut le RATTACHER à
+    // celle-ci (attach_checklist_document), ce qui se fait sur /checklist.
+    // Le bouton envoyait vers la data room, donc vers une action qui ne
+    // terminait jamais l'étape. Il mène maintenant là où elle se termine :
+    // dans la salle tant qu'aucun document n'existe, sur la checklist dès
+    // qu'il y en a un à rattacher.
+    { fait: socleComplet,
+      titre: t("setupStep1"),
+      corps: t("setupStep1Body"),
+      cta: nbDocuments > 0 ? t("setupStep1CtaLink") : t("setupStep1Cta"),
       compte: socleTotal > 0 ? t("setupCount", { done: socleFaits, total: socleTotal }) : "" },
     // L'étape 2 exige DEUX choses éditées à deux endroits : la date de clôture
     // (modal « Modifier la levée ») et les indicateurs de vitrine (éditeur de
@@ -693,7 +687,13 @@ function MiseEnRoute({
           <div className="flex items-center gap-2.5 mt-5 flex-wrap">
             {indexCourant === 0 ? (
               <Link
-                href={premiereManquante?.folderId ? `/data-room?dossier=${premiereManquante.folderId}` : "/data-room"}
+                href={
+                  nbDocuments > 0
+                    ? "/checklist"
+                    : premiereManquante?.folderId
+                      ? `/data-room?dossier=${premiereManquante.folderId}`
+                      : "/data-room"
+                }
                 className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
               >
                 {courante.cta}

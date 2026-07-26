@@ -328,6 +328,7 @@ export default async function DealPage() {
       investors={investisseurs}
       team={team}
       keyDocs={keyDocs}
+      nbDocuments={tousDocs.length}
       ndaDefault={ndaDefault}
       dataRooms={dataRooms}
       roomsSansLevee={roomsSansLevee}

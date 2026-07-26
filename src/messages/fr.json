@@ -1116,7 +1116,8 @@
       "previewKpiReady": "dossier prêt",
       "previewKpiReadyValue": "74 %",
       "previewKpiAccess": "accès actifs",
-      "previewKpiAccessValue": "9"
+      "previewKpiAccessValue": "9",
+      "setupStep1CtaLink": "Rattacher mes pièces"
     }
   },
   "versions": {
