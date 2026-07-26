@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { marquerOccupe } from "@/lib/ui-busy";
 
 /**
  * Modal réutilisable, style handoff : voile sombre, carte blanche rayon 8,
@@ -37,6 +38,14 @@ export function Modal({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
+
+  // Tant qu'un modal est ouvert, l'interface est occupée : l'enquête produit
+  // ne doit pas s'inviter par-dessus (§2 du handoff enquête). Le modal le
+  // déclare lui-même plutôt que de laisser un tiers le deviner depuis le DOM.
+  useEffect(() => {
+    if (!open) return;
+    return marquerOccupe();
+  }, [open]);
 
   if (!open || !mounted) return null;
 

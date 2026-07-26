@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { marquerOccupe } from "@/lib/ui-busy";
 import { createClient } from "@/lib/supabase/client";
 import { cleStockage } from "@/lib/storage-key";
 import { registerDocument } from "@/app/actions/deals";
@@ -29,6 +30,12 @@ export const Uploader = forwardRef<HTMLButtonElement, UploaderProps>(
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // Un dépôt en cours occupe l'utilisateur : pas d'enquête par-dessus.
+    useEffect(() => {
+      if (!busy) return;
+      return marquerOccupe();
+    }, [busy]);
     const proxyRef = useRef<HTMLButtonElement>(null);
 
     useImperativeHandle(ref, () => proxyRef.current as HTMLButtonElement);
