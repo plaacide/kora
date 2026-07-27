@@ -41,15 +41,23 @@ export default async function RejoindrePage({
     redirect(`/inscription?suivant=${suivant}${email}`);
   }
 
-  const { data: lien } = await supabase
-    .from("cohort_links")
-    .select("id, email, status, organizations!cohort_links_sae_org_id_fkey(name)")
-    .eq("token", token)
-    .maybeSingle();
+  // PAS de lecture directe de `cohort_links`. Sa politique exige d'être membre
+  // du programme ou de l'entreprise déjà rattachée — or l'invité n'est ni l'un
+  // ni l'autre AVANT d'avoir accepté. La requête renvoyait zéro ligne, et
+  // l'écran annonçait « invitation introuvable » à tous les invités.
+  //
+  // `invitation_apercu` rend exactement ce qu'un porteur de jeton a le droit de
+  // savoir : l'adresse visée, l'état, qui invite.
+  const { data: apercuData } = await supabase.rpc("invitation_apercu", {
+    p_token: token,
+  });
+  const lien = (
+    (apercuData ?? []) as Array<{
+      email: string; statut: string; programme: string; cohorte: string | null;
+    }>
+  )[0];
 
-  const programme =
-    (lien?.organizations as unknown as { name?: string } | null)?.name ??
-    "Un programme";
+  const programme = lien?.programme ?? "Un programme";
 
   // SANS ORGANISATION, ON NE PEUT PAS ACCEPTER. `accept_cohort_link` rattache
   // la cohorte à l'organisation de l'invité et refuse s'il n'en a pas
@@ -67,8 +75,8 @@ export default async function RejoindrePage({
   const sansEspace = !adhesion;
 
   const introuvable = !lien;
-  const dejaFait = lien?.status === "accepted";
-  const revoque = lien?.status === "revoked";
+  const dejaFait = lien?.statut === "accepted";
+  const revoque = lien?.statut === "revoked";
   // Le jeton peut circuler ; l'adresse, elle, ne ment pas. Même garde-fou que
   // pour les invitations investisseur.
   const mauvaiseAdresse =
