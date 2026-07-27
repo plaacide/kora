@@ -1629,7 +1629,16 @@
     "pendingInviteTitle": "{programme} invites you to join their cohort",
     "pendingInviteBody": "Cohort “{cohorte}”. Joining grants access to none of your documents — you remain in sole control of your file.",
     "pendingInviteBodyNoCohort": "Joining grants access to none of your documents — you remain in sole control of your file.",
-    "pendingInviteCta": "View the invitation"
+    "pendingInviteCta": "View the invitation",
+    "advice": {
+      "openedNoneJoined": "{envoyees, plural, one {One invitation went out} other {# invitations went out}}, nobody has accepted yet. That is common in the first week: a personal follow-up converts better than an automated reminder. {nom} opened the link without finishing — that is the one to call.",
+      "opened": "{nom} opened the link without going through. It is the most promising invitation on your list: a short call usually does it.",
+      "joinedEmpty": "{nom} has joined your cohort. Its file is still empty: this is the moment to point out the core documents. Your portfolio indicators switch on with its first upload.",
+      "startedNoConsent": "{nom} has started its file but has not yet agreed to be listed in your dealroom. That agreement is theirs to give, from their permissions — you cannot do it for them.",
+      "waiting": "{n, plural, one {One invitation is awaiting} other {# invitations are awaiting}} a reply, none has been opened yet. Past five days, a personal message beats another reminder."
+    },
+    "invitesSent": "{n, plural, one {# invitation sent} other {# invitations sent}}",
+    "invitesAccepted": "{n, plural, =0 {none accepted} one {# accepted} other {# accepted}}"
   },
   "showcase": {
     "title": "{programme} showcase",

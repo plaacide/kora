@@ -1629,7 +1629,16 @@
     "pendingInviteTitle": "{programme} vous invite à rejoindre sa cohorte",
     "pendingInviteBody": "Cohorte « {cohorte} ». Rejoindre ne donne accès à aucun de vos documents — vous restez seul maître de votre dossier.",
     "pendingInviteBodyNoCohort": "Rejoindre ne donne accès à aucun de vos documents — vous restez seul maître de votre dossier.",
-    "pendingInviteCta": "Voir l'invitation"
+    "pendingInviteCta": "Voir l'invitation",
+    "advice": {
+      "openedNoneJoined": "{envoyees, plural, one {Une invitation est partie} other {# invitations sont parties}}, personne n'a encore accepté. C'est fréquent la première semaine : une relance nominative convertit mieux qu'un rappel automatique. {nom} a ouvert le lien sans finir — c'est celle-là qu'il faut appeler.",
+      "opened": "{nom} a ouvert le lien sans aller au bout. C'est l'invitation la plus prometteuse de votre liste : un appel court y suffit généralement.",
+      "joinedEmpty": "{nom} a rejoint votre cohorte. Son dossier est encore vide : c'est le bon moment pour lui indiquer les pièces socle. Vos indicateurs de portefeuille s'activeront dès son premier dépôt.",
+      "startedNoConsent": "{nom} a entamé son dossier mais n'a pas encore accepté d'être listée dans votre dealroom. C'est elle qui donne cet accord, depuis ses autorisations — vous ne pouvez pas le faire à sa place.",
+      "waiting": "{n, plural, one {Une invitation attend} other {# invitations attendent}} une réponse, aucune n'a encore été ouverte. Au-delà de cinq jours, un message personnel vaut mieux qu'une relance de plus."
+    },
+    "invitesSent": "{n, plural, one {# invitation envoyée} other {# invitations envoyées}}",
+    "invitesAccepted": "{n, plural, =0 {aucune acceptée} one {# acceptée} other {# acceptées}}"
   },
   "showcase": {
     "title": "Vitrine {programme}",

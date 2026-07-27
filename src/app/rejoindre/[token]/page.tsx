@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { RejoindreForm } from "@/components/cohorte/RejoindreForm";
 
@@ -21,6 +22,15 @@ export default async function RejoindrePage({
 }) {
   const { token } = await params;
   const supabase = await createClient();
+
+  // « LIEN OUVERT » se mesure ICI, à la première visite, avant même de savoir
+  // qui regarde — c'est justement le cas qu'on veut distinguer : quelqu'un a
+  // ouvert et n'est pas allé au bout. Après la réponse (`after`) : le visiteur
+  // n'a pas à attendre une écriture qui ne le concerne pas.
+  after(async () => {
+    const client = await createClient();
+    await client.rpc("mark_cohort_link_opened", { p_token: token });
+  });
 
   const {
     data: { user },

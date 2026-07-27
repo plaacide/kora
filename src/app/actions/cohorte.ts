@@ -27,12 +27,14 @@ export interface CohorteResult {
 export async function inviteToCohort(
   email: string,
   cohortId?: string,
+  nom?: string,
 ): Promise<CohorteResult> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("invite_to_cohort", {
     p_email: email,
     p_cohort: cohortId ?? null,
+    p_name: nom?.trim() || null,
   });
   if (error) return { ok: false, error: error.message };
 
@@ -145,4 +147,55 @@ export async function relancerInvitation(
     emailSkipped: sent.skipped,
     emailError: sent.ok ? undefined : sent.error,
   };
+}
+
+/**
+ * Relance TOUTES les invitations en attente d'une cohorte — « Relancer tout le
+ * monde » de l'écran 09.
+ *
+ * La base fait la mise à jour et rend la liste ; on n'envoie que les e-mails.
+ * Boucler sur la relance unitaire depuis le navigateur aurait multiplié les
+ * allers-retours et laissé le travail à moitié fait si l'onglet se ferme.
+ */
+export async function relancerToutes(
+  cohorteId: string,
+): Promise<{ ok: boolean; n?: number; error?: string }> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("relaunch_cohort_links", {
+    p_cohort: cohorteId,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  const liens = (data ?? []) as Array<{
+    email: string; company_name: string | null; token: string;
+  }>;
+  if (liens.length === 0) return { ok: true, n: 0 };
+
+  const origine = originFromHeaders(await headers());
+  const locale = (await getLocale()) as "fr" | "en";
+
+  const { data: cohorte } = await supabase
+    .from("cohorts")
+    .select("organizations(name)")
+    .eq("id", cohorteId)
+    .maybeSingle();
+  const saeName =
+    (cohorte?.organizations as unknown as { name?: string } | null)?.name ??
+    "Un programme";
+
+  // En série, pas en parallèle : Resend limite le débit, et une rafale de
+  // quinze envois simultanés se fait écrêter — on perdrait des relances sans
+  // le voir.
+  for (const l of liens) {
+    const { subject, html } = cohortInviteEmail({
+      saeName,
+      link: `${origine}/rejoindre/${l.token}`,
+      locale,
+    });
+    await sendEmail({ to: l.email, subject, html });
+  }
+
+  revalidatePath("/cohortes");
+  return { ok: true, n: liens.length };
 }

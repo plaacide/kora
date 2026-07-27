@@ -3,10 +3,18 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody } from "@/components/ui/Card";
 import { CohorteForm, type LienCohorte } from "@/components/cohorte/CohorteForm";
-import {
-  JOURS_AVANT_EXPIRATION,
-  JOURS_ALERTE,
-} from "@/lib/demandes-echeance";
+import { JOURS_AVANT_EXPIRATION } from "@/lib/demandes-echeance";
+import { conseilCohorte } from "@/lib/conseil-cohorte";
+
+/**
+ * Au-delà, une invitation jamais ouverte passe « À RELANCER ».
+ *
+ * Cinq jours, comme la maquette : deux jours c'est encore le délai normal
+ * d'une boîte mail, cinq c'est un silence. Le seuil ne s'applique PAS aux
+ * invitations ouvertes — celles-là gardent leur statut, parce que « a vu et
+ * n'a pas fini » appelle un autre geste que « n'a rien vu ».
+ */
+const JOURS_AVANT_RELANCE = 5;
 import { aujourdhuiIso } from "@/lib/echeance";
 import { CohorteTable, type LigneEntreprise } from "@/components/cohorte/CohorteTable";
 import { QuestionsPanel, type Echange } from "@/components/cohorte/QuestionsPanel";
@@ -40,7 +48,7 @@ export default async function CohortePage({
   const [{ data }, { data: profil }] = await Promise.all([
     supabase
       .from("cohort_links")
-      .select("id, email, status, created_at, relaunched_at, organizations!cohort_links_startup_org_id_fkey(name)")
+      .select("id, email, company_name, status, created_at, relaunched_at, opened_at, startup_org_id")
       // Sans ce filtre, un programme à trois cohortes verrait les trois
       // mélangées sur chacune — l'écran mentirait sur ce qu'il montre.
       .eq("cohort_id", cohorteId)
@@ -77,6 +85,7 @@ export default async function CohortePage({
     orgId: m.startup_org_id,
     nom: m.name ?? "—",
   }));
+  const nomParOrgId = new Map(membresListe.map((m) => [m.orgId, m.nom]));
   const orgIds = membresListe.map((m) => m.orgId);
 
   const [{ data: consentements }, { data: vitrine }, { data: sallesData }, { data: leveesData }, { data: fils }] =
@@ -178,6 +187,23 @@ export default async function CohortePage({
   }));
 
   const nomCohorte = (cohorte as { name?: string } | null)?.name ?? "";
+
+  // « mars → décembre 2026 » : la période cadre tout le reste de l'écran. Une
+  // cohorte sans dates n'en affiche pas plutôt qu'un tiret — l'absence de dates
+  // est un choix du programme, pas une donnée manquante.
+  const c = cohorte as { starts_on?: string | null; ends_on?: string | null } | null;
+  const moisAn = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
+    month: "long",
+    year: "numeric",
+  });
+  const mois = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
+    month: "long",
+  });
+  const periode = c?.starts_on
+    ? c.ends_on
+      ? `${mois.format(new Date(c.starts_on))} → ${moisAn.format(new Date(c.ends_on))}`
+      : moisAn.format(new Date(c.starts_on))
+    : null;
   const totalSalles = lignes.reduce((n, l) => n + l.salles, 0);
   const limite =
     (profil?.organizations as unknown as { cohort_limit?: number } | null)
@@ -191,29 +217,69 @@ export default async function CohortePage({
   // `accept_cohort_link`, sinon l'écran et la base ne diraient pas la même
   // chose sur ce qui a expiré.
   const maintenant = aujourdhuiIso();
-  const invitations = ((data ?? []) as unknown as LienCohorte[]).map((l) => {
+  const invitations: LienCohorte[] = (
+    (data ?? []) as unknown as Array<{
+      id: string; email: string; company_name: string | null;
+      status: "pending" | "accepted" | "revoked";
+      created_at: string; relaunched_at: string | null; opened_at: string | null;
+      startup_org_id: string | null;
+    }>
+  ).map((l) => {
     const jours = Math.floor(
       (new Date(maintenant).getTime() -
         new Date(l.relaunched_at ?? l.created_at).getTime()) /
         86400000,
     );
+    // TROIS STATUTS, dans l'ordre où ils comptent pour le programme :
+    //  · périmée — plus rien à en tirer, il faut la relancer ;
+    //  · LIEN OUVERT — elle a vu et n'a pas fini : c'est celle qu'on appelle ;
+    //  · À RELANCER — envoyée, jamais ouverte, et ça traîne.
+    // Une invitation ouverte reste « ouverte » quel que soit son âge : le fait
+    // qu'elle ait été vue prime sur le temps écoulé.
+    const statut =
+      jours >= JOURS_AVANT_EXPIRATION
+        ? ("expiree" as const)
+        : l.opened_at
+          ? ("ouverte" as const)
+          : jours >= JOURS_AVANT_RELANCE
+            ? ("a_relancer" as const)
+            : ("envoyee" as const);
     return {
-      ...l,
+      id: l.id,
+      email: l.email,
+      companyName: l.company_name,
+      status: l.status,
+      statut,
       jours,
-      etat:
-        jours >= JOURS_AVANT_EXPIRATION
-          ? ("expiree" as const)
-          : jours >= JOURS_AVANT_EXPIRATION - JOURS_ALERTE
-            ? ("bientot" as const)
-            : ("fraiche" as const),
+      // Une fois acceptée, c'est le nom RÉEL de l'organisation qui fait foi —
+      // celui saisi à l'invitation n'était qu'une approximation du programme.
+      orgNom: l.startup_org_id ? (nomParOrgId.get(l.startup_org_id) ?? null) : null,
     };
   });
 
   // Invitations parties et sans réponse — ni acceptées, ni retirées, ni
   // périmées. C'est ce qui « court » au sens de la §3.
   const enAttente = invitations.filter(
-    (l) => l.status === "pending" && l.etat !== "expiree",
+    (l) => l.status === "pending" && l.statut !== "expiree",
   ).length;
+
+  // LE CONSEIL DU JOUR. Il NOMME quelqu'un : sans nom, c'est un bandeau ; avec,
+  // c'est une consigne. Un seul, le plus urgent — trois empilés ne se lisent pas.
+  const premiereOuverte = invitations.find(
+    (l) => l.status === "pending" && l.statut === "ouverte",
+  );
+  const arriveeVide = lignes.find((l) => l.salles === 0 || !l.dossierEntame);
+  const entameeSansAccord = lignes.find((l) => l.dossierEntame && !l.consent);
+  const conseil = conseilCohorte({
+    membres: lignes.length,
+    salles: totalSalles,
+    enAttente,
+    envoyees: invitations.filter((l) => l.status !== "revoked").length,
+    ouverteSansSuite:
+      premiereOuverte?.orgNom ?? premiereOuverte?.companyName ?? premiereOuverte?.email ?? null,
+    arriveeSansDossier: arriveeVide?.nom ?? null,
+    entameeSansAccord: entameeSansAccord?.nom ?? null,
+  });
 
   return (
     <div className="flex flex-col gap-5 text-[#1A1B1F]">
@@ -233,13 +299,28 @@ export default async function CohortePage({
             {/* §3 : « Ne jamais afficher 0 entreprise quand des invitations
                 courent. » Un programme qui vient d'inviter trois entreprises
                 et lit « 0 entreprises » croit que son geste s'est perdu. */}
+            {/* Sous-ligne de la maquette : période, puis l'état réel. Une
+                cohorte sans membre parle en INVITATIONS (« 3 envoyées ·
+                0 acceptée ») ; dès qu'une entreprise est là, elle parle en
+                entreprises. Ce ne sont pas les mêmes questions. */}
             <p className="text-[12.5px] text-[#6E727A] mt-1">
-              {t("companies", { n: lignes.length })} · {t("rooms", { n: totalSalles })}
-              {enAttente > 0 && (
-                <span className="text-[#B4741B]">
-                  {" · "}
-                  {t("pendingInvites", { n: enAttente })}
-                </span>
+              {periode && <span>{periode} · </span>}
+              {lignes.length === 0 && enAttente > 0 ? (
+                <>
+                  {t("invitesSent", { n: enAttente })} ·{" "}
+                  <span>{t("invitesAccepted", { n: 0 })}</span>
+                </>
+              ) : (
+                <>
+                  {t("companies", { n: lignes.length })} ·{" "}
+                  {t("rooms", { n: totalSalles })}
+                  {enAttente > 0 && (
+                    <span className="text-[#B4741B]">
+                      {" · "}
+                      {t("pendingInvites", { n: enAttente })}
+                    </span>
+                  )}
+                </>
               )}
             </p>
           </div>
@@ -250,6 +331,12 @@ export default async function CohortePage({
         {/* « Rapport bailleur » attend son écran (/rapports, §6 des règles) :
             absent plutôt qu'inerte, comme la règle produit l'exige. */}
       </div>
+
+      {conseil && (
+        <p className="text-[12.5px] text-[#55585F] leading-relaxed max-w-2xl bg-white border border-[#E8E5DC] rounded-[8px] px-4 py-3">
+          {t(`advice.${conseil.cle}`, conseil.params)}
+        </p>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         <div className="flex-1 min-w-0">
