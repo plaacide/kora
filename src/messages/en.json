@@ -879,7 +879,16 @@
     "revoke": "Revoke",
     "revokeConfirm": "Revoke {name}’s access? They will no longer be able to open your documents.",
     "emptyTitle": "Nobody has access yet",
-    "emptyBody": "Invite an investor: you will see their rights, the folders they can open and their last visit here."
+    "emptyBody": "Invite an investor: you will see their rights, the folders they can open and their last visit here.",
+    "mandateTitle": "Delegation",
+    "mandateIntro": "You may authorise a programme that supports you to open this room itself, without coming back to you. Without a mandate, it can only recommend a request — you decide.",
+    "mandateBadge": "MANDATE GIVEN",
+    "mandateGrant": "Give mandate",
+    "mandateConfirm": "Confirm",
+    "mandateCancel": "Cancel",
+    "mandateRevoke": "Withdraw mandate",
+    "mandateWarning": "{name} will be able to open this room to an investor without asking you. Every opening is still recorded in your audit log, and you keep the ability to revoke access one by one.",
+    "mandateRevokeHint": "Withdrawing the mandate prevents future openings. Access already granted stays open: it was granted in your name, and cutting it all at once would blindside investors who did nothing wrong. Remove it one by one above."
   },
   "viewer": {
     "title": "Viewer",

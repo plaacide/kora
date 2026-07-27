@@ -7,6 +7,10 @@ import { ShareButton } from "@/components/dataroom/ShareButton";
 import { RevokeButton } from "@/components/permissions/RevokeButton";
 import { RightsEditor } from "@/components/permissions/RightsEditor";
 import { EmptyState } from "@/components/ui/EmptyState";
+import {
+  MandatPanneau,
+  type ProgrammeMandat,
+} from "@/components/permissions/MandatPanneau";
 import type { Locale } from "@/i18n/locales";
 
 /**
@@ -51,6 +55,57 @@ export default async function PermissionsPage() {
         .order("created_at", { ascending: false })
         .limit(300),
     ]);
+
+  // ── Programmes qui accompagnent cette entreprise ────────────────────────
+  // Le mandat vit ici parce que c'est l'écran de « qui entre dans cette
+  // salle » : déléguer le droit d'ouvrir la porte est une décision d'accès, pas
+  // un réglage d'organisation. Rangée ailleurs, elle se prendrait sans voir la
+  // liste des invités qu'elle va faire grandir.
+  const { data: appartenances } = await supabase
+    .from("cohort_members")
+    .select("cohorts!inner(id, name, org_id, archived_at, organizations(name))")
+    .eq("startup_org_id", deal.org_id);
+
+  const parProgramme = new Map<string, ProgrammeMandat>();
+  for (const a of (appartenances ?? []) as unknown as Array<{
+    cohorts: {
+      name: string;
+      org_id: string;
+      archived_at: string | null;
+      organizations: { name?: string } | null;
+    };
+  }>) {
+    const c = a.cohorts;
+    // Une cohorte archivée fige la vitrine sans rien révoquer ; elle ne doit
+    // pas pour autant proposer un NOUVEAU mandat.
+    if (!c || c.archived_at) continue;
+    const cur = parProgramme.get(c.org_id);
+    if (cur) {
+      cur.cohortes.push(c.name);
+    } else {
+      parProgramme.set(c.org_id, {
+        orgId: c.org_id,
+        nom: c.organizations?.name ?? "—",
+        cohortes: [c.name],
+        mandate: false,
+      });
+    }
+  }
+
+  if (parProgramme.size > 0) {
+    const { data: mandats } = await supabase
+      .from("mandates")
+      .select("program_org_id")
+      .eq("startup_org_id", deal.org_id)
+      .eq("deal_id", deal.id)
+      .is("revoked_at", null);
+    for (const m of (mandats ?? []) as Array<{ program_org_id: string }>) {
+      const p = parProgramme.get(m.program_org_id);
+      if (p) p.mandate = true;
+    }
+  }
+
+  const programmes = [...parProgramme.values()];
 
   const nbFolders = (folders ?? []).length;
   const folderName = new Map((folders ?? []).map((f) => [f.id, f.name]));
@@ -135,6 +190,13 @@ export default async function PermissionsPage() {
             <RevokeButton dealId={deal.id} userId={i.id} folderIds={i.folderIds} label={t("revoke")} confirmLabel={t("revokeConfirm", { name: i.nom })} />
           </div>
         ))
+      )}
+
+      {/* Aucun programme ne l'accompagne : la section n'a personne à proposer.
+          L'afficher vide apprendrait une notion sans usage, au milieu de
+          l'écran où l'on gère ses invités. */}
+      {programmes.length > 0 && (
+        <MandatPanneau dealId={deal.id} programmes={programmes} />
       )}
     </div>
   );

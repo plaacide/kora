@@ -879,7 +879,16 @@
     "revoke": "Révoquer",
     "revokeConfirm": "Révoquer l’accès de {name} ? Cette personne ne pourra plus ouvrir vos documents.",
     "emptyTitle": "Personne n'a encore accès",
-    "emptyBody": "Invitez un investisseur : vous verrez ici ses droits, les dossiers qu'il peut ouvrir et sa dernière visite."
+    "emptyBody": "Invitez un investisseur : vous verrez ici ses droits, les dossiers qu'il peut ouvrir et sa dernière visite.",
+    "mandateTitle": "Délégation",
+    "mandateIntro": "Vous pouvez autoriser un programme qui vous accompagne à ouvrir cette salle lui-même, sans repasser par vous. Sans mandat, il ne peut que vous recommander une demande — c'est vous qui tranchez.",
+    "mandateBadge": "MANDAT DONNÉ",
+    "mandateGrant": "Donner mandat",
+    "mandateConfirm": "Je confirme",
+    "mandateCancel": "Annuler",
+    "mandateRevoke": "Retirer le mandat",
+    "mandateWarning": "{name} pourra ouvrir cette salle à un investisseur sans vous demander. Chaque ouverture reste inscrite à votre journal, et vous gardez la main pour révoquer un accès un par un.",
+    "mandateRevokeHint": "Retirer le mandat empêche les ouvertures futures. Les accès déjà accordés restent ouverts : ils l'ont été en votre nom, et les couper d'un coup surprendrait des investisseurs qui n'y sont pour rien. Ils se retirent un par un ci-dessus."
   },
   "viewer": {
     "title": "Visionneuse",
