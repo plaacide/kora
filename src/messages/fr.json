@@ -1718,8 +1718,12 @@
     "refusedWhy": "Ce qui entrera dedans : entreprises, montants recherchés, préparation, pièces manquantes par catégorie, invitations et accès accordés sur la période.",
     "noCohortTitle": "Aucune cohorte à rapporter",
     "noCohortBody": "Créez une cohorte et invitez-y des entreprises : le rapport se construira à partir de leurs dossiers.",
-    "trendMissing": "Tendance mensuelle",
-    "trendMissingBody": "Un bailleur lit des courbes, pas un instantané. L'historique mensuel demande une tâche planifiée, qui n'existe pas encore sur cette installation — le rapport ne montre donc que l'état du jour.",
-    "asOf": "État au {date}"
+    "asOf": "État au {date}",
+    "trendTitle": "Tendance mensuelle",
+    "trendNone": "Le premier relevé sera fait en ouvrant ce rapport. Revenez le mois prochain : une courbe demande au moins deux points.",
+    "trendFirst": "Un seul relevé pour l'instant, celui de ce mois-ci. La tendance apparaîtra au relevé suivant — nous ne traçons pas de courbe à partir d'un point.",
+    "trendRow": "{entreprises} entr. · {accords} accès",
+    "trendGap": "{n, plural, one {# mois sans relevé} other {# mois sans relevé}}",
+    "trendFoot": "Chaque relevé est pris au premier passage du mois sur cet écran, puis figé. Les mois où personne n'a ouvert le rapport restent vides : nous ne relions pas deux points distants, cela inventerait les mesures manquantes."
   }
 }

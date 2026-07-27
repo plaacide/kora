@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { after } from "next/server";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -17,12 +18,39 @@ import type { Locale } from "@/i18n/locales";
  *
  * Le programme ne lit jamais un document (§0.1) : on compte des pièces et des
  * statuts d'exigences, jamais un contenu ni même un nom de fichier.
+ *
+ * LA TENDANCE SE RELÈVE, ELLE NE SE CALCULE PAS. Un bailleur lit des courbes,
+ * dit la §6 — et une courbe ne se reconstitue pas après coup : `checklist_items`
+ * ne garde pas l'historique de ses statuts, `readiness_score` est écrasé à
+ * chaque recalcul. Ouvrir ce rapport DÉCLENCHE donc le relevé du mois, une
+ * seule fois par mois et par cohorte, après l'envoi de la réponse (`after`).
+ *
+ * Le prix est assumé : un mois où personne n'ouvre le rapport ne laisse aucun
+ * point. Les trous sont montrés tels quels, jamais reliés — une droite entre
+ * deux points distants de trois mois inventerait deux mesures.
  */
 
 const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
 
 /** Au moins une entreprise au dossier entamé — le seuil de la règle §6. */
 const SEUIL_ENTREPRISES = 1;
+
+/**
+ * Mois entiers entre deux relevés. Sert à repérer les TROUS — les mois où
+ * personne n'a ouvert le rapport, donc où rien n'a été mesuré.
+ *
+ * Compté sur (année, mois) et non en millisecondes : février et juillet n'ont
+ * pas la même durée, et une division approximative ferait apparaître ou
+ * disparaître un trou selon le mois.
+ */
+function moisEcoules(a: string, b: string): number {
+  const d1 = new Date(a);
+  const d2 = new Date(b);
+  return (
+    (d2.getUTCFullYear() - d1.getUTCFullYear()) * 12 +
+    (d2.getUTCMonth() - d1.getUTCMonth())
+  );
+}
 
 export default async function RapportsPage({
   searchParams,
@@ -55,6 +83,26 @@ export default async function RapportsPage({
 
   const cohorteId = choisie && cohortes.some((c) => c.id === choisie) ? choisie : cohortes[0].id;
   const cohorte = cohortes.find((c) => c.id === cohorteId)!;
+
+  // Après la réponse : le lecteur n'attend pas les agrégats du relevé, et un
+  // échec ne doit pas empêcher le rapport de s'afficher. La fonction sort tôt
+  // si le mois est déjà relevé.
+  after(async () => {
+    const client = await createClient();
+    await client.rpc("record_cohort_snapshot", { p_cohort: cohorteId });
+  });
+
+  const { data: relevesData } = await supabase
+    .from("cohort_snapshots")
+    .select("month, companies, rooms, readiness_avg, items_total, items_done, granted")
+    .eq("cohort_id", cohorteId)
+    .order("month");
+
+  const releves = (relevesData ?? []) as Array<{
+    month: string; companies: number; rooms: number;
+    readiness_avg: number | null; items_total: number; items_done: number;
+    granted: number;
+  }>;
 
   const { data: membres } = await supabase
     .from("cohort_members")
@@ -229,15 +277,68 @@ export default async function RapportsPage({
         </div>
       )}
 
-      {/* Signalé, pas simulé : la règle §6 veut un instantané mensuel pour
-          donner la tendance. Il demande une tâche planifiée, absente de cette
-          installation. Fabriquer une courbe depuis un seul point serait
-          inventer une donnée. */}
+      {/* LA TENDANCE. Deux points au moins, sinon il n'y a pas de courbe — et
+          on le dit plutôt que de dessiner un trait à partir d'un seul relevé. */}
       <div className="mt-4 rounded-[6px] border border-[#E2DED4] bg-white px-4 py-3">
         <div style={mono} className="text-[9px] tracking-[0.08em] text-[#A0A3AB] uppercase">
-          {t("trendMissing")}
+          {t("trendTitle")}
         </div>
-        <p className="text-[12px] text-[#6E727A] mt-1.5 leading-relaxed">{t("trendMissingBody")}</p>
+
+        {releves.length < 2 ? (
+          <p className="text-[12px] text-[#6E727A] mt-1.5 leading-relaxed">
+            {releves.length === 0 ? t("trendNone") : t("trendFirst")}
+          </p>
+        ) : (
+          <>
+            <div className="flex flex-col mt-2.5">
+              {releves.map((r, i) => {
+                const precedent = releves[i - 1];
+                // Un mois sans relevé se MONTRE. Sauter la ligne laisserait
+                // croire à une continuité que la mesure n'a pas.
+                const trou =
+                  precedent !== undefined &&
+                  moisEcoules(precedent.month, r.month) > 1;
+                const prep = r.readiness_avg ?? 0;
+                return (
+                  <div key={r.month}>
+                    {trou && (
+                      <div className="flex items-center gap-3 py-1.5">
+                        <span style={mono} className="w-[70px] shrink-0 text-[10.5px] text-[#C9C6BD]">
+                          ···
+                        </span>
+                        <span className="text-[11px] italic text-[#A9ACBB]">
+                          {t("trendGap", {
+                            n: moisEcoules(precedent!.month, r.month) - 1,
+                          })}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 py-1.5">
+                      <span style={mono} className="w-[70px] shrink-0 text-[10.5px] text-[#8B8FA3]">
+                        {jour.format(new Date(r.month))}
+                      </span>
+                      <span className="flex-1 h-1.5 rounded-full bg-[#E8E5DC] overflow-hidden">
+                        <span
+                          className="block h-full rounded-full bg-[#E85C2B]"
+                          style={{ width: `${Math.min(100, Math.max(0, prep))}%` }}
+                        />
+                      </span>
+                      <span style={mono} className="w-[36px] shrink-0 text-right text-[11px] text-[#1A1B1F]">
+                        {r.readiness_avg == null ? "—" : `${prep}%`}
+                      </span>
+                      <span style={mono} className="w-[92px] shrink-0 text-right text-[10.5px] text-[#A0A3AB]">
+                        {t("trendRow", { entreprises: r.companies, accords: r.granted })}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-[#A0A3AB] mt-2 leading-relaxed">
+              {t("trendFoot")}
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
