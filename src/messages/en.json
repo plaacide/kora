@@ -888,7 +888,16 @@
     "mandateCancel": "Cancel",
     "mandateRevoke": "Withdraw mandate",
     "mandateWarning": "{name} will be able to open this room to an investor without asking you. Every opening is still recorded in your audit log, and you keep the ability to revoke access one by one.",
-    "mandateRevokeHint": "Withdrawing the mandate prevents future openings. Access already granted stays open: it was granted in your name, and cutting it all at once would blindside investors who did nothing wrong. Remove it one by one above."
+    "mandateRevokeHint": "Withdrawing the mandate prevents future openings. Access already granted stays open: it was granted in your name, and cutting it all at once would blindside investors who did nothing wrong. Remove it one by one above.",
+    "listingTitle": "Be listed in a dealroom",
+    "listingIntro": "A programme that supports you may show your profile to its investors: the indicators you published, the amount you seek, your readiness. No document is viewable there — an interested investor requests access, and you decide.",
+    "listingGrant": "Agree to be listed",
+    "listingRevoke": "Stop being listed",
+    "listingBadge": "LISTED",
+    "listingRoom": "Room shown: {salle}",
+    "listingRoomOther": "You designated another room ({salle}). Agreeing from this one will move the profile.",
+    "listingRevokeHint": "Withdrawing your agreement prevents any new publication. A profile already online stays until the programme removes it — cutting it instantly would blindside an investor mid-read, and the programme should know you withdrew.",
+    "listingNoCohort": "You belong to no cohort: nobody can list you."
   },
   "viewer": {
     "title": "Viewer",

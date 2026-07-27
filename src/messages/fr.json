@@ -888,7 +888,16 @@
     "mandateCancel": "Annuler",
     "mandateRevoke": "Retirer le mandat",
     "mandateWarning": "{name} pourra ouvrir cette salle à un investisseur sans vous demander. Chaque ouverture reste inscrite à votre journal, et vous gardez la main pour révoquer un accès un par un.",
-    "mandateRevokeHint": "Retirer le mandat empêche les ouvertures futures. Les accès déjà accordés restent ouverts : ils l'ont été en votre nom, et les couper d'un coup surprendrait des investisseurs qui n'y sont pour rien. Ils se retirent un par un ci-dessus."
+    "mandateRevokeHint": "Retirer le mandat empêche les ouvertures futures. Les accès déjà accordés restent ouverts : ils l'ont été en votre nom, et les couper d'un coup surprendrait des investisseurs qui n'y sont pour rien. Ils se retirent un par un ci-dessus.",
+    "listingTitle": "Être listé dans un dealroom",
+    "listingIntro": "Un programme qui vous accompagne peut montrer votre fiche à ses investisseurs : les indicateurs que vous avez publiés, votre montant recherché, votre préparation. Aucun document n'y est consultable — un investisseur intéressé demande l'accès, et c'est vous qui tranchez.",
+    "listingGrant": "Accepter d'être listé",
+    "listingRevoke": "Ne plus être listé",
+    "listingBadge": "LISTÉ",
+    "listingRoom": "Salle montrée : {salle}",
+    "listingRoomOther": "Vous avez désigné une autre salle ({salle}). Accepter depuis celle-ci déplacera la fiche.",
+    "listingRevokeHint": "Retirer votre accord empêche toute nouvelle publication. Une fiche déjà en ligne y reste jusqu'à ce que le programme la retire — la couper dans la seconde surprendrait un investisseur en pleine lecture, et le programme doit savoir que vous vous êtes retiré.",
+    "listingNoCohort": "Vous n'appartenez à aucune cohorte : personne ne peut vous lister."
   },
   "viewer": {
     "title": "Visionneuse",

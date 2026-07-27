@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import {
   MandatPanneau,
   type ProgrammeMandat,
+  type CohorteListage,
 } from "@/components/permissions/MandatPanneau";
 import type { Locale } from "@/i18n/locales";
 
@@ -67,8 +68,10 @@ export default async function PermissionsPage() {
     .eq("startup_org_id", deal.org_id);
 
   const parProgramme = new Map<string, ProgrammeMandat>();
+  const listages: CohorteListage[] = [];
   for (const a of (appartenances ?? []) as unknown as Array<{
     cohorts: {
+      id: string;
       name: string;
       org_id: string;
       archived_at: string | null;
@@ -79,6 +82,14 @@ export default async function PermissionsPage() {
     // Une cohorte archivée fige la vitrine sans rien révoquer ; elle ne doit
     // pas pour autant proposer un NOUVEAU mandat.
     if (!c || c.archived_at) continue;
+    listages.push({
+      cohorteId: c.id,
+      cohorteNom: c.name,
+      programmeNom: c.organizations?.name ?? "—",
+      liste: false,
+      salleDesignee: null,
+      salleEstCelleCi: false,
+    });
     const cur = parProgramme.get(c.org_id);
     if (cur) {
       cur.cohortes.push(c.name);
@@ -93,15 +104,42 @@ export default async function PermissionsPage() {
   }
 
   if (parProgramme.size > 0) {
-    const { data: mandats } = await supabase
-      .from("mandates")
-      .select("program_org_id")
-      .eq("startup_org_id", deal.org_id)
-      .eq("deal_id", deal.id)
-      .is("revoked_at", null);
+    const [{ data: mandats }, { data: accords }] = await Promise.all([
+      supabase
+        .from("mandates")
+        .select("program_org_id")
+        .eq("startup_org_id", deal.org_id)
+        .eq("deal_id", deal.id)
+        .is("revoked_at", null),
+      // L'accord de listage est par COHORTE, pas par salle : on le lit sans
+      // filtrer sur `deal.id`, justement pour repérer le cas où l'entreprise a
+      // désigné une AUTRE salle. Filtrer ici l'aurait rendu invisible, et
+      // consentir depuis cet écran aurait déplacé sa fiche sans prévenir.
+      supabase
+        .from("listing_consents")
+        .select("cohort_id, deal_id, deals(name)")
+        .eq("startup_org_id", deal.org_id)
+        .is("revoked_at", null),
+    ]);
+
     for (const m of (mandats ?? []) as Array<{ program_org_id: string }>) {
       const p = parProgramme.get(m.program_org_id);
       if (p) p.mandate = true;
+    }
+
+    const parCohorte = new Map(
+      ((accords ?? []) as unknown as Array<{
+        cohort_id: string;
+        deal_id: string | null;
+        deals: { name?: string } | null;
+      }>).map((a) => [a.cohort_id, a]),
+    );
+    for (const l of listages) {
+      const a = parCohorte.get(l.cohorteId);
+      if (!a) continue;
+      l.liste = true;
+      l.salleDesignee = a.deals?.name ?? null;
+      l.salleEstCelleCi = a.deal_id === deal.id;
     }
   }
 
@@ -196,7 +234,11 @@ export default async function PermissionsPage() {
           L'afficher vide apprendrait une notion sans usage, au milieu de
           l'écran où l'on gère ses invités. */}
       {programmes.length > 0 && (
-        <MandatPanneau dealId={deal.id} programmes={programmes} />
+        <MandatPanneau
+          dealId={deal.id}
+          programmes={programmes}
+          cohortes={listages}
+        />
       )}
     </div>
   );

@@ -3,7 +3,12 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { donnerMandat, retirerMandat } from "@/app/actions/mandat";
+import {
+  donnerMandat,
+  retirerMandat,
+  accepterListage,
+  retirerListage,
+} from "@/app/actions/mandat";
 
 const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
 
@@ -13,6 +18,21 @@ export interface ProgrammeMandat {
   /** Cohortes vivantes par lesquelles ce programme accompagne l'entreprise. */
   cohortes: string[];
   mandate: boolean;
+}
+
+export interface CohorteListage {
+  cohorteId: string;
+  cohorteNom: string;
+  programmeNom: string;
+  /** Accord vivant pour cette cohorte. */
+  liste: boolean;
+  /**
+   * Salle désignée par l'entreprise, si elle a consenti. Comparée à la salle
+   * courante : consentir depuis une autre DÉPLACE la fiche, et il faut le dire
+   * avant le clic, pas après.
+   */
+  salleDesignee: string | null;
+  salleEstCelleCi: boolean;
 }
 
 /**
@@ -32,15 +52,28 @@ export interface ProgrammeMandat {
 export function MandatPanneau({
   dealId,
   programmes,
+  cohortes,
 }: {
   dealId: string;
   programmes: ProgrammeMandat[];
+  cohortes: CohorteListage[];
 }) {
   const t = useTranslations("permissions");
   const router = useRouter();
   const [confirme, setConfirme] = useState<string | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
   const [encours, demarrer] = useTransition();
+
+  function listage(cohorteId: string, accepter: boolean) {
+    setErreur(null);
+    demarrer(async () => {
+      const r = accepter
+        ? await accepterListage(cohorteId, dealId)
+        : await retirerListage(cohorteId);
+      if (!r.ok) setErreur(r.error ?? "—");
+      router.refresh();
+    });
+  }
 
   function agir(programmeId: string, donner: boolean) {
     setErreur(null);
@@ -55,6 +88,95 @@ export function MandatPanneau({
   }
 
   return (
+    <>
+      {/* ÊTRE LISTÉ VIENT EN PREMIER, et c'est délibéré : c'est le geste le
+          plus léger, celui qui a du sens sans l'autre. Le mandat n'a de sens
+          qu'une fois listé — un investisseur ne peut demander l'accès que
+          depuis une fiche. Les présenter dans l'autre ordre proposerait de
+          déléguer avant d'avoir quoi que ce soit à déléguer. */}
+      <section className="mt-8">
+        <div
+          style={mono}
+          className="text-[9px] tracking-[0.08em] text-[#A0A3AB] uppercase"
+        >
+          {t("listingTitle")}
+        </div>
+        <p className="text-[12px] text-[#6E727A] mt-1.5 max-w-xl leading-relaxed">
+          {t("listingIntro")}
+        </p>
+
+        <div className="mt-3 bg-white border border-[#E2DED4] rounded-[8px]">
+          {cohortes.map((c, i) => (
+            <div
+              key={c.cohorteId}
+              className={
+                "px-4 py-3.5 " + (i > 0 ? "border-t border-[#F0EDE4]" : "")
+              }
+            >
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="min-w-0">
+                  <span className="block text-[13px] font-[600] truncate">
+                    {c.cohorteNom}
+                  </span>
+                  <span className="block text-[11px] text-[#9DA0A8] truncate">
+                    {c.programmeNom}
+                  </span>
+                </span>
+
+                {c.liste && (
+                  <span
+                    style={mono}
+                    className="shrink-0 text-[8.5px] font-[700] tracking-[0.06em] rounded-[4px] px-2 py-[3px] text-[#147A5C] bg-[#E4F3EC]"
+                  >
+                    {t("listingBadge")}
+                  </span>
+                )}
+
+                <span className="ml-auto shrink-0">
+                  {c.liste && c.salleEstCelleCi ? (
+                    <button
+                      onClick={() => listage(c.cohorteId, false)}
+                      disabled={encours}
+                      className="text-[11.5px] text-[#9DA0A8] underline underline-offset-2 hover:text-[#C0392B] disabled:no-underline"
+                    >
+                      {t("listingRevoke")}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => listage(c.cohorteId, true)}
+                      disabled={encours}
+                      className="rounded-[5px] border border-[#E2DED4] px-3 py-1.5 text-[12px] font-[550] text-[#33353B] hover:border-[#C9C6BD] disabled:opacity-60"
+                    >
+                      {t("listingGrant")}
+                    </button>
+                  )}
+                </span>
+              </div>
+
+              {/* La salle montrée est une information, pas un détail : une
+                  entreprise à trois salles ne veut pas forcément montrer la
+                  même, et consentir d'ici déplacerait la fiche. */}
+              {c.liste && (
+                <p
+                  className={
+                    "text-[11.5px] mt-1.5 leading-relaxed " +
+                    (c.salleEstCelleCi ? "text-[#8B8FA3]" : "text-[#8A4B2C]")
+                  }
+                >
+                  {c.salleEstCelleCi
+                    ? t("listingRoom", { salle: c.salleDesignee ?? "—" })
+                    : t("listingRoomOther", { salle: c.salleDesignee ?? "—" })}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <p className="text-[11.5px] text-[#8B8FA3] mt-2.5 max-w-xl leading-relaxed">
+          {t("listingRevokeHint")}
+        </p>
+      </section>
+
     <section className="mt-8">
       <div
         style={mono}
@@ -149,5 +271,6 @@ export function MandatPanneau({
         {t("mandateRevokeHint")}
       </p>
     </section>
+    </>
   );
 }
