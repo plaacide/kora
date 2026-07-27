@@ -962,6 +962,21 @@
     "colReadiness": "Complétude",
     "hint": "Glissez une carte d'une colonne à l'autre, ou utilisez le sélecteur au bas de chaque carte."
   },
+  "portfolio": {
+    "title": "Portefeuille",
+    "subtitle": "{n, plural, one {# entreprise} other {# entreprises}} · préparation moyenne {moyenne} %",
+    "export": "Exporter (Excel)",
+    "kpiCompanies": "Entreprises",
+    "kpiReady": "Prêtes (≥ {seuil} %)",
+    "kpiAverage": "Préparation moyenne",
+    "kpiVolume": "Volume recherché",
+    "kpiVolumeMixed": "devises multiples",
+    "missing": "Il lui reste à fournir",
+    "emptyTitle": "Vos indicateurs attendent le premier dépôt",
+    "emptyBody": "Préparation moyenne, pièces manquantes, entreprises prêtes : tout se calcule à partir de ce que les entreprises déposent. Tant que la cohorte est vide, ces chiffres n'existent pas.",
+    "emptyFoot": "Nous n'affichons pas d'indicateurs à zéro : un tableau de bord vide se lit comme un produit cassé.",
+    "emptyCta": "Inviter une entreprise"
+  },
   "deal": {
     "title": "Fiche deal",
     "subtitle": "Modifiez le deal, suivez son avancement et accédez à sa data room.",

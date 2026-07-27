@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
@@ -17,6 +18,10 @@ import { EmptyState } from "@/components/ui/EmptyState";
  * s'affichent pas du tout — on ne montre pas « 0 startup · 0 % · 0 FCFA ». Un
  * tableau de bord entièrement à zéro se lit comme un produit cassé, pas comme
  * un produit qui attend. L'état vide dit ce qui les remplira.
+ *
+ * LE SEUIL « PRÊTE » EST UNE CONSTANTE. Il vivait en double — dans le filtre et
+ * dans le libellé « Prêtes (≥ 75 %) ». Deux 75 côte à côte, c'est un jour où
+ * l'un des deux bouge seul.
  *
  * Les pièces manquantes sont affichées NOMMÉES. Un directeur de programme qui
  * lit « 40 % » ne sait pas quoi faire de sa journée ; « il manque le RCCM et
@@ -38,12 +43,24 @@ interface Ligne {
   missing: string[] | null;
 }
 
-function montant(v: number | null, devise: string | null): string {
+/** Préparation à partir de laquelle une entreprise peut se présenter. */
+const SEUIL_PRETE = 75;
+
+function montant(
+  v: number | null,
+  devise: string | null,
+  nf: Intl.NumberFormat,
+): string {
   if (v === null) return "—";
-  return `${new Intl.NumberFormat("fr-FR").format(v)} ${devise ?? ""}`.trim();
+  return `${nf.format(v)} ${devise ?? ""}`.trim();
 }
 
 export default async function PortefeuillePage() {
+  const t = await getTranslations("portfolio");
+  const locale = await getLocale();
+  // Les nombres suivaient « fr-FR » quelle que soit la langue : un lecteur
+  // anglophone lisait des séparateurs français.
+  const nf = new Intl.NumberFormat(locale === "fr" ? "fr-FR" : "en-US");
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("sae_portfolio");
   const lignes = (error ? [] : ((data ?? []) as Ligne[])).sort(
@@ -68,22 +85,24 @@ export default async function PortefeuillePage() {
       : null;
   const devise = devises.size === 1 ? [...devises][0] : null;
 
-  // Prêtes = préparation ≥ 75 %. Le seuil qui intéresse un bailleur : combien
-  // de sa cohorte peut se présenter à un investisseur aujourd'hui.
-  const pretes = lignes.filter((l) => (l.readiness ?? 0) >= 75).length;
+  // Le seuil qui intéresse un bailleur : combien de sa cohorte peut se
+  // présenter à un investisseur aujourd'hui.
+  const pretes = lignes.filter((l) => (l.readiness ?? 0) >= SEUIL_PRETE).length;
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-[22px] font-[650] tracking-[-0.02em]">
-            Portefeuille
+            {t("title")}
           </h1>
-          <p className="text-[12.5px] text-ink-secondary mt-0.5">
-            {lignes.length === 0
-              ? "Aucune startup dans votre cohorte pour l’instant."
-              : `${lignes.length} startup${lignes.length > 1 ? "s" : ""} · préparation moyenne ${moyenne} %`}
-          </p>
+          {/* Pas de sous-titre quand c'est vide : l'état vide ci-dessous dit
+              déjà, et mieux, qu'il n'y a personne. */}
+          {lignes.length > 0 && (
+            <p className="text-[12.5px] text-ink-secondary mt-0.5">
+              {t("subtitle", { n: lignes.length, moyenne })}
+            </p>
+          )}
         </div>
         {lignes.length > 0 && (
           <a
@@ -95,7 +114,7 @@ export default async function PortefeuillePage() {
               <path d="M7 10l5 5 5-5" />
               <path d="M4 21h16" />
             </svg>
-            Exporter (Excel)
+            {t("export")}
           </a>
         )}
       </div>
@@ -103,16 +122,16 @@ export default async function PortefeuillePage() {
       {lignes.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: "Startups", valeur: String(lignes.length) },
-            { label: "Prêtes (≥ 75 %)", valeur: `${pretes}/${lignes.length}` },
-            { label: "Préparation moyenne", valeur: `${moyenne} %` },
+            { label: t("kpiCompanies"), valeur: String(lignes.length) },
             {
-              label: "Volume recherché",
-              valeur:
-                volume !== null
-                  ? `${new Intl.NumberFormat("fr-FR").format(volume)} ${devise ?? ""}`.trim()
-                  : "—",
-              indice: volume === null ? "devises multiples" : undefined,
+              label: t("kpiReady", { seuil: SEUIL_PRETE }),
+              valeur: `${pretes}/${lignes.length}`,
+            },
+            { label: t("kpiAverage"), valeur: `${moyenne} %` },
+            {
+              label: t("kpiVolume"),
+              valeur: volume !== null ? montant(volume, devise, nf) : "—",
+              indice: volume === null ? t("kpiVolumeMixed") : undefined,
             },
           ].map((k) => (
             <Card key={k.label}>
@@ -136,12 +155,12 @@ export default async function PortefeuillePage() {
 
       {lignes.length === 0 ? (
         <EmptyState
-          title="Vos indicateurs attendent le premier dépôt"
-          description="Préparation moyenne, pièces manquantes, entreprises prêtes : tout se calcule à partir de ce que les entreprises déposent. Tant que la cohorte est vide, ces chiffres n'existent pas."
-          foot="Nous n'affichons pas d'indicateurs à zéro : un tableau de bord vide se lit comme un produit cassé."
+          title={t("emptyTitle")}
+          description={t("emptyBody")}
+          foot={t("emptyFoot")}
           action={
             <Link href="/cohortes" className="sz-cta text-[13px] px-4 py-2">
-              Inviter une startup
+              {t("emptyCta")}
             </Link>
           }
         />
@@ -159,7 +178,7 @@ export default async function PortefeuillePage() {
                       {l.startup_name}
                     </div>
                     <div className="text-[11.5px] text-ink-muted mt-0.5">
-                      {montant(l.amount, l.currency)}
+                      {montant(l.amount, l.currency, nf)}
                       {l.stage ? ` · ${l.stage}` : ""}
                     </div>
                   </div>
@@ -171,7 +190,7 @@ export default async function PortefeuillePage() {
                       tone={
                         (l.readiness ?? 0) < 40
                           ? "amber"
-                          : (l.readiness ?? 0) < 75
+                          : (l.readiness ?? 0) < SEUIL_PRETE
                             ? "indigo"
                             : "success"
                       }
@@ -184,7 +203,7 @@ export default async function PortefeuillePage() {
                 {l.missing && l.missing.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-separator-soft">
                     <div className="text-[10.5px] font-[650] uppercase tracking-[0.05em] text-ink-muted mb-1.5">
-                      Il lui reste à fournir
+                      {t("missing")}
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {l.missing.map((m) => (

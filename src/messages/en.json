@@ -962,6 +962,21 @@
     "colReadiness": "Completeness",
     "hint": "Drag a card between columns, or use the selector at the bottom of each card."
   },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "{n, plural, one {# company} other {# companies}} · {moyenne}% average readiness",
+    "export": "Export (Excel)",
+    "kpiCompanies": "Companies",
+    "kpiReady": "Ready (≥ {seuil}%)",
+    "kpiAverage": "Average readiness",
+    "kpiVolume": "Amount sought",
+    "kpiVolumeMixed": "multiple currencies",
+    "missing": "Still to provide",
+    "emptyTitle": "Your indicators are waiting for the first upload",
+    "emptyBody": "Average readiness, missing documents, companies ready: everything is computed from what companies upload. While the cohort is empty, these figures do not exist.",
+    "emptyFoot": "We do not display indicators at zero: an empty dashboard reads as a broken product.",
+    "emptyCta": "Invite a company"
+  },
   "deal": {
     "title": "Deal sheet",
     "subtitle": "Edit the deal, track its progress and open its data room.",
