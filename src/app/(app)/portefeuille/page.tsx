@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Mono } from "@/components/ui/Table";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 /**
  * Le portefeuille d'un programme.
@@ -11,6 +12,11 @@ import { Mono } from "@/components/ui/Table";
  * colonnes y sont énumérées, donc ce qui n'y figure pas ne peut pas fuiter ici
  * par inadvertance. Aucun nom de document n'en sort — c'est structurel, pas
  * une précaution d'affichage.
+ *
+ * AUCUN INDICATEUR À ZÉRO. Quand la cohorte est vide, les quatre cartes ne
+ * s'affichent pas du tout — on ne montre pas « 0 startup · 0 % · 0 FCFA ». Un
+ * tableau de bord entièrement à zéro se lit comme un produit cassé, pas comme
+ * un produit qui attend. L'état vide dit ce qui les remplira.
  *
  * Les pièces manquantes sont affichées NOMMÉES. Un directeur de programme qui
  * lit « 40 % » ne sait pas quoi faire de sa journée ; « il manque le RCCM et
@@ -129,20 +135,16 @@ export default async function PortefeuillePage() {
       )}
 
       {lignes.length === 0 ? (
-        <Card>
-          <CardBody>
-            <div className="flex flex-col items-start gap-3 py-3">
-              <p className="text-[12.5px] text-ink-secondary max-w-md leading-relaxed">
-                Invitez vos startups à rejoindre votre cohorte. Chacune accepte
-                elle-même : vous verrez alors sa préparation, jamais ses
-                documents.
-              </p>
-              <Link href="/cohortes" className="sz-cta text-[13px] px-4 py-2">
-                Inviter une startup
-              </Link>
-            </div>
-          </CardBody>
-        </Card>
+        <EmptyState
+          title="Vos indicateurs attendent le premier dépôt"
+          description="Préparation moyenne, pièces manquantes, entreprises prêtes : tout se calcule à partir de ce que les entreprises déposent. Tant que la cohorte est vide, ces chiffres n'existent pas."
+          foot="Nous n'affichons pas d'indicateurs à zéro : un tableau de bord vide se lit comme un produit cassé."
+          action={
+            <Link href="/cohortes" className="sz-cta text-[13px] px-4 py-2">
+              Inviter une startup
+            </Link>
+          }
+        />
       ) : (
         <div className="flex flex-col gap-3">
           {/* Trié du moins préparé au plus préparé : ceux qui ont besoin d'un

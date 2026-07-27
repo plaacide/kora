@@ -106,7 +106,7 @@ export default async function DemandesPage() {
       </div>
 
       {demandes.length === 0 ? (
-        <EmptyState title={t("emptyTitle")} description={t("emptyBody")} />
+        <EmptyState title={t("emptyTitle")} description={t("emptyBody")} foot={t("emptyFoot")} />
       ) : (
         <>
           <div className="flex flex-col gap-2.5">

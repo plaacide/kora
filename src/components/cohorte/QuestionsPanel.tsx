@@ -73,7 +73,12 @@ export function QuestionsPanel({
 
       <div className="flex-1 flex flex-col gap-2 min-h-0">
         {echanges.length === 0 ? (
-          <EmptyState inset title={t("threadsEmptyTitle")} description={t("threadsEmptyBody")} />
+          <EmptyState
+            inset
+            title={t("threadsEmptyTitle")}
+            description={t("threadsEmptyBody")}
+            foot={t("threadsEmptyFoot")}
+          />
         ) : (
           echanges.map((e) => (
             <div key={e.id} className="bg-white border border-[#E2DED4] rounded-[6px] px-3.5 py-3">

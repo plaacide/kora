@@ -164,7 +164,7 @@ export default async function CohortesPage() {
       </div>
 
       {lignes.length === 0 ? (
-        <EmptyState title={t("emptyTitle")} description={t("emptyBody")} />
+        <EmptyState title={t("emptyTitle")} description={t("emptyBody")} foot={t("emptyFoot")} />
       ) : (
         <div className="flex flex-col gap-2.5">
           {lignes.map((c) => (

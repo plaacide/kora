@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { publierVitrine } from "@/app/actions/dealroom";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 /**
  * Table des entreprises d'une cohorte + barre de sélection (§2 de la spec).
@@ -126,6 +127,20 @@ export function CohorteTable({
           {t("sortedByRisk")}
         </span>
       </div>
+
+      {/* Rien de listable : on le DIT, au lieu de le cacher dans l'info-bulle
+          d'un bouton grisé — invisible au doigt, et muette sur le pourquoi.
+          Les deux conditions sont nommées ; c'est ce qui rend l'écran
+          actionnable plutôt que bloquant. */}
+      {publiables.length === 0 && lignes.length > 0 && (
+        <div className="rounded-[6px] border border-[#E2DED4] bg-white mb-3">
+          <EmptyState
+            inset
+            title={t("nothingListableTitle")}
+            description={t("nothingListableBody")}
+          />
+        </div>
+      )}
 
       {/* Barre de sélection — teintée dès qu'une entreprise est cochée. */}
       <div

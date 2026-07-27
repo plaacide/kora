@@ -9,6 +9,7 @@ import { EncryptionBadge } from "@/components/ui/EncryptionBadge";
 import { Table, TableHead, TableRow, Mono } from "@/components/ui/Table";
 import { Modal } from "@/components/ui/Modal";
 import { ToastProvider, useToast } from "@/components/ui/Toast";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 function Section({
   title,
@@ -154,6 +155,21 @@ function Demo() {
           </div>
         </div>
       </Modal>
+
+      {/* L'état vide se lit en TROIS temps, et la galerie doit le montrer :
+          c'est le composant le plus copié du dépôt, et celui dont la grammaire
+          se perd le plus vite si on ne peut pas la voir. */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-[10.5px] font-[650] uppercase tracking-[0.06em] text-ink-muted">
+          État vide
+        </h2>
+        <EmptyState
+          title="Invitez vos premières entreprises"
+          description="Rien n'apparaîtra ici avant qu'une entreprise ait accepté votre invitation. Elle garde la main sur ses documents — vous verrez son avancement, pas ses pièces."
+          foot="Une invitation reste valable 30 jours et se relance en un clic."
+          action={<Button variant="primary">Inviter une entreprise</Button>}
+        />
+      </section>
     </main>
   );
 }

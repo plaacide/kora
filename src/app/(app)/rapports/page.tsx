@@ -160,12 +160,14 @@ export default async function RapportsPage({
       )}
 
       {!assez ? (
-        // Le refus NOMME le seuil et dit où l'on en est. Refuser sans
-        // expliquer serait pire que produire un rapport vide.
+        // Le refus NOMME le seuil et dit ce que le rapport contiendra une
+        // fois franchi. Refuser sans expliquer serait pire que produire un
+        // rapport vide : l'un frustre, l'autre dessert la cohorte auprès du
+        // bailleur.
         <div className="mt-5 rounded-[8px] border border-[#F0C4AE] bg-[#FEFAF7] px-5 py-4">
           <h2 className="text-[14px] font-[700] text-[#C24619]">{t("refusedTitle")}</h2>
           <p className="text-[12.5px] text-[#8A4B2C] mt-1.5 leading-relaxed">
-            {t("refusedBody", { n: SEUIL_ENTREPRISES, actuel: orgsEntamees.size })}
+            {t("refusedBody")}
           </p>
           <p className="text-[12px] text-[#8B8FA3] mt-2 leading-relaxed">{t("refusedWhy")}</p>
         </div>

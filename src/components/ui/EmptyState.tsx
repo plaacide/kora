@@ -8,7 +8,12 @@ import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
  *  - le `title` NOMME ce qui manque — jamais « Aucune donnée » ni « Liste vide » ;
  *  - la `description` dit À QUOI SERVIRA l'écran une fois rempli ;
  *  - `action` est unique. Quand aucune action n'a de sens (le journal se
- *    remplit tout seul), on n'en passe pas : on explique ce qui le remplira.
+ *    remplit tout seul), on n'en passe pas : on explique ce qui le remplira ;
+ *  - `foot` est une ligne de RETRAIT, sous l'action : ce qu'on veut dire sans
+ *    l'imposer — « une invitation reste valable 30 jours », « nous n'affichons
+ *    pas d'indicateurs à zéro ». Elle est arrivée avec les maquettes du persona
+ *    programme, dont les états vides tiennent en trois temps et non deux : ce
+ *    qui manque, à quoi ça servira, et la précision qui rassure.
  *
  * Un bouton non branché est interdit : `action` prend un nœud déjà câblé
  * (Link ou composant d'action existant), pas un libellé à décorer.
@@ -28,6 +33,7 @@ export function EmptyState({
   description,
   action,
   secondaryAction,
+  foot,
   tone = "light",
   arcs = false,
   inset = false,
@@ -37,6 +43,8 @@ export function EmptyState({
   description: string;
   action?: React.ReactNode;
   secondaryAction?: React.ReactNode;
+  /** Précision de retrait, sous l'action. Jamais une seconde description. */
+  foot?: string;
   tone?: "light" | "dark";
   arcs?: boolean;
   /** Logé dans un conteneur déjà bordé : ni cadre, ni fond, moins de marge. */
@@ -91,6 +99,17 @@ export function EmptyState({
             {action}
             {secondaryAction}
           </div>
+        )}
+
+        {foot && (
+          <p
+            className={
+              "text-[11.5px] mt-4 max-w-md mx-auto leading-relaxed " +
+              (sombre ? "text-white/40" : "text-[#A0A3AB]")
+            }
+          >
+            {foot}
+          </p>
         )}
       </div>
     </div>

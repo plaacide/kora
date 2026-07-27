@@ -209,7 +209,11 @@ export default async function CohortePage({
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         <div className="flex-1 min-w-0">
           {lignes.length === 0 ? (
-            <EmptyState title={t("membersEmptyTitle")} description={t("membersEmptyBody")} />
+            <EmptyState
+              title={t("membersEmptyTitle")}
+              description={t("membersEmptyBody")}
+              foot={t("membersEmptyFoot")}
+            />
           ) : (
             <CohorteTable cohorteId={cohorteId} lignes={lignes} devise={devise} />
           )}
