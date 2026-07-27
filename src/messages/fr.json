@@ -424,7 +424,9 @@
       },
       "searchPlaceholder": "Rechercher un document…"
     },
-    "share": "Partager"
+    "share": "Partager",
+    "lockedPortfolio": "S'ouvre dès qu'une entreprise rejoint une cohorte",
+    "lockedRequests": "S'ouvre dès qu'une entreprise est publiée dans votre vitrine"
   },
   "dashboard": {
     "greeting": "Bonjour, {name}",

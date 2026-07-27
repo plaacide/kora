@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { SurveyGate } from "@/components/survey/SurveyGate";
@@ -85,6 +86,31 @@ export default async function AppLayout({
   // ayant accès, exigences restantes, questions ouvertes. Requêtes `head`
   // (compte seul) et tolérantes — un compte manquant masque juste la pastille.
   const interne = persona === "founder" || persona === "fund";
+
+  // §8 — entrées non encore atteignables, avec leur condition RÉELLE.
+  //
+  // On grise plutôt que de masquer : un menu qui s'allonge tout seul au fil des
+  // jours désoriente, alors qu'une entrée grisée qui dit sa condition enseigne
+  // le produit. La phrase est calculée ici parce que seul le serveur sait s'il
+  // existe une entreprise ou une fiche publiée.
+  //
+  // Uniquement pour le PROGRAMME : les autres personas possèdent un dossier,
+  // leurs écrans ont toujours quelque chose à dire, fût-ce un état vide.
+  const bloquees: Record<string, string> = {};
+  if (persona === "sae") {
+    const ts = await getTranslations("shell");
+    const [{ count: nMembres }, { count: nPubliees }] = await Promise.all([
+      supabase.from("cohort_members").select("cohort_id", { count: "exact", head: true }),
+      supabase
+        .from("showcase_entries")
+        .select("id", { count: "exact", head: true })
+        .is("unpublished_at", null),
+    ]);
+    if (!nMembres) bloquees["/portefeuille"] = ts("lockedPortfolio");
+    // Sans fiche publiée, aucune demande ne PEUT exister : l'écran serait vide
+    // par construction, pas par hasard.
+    if (!nPubliees) bloquees["/demandes"] = ts("lockedRequests");
+  }
   let roomCounts: { permissions?: number; checklist?: number; qa?: number } | undefined;
   if (interne && deal) {
     const [perm, chk, qa] = await Promise.all([
@@ -107,6 +133,7 @@ export default async function AppLayout({
       currentDealId={deal?.id ?? null}
       role={role}
       persona={persona}
+      bloquees={bloquees}
       roomCounts={roomCounts}
     >
       {/* Le verrouillage est brutal — plus rien n'est accessible. Il ne doit

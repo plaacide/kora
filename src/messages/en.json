@@ -424,7 +424,9 @@
       },
       "searchPlaceholder": "Search a document…"
     },
-    "share": "Share"
+    "share": "Share",
+    "lockedPortfolio": "Opens as soon as a company joins a cohort",
+    "lockedRequests": "Opens as soon as a company is published in your showcase"
   },
   "dashboard": {
     "greeting": "Hello, {name}",

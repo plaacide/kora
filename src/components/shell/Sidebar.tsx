@@ -15,11 +15,22 @@ export function Sidebar({
   currentDealId,
   role,
   persona = "fund",
+  bloquees = {},
 }: {
   deals: DealRef[];
   currentDealId: string | null;
   role: string | null;
   persona?: Persona;
+  /**
+   * Entrées non encore atteignables : href → la CONDITION à remplir, déjà
+   * traduite. Grisées plutôt que masquées (§8) — un menu qui s'allonge tout
+   * seul au fil des jours désoriente, alors qu'une entrée grisée qui dit
+   * pourquoi enseigne le produit.
+   *
+   * La phrase est passée toute faite : elle dépend de données que seul le
+   * serveur connaît, et la reconstruire ici demanderait de lui redemander.
+   */
+  bloquees?: Record<string, string>;
 }) {
   const pathname = usePathname();
   const t = useTranslations("shell");
@@ -57,6 +68,23 @@ export function Sidebar({
               const active = pathname === item.href;
               return (
                 <li key={item.href}>
+                  {bloquees[item.href] ? (
+                    // Un `span`, pas un `Link` désactivé : rien à cliquer, rien
+                    // à tabuler. `aria-disabled` seul laisserait le lien
+                    // navigable au clavier vers un écran qui n'a rien à dire.
+                    <span
+                      title={bloquees[item.href]}
+                      className="flex flex-col gap-0.5 rounded-[5px] px-2.5 py-2 cursor-default"
+                    >
+                      <span className="flex items-center gap-[11px] text-[13.5px] font-medium text-[#B7BAC4]">
+                        <NavIcon name={item.key} />
+                        <span className="truncate">{navLabel(item.key)}</span>
+                      </span>
+                      <span className="text-[10.5px] text-[#B7BAC4] leading-snug pl-[27px]">
+                        {bloquees[item.href]}
+                      </span>
+                    </span>
+                  ) : (
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}
@@ -70,6 +98,7 @@ export function Sidebar({
                     <NavIcon name={item.key} />
                     <span className="truncate">{navLabel(item.key)}</span>
                   </Link>
+                  )}
                 </li>
               );
             })}
