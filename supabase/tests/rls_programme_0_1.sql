@@ -107,100 +107,109 @@ end $$;
 -- ── ON DEVIENT LE PROGRAMME ────────────────────────────────────────────────
 -- `role authenticated` + les claims JWT : exactement ce que PostgREST met en
 -- place pour une requête de l'application. `auth.uid()` lit `request.jwt.claims`.
-select set_config(
-  'request.jwt.claims',
-  json_build_object(
-    'sub', current_setting('rlstest.prog_user'),
-    'role', 'authenticated',
-    'email', 'test-programme@rls.invalid'
-  )::text,
-  true
-);
+--
+-- Enveloppé dans un `do` plutôt qu'un `select set_config(...)` : l'éditeur SQL
+-- de Supabase n'affiche QUE le dernier jeu de résultats, et un `select` ici en
+-- produirait un de plus. Tout ce fichier ne doit rendre qu'un seul tableau.
+do $$
+begin
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object(
+      'sub', current_setting('rlstest.prog_user'),
+      'role', 'authenticated',
+      'email', 'test-programme@rls.invalid'
+    )::text,
+    true
+  );
+end $$;
+
 set local role authenticated;
 
 -- ── LES CONTRÔLES ──────────────────────────────────────────────────────────
--- Chacun compte des lignes VISIBLES sous RLS. Zéro est la réponse attendue
--- partout où la §0.1 s'applique.
+-- UN SEUL `select`, et c'est délibéré : l'éditeur Supabase n'affiche que le
+-- dernier résultat d'un script. Séparés, les contrôles de RLS disparaissaient
+-- au profit du dernier — un test dont on ne voit pas la sortie ne teste rien.
+--
+-- D'où `mesure` en texte : les sept premiers comptent des lignes, le huitième
+-- énumère des colonnes. Le type commun est la chaîne.
+select controle, mesure, attendu, verdict
+from (
 
-select
-  'documents de la startup' as controle,
-  count(*)                  as vues,
-  0                         as attendu,
-  case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end as verdict
-from public.documents
-where deal_id = current_setting('rlstest.deal')::uuid
+  -- Zéro attendu partout où la §0.1 s'applique.
+  select 1 as ord, 'documents de la startup' as controle,
+    count(*)::text as mesure, '0' as attendu,
+    case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end as verdict
+  from public.documents
+  where deal_id = current_setting('rlstest.deal')::uuid
 
-union all
-select
-  'versions de documents', count(*), 0,
-  case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end
-from public.document_versions v
-join public.documents d on d.id = v.document_id
-where d.deal_id = current_setting('rlstest.deal')::uuid
+  union all
+  select 2, 'versions de documents', count(*)::text, '0',
+    case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end
+  from public.document_versions v
+  join public.documents d on d.id = v.document_id
+  where d.deal_id = current_setting('rlstest.deal')::uuid
 
-union all
-select
-  'dossiers de la data room', count(*), 0,
-  case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end
-from public.folders
-where deal_id = current_setting('rlstest.deal')::uuid
+  union all
+  select 3, 'dossiers de la data room', count(*)::text, '0',
+    case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end
+  from public.folders
+  where deal_id = current_setting('rlstest.deal')::uuid
 
-union all
-select
-  'deals de la startup', count(*), 0,
-  case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end
-from public.deals
-where org_id = current_setting('rlstest.start_org')::uuid
+  union all
+  select 4, 'deals de la startup', count(*)::text, '0',
+    case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end
+  from public.deals
+  where org_id = current_setting('rlstest.start_org')::uuid
 
-union all
--- Le NOM d'un document est déjà une fuite : « Term sheet Sequoia.pdf » dit
--- l'essentiel sans qu'on ouvre le fichier. Contrôlé séparément parce qu'une
--- politique peut très bien masquer le contenu et laisser passer le titre.
-select
-  'noms de documents (fuite par le titre)', count(*), 0,
-  case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end
-from public.documents
-where deal_id = current_setting('rlstest.deal')::uuid
-  and name is not null
+  union all
+  -- Le NOM d'un document est déjà une fuite : « Term sheet Sequoia.pdf » dit
+  -- l'essentiel sans qu'on ouvre le fichier. Contrôlé à part parce qu'une
+  -- politique peut masquer le contenu et laisser passer le titre.
+  select 5, 'noms de documents (fuite par le titre)', count(*)::text, '0',
+    case when count(*) = 0 then 'OK' else 'ÉCHEC — §0.1 entamée' end
+  from public.documents
+  where deal_id = current_setting('rlstest.deal')::uuid
+    and name is not null
 
-union all
--- ── LE CONTRÔLE INVERSE ────────────────────────────────────────────────────
--- Aussi important que les autres : une RLS qui bloque TOUT passerait les cinq
--- contrôles ci-dessus tout en rendant le produit inutilisable. Le programme
--- DOIT voir sa cohorte et l'appartenance de la startup.
-select
-  'sa propre cohorte (doit être visible)', count(*), 1,
-  case when count(*) = 1 then 'OK' else 'ÉCHEC — le programme ne voit plus sa cohorte' end
-from public.cohorts
-where id = current_setting('rlstest.cohorte')::uuid
+  union all
+  -- ── LES CONTRÔLES INVERSES ───────────────────────────────────────────────
+  -- Aussi importants que les autres : une RLS qui bloque TOUT passerait les
+  -- cinq précédents tout en rendant le produit inutilisable.
+  select 6, 'sa propre cohorte (doit être visible)', count(*)::text, '1',
+    case when count(*) = 1 then 'OK' else 'ÉCHEC — le programme ne voit plus sa cohorte' end
+  from public.cohorts
+  where id = current_setting('rlstest.cohorte')::uuid
 
-union all
-select
-  'appartenance à la cohorte (doit être visible)', count(*), 1,
-  case when count(*) = 1 then 'OK' else 'ÉCHEC — le programme ne voit plus ses membres' end
-from public.cohort_members
-where cohort_id = current_setting('rlstest.cohorte')::uuid;
+  union all
+  select 7, 'appartenance à la cohorte (doit être visible)', count(*)::text, '1',
+    case when count(*) = 1 then 'OK' else 'ÉCHEC — le programme ne voit plus ses membres' end
+  from public.cohort_members
+  where cohort_id = current_setting('rlstest.cohorte')::uuid
 
--- L'état de préparation transite par `sae_portfolio()`, une fonction qui
--- ÉNUMÈRE ses colonnes : ce qui n'y figure pas ne peut pas fuiter. On vérifie
--- qu'aucune colonne de document ne s'y est glissée depuis.
-select
-  'colonnes de sae_portfolio()' as controle,
-  coalesce(string_agg(p.name, ', ' order by p.ordinality), '—') as colonnes,
-  case
-    -- `count(*) = 0` d'abord : sans lui, une fonction DISPARUE donnerait
-    -- `bool_or` à null, donc « OK ». Un contrôle qui passe au vert quand son
-    -- objet n'existe plus est pire que pas de contrôle.
-    when count(*) = 0
-      then 'ÉCHEC — sae_portfolio() est introuvable'
-    when bool_or(p.name ~* '(document|file|storage|path|version|nom_fichier)')
-      then 'ÉCHEC — une colonne de document est exposée'
-    else 'OK'
-  end as verdict
-from unnest(
-  (select proargnames from pg_proc
-   where proname = 'sae_portfolio' and pronamespace = 'public'::regnamespace
-   limit 1)
-) with ordinality as p(name, ordinality);
+  union all
+  -- L'état de préparation transite par `sae_portfolio()`, qui ÉNUMÈRE ses
+  -- colonnes : ce qui n'y figure pas ne peut pas fuiter. On vérifie qu'aucune
+  -- colonne de document ne s'y est glissée depuis.
+  select 8, 'colonnes de sae_portfolio()',
+    coalesce(string_agg(p.name, ', ' order by p.ordinality), '—'),
+    'aucune colonne de document',
+    case
+      -- `count(*) = 0` d'abord : sans lui, une fonction DISPARUE donnerait
+      -- `bool_or` à null, donc « OK ». Un contrôle qui passe au vert quand son
+      -- objet n'existe plus est pire que pas de contrôle.
+      when count(*) = 0 then 'ÉCHEC — sae_portfolio() est introuvable'
+      when bool_or(p.name ~* '(document|file|storage|path|version|nom_fichier)')
+        then 'ÉCHEC — une colonne de document est exposée'
+      else 'OK'
+    end
+  from unnest(
+    (select proargnames from pg_proc
+     where proname = 'sae_portfolio' and pronamespace = 'public'::regnamespace
+     limit 1)
+  ) with ordinality as p(name, ordinality)
+
+) t
+order by ord;
 
 rollback;
