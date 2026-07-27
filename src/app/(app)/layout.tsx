@@ -110,6 +110,12 @@ export default async function AppLayout({
     // Sans fiche publiée, aucune demande ne PEUT exister : l'écran serait vide
     // par construction, pas par hasard.
     if (!nPubliees) bloquees["/demandes"] = ts("lockedRequests");
+    // Le rapport REFUSE de se générer sous le seuil ; l'entrée dit donc la
+    // même condition, plutôt que d'y mener pour montrer un refus.
+    const { count: nEntamees } = await supabase
+      .from("documents")
+      .select("id", { count: "exact", head: true });
+    if (!nEntamees) bloquees["/rapports"] = ts("lockedReports");
   }
   let roomCounts: { permissions?: number; checklist?: number; qa?: number } | undefined;
   if (interne && deal) {

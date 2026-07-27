@@ -384,7 +384,8 @@
       "nda": "Signed agreements",
       "cohort": "My cohorts",
       "contacts": "Contacts",
-      "requests": "Access requests"
+      "requests": "Access requests",
+      "reports": "Reports"
     },
     "founder": {
       "groups": {
@@ -426,7 +427,8 @@
     },
     "share": "Share",
     "lockedPortfolio": "Opens as soon as a company joins a cohort",
-    "lockedRequests": "Opens as soon as a company is published in your showcase"
+    "lockedRequests": "Opens as soon as a company is published in your showcase",
+    "lockedReports": "Opens as soon as a company has started its file"
   },
   "dashboard": {
     "greeting": "Hello, {name}",
@@ -1609,5 +1611,29 @@
     "instrEquity": "Equity",
     "instrDette": "Debt",
     "instrMezzanine": "Mezzanine"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "A cohort statement for your funder. Aggregated figures, no documents.",
+    "pickCohort": "Cohort",
+    "period": "Period",
+    "noPeriod": "dates not set",
+    "companies": "Companies",
+    "rooms": "Data rooms",
+    "sought": "Amounts sought",
+    "byCategory": "Readiness by document category",
+    "catOhada": "Legal (OHADA)",
+    "catFinancier": "Financial",
+    "catDfi": "Funders / DFI",
+    "invitations": "Invitations sent",
+    "granted": "Access granted",
+    "refusedTitle": "Report not generated",
+    "refusedBody": "At least {n, plural, =1 {1 company with a started file} other {# companies with started files}} are needed to produce a report. {actuel, plural, =0 {None has started yet} =1 {Only 1 has} other {# have}}.",
+    "refusedWhy": "A report full of blanks does your cohort a disservice with a funder: better not to send it.",
+    "noCohortTitle": "No cohort to report on",
+    "noCohortBody": "Create a cohort and invite companies into it: the report builds itself from their files.",
+    "trendMissing": "Monthly trend",
+    "trendMissingBody": "A funder reads curves, not a snapshot. Monthly history requires a scheduled job, which does not exist on this installation yet — so the report only shows today's state.",
+    "asOf": "State as of {date}"
   }
 }

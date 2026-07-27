@@ -384,7 +384,8 @@
       "nda": "Accords signés",
       "cohort": "Mes cohortes",
       "contacts": "Contacts",
-      "requests": "Demandes d'accès"
+      "requests": "Demandes d'accès",
+      "reports": "Rapports"
     },
     "founder": {
       "groups": {
@@ -426,7 +427,8 @@
     },
     "share": "Partager",
     "lockedPortfolio": "S'ouvre dès qu'une entreprise rejoint une cohorte",
-    "lockedRequests": "S'ouvre dès qu'une entreprise est publiée dans votre vitrine"
+    "lockedRequests": "S'ouvre dès qu'une entreprise est publiée dans votre vitrine",
+    "lockedReports": "S'ouvre dès qu'une entreprise a entamé son dossier"
   },
   "dashboard": {
     "greeting": "Bonjour, {name}",
@@ -1609,5 +1611,29 @@
     "instrEquity": "Equity",
     "instrDette": "Dette",
     "instrMezzanine": "Mezzanine"
+  },
+  "reports": {
+    "title": "Rapports",
+    "subtitle": "Un état de cohorte destiné à votre bailleur. Chiffres agrégés, aucun document.",
+    "pickCohort": "Cohorte",
+    "period": "Période",
+    "noPeriod": "dates non renseignées",
+    "companies": "Entreprises",
+    "rooms": "Data rooms",
+    "sought": "Montants recherchés",
+    "byCategory": "Préparation par catégorie de pièces",
+    "catOhada": "Juridique (OHADA)",
+    "catFinancier": "Financier",
+    "catDfi": "Bailleurs / DFI",
+    "invitations": "Invitations envoyées",
+    "granted": "Accès accordés",
+    "refusedTitle": "Rapport non généré",
+    "refusedBody": "Il faut au moins {n, plural, =1 {1 entreprise ayant entamé son dossier} other {# entreprises ayant entamé leur dossier}} pour produire un rapport. {actuel, plural, =0 {Aucune ne l'a fait pour l'instant} =1 {1 seule l'a fait} other {# l'ont fait}}.",
+    "refusedWhy": "Un rapport à cases vides dessert votre cohorte auprès d'un bailleur : mieux vaut ne pas l'envoyer.",
+    "noCohortTitle": "Aucune cohorte à rapporter",
+    "noCohortBody": "Créez une cohorte et invitez-y des entreprises : le rapport se construira à partir de leurs dossiers.",
+    "trendMissing": "Tendance mensuelle",
+    "trendMissingBody": "Un bailleur lit des courbes, pas un instantané. L'historique mensuel demande une tâche planifiée, qui n'existe pas encore sur cette installation — le rapport ne montre donc que l'état du jour.",
+    "asOf": "État au {date}"
   }
 }

@@ -26,3 +26,15 @@ export function joursRestants(echeance: string | null | undefined): number | nul
 export function isoDans(ms: number): string {
   return new Date(Date.now() + ms).toISOString();
 }
+
+/**
+ * La date du jour, en ISO.
+ *
+ * Isolée ici comme `joursRestants` et `isoDans` : `Date.now()` appelé pendant
+ * un rendu viole `react-hooks/purity`, que ce dépôt applique. Un rapport doit
+ * pourtant porter sa date — sans elle, un bailleur ne sait pas de quand
+ * datent les chiffres qu'il lit.
+ */
+export function aujourdhuiIso(): string {
+  return new Date().toISOString();
+}

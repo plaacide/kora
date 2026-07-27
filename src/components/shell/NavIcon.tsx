@@ -32,6 +32,15 @@ const PATHS: Record<string, React.ReactNode> = {
   // Vue d'ensemble
   // Demandes d'accès : une main tendue vers une porte — on demande à entrer,
   // on n'entre pas. Trait 1.6 comme les autres, pour que la colonne reste calme.
+  // Rapports : une feuille et ses barres — ce qu'un bailleur y cherche.
+  reports: (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M9 17v-3M12 17v-5M15 17v-2" />
+    </>
+  ),
+
   requests: (
     <>
       <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
