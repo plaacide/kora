@@ -383,6 +383,7 @@
       "roadmap": "Roadmap",
       "nda": "Signed agreements",
       "cohort": "My cohorts",
+      "dealroom": "Dealroom",
       "contacts": "Contacts",
       "requests": "Access requests",
       "reports": "Reports"
@@ -752,6 +753,37 @@
       "lvlDownload": "Download",
       "lvlDownloadHint": "Can download the files."
     }
+  },
+  "dealroom": {
+    "title": "Dealroom",
+    "intro": "Your showcase: the companies you have published, and the investors you have invited to it. No document is viewable there — an interested investor requests access, and the company decides.",
+    "publishedTitle": "Published profiles",
+    "publishedCount": "{n, plural, =0 {no profile} one {# profile} other {# profiles}}",
+    "publishedSince": "published on {date}",
+    "unpublish": "Unpublish",
+    "unpublishHint": "Unpublishing removes the profile from the showcase. It withdraws no data room access already granted.",
+    "emptyPublishedTitle": "Your showcase is still empty",
+    "emptyPublishedBody": "You publish company by company, from a cohort's detail view. Two conditions: the company has agreed to be listed, and its file is started.",
+    "emptyPublishedFoot": "Inviting investors before publishing a profile means walking them into an empty room.",
+    "goToCohorts": "Choose companies to publish",
+    "audienceTitle": "Who has access",
+    "audienceIntro": "The showcase is not public and is not indexed. Entry is by personal invitation tied to an email address: a forwarded link opens nothing.",
+    "invitePlaceholder": "address@fund.com",
+    "invite": "Invite",
+    "inviting": "Sending…",
+    "inviteCohort": "Cohort",
+    "statusSent": "SENT",
+    "statusAccepted": "ACCEPTED",
+    "invitedOn": "invited on {date}",
+    "revoke": "Withdraw access",
+    "revokeHint": "Withdrawing access closes the showcase to this person. Data rooms a company has opened to them are untouched — that decision belongs to the company.",
+    "emptyAudienceTitle": "No one has access yet",
+    "emptyAudienceBody": "Invite the investors you want browsing this cohort. They will see the indicators companies have published, and nothing else.",
+    "linkCopied": "Link copied",
+    "copyLink": "Copy link",
+    "emailNotSent": "The invitation exists, but the email did not go out. Pass the link on yourself.",
+    "noCohortTitle": "Create a cohort first",
+    "noCohortBody": "The showcase is built cohort by cohort: an investor is invited to browse one intake, not your whole programme."
   },
   "invitations": {
     "title": "Invitations & NDA",
@@ -1604,7 +1636,12 @@
       "garanties": "Collateral",
       "saisonnalite": "Seasonality",
       "cycleTresorerie": "Cash cycle"
-    }
+    },
+    "joinInvalidTitle": "This invitation is no longer valid",
+    "joinInvalidBody": "The link is unknown, or access was withdrawn by the programme. Ask them for a new invitation.",
+    "joinWrongAddressTitle": "This invitation is for another address",
+    "joinWrongAddressBody": "You are signed in as {email}. The invitation was sent to a different address, and it is not transferable — that is what assures the programme it knows who is viewing its showcase.",
+    "joinSwitchAccount": "Sign in with another address"
   },
   "requests": {
     "title": "Access requests",

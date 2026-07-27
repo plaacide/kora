@@ -383,6 +383,7 @@
       "roadmap": "Roadmap",
       "nda": "Accords signés",
       "cohort": "Mes cohortes",
+      "dealroom": "Dealroom",
       "contacts": "Contacts",
       "requests": "Demandes d'accès",
       "reports": "Rapports"
@@ -752,6 +753,37 @@
       "lvlDownload": "Télécharger",
       "lvlDownloadHint": "Peut télécharger les fichiers."
     }
+  },
+  "dealroom": {
+    "title": "Dealroom",
+    "intro": "Votre vitrine : les entreprises que vous avez publiées, et les investisseurs que vous y avez invités. Aucune pièce n'y est consultable — un investisseur intéressé demande l'accès, et c'est l'entreprise qui tranche.",
+    "publishedTitle": "Fiches publiées",
+    "publishedCount": "{n, plural, =0 {aucune fiche} one {# fiche} other {# fiches}}",
+    "publishedSince": "publiée le {date}",
+    "unpublish": "Dépublier",
+    "unpublishHint": "Dépublier retire la fiche de la vitrine. Cela ne retire aucun accès à une data room déjà accordé.",
+    "emptyPublishedTitle": "Votre vitrine est encore vide",
+    "emptyPublishedBody": "Vous publiez entreprise par entreprise, depuis le détail d'une cohorte. Deux conditions : l'entreprise a donné son accord pour être listée, et son dossier est entamé.",
+    "emptyPublishedFoot": "Inviter des investisseurs avant d'avoir publié une fiche, c'est les faire entrer dans une salle vide.",
+    "goToCohorts": "Choisir des entreprises à publier",
+    "audienceTitle": "Qui a accès",
+    "audienceIntro": "La vitrine n'est pas publique et n'est pas indexée. On y entre par invitation nominative, liée à une adresse : un lien transféré n'ouvre rien.",
+    "invitePlaceholder": "adresse@fonds.com",
+    "invite": "Inviter",
+    "inviting": "Envoi…",
+    "inviteCohort": "Cohorte",
+    "statusSent": "ENVOYÉE",
+    "statusAccepted": "ACCEPTÉE",
+    "invitedOn": "invité le {date}",
+    "revoke": "Retirer l'accès",
+    "revokeHint": "Retirer l'accès ferme la vitrine à cette personne. Les data rooms auxquelles une entreprise lui a ouvert l'accès ne sont pas touchées — cette décision appartient à l'entreprise.",
+    "emptyAudienceTitle": "Personne n'a encore accès",
+    "emptyAudienceBody": "Invitez les investisseurs que vous voulez voir parcourir cette cohorte. Ils verront les indicateurs publiés par les entreprises, et rien d'autre.",
+    "linkCopied": "Lien copié",
+    "copyLink": "Copier le lien",
+    "emailNotSent": "L'invitation existe, mais l'e-mail n'est pas parti. Transmettez le lien vous-même.",
+    "noCohortTitle": "Créez d'abord une cohorte",
+    "noCohortBody": "La vitrine se compose cohorte par cohorte : un investisseur est invité à parcourir une promotion, pas votre programme entier."
   },
   "invitations": {
     "title": "Invitations & NDA",
@@ -1604,7 +1636,12 @@
       "garanties": "Garanties",
       "saisonnalite": "Saisonnalité",
       "cycleTresorerie": "Cycle de trésorerie"
-    }
+    },
+    "joinInvalidTitle": "Cette invitation n'est plus valable",
+    "joinInvalidBody": "Le lien est inconnu, ou l'accès a été retiré par le programme. Demandez-lui une nouvelle invitation.",
+    "joinWrongAddressTitle": "Cette invitation vise une autre adresse",
+    "joinWrongAddressBody": "Vous êtes connecté avec {email}. L'invitation a été envoyée à une autre adresse, et elle n'est pas transmissible — c'est ce qui garantit au programme qu'il sait qui consulte sa vitrine.",
+    "joinSwitchAccount": "Se connecter avec une autre adresse"
   },
   "requests": {
     "title": "Demandes d'accès",

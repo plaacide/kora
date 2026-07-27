@@ -32,6 +32,18 @@ const PATHS: Record<string, React.ReactNode> = {
   // Vue d'ensemble
   // Demandes d'accès : une main tendue vers une porte — on demande à entrer,
   // on n'entre pas. Trait 1.6 comme les autres, pour que la colonne reste calme.
+  // Dealroom : une devanture — fronton, seuil, porte. La vitrine du programme
+  // est un lieu où l'on fait entrer des gens, pas un dossier qu'on ouvre ;
+  // l'icône dit le seuil plutôt que le contenu.
+  dealroom: (
+    <>
+      <path d="M3 9l9-6 9 6" />
+      <path d="M5 9v11h14V9" />
+      <path d="M3 20h18" />
+      <path d="M10 20v-6h4v6" />
+    </>
+  ),
+
   // Rapports : une feuille et ses barres — ce qu'un bailleur y cherche.
   reports: (
     <>

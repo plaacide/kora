@@ -52,11 +52,23 @@ const HORS_SUJET_FONDATEUR = ["/pipeline", "/readiness"];
  * a le droit de voir est plus sûr — un écran ajouté demain n'apparaîtra pas
  * chez lui par accident.
  */
-// Les règles §1 prévoient aussi `/dealroom` et `/rapports`. Ils ne sont PAS
-// listés ici : leurs écrans n'existent pas encore, et la règle produit du
-// dépôt interdit un lien de navigation vers une page inexistante. Ils
-// s'ajouteront avec leurs écrans.
-const ECRANS_PROGRAMME = ["/portefeuille", "/cohortes", "/demandes", "/securite", "/roadmap"];
+// Ordre imposé par les règles §1. Chacun a sa page dans `src/app/(app)/` — la
+// règle produit du dépôt interdit un lien vers un écran inexistant, et c'est ce
+// qui a longtemps retenu `/dealroom` et `/rapports` hors de cette liste.
+//
+// ⚠️ Cette liste blanche filtre `navGroups` : une entrée absente de `navGroups`
+// n'apparaît pas, même listée ici. `/demandes` et `/rapports` figuraient dans
+// cette liste sans y être — leurs pages étaient donc injoignables au menu, et
+// le grisage calculé par le layout pour elles ne s'appliquait à rien.
+const ECRANS_PROGRAMME = [
+  "/portefeuille",
+  "/cohortes",
+  "/dealroom",
+  "/demandes",
+  "/rapports",
+  "/securite",
+  "/roadmap",
+];
 
 /**
  * Écrans devenus des ONGLETS de la data room (handoff §3b) : ils vivent dans
@@ -183,6 +195,9 @@ export const navGroups: NavGroup[] = [
     items: [
       { key: "portfolio", href: "/portefeuille", internalOnly: true, saeOnly: true },
       { key: "cohort", href: "/cohortes", internalOnly: true, saeOnly: true },
+      { key: "dealroom", href: "/dealroom", internalOnly: true, saeOnly: true },
+      { key: "requests", href: "/demandes", internalOnly: true, saeOnly: true },
+      { key: "reports", href: "/rapports", internalOnly: true, saeOnly: true },
     ],
   },
   {

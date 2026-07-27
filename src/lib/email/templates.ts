@@ -180,3 +180,70 @@ export function cohortInviteEmail(input: {
 
   return { subject, html };
 }
+
+/**
+ * Le programme ouvre sa vitrine à un investisseur.
+ *
+ * CE QUE CET E-MAIL NE DOIT PAS LAISSER CROIRE : que l'on donne accès à des
+ * data rooms. La vitrine ne contient aucune pièce — que des chiffres saisis
+ * par les entreprises, et un bouton pour demander l'accès, que l'entreprise
+ * accorde ou refuse elle-même. Un investisseur qui arrive en croyant avoir
+ * obtenu des documents repart déçu et pense le produit cassé.
+ *
+ * On le dit donc AVANT le bouton, comme pour l'invitation de cohorte.
+ */
+export function showcaseInviteEmail(input: {
+  saeName: string;
+  cohortName: string;
+  link: string;
+  locale: "fr" | "en";
+}): { subject: string; html: string } {
+  const fr = input.locale === "fr";
+
+  const subject = fr
+    ? `${input.saeName} vous ouvre sa vitrine « ${input.cohortName} »`
+    : `${input.saeName} is opening its “${input.cohortName}” showcase to you`;
+
+  const intro = fr
+    ? `<strong>${escape(input.saeName)}</strong> vous invite à consulter les entreprises de sa cohorte <strong>${escape(input.cohortName)}</strong> sur Sanza.`
+    : `<strong>${escape(input.saeName)}</strong> invites you to review the companies of its <strong>${escape(input.cohortName)}</strong> cohort on Sanza.`;
+
+  const voit = fr
+    ? "Ce que vous verrez : pour chaque entreprise, les indicateurs qu'elle a elle-même publiés — montant recherché, instrument, stade, secteur, pays — en lecture equity ou dette."
+    : "What you will see: for each company, the indicators it has published itself — amount sought, instrument, stage, sector, country — in an equity or debt reading.";
+
+  const voitPas = fr
+    ? "Ce que vous n'y trouverez pas : aucun document. Pour en obtenir, vous demandez l'accès à la data room depuis la fiche, et c'est l'entreprise qui tranche."
+    : "What you will not find: any document. To obtain some, you request data room access from the company profile, and the company itself decides.";
+
+  const nominatif = fr
+    ? "Cette invitation est nominative et n'est pas transmissible : elle est liée à votre adresse."
+    : "This invitation is personal and not transferable: it is tied to your email address.";
+
+  const cta = fr ? "Ouvrir la vitrine" : "Open the showcase";
+
+  const html = `<!doctype html>
+<html lang="${input.locale}">
+<body style="margin:0;padding:0;background:#f7f5f0;font-family:'Instrument Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f5f0;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #e8e5dc;border-radius:12px;padding:32px;">
+        <tr><td>
+          <div style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;border-radius:8px;background:#171a2c;color:#ffffff;font-weight:700;font-size:16px;letter-spacing:-0.015em;">a</div>
+          <h1 style="margin:20px 0 12px;font-size:20px;font-weight:600;color:#171a2c;letter-spacing:-0.02em;">${escape(subject)}</h1>
+          <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#4a4e63;">${intro}</p>
+          <p style="margin:0 0 10px;font-size:13px;line-height:1.6;color:#4a4e63;">${escape(voit)}</p>
+          <p style="margin:0 0 20px;font-size:13px;line-height:1.6;color:#4a4e63;">${escape(voitPas)}</p>
+          <a href="${input.link}" style="display:inline-block;background:#e85c2b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
+          <hr style="border:none;border-top:1px solid #e8e5dc;margin:24px 0 16px;">
+          <p style="margin:0 0 6px;font-size:11px;color:#8b8fa3;">${escape(nominatif)}</p>
+          <p style="margin:0;font-size:11px;color:#8b8fa3;">Sanza — ${fr ? "data room sécurisée" : "secure data room"}</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, html };
+}

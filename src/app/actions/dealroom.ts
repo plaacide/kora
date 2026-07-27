@@ -1,7 +1,12 @@
 "use server";
 
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { originFromHeaders } from "@/lib/app-origin";
+import { sendEmail } from "@/lib/email/send";
+import { showcaseInviteEmail } from "@/lib/email/templates";
 
 /**
  * Actions du dealroom, côté programme.
@@ -54,6 +59,7 @@ export async function depublier(
     .eq("startup_org_id", startupOrgId);
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/cohortes/${cohorteId}`);
+  revalidatePath("/dealroom");
   return { ok: true };
 }
 
@@ -93,5 +99,84 @@ export async function ecrireAEntreprise(input: {
   });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/cohortes/${input.cohorteId}`);
+  return { ok: true };
+}
+
+export interface InvitationResultat extends Resultat {
+  /** Le lien reste utilisable à la main quand l'e-mail n'est pas parti. */
+  link?: string;
+  emailSkipped?: boolean;
+  emailError?: string;
+}
+
+/**
+ * Le programme ouvre sa vitrine à un investisseur, nominativement.
+ *
+ * PAS DE LIEN ANONYME, c'est la règle §4 : la vitrine n'est pas publique, elle
+ * n'est pas indexée, et l'accès est lié à une ADRESSE. Le jeton seul ne suffit
+ * pas — `accept_showcase_invite` refuse si l'adresse du compte connecté n'est
+ * pas celle invitée. Un lien qui fuite ne donne donc rien.
+ *
+ * Comme pour les invitations de cohorte, un échec d'envoi n'annule pas
+ * l'invitation : elle existe en base, et le lien reste transmissible à la main.
+ */
+export async function inviterVitrine(
+  cohorteId: string,
+  email: string,
+): Promise<InvitationResultat> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("invite_to_showcase", {
+    p_cohort: cohorteId,
+    p_email: email,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  const acces = data as { token: string };
+
+  // `originFromHeaders` et non `request.url` : le lien part chez un tiers, et
+  // derrière le proxy l'URL de la requête porte `0.0.0.0:8080` (cf. AGENTS.md).
+  const link = `${originFromHeaders(await headers())}/vitrine/rejoindre/${acces.token}`;
+
+  const { data: cohorte } = await supabase
+    .from("cohorts")
+    .select("name, organizations(name)")
+    .eq("id", cohorteId)
+    .maybeSingle();
+
+  const { subject, html } = showcaseInviteEmail({
+    saeName:
+      (cohorte?.organizations as unknown as { name?: string } | null)?.name ??
+      "Un programme",
+    cohortName: (cohorte as { name?: string } | null)?.name ?? "—",
+    link,
+    locale: (await getLocale()) as "fr" | "en",
+  });
+
+  const sent = await sendEmail({ to: email, subject, html });
+
+  revalidatePath("/dealroom");
+  return {
+    ok: true,
+    link,
+    emailSkipped: sent.skipped,
+    emailError: sent.ok ? undefined : sent.error,
+  };
+}
+
+/**
+ * Ferme la vitrine à un investisseur.
+ *
+ * NE TOUCHE À AUCUN ACCÈS DE DATA ROOM. Si cette personne a obtenu l'accès à
+ * une salle par une demande acceptée, cet accès a été accordé par l'ENTREPRISE
+ * et vit ailleurs (`memberships`, `permissions`). Le programme n'a pas à le
+ * reprendre depuis son écran de vitrine : ce serait défaire la décision d'un
+ * tiers sans qu'il en soit informé.
+ */
+export async function revoquerAccesVitrine(id: string): Promise<Resultat> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("revoke_showcase_access", { p_id: id });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dealroom");
   return { ok: true };
 }
