@@ -4,6 +4,10 @@ import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { deciderDemande } from "@/app/actions/demandes";
+import {
+  JOURS_AVANT_EXPIRATION,
+  type EtatDemande,
+} from "@/lib/demandes-echeance";
 
 /**
  * Une demande d'accès, et les décisions qu'elle appelle (§5).
@@ -16,6 +20,12 @@ import { deciderDemande } from "@/app/actions/demandes";
  *
  * D'où deux jeux d'actions distincts, jamais le même libellé pour deux gestes
  * différents.
+ *
+ * UNE DEMANDE PÉRIMÉE NE SE DÉCIDE PLUS. L'état est calculé (§5 : 30 jours),
+ * pas stocké — en base elle reste `pending`. Les boutons disparaissent alors
+ * au lieu d'être grisés : un bouton grisé invite à chercher comment
+ * l'activer, alors qu'ici il n'y a rien à faire de ce côté-ci. C'est
+ * l'investisseur qui relance.
  */
 
 const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
@@ -30,6 +40,10 @@ export interface Demande {
   jours: number;
   statut: string;
   sousMandat: boolean;
+  /** Calculé par `etatDemande` côté serveur — jamais déduit du seul statut. */
+  etat: EtatDemande;
+  /** Jours avant péremption ; négatif une fois passée. */
+  joursRestants: number;
 }
 
 export function DemandeCarte({ d }: { d: Demande }) {
@@ -56,7 +70,8 @@ export function DemandeCarte({ d }: { d: Demande }) {
       )
     : null;
 
-  const traitee = d.statut !== "pending";
+  const traitee = d.etat === "tranchee";
+  const expiree = d.etat === "expiree";
   const libelleStatut: Record<string, string> = {
     recommended: t("statusRecommended"),
     forwarded: t("statusForwarded"),
@@ -103,14 +118,30 @@ export function DemandeCarte({ d }: { d: Demande }) {
           </span>
         </div>
 
-        {traitee && (
+        {traitee ? (
           <span style={mono} className="shrink-0 text-[8.5px] font-[700] tracking-[0.06em] text-[#6E727A] bg-[#F1F0EB] rounded-[4px] px-2 py-[3px]">
             {libelleStatut[d.statut] ?? d.statut}
           </span>
-        )}
+        ) : expiree ? (
+          <span style={mono} className="shrink-0 text-[8.5px] font-[700] tracking-[0.06em] text-[#C0392B] bg-[#FBE6E0] rounded-[4px] px-2 py-[3px]">
+            {t("statusExpired")}
+          </span>
+        ) : d.etat === "bientot" ? (
+          // On prévient AVANT, pas au moment où il est trop tard : une file
+          // qu'on découvre périmée est une file perdue.
+          <span style={mono} className="shrink-0 text-[8.5px] font-[700] tracking-[0.06em] text-[#B4741B] bg-[#FBF1DF] rounded-[4px] px-2 py-[3px]">
+            {t("expiresIn", { n: d.joursRestants })}
+          </span>
+        ) : null}
       </div>
 
-      {!traitee && (
+      {expiree && (
+        <p className="text-[12px] text-[#8A4B2C] bg-[#FEFAF7] border border-[#F0C4AE] rounded-[6px] px-3.5 py-2.5 mt-3.5 leading-relaxed">
+          {t("expiredBody", { jours: JOURS_AVANT_EXPIRATION })}
+        </p>
+      )}
+
+      {!traitee && !expiree && (
         <div className="mt-4 pt-3.5 border-t border-[#F0EDE4]">
           <div className="flex items-center gap-2.5 flex-wrap">
             {d.sousMandat ? (

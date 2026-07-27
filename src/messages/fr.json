@@ -1661,7 +1661,12 @@
     "joinInvalidBody": "Le lien est inconnu, ou l'accès a été retiré par le programme. Demandez-lui une nouvelle invitation.",
     "joinWrongAddressTitle": "Cette invitation vise une autre adresse",
     "joinWrongAddressBody": "Vous êtes connecté avec {email}. L'invitation a été envoyée à une autre adresse, et elle n'est pas transmissible — c'est ce qui garantit au programme qu'il sait qui consulte sa vitrine.",
-    "joinSwitchAccount": "Se connecter avec une autre adresse"
+    "joinSwitchAccount": "Se connecter avec une autre adresse",
+    "requestPendingSince": "{n, plural, =0 {Elle expire aujourd'hui.} one {Elle expire dans # jour sans réponse.} other {Elle expire dans # jours sans réponse.}}",
+    "requestExpired": "Votre demande est restée sans réponse pendant {jours} jours. Elle a expiré — ni le programme ni l'entreprise ne peuvent plus y répondre.",
+    "requestRelaunch": "Relancer ma demande",
+    "requestRelaunchSpent": "Vous avez déjà relancé cette demande une fois. Contactez le programme directement.",
+    "requestDecided": "Votre demande a reçu une réponse. Si l'accès vous a été accordé, la data room apparaît dans vos espaces."
   },
   "requests": {
     "title": "Demandes d'accès",
@@ -1688,7 +1693,10 @@
     "instrEquity": "Equity",
     "instrDette": "Dette",
     "instrMezzanine": "Mezzanine",
-    "emptyFoot": "Vous filtrez et recommandez : transmettre avec avis favorable, transmettre sans avis, ou écarter. C'est l'entreprise qui accorde l'accès — vous éclairez sa décision."
+    "emptyFoot": "Vous filtrez et recommandez : transmettre avec avis favorable, transmettre sans avis, ou écarter. C'est l'entreprise qui accorde l'accès — vous éclairez sa décision.",
+    "statusExpired": "EXPIRÉE",
+    "expiresIn": "{n, plural, one {EXPIRE DANS # JOUR} other {EXPIRE DANS # JOURS}}",
+    "expiredBody": "Sans réponse depuis {jours} jours, cette demande a expiré : elle ne peut plus être tranchée. L'investisseur peut la relancer une fois depuis la fiche."
   },
   "reports": {
     "title": "Rapports",

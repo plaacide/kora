@@ -40,6 +40,31 @@ export default async function FichePage({
     .maybeSingle();
   if (!entree) notFound();
 
+  // La demande DÉJÀ FAITE par ce visiteur sur cette entreprise. Sans elle, un
+  // rechargement remettait le bouton « Demander l'accès » et l'investisseur
+  // redemandait, croyant que la première fois n'avait pas marché. La RLS ne
+  // lui montre que les siennes.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: demandeData } = user
+    ? await supabase
+        .from("access_requests")
+        .select("id, status, created_at, relaunched_at")
+        .eq("startup_org_id", org)
+        .eq("investor_user", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+
+  const d = demandeData as {
+    id: string; status: string; created_at: string; relaunched_at: string | null;
+  } | null;
+  const demande = d
+    ? { id: d.id, statut: d.status, creeLe: d.created_at, relanceeLe: d.relaunched_at }
+    : null;
+
   const [{ data: startup }, { data: levee }, { data: salles }] = await Promise.all([
     supabase
       .from("startups")
@@ -109,6 +134,7 @@ export default async function FichePage({
         indicateurs={indicateurs}
         majDate={maj ? dateFmt.format(maj) : null}
         lectureInitiale={(lecture === "dette" ? "dette" : "equity") as Lecture}
+        demande={demande}
       />
     </>
   );

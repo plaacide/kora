@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { DemandeCarte, type Demande } from "@/components/demandes/DemandeCarte";
 import { joursRestants } from "@/lib/echeance";
+import { etatDemande, joursAvantPeremption } from "@/lib/demandes-echeance";
 
 /**
  * `/demandes` — le point de rencontre (§5).
@@ -21,14 +22,16 @@ export default async function DemandesPage() {
 
   const { data: brutes } = await supabase
     .from("access_requests")
-    .select("id, investor_user, startup_org_id, deal_id, instrument, status, created_at, program_org_id")
+    .select(
+      "id, investor_user, startup_org_id, deal_id, instrument, status, created_at, relaunched_at, program_org_id",
+    )
     .order("created_at", { ascending: false })
     .limit(100);
 
   const lignes = (brutes ?? []) as Array<{
     id: string; investor_user: string; startup_org_id: string; deal_id: string;
     instrument: "equity" | "dette" | "mezzanine" | null; status: string;
-    created_at: string; program_org_id: string;
+    created_at: string; relaunched_at: string | null; program_org_id: string;
   }>;
 
   const users = [...new Set(lignes.map((l) => l.investor_user))];
@@ -83,10 +86,21 @@ export default async function DemandesPage() {
     // dépôt). Une date passée renvoie un négatif : l'ancienneté est son opposé.
     jours: Math.max(0, -(joursRestants(l.created_at) ?? 0)),
     statut: l.status,
+    // L'état RÉEL : le statut seul ment, une demande de trois mois est
+    // toujours `pending` en base. Calculé ici une fois, pas dans chaque
+    // composant — c'est ce qui garantit que la carte, le compteur et la base
+    // disent la même chose.
+    etat: etatDemande(l.status, l.created_at, l.relaunched_at),
+    joursRestants: joursAvantPeremption(l.created_at, l.relaunched_at),
     sousMandat: sousMandat.has(`${l.startup_org_id}:${l.deal_id}`),
   }));
 
-  const enAttente = demandes.filter((d) => d.statut === "pending").length;
+  // Le compteur de l'en-tête ne compte QUE ce sur quoi le programme peut
+  // encore agir. Y inclure les périmées gonflerait une file qu'on ne peut pas
+  // vider — le contraire de ce qu'une pastille est censée provoquer.
+  const enAttente = demandes.filter(
+    (d) => d.etat === "enAttente" || d.etat === "bientot",
+  ).length;
 
   return (
     <div className="text-[#1A1B1F] max-w-[860px]">

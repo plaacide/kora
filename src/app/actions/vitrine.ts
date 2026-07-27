@@ -49,3 +49,21 @@ export async function demanderAcces(input: {
   if (error) return { ok: false, error: error.message };
   return { ok: true };
 }
+
+/**
+ * L'investisseur relance sa demande restée sans réponse.
+ *
+ * UNE SEULE FOIS — la base le fait respecter (`relaunch_access_request`), pas
+ * l'écran. Une relance illimitée transformerait la file du programme en boîte
+ * de réclamation et retirerait à l'expiration tout son sens.
+ */
+export async function relancerDemande(
+  id: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("relaunch_access_request", {
+    p_request: id,
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}

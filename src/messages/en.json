@@ -1661,7 +1661,12 @@
     "joinInvalidBody": "The link is unknown, or access was withdrawn by the programme. Ask them for a new invitation.",
     "joinWrongAddressTitle": "This invitation is for another address",
     "joinWrongAddressBody": "You are signed in as {email}. The invitation was sent to a different address, and it is not transferable — that is what assures the programme it knows who is viewing its showcase.",
-    "joinSwitchAccount": "Sign in with another address"
+    "joinSwitchAccount": "Sign in with another address",
+    "requestPendingSince": "{n, plural, =0 {It expires today.} one {It expires in # day without a reply.} other {It expires in # days without a reply.}}",
+    "requestExpired": "Your request went unanswered for {jours} days. It has expired — neither the programme nor the company can respond to it now.",
+    "requestRelaunch": "Send it again",
+    "requestRelaunchSpent": "You have already sent this request again once. Contact the programme directly.",
+    "requestDecided": "Your request has been answered. If access was granted, the data room appears in your spaces."
   },
   "requests": {
     "title": "Access requests",
@@ -1688,7 +1693,10 @@
     "instrEquity": "Equity",
     "instrDette": "Debt",
     "instrMezzanine": "Mezzanine",
-    "emptyFoot": "You filter and recommend: forward with a favourable opinion, forward without one, or dismiss. The company grants access — you inform its decision."
+    "emptyFoot": "You filter and recommend: forward with a favourable opinion, forward without one, or dismiss. The company grants access — you inform its decision.",
+    "statusExpired": "EXPIRED",
+    "expiresIn": "{n, plural, one {EXPIRES IN # DAY} other {EXPIRES IN # DAYS}}",
+    "expiredBody": "Unanswered for {jours} days, this request has expired: it can no longer be decided. The investor may send it again once from the profile."
   },
   "reports": {
     "title": "Reports",
