@@ -19,6 +19,36 @@ par une référence, et la valeur n'est plus utilisable.
 **Ni TypeScript ni `next build` ne le détectent** — seul un test réel le
 révèle. Les constantes vivent dans `src/lib/*` (`permissions.ts`, `stages.ts`).
 
+## Une FONCTION ne traverse pas la frontière serveur → client
+
+Passer une fonction en `prop` d'un composant serveur vers un composant client
+produit un **500 en production**, sans aucune erreur au build ni au typage.
+
+Constaté sur la page d'invitation : le serveur passait
+`tooMany: (minutes) => t(...)` pour formater un message. TypeScript l'accepte,
+`next build` passe, la page rend en local — et renvoie 500 une fois déployée.
+
+Remède : passer la CHAÎNE brute (le gabarit ICU) et l'interpoler côté client
+avec `useTranslations`. Ne franchissent la frontière que des données
+sérialisables.
+
+**Rien ne le détecte avant l'exécution en conteneur**, et l'écran fautif peut
+être rare — celui-ci ne s'ouvrait qu'après avoir cliqué un lien d'invitation.
+
+## Supabase Storage : la clé d'objet refuse le non-ASCII
+
+`Invalid key: .../Sanza — African dealflow, finally structured.pdf`
+
+Le nom de fichier partait tel quel dans la clé de stockage. Un tiret cadratin,
+une apostrophe typographique ou un accent suffisent à faire rejeter l'envoi.
+
+Remède : `cleStockage()` (`src/lib/storage-key.ts`), qui translittère et retire
+le non-ASCII **pour la clé seulement**. Le nom AFFICHÉ reste intact — c'est
+celui que le fondateur a choisi, et le tronquer serait une perte visible.
+
+Le piège s'était glissé à DEUX endroits : le téléversement initial et
+`VersionList.tsx`. Chercher tous les points d'écriture avant de conclure.
+
 ## next-intl : pas de point dans les clés
 
 Le point exprime l'imbrication, `"document.page_viewed"` est donc une clé
