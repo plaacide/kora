@@ -93,3 +93,56 @@ export async function revokeCohortLink(
   revalidatePath("/portefeuille");
   return { ok: true };
 }
+
+/**
+ * Relance une invitation restée sans réponse : même lien, échéance repoussée.
+ *
+ * Le jeton ne change pas. Un invité qui a gardé le premier e-mail doit pouvoir
+ * s'en servir — lui invalider son lien parce qu'on lui en a renvoyé un serait
+ * le punir d'avoir tardé.
+ */
+export async function relancerInvitation(
+  linkId: string,
+): Promise<CohorteResult> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("relaunch_cohort_link", {
+    p_link: linkId,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  const link = `${originFromHeaders(await headers())}/rejoindre/${data as string}`;
+
+  // Le destinataire et le nom du programme : la RPC ne rend que le jeton, et
+  // la RLS autorise ici la lecture — l'appelant est membre du programme.
+  const { data: lien } = await supabase
+    .from("cohort_links")
+    .select("email, sae_org_id")
+    .eq("id", linkId)
+    .maybeSingle();
+  const l = lien as { email: string; sae_org_id: string } | null;
+
+  const { data: org } = l
+    ? await supabase
+        .from("organizations")
+        .select("name")
+        .eq("id", l.sae_org_id)
+        .maybeSingle()
+    : { data: null };
+
+  const { subject, html } = cohortInviteEmail({
+    saeName: (org as { name?: string } | null)?.name ?? "Un programme",
+    link,
+    locale: (await getLocale()) as "fr" | "en",
+  });
+
+  const sent = l ? await sendEmail({ to: l.email, subject, html }) : { ok: false, skipped: true, error: undefined };
+
+  revalidatePath("/cohortes");
+  return {
+    ok: true,
+    link,
+    emailSkipped: sent.skipped,
+    emailError: sent.ok ? undefined : sent.error,
+  };
+}

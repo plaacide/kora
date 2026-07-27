@@ -3,6 +3,11 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody } from "@/components/ui/Card";
 import { CohorteForm, type LienCohorte } from "@/components/cohorte/CohorteForm";
+import {
+  JOURS_AVANT_EXPIRATION,
+  JOURS_ALERTE,
+} from "@/lib/demandes-echeance";
+import { aujourdhuiIso } from "@/lib/echeance";
 import { CohorteTable, type LigneEntreprise } from "@/components/cohorte/CohorteTable";
 import { QuestionsPanel, type Echange } from "@/components/cohorte/QuestionsPanel";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -35,7 +40,7 @@ export default async function CohortePage({
   const [{ data }, { data: profil }] = await Promise.all([
     supabase
       .from("cohort_links")
-      .select("id, email, status, created_at, organizations!cohort_links_startup_org_id_fkey(name)")
+      .select("id, email, status, created_at, relaunched_at, organizations!cohort_links_startup_org_id_fkey(name)")
       // Sans ce filtre, un programme à trois cohortes verrait les trois
       // mélangées sur chacune — l'écran mentirait sur ce qu'il montre.
       .eq("cohort_id", cohorteId)
@@ -179,6 +184,30 @@ export default async function CohortePage({
   // On compte comme la base : les liens non révoqués occupent une place.
   const occupe = liens.filter((l) => l.status !== "revoked").length;
 
+  // L'âge des invitations et leur verdict, calculés ici : lire l'horloge dans
+  // le rendu d'un composant client viole `react-hooks/purity`. Le décompte part
+  // de la dernière RELANCE quand il y en a eu une — même définition que
+  // `accept_cohort_link`, sinon l'écran et la base ne diraient pas la même
+  // chose sur ce qui a expiré.
+  const maintenant = aujourdhuiIso();
+  const invitations = ((data ?? []) as unknown as LienCohorte[]).map((l) => {
+    const jours = Math.floor(
+      (new Date(maintenant).getTime() -
+        new Date(l.relaunched_at ?? l.created_at).getTime()) /
+        86400000,
+    );
+    return {
+      ...l,
+      jours,
+      etat:
+        jours >= JOURS_AVANT_EXPIRATION
+          ? ("expiree" as const)
+          : jours >= JOURS_AVANT_EXPIRATION - JOURS_ALERTE
+            ? ("bientot" as const)
+            : ("fraiche" as const),
+    };
+  });
+
   return (
     <div className="flex flex-col gap-5 text-[#1A1B1F]">
       {/* Fil d'Ariane : sans lui, on ne sait plus de quelle cohorte on parle
@@ -223,7 +252,7 @@ export default async function CohortePage({
 
       <Card>
         <CardBody>
-          <CohorteForm liens={(data ?? []) as unknown as LienCohorte[]} />
+          <CohorteForm cohorteId={cohorteId} liens={invitations} />
         </CardBody>
       </Card>
 
