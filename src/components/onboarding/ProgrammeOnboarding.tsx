@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { OnboardingShell, AsideEncre, AsideClair } from "./OnboardingShell";
 import { SelectChips } from "./SelectChips";
+import { ChipsObjectifs } from "./ChipsObjectifs";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PlainError } from "@/components/auth/FormError";
@@ -60,6 +61,13 @@ export function ProgrammeOnboarding({
   // Étape 05 — invitations
   const [emails, setEmails] = useState("");
 
+  // CE QUI MANQUE, NOMMÉ. Un bouton grisé sans explication laisse chercher :
+  // on relit ses champs, on croit avoir tout rempli, on conclut que l'écran est
+  // cassé. La phrase vit sous le bouton et non en info-bulle — une info-bulle
+  // ne s'ouvre pas au doigt.
+  const manqueStructure = nom.trim().length < 2 ? t("needName") : null;
+  const manqueCohorte = cohorte.trim().length < 2 ? t("needCohortName") : null;
+
   const ETAPES = [
     { title: t("step1Title"), subtitle: t("step1Sub") },
     { title: t("step2Title"), subtitle: t("step2Sub") },
@@ -106,7 +114,7 @@ export function ProgrammeOnboarding({
         seats: places ? Number(places) : null,
         startsOn: debut || null,
         endsOn: fin || null,
-        goal: objectif[0],
+        goals: objectif,
       });
       if (!res.ok) return setErreur(res.error);
       setCohortId(res.cohortId);
@@ -171,9 +179,14 @@ export function ProgrammeOnboarding({
 
           {erreur && <PlainError message={erreur} />}
 
-          <Button onClick={validerStructure} disabled={encours || nom.trim().length < 2}>
-            {encours ? t("saving") : t("continue")}
-          </Button>
+          <div className="flex flex-col gap-1.5">
+            <Button onClick={validerStructure} disabled={encours || !!manqueStructure}>
+              {encours ? t("saving") : t("continue")}
+            </Button>
+            {manqueStructure && (
+              <p className="text-[11.5px] text-[#8B8FA3]">{manqueStructure}</p>
+            )}
+          </div>
         </div>
       </OnboardingShell>
     );
@@ -204,7 +217,7 @@ export function ProgrammeOnboarding({
 
           <div className="flex flex-col gap-2">
             <label className="text-[12.5px] font-[600] text-[#4A4E63]">{t("goalLabel")}</label>
-            <SelectChips options={OBJECTIFS} value={objectif} onChange={setObjectif} />
+            <ChipsObjectifs options={OBJECTIFS} value={objectif} onChange={setObjectif} />
           </div>
 
           {erreur && <PlainError message={erreur} />}
@@ -214,9 +227,14 @@ export function ProgrammeOnboarding({
               className="text-[12.5px] font-[600] text-[#8B8FA3] hover:text-[#4A4E63]">
               {t("back")}
             </button>
-            <Button onClick={validerCohorte} disabled={encours || cohorte.trim().length < 2}>
-              {encours ? t("saving") : t("continue")}
-            </Button>
+            <div className="flex flex-col items-end gap-1.5">
+              <Button onClick={validerCohorte} disabled={encours || !!manqueCohorte}>
+                {encours ? t("saving") : t("continue")}
+              </Button>
+              {manqueCohorte && (
+                <p className="text-[11.5px] text-[#8B8FA3]">{manqueCohorte}</p>
+              )}
+            </div>
           </div>
         </div>
       </OnboardingShell>

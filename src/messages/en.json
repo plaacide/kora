@@ -338,7 +338,14 @@
       "continue": "Continue",
       "back": "← Back",
       "skip": "I'll do it later",
-      "finish": "Finish"
+      "finish": "Finish",
+      "goalAdd": "+ Other goal",
+      "goalAddConfirm": "Add",
+      "goalOtherPh": "Access to public contracts…",
+      "goalRemove": "Remove this goal",
+      "goalMax": "{n} goals maximum — beyond that it is no longer a goal but a description.",
+      "needName": "Enter your organisation's name to continue.",
+      "needCohortName": "Give this cohort a name to continue."
     }
   },
   "shell": {

@@ -338,7 +338,14 @@
       "continue": "Continuer",
       "back": "← Retour",
       "skip": "Je le ferai plus tard",
-      "finish": "Terminer"
+      "finish": "Terminer",
+      "goalAdd": "+ Autre objectif",
+      "goalAddConfirm": "Ajouter",
+      "goalOtherPh": "Accès aux marchés publics…",
+      "goalRemove": "Retirer cet objectif",
+      "goalMax": "{n} objectifs au maximum — au-delà, ce n'est plus un objectif mais une description.",
+      "needName": "Renseignez le nom de votre structure pour continuer.",
+      "needCohortName": "Donnez un nom à cette cohorte pour continuer."
     }
   },
   "shell": {

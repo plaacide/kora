@@ -87,7 +87,11 @@ export async function createFirstCohort(input: {
   seats?: number | null;
   startsOn?: string | null;
   endsOn?: string | null;
-  goal?: string;
+  /**
+   * Plusieurs objectifs, mêlant nos codes connus et les libellés libres du
+   * programme. La base rogne, dédoublonne et plafonne — pas nous.
+   */
+  goals?: string[];
 }): Promise<Result & { cohortId?: string }> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_cohort", {
@@ -95,7 +99,7 @@ export async function createFirstCohort(input: {
     p_seats: input.seats ?? null,
     p_starts_on: input.startsOn ?? null,
     p_ends_on: input.endsOn ?? null,
-    p_goal: input.goal ?? null,
+    p_goals: input.goals ?? null,
   });
   if (error) return { ok: false, error: error.message };
   return { ok: true, cohortId: (data as { id: string } | null)?.id };
