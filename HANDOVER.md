@@ -12,7 +12,8 @@ il contient les pièges du dépôt, dont plusieurs coûtent une demi-journée ch
 | Source | Rôle |
 |---|---|
 | `sanza_handoff/PROGRAMME-COHORTES-DEALROOM.md` | **les règles**. En cas de conflit avec un autre document, elles gagnent. |
-| `Sanza Onboarding Programme (1).html` (Téléchargements du fondateur) | **la maquette**, 17 écrans. |
+| `sanza_handoff/maquettes/programme-onboarding-17-ecrans.html` | **la maquette**, 17 écrans. Fait foi. |
+| `sanza_handoff/maquettes/` | les deux autres maquettes du projet + la méthode de lecture (`LISEZ-MOI.md`). |
 
 **La maquette n'est pas indicative — elle est la spécification.** L'erreur la
 plus coûteuse de la session précédente a été d'inventer des libellés et des
@@ -25,7 +26,8 @@ Le fichier est un bundle avec scripts inline. Le servir depuis l'application
 échoue (notre CSP bloque l'inline sans nonce). Le servir à plat fonctionne :
 
 ```bash
-cp "Sanza Onboarding Programme (1).html" /tmp/maq/index.html && cd /tmp/maq && python3 -m http.server 8899
+mkdir -p /tmp/maq && cp sanza_handoff/maquettes/programme-onboarding-17-ecrans.html /tmp/maq/index.html
+cd /tmp/maq && python3 -m http.server 8899
 ```
 
 Puis, dans le navigateur, extraire les 17 écrans :
@@ -299,3 +301,29 @@ Aucune tâche planifiée n'existe sur cette installation. Deux mécanismes le
 contournent volontairement : l'expiration des demandes et invitations est
 **calculée** à la lecture, et le relevé mensuel du rapport se déclenche à la
 première ouverture de `/rapports` chaque mois.
+
+---
+
+## 10. Ce qui n'est PAS sur GitHub, et qu'il faut récupérer
+
+`.env*` est exclu par `.gitignore` — délibérément. Le dépôt ne contient donc
+aucun secret, et l'application ne démarre pas sans eux. À demander au fondateur :
+
+| Variable | Sans elle |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | rien ne fonctionne |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | rien ne fonctionne |
+| `SUPABASE_SERVICE_ROLE_KEY` | serveur uniquement — sondes et administration |
+| `RESEND_API_KEY` | aucun e-mail ne part, **en silence** |
+| `SEND_EMAIL_HOOK_SECRET` | la route de composition d'e-mails refuse tout |
+| `EMAIL_FROM` | doit être `noreply@sanza.africa` — le domaine vérifié est la RACINE, pas `send.` |
+
+⚠️ `EMAIL_FROM` contient `<` et `>`. Sans guillemets dans `.env.local`,
+`source .env.local` casse le shell — dotenv, lui, le tolère, donc le défaut ne
+se voit qu'en ligne de commande.
+
+Le fondateur a par ailleurs exposé un Client Secret Google dans une capture
+d'écran pendant la session : **à faire tourner** s'il ne l'a pas déjà fait.
+
+Les accès qui ne passent pas par le dépôt : tableau de bord Supabase (les
+migrations s'y appliquent à la main), Coolify (déploiement), Resend.
