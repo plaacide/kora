@@ -208,6 +208,12 @@ export default async function CohortePage({
     };
   });
 
+  // Invitations parties et sans réponse — ni acceptées, ni retirées, ni
+  // périmées. C'est ce qui « court » au sens de la §3.
+  const enAttente = invitations.filter(
+    (l) => l.status === "pending" && l.etat !== "expiree",
+  ).length;
+
   return (
     <div className="flex flex-col gap-5 text-[#1A1B1F]">
       {/* Fil d'Ariane : sans lui, on ne sait plus de quelle cohorte on parle
@@ -223,8 +229,17 @@ export default async function CohortePage({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="font-display text-[24px] font-[700] tracking-[-0.02em]">{nomCohorte}</h1>
+            {/* §3 : « Ne jamais afficher 0 entreprise quand des invitations
+                courent. » Un programme qui vient d'inviter trois entreprises
+                et lit « 0 entreprises » croit que son geste s'est perdu. */}
             <p className="text-[12.5px] text-[#6E727A] mt-1">
               {t("companies", { n: lignes.length })} · {t("rooms", { n: totalSalles })}
+              {enAttente > 0 && (
+                <span className="text-[#B4741B]">
+                  {" · "}
+                  {t("pendingInvites", { n: enAttente })}
+                </span>
+              )}
             </p>
           </div>
           <span className="text-[12px] text-[#8B8FA3]">
@@ -246,15 +261,22 @@ export default async function CohortePage({
           ) : (
             <CohorteTable cohorteId={cohorteId} lignes={lignes} devise={devise} />
           )}
+
+          {/* LE FORMULAIRE SUIT IMMÉDIATEMENT ce qui demande d'agir. Il vivait
+              en bas de page, sous le panneau de questions et un paragraphe
+              d'explication : l'écran disait « invitez vos premières
+              entreprises » et cachait le moyen de le faire six cents pixels
+              plus bas. */}
+          <div className="mt-4">
+            <Card>
+              <CardBody>
+                <CohorteForm cohorteId={cohorteId} liens={invitations} />
+              </CardBody>
+            </Card>
+          </div>
         </div>
         <QuestionsPanel cohorteId={cohorteId} echanges={echanges} entreprises={membresListe} />
       </div>
-
-      <Card>
-        <CardBody>
-          <CohorteForm cohorteId={cohorteId} liens={invitations} />
-        </CardBody>
-      </Card>
 
       <p className="text-[11.5px] text-ink-muted leading-relaxed max-w-lg">
         Rejoindre votre cohorte ne vous donne accès à aucun document. Vous
