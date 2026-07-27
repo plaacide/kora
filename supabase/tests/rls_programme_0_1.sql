@@ -46,9 +46,19 @@ begin
     (v_fond_user, '00000000-0000-0000-0000-000000000000', 'authenticated',
      'authenticated', 'test-fondatrice@rls.invalid', '', now(), now(), now());
 
+  -- ⚠️ `on conflict` OBLIGATOIRE, et non par prudence : le déclencheur
+  -- `on_auth_user_created` a DÉJÀ créé ces deux profils au moment de l'insert
+  -- ci-dessus. Un `insert` nu échoue en 23505 sur `profiles_pkey`.
+  --
+  -- On écrit quand même, plutôt que de se reposer sur le déclencheur : celui-ci
+  -- lit `full_name` dans `raw_user_meta_data`, que ce scénario ne remplit pas.
+  -- Les fixtures resteraient anonymes, et un échec deviendrait illisible.
   insert into public.profiles (id, email, full_name)
   values (v_prog_user, 'test-programme@rls.invalid', 'Test Programme'),
-         (v_fond_user, 'test-fondatrice@rls.invalid', 'Test Fondatrice');
+         (v_fond_user, 'test-fondatrice@rls.invalid', 'Test Fondatrice')
+  on conflict (id) do update
+    set email = excluded.email,
+        full_name = excluded.full_name;
 
   insert into public.organizations (name, slug)
   values ('Programme de test RLS', 'rls-test-programme-' || substr(v_prog_user::text, 1, 8))
