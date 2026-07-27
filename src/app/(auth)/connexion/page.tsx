@@ -14,9 +14,9 @@ function Badge({ icon, label }: { icon: React.ReactNode; label: string }) {
 export default async function ConnexionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ erreur?: string; suivant?: string }>;
+  searchParams: Promise<{ erreur?: string; suivant?: string; email?: string }>;
 }) {
-  const { erreur, suivant } = await searchParams;
+  const { erreur, suivant, email } = await searchParams;
   const t = await getTranslations("auth.panel");
 
   return (
@@ -93,7 +93,7 @@ export default async function ConnexionPage({
         </div>
       }
     >
-      <LoginForm notice={erreur} suivant={suivant} />
+      <LoginForm notice={erreur} suivant={suivant} email={email} />
     </AuthSplit>
   );
 }

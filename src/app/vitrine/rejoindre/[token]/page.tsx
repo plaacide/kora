@@ -32,7 +32,21 @@ export default async function RejoindreVitrinePage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/connexion?suivant=/vitrine/rejoindre/${token}`);
+  // L'invité n'a presque jamais de compte : l'envoyer d'abord vers la
+  // connexion lui fait chercher un mot de passe qu'il n'a pas. On l'envoie
+  // s'inscrire, avec son adresse — celle-là même que l'acceptation exigera.
+  // Le formulaire garde un lien « déjà un compte » pour l'autre cas.
+  //
+  // L'adresse passe par une RPC : les deux tables d'invitation sont fermées à
+  // `anon`, une lecture directe ici renverrait zéro ligne sans rien dire.
+  if (!user) {
+    const { data: invite } = await supabase.rpc("invitation_email", {
+      p_token: token,
+    });
+    const suivant = encodeURIComponent(`/vitrine/rejoindre/${token}`);
+    const email = invite ? `&email=${encodeURIComponent(invite as string)}` : "";
+    redirect(`/inscription?suivant=${suivant}${email}`);
+  }
 
   const { data, error } = await supabase.rpc("accept_showcase_invite", {
     p_token: token,

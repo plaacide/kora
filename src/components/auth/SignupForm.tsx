@@ -66,7 +66,10 @@ function RoleIcon({ name }: { name: "investor" | "founder" | "sae" }) {
  * passe le plus souvent par une confirmation d'e-mail, et la destination doit
  * survivre à l'aller-retour dans la boîte mail (cf. `signup`).
  */
-export function SignupForm({ suivant }: { suivant?: string } = {}) {
+export function SignupForm({
+  suivant,
+  email,
+}: { suivant?: string; email?: string } = {}) {
   const [state, action, pending] = useActionState(signup, undefined);
   const t = useTranslations("auth.signup");
   const locale = useLocale();
@@ -103,7 +106,8 @@ export function SignupForm({ suivant }: { suivant?: string } = {}) {
           <Link
             href={
               suivant
-                ? `/connexion?suivant=${encodeURIComponent(suivant)}`
+                ? `/connexion?suivant=${encodeURIComponent(suivant)}` +
+                  (email ? `&email=${encodeURIComponent(email)}` : "")
                 : "/connexion"
             }
             className="font-medium"
@@ -205,11 +209,16 @@ export function SignupForm({ suivant }: { suivant?: string } = {}) {
         </div>
 
         <div>
+          {/* Pré-rempli depuis l'invitation, mais MODIFIABLE : un dirigeant
+              peut vouloir un autre compte. Il sera alors averti clairement par
+              le garde-fou « cette invitation vise une autre adresse » — mieux
+              vaut un avertissement lisible qu'un champ verrouillé. */}
           <Input
             label={t("email")}
             name="email"
             type="email"
             autoComplete="email"
+            defaultValue={email}
             placeholder={t("emailPlaceholder")}
           />
           <FieldError messages={state?.fieldErrors?.email} />

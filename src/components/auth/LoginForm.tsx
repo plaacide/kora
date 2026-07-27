@@ -22,7 +22,8 @@ import { cheminInterne } from "@/lib/redirect";
 export function LoginForm({
   notice,
   suivant,
-}: { notice?: string; suivant?: string } = {}) {
+  email,
+}: { notice?: string; suivant?: string; email?: string } = {}) {
   const [state, action, pending] = useActionState(login, undefined);
   const t = useTranslations("auth.login");
 
@@ -54,7 +55,8 @@ export function LoginForm({
           <Link
             href={
               suivant
-                ? `/inscription?suivant=${encodeURIComponent(suivant)}`
+                ? `/inscription?suivant=${encodeURIComponent(suivant)}` +
+                  (email ? `&email=${encodeURIComponent(email)}` : "")
                 : "/inscription"
             }
             className="font-medium"
@@ -74,11 +76,16 @@ export function LoginForm({
         <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />
 
         <div>
+          {/* Pré-rempli depuis l'invitation, mais MODIFIABLE : un dirigeant
+              peut vouloir un autre compte. Il sera alors averti clairement par
+              le garde-fou « cette invitation vise une autre adresse » — mieux
+              vaut un avertissement lisible qu'un champ verrouillé. */}
           <Input
             label={t("email")}
             name="email"
             type="email"
             autoComplete="email"
+            defaultValue={email}
             placeholder={t("emailPlaceholder")}
           />
           <FieldError messages={state?.fieldErrors?.email} />

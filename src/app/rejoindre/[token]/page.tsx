@@ -25,7 +25,21 @@ export default async function RejoindrePage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/connexion?suivant=/rejoindre/${token}`);
+  // L'invité n'a presque jamais de compte : l'envoyer d'abord vers la
+  // connexion lui fait chercher un mot de passe qu'il n'a pas. On l'envoie
+  // s'inscrire, avec son adresse — celle-là même que l'acceptation exigera.
+  // Le formulaire garde un lien « déjà un compte » pour l'autre cas.
+  //
+  // L'adresse passe par une RPC : les deux tables d'invitation sont fermées à
+  // `anon`, une lecture directe ici renverrait zéro ligne sans rien dire.
+  if (!user) {
+    const { data: invite } = await supabase.rpc("invitation_email", {
+      p_token: token,
+    });
+    const suivant = encodeURIComponent(`/rejoindre/${token}`);
+    const email = invite ? `&email=${encodeURIComponent(invite as string)}` : "";
+    redirect(`/inscription?suivant=${suivant}${email}`);
+  }
 
   const { data: lien } = await supabase
     .from("cohort_links")
@@ -36,6 +50,21 @@ export default async function RejoindrePage({
   const programme =
     (lien?.organizations as unknown as { name?: string } | null)?.name ??
     "Un programme";
+
+  // SANS ORGANISATION, ON NE PEUT PAS ACCEPTER. `accept_cohort_link` rattache
+  // la cohorte à l'organisation de l'invité et refuse s'il n'en a pas
+  // (« accès refusé »). C'est le cas de tout invité qui vient de s'inscrire :
+  // il arriverait ici pour se heurter à un refus qui ne lui apprend rien.
+  //
+  // On le lui dit AVANT, et on l'envoie créer son espace. L'invitation reste
+  // valable — il rouvrira le lien de son e-mail.
+  const { data: adhesion } = await supabase
+    .from("memberships")
+    .select("org_id")
+    .eq("user_id", user.id)
+    .limit(1)
+    .maybeSingle();
+  const sansEspace = !adhesion;
 
   const introuvable = !lien;
   const dejaFait = lien?.status === "accepted";
@@ -49,7 +78,28 @@ export default async function RejoindrePage({
     <main className="min-h-screen bg-bg flex items-center justify-center px-5 py-16">
       <div className="w-full max-w-[520px]">
         <div className="rounded-[14px] border border-line bg-surface p-7">
-          {introuvable || revoque ? (
+          {sansEspace && !introuvable && !revoque ? (
+            <>
+              <h1 className="text-[20px] font-[650] tracking-[-0.02em]">
+                Créez d’abord votre espace
+              </h1>
+              <p className="text-[13px] text-ink-secondary leading-relaxed mt-2">
+                {programme} vous invite à rejoindre sa cohorte. Pour accepter,
+                il vous faut d’abord votre propre espace Sanza — c’est lui qui
+                portera votre dossier, et vous en resterez seul propriétaire.
+              </p>
+              <p className="text-[12.5px] text-ink-muted leading-relaxed mt-3">
+                Votre invitation reste valable&nbsp;: rouvrez ce lien depuis
+                votre e-mail une fois votre espace créé.
+              </p>
+              <a
+                href="/onboarding"
+                className="sz-cta text-[13px] px-4 py-2.5 inline-flex mt-5"
+              >
+                Créer mon espace
+              </a>
+            </>
+          ) : introuvable || revoque ? (
             <>
               <h1 className="text-[20px] font-[650] tracking-[-0.02em]">
                 Cette invitation n’est plus valable
