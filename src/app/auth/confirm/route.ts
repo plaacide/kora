@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { originFromHeaders } from "@/lib/app-origin";
+import { cheminInterne } from "@/lib/redirect";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,10 +17,10 @@ export const dynamic = "force-dynamic";
  * transiter le jeton dans l'URL du navigateur, où il finirait dans l'historique
  * et les journaux du proxy.
  *
- * `next` est volontairement restreint aux chemins internes : accepter une URL
- * complète ferait de cette route une redirection ouverte, utilisable pour
- * envoyer un utilisateur authentifié vers un site de hameçonnage depuis un lien
- * qui porte notre domaine.
+ * `next` est volontairement restreint aux chemins internes (`cheminInterne`) :
+ * accepter une URL complète ferait de cette route une redirection ouverte,
+ * utilisable pour envoyer un utilisateur authentifié vers un site de
+ * hameçonnage depuis un lien qui porte notre domaine.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -30,9 +31,7 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next") ?? "/dashboard";
 
-  const destination = next.startsWith("/") && !next.startsWith("//")
-    ? next
-    : "/dashboard";
+  const destination = cheminInterne(next, "/dashboard");
 
   if (!tokenHash || !type) {
     return NextResponse.redirect(`${origin}/connexion?erreur=lien_invalide`);

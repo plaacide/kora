@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { originFromHeaders } from "@/lib/app-origin";
+import { cheminInterne } from "@/lib/redirect";
 
 /** Types de compte acceptés depuis l'URL — jamais la valeur brute. */
 const ROLES = ["investor", "founder", "sae"] as const;
@@ -33,8 +34,7 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next") ?? "/onboarding";
   const origin = originFromHeaders(request.headers);
 
-  const destination =
-    next.startsWith("/") && !next.startsWith("//") ? next : "/onboarding";
+  const destination = cheminInterne(next, "/onboarding");
 
   if (!code) {
     return NextResponse.redirect(`${origin}/connexion`);
