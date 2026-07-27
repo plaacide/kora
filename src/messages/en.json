@@ -1624,7 +1624,8 @@
     "threadsEmptyFoot": "Your exchanges are visible only to the company concerned. Other cohort members know nothing of them.",
     "nothingListableTitle": "No company is listable yet",
     "nothingListableBody": "You choose who appears, company by company. Two conditions: the company has agreed to be listed, and its file is started — an investor who opens an empty profile does not come back.",
-    "pendingInvites": "{n, plural, one {# invitation pending} other {# invitations pending}}"
+    "pendingInvites": "{n, plural, one {# invitation pending} other {# invitations pending}}",
+    "stateNotStarted": "NOT STARTED"
   },
   "showcase": {
     "title": "{programme} showcase",

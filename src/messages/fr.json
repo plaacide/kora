@@ -1624,7 +1624,8 @@
     "threadsEmptyFoot": "Vos échanges ne sont visibles que de l'entreprise concernée. Les autres membres de la cohorte n'en savent rien.",
     "nothingListableTitle": "Aucune entreprise n'est encore listable",
     "nothingListableBody": "Vous choisissez qui apparaît, entreprise par entreprise. Deux conditions : l'entreprise a donné son accord pour être listée, et son dossier est entamé — un investisseur qui ouvre une fiche vide ne revient pas.",
-    "pendingInvites": "{n, plural, one {# invitation en attente} other {# invitations en attente}}"
+    "pendingInvites": "{n, plural, one {# invitation en attente} other {# invitations en attente}}",
+    "stateNotStarted": "PAS COMMENCÉ"
   },
   "showcase": {
     "title": "Vitrine {programme}",

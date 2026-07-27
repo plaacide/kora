@@ -72,7 +72,11 @@ export function CohorteTable({
       (a, b) => (a.preparation ?? -1) - (b.preparation ?? -1),
     );
     if (filtre === "decrochent") {
-      return parRisque.filter((l) => (l.preparation ?? 0) < PREPARATION_ROUGE);
+      // Même raison : une entreprise sans dossier ne « décroche » pas, elle
+      // n'a pas commencé. La mêler aux vrais décrochages noierait le signal.
+      return parRisque.filter(
+        (l) => l.preparation !== null && l.preparation < PREPARATION_ROUGE,
+      );
     }
     if (filtre === "listees") return parRisque.filter((l) => l.listee);
     return parRisque;
@@ -191,12 +195,19 @@ export function CohorteTable({
       </div>
 
       {triees.map((l) => {
+        // PRÉPARATION NULLE ≠ PRÉPARATION ZÉRO. Une entreprise qui vient de
+        // rejoindre n'a pas encore de salle : `preparation` est `null`. La
+        // traiter comme 0 l'affichait « DÉCROCHE » en rouge le jour de son
+        // arrivée — un reproche adressé à quelqu'un qui n'a rien eu le temps
+        // de faire, et le premier signal que le programme lui envoie.
         const etat =
-          (l.preparation ?? 0) < PREPARATION_ROUGE
-            ? { libelle: t("stateDropping"), cls: "text-[#C0392B] bg-[#FBE6E0]" }
-            : (l.preparation ?? 0) >= PREPARATION_VERTE
-              ? { libelle: t("stateReady"), cls: "text-[#147A5C] bg-[#E4F3EC]" }
-              : { libelle: t("stateGoing"), cls: "text-[#B4741B] bg-[#FBF1DF]" };
+          l.preparation === null
+            ? { libelle: t("stateNotStarted"), cls: "text-[#6E727A] bg-[#F1F0EB]" }
+            : l.preparation < PREPARATION_ROUGE
+              ? { libelle: t("stateDropping"), cls: "text-[#C0392B] bg-[#FBE6E0]" }
+              : l.preparation >= PREPARATION_VERTE
+                ? { libelle: t("stateReady"), cls: "text-[#147A5C] bg-[#E4F3EC]" }
+                : { libelle: t("stateGoing"), cls: "text-[#B4741B] bg-[#FBF1DF]" };
 
         return (
           <div

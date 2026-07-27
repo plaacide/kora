@@ -63,18 +63,19 @@ export default async function CohortePage({
   // programme voie des ÉTATS, jamais un contenu.
   const [{ data: cohorte }, { data: membres }] = await Promise.all([
     supabase.from("cohorts").select("id, name, starts_on, ends_on").eq("id", cohorteId).maybeSingle(),
-    supabase
-      .from("cohort_members")
-      .select("startup_org_id, organizations!cohort_members_startup_org_id_fkey(name)")
-      .eq("cohort_id", cohorteId),
+    // PAS de jointure sur `organizations` : sa politique exige d'être MEMBRE
+    // de l'organisation lue, et le programme ne l'est pas — c'est le principe
+    // même de la §0.1. La jointure renvoyait null et l'écran affichait « — »
+    // à la place du nom. La fonction rend l'identifiant et le nom, rien d'autre.
+    supabase.rpc("cohort_members_named", { p_cohort: cohorteId }),
   ]);
 
   const membresListe = ((membres ?? []) as unknown as Array<{
     startup_org_id: string;
-    organizations: { name: string } | { name: string }[];
+    name: string | null;
   }>).map((m) => ({
     orgId: m.startup_org_id,
-    nom: (Array.isArray(m.organizations) ? m.organizations[0] : m.organizations)?.name ?? "—",
+    nom: m.name ?? "—",
   }));
   const orgIds = membresListe.map((m) => m.orgId);
 

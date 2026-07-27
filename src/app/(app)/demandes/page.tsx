@@ -43,8 +43,10 @@ export default async function DemandesPage() {
       users.length
         ? supabase.from("profiles").select("id, full_name, email").in("id", users)
         : Promise.resolve({ data: [] }),
+      // Même raison qu'ailleurs : la politique de `organizations` réserve la
+      // lecture à ses membres, et le programme n'en est pas un.
       orgs.length
-        ? supabase.from("organizations").select("id, name").in("id", orgs)
+        ? supabase.rpc("related_org_names", { p_ids: orgs })
         : Promise.resolve({ data: [] }),
       // Le NOM de la salle, jamais son contenu — la règle §0.1 tient aussi ici.
       deals.length

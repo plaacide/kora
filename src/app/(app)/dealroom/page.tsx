@@ -79,8 +79,11 @@ export default async function DealroomPage() {
 
   // Les noms d'entreprises en une requête, pas une par fiche.
   const orgs = [...new Set(lignesEntrees.map((e) => e.startup_org_id))];
+  // PAS de lecture directe : la politique de `organizations` exige d'être
+  // membre de l'organisation lue, et le programme ne l'est pas. Elle renverrait
+  // zéro ligne et l'écran afficherait « — » à la place de chaque nom.
   const { data: organisations } = orgs.length
-    ? await supabase.from("organizations").select("id, name").in("id", orgs)
+    ? await supabase.rpc("related_org_names", { p_ids: orgs })
     : { data: [] };
   const nomOrg = new Map(
     ((organisations ?? []) as Array<{ id: string; name: string }>).map((o) => [
