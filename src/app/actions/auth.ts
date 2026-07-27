@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { cheminInterne } from "@/lib/redirect";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, clientIp } from "@/lib/security/rate-limit";
 import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
@@ -120,13 +121,23 @@ export async function login(
     }
   }
 
+  // Où reprendre. Lu BRUT du formulaire — `loginSchema` ne le valide pas, et
+  // ne doit pas : ce n'est pas une donnée de compte mais une destination, et
+  // `cheminInterne` est sa seule validation légitime.
+  const dest = cheminInterne(
+    formData.get("suivant") as string | null,
+    "/dashboard",
+  );
+
   const { data: aal } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
-    redirect("/connexion/2fa");
+    // La 2FA s'intercale : la destination doit lui survivre, sinon tout compte
+    // protégé perd son invitation au moment précis où il prouve son identité.
+    redirect(`/connexion/2fa?suivant=${encodeURIComponent(dest)}`);
   }
 
-  redirect("/dashboard");
+  redirect(dest);
 }
 
 /**

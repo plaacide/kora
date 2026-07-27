@@ -6,8 +6,9 @@ import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { PlainError } from "./FormError";
+import { cheminInterne } from "@/lib/redirect";
 
-export function TwoFactorChallenge() {
+export function TwoFactorChallenge({ suivant }: { suivant?: string } = {}) {
   const t = useTranslations("security.twoFactor");
   const router = useRouter();
   const [code, setCode] = useState("");
@@ -40,7 +41,7 @@ export function TwoFactorChallenge() {
     });
     setBusy(false);
     if (v.error) return setError(t("codeIncorrect"));
-    router.push("/dashboard");
+    router.push(cheminInterne(suivant, "/dashboard"));
     router.refresh();
   }
 

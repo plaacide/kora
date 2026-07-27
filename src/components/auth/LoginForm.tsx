@@ -9,8 +9,20 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
 import { SsoButtons } from "./SsoButtons";
+import { cheminInterne } from "@/lib/redirect";
 
-export function LoginForm({ notice }: { notice?: string } = {}) {
+/**
+ * `suivant` : où reprendre après la connexion.
+ *
+ * Il traverse TROIS chemins qui ne se parlent pas — le formulaire e-mail, le
+ * SSO, et le basculement vers l'inscription. En oublier un suffit à perdre la
+ * destination, et l'utilisateur retombe sur le tableau de bord sans comprendre
+ * pourquoi son invitation s'est évaporée. C'est exactement ce qui se produisait.
+ */
+export function LoginForm({
+  notice,
+  suivant,
+}: { notice?: string; suivant?: string } = {}) {
   const [state, action, pending] = useActionState(login, undefined);
   const t = useTranslations("auth.login");
 
@@ -37,16 +49,28 @@ export function LoginForm({ notice }: { notice?: string } = {}) {
         </h1>
         <p className="mt-2 text-[13px] text-[#4A4E63]">
           {t("noAccount")}{" "}
-          <Link href="/inscription" className="font-medium">
+          {/* Bascule vers l'inscription : la destination doit suivre, sinon
+              l'invité qui n'a pas de compte la perd en changeant d'écran. */}
+          <Link
+            href={
+              suivant
+                ? `/inscription?suivant=${encodeURIComponent(suivant)}`
+                : "/inscription"
+            }
+            className="font-medium"
+          >
             {t("signupLink")}
           </Link>
         </p>
       </div>
 
       {/* SSO d'abord, puis « OU PAR EMAIL » (handoff v2 §3). */}
-      <SsoButtons next="/dashboard" />
+      <SsoButtons next={cheminInterne(suivant, "/dashboard")} />
 
       <form action={action} className="flex flex-col gap-4">
+        {/* L'action serveur ne voit pas l'URL : la destination doit voyager
+            dans le formulaire. Validée côté serveur, jamais telle quelle. */}
+        <input type="hidden" name="suivant" value={suivant ?? ""} />
         <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />
 
         <div>
