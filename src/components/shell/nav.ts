@@ -56,7 +56,7 @@ const HORS_SUJET_FONDATEUR = ["/pipeline", "/readiness"];
 // listés ici : leurs écrans n'existent pas encore, et la règle produit du
 // dépôt interdit un lien de navigation vers une page inexistante. Ils
 // s'ajouteront avec leurs écrans.
-const ECRANS_PROGRAMME = ["/portefeuille", "/cohortes", "/securite", "/roadmap"];
+const ECRANS_PROGRAMME = ["/portefeuille", "/cohortes", "/demandes", "/securite", "/roadmap"];
 
 /**
  * Écrans devenus des ONGLETS de la data room (handoff §3b) : ils vivent dans

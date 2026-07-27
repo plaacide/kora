@@ -30,6 +30,16 @@ export function NavIcon({ name }: { name: string }) {
 
 const PATHS: Record<string, React.ReactNode> = {
   // Vue d'ensemble
+  // Demandes d'accès : une main tendue vers une porte — on demande à entrer,
+  // on n'entre pas. Trait 1.6 comme les autres, pour que la colonne reste calme.
+  requests: (
+    <>
+      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+      <path d="M10 17l5-5-5-5" />
+      <path d="M15 12H3" />
+    </>
+  ),
+
   dashboard: (
     <>
       <rect x="3" y="3" width="7" height="7" rx="1.5" />

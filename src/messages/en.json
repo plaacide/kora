@@ -383,7 +383,8 @@
       "roadmap": "Roadmap",
       "nda": "Signed agreements",
       "cohort": "My cohorts",
-      "contacts": "Contacts"
+      "contacts": "Contacts",
+      "requests": "Access requests"
     },
     "founder": {
       "groups": {
@@ -1577,5 +1578,31 @@
       "saisonnalite": "Seasonality",
       "cycleTresorerie": "Cash cycle"
     }
+  },
+  "requests": {
+    "title": "Access requests",
+    "intro": "You filter and recommend. The company grants — unless it has explicitly mandated you.",
+    "pending": "{n} PENDING",
+    "badgeMandate": "MANDATE GRANTED",
+    "badgeStartup": "COMPANY DECIDES",
+    "wants": "Seeking",
+    "room": "Data room",
+    "age": "{n, plural, =0 {less than a day ago} =1 {1 day ago} other {# days ago}}",
+    "recommend": "Forward with a favourable opinion",
+    "forward": "Forward without an opinion",
+    "dismiss": "Dismiss",
+    "grant": "Grant access",
+    "legend": "The company will decide — you inform its decision.",
+    "footer": "Every outcome is written to the company's audit log. A refusal is kept.",
+    "emptyTitle": "No request yet",
+    "emptyBody": "Requests arrive when an investor views a profile in your showcase and wants to open the data room.",
+    "statusRecommended": "FORWARDED WITH OPINION",
+    "statusForwarded": "FORWARDED",
+    "statusDismissed": "DISMISSED",
+    "statusGranted": "GRANTED",
+    "statusRefused": "REFUSED",
+    "instrEquity": "Equity",
+    "instrDette": "Debt",
+    "instrMezzanine": "Mezzanine"
   }
 }

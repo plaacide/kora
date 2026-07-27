@@ -383,7 +383,8 @@
       "roadmap": "Roadmap",
       "nda": "Accords signés",
       "cohort": "Mes cohortes",
-      "contacts": "Contacts"
+      "contacts": "Contacts",
+      "requests": "Demandes d'accès"
     },
     "founder": {
       "groups": {
@@ -1577,5 +1578,31 @@
       "saisonnalite": "Saisonnalité",
       "cycleTresorerie": "Cycle de trésorerie"
     }
+  },
+  "requests": {
+    "title": "Demandes d'accès",
+    "intro": "Vous filtrez et recommandez. L'entreprise accorde — sauf mandat explicite de sa part.",
+    "pending": "{n} EN ATTENTE",
+    "badgeMandate": "MANDAT ACCORDÉ",
+    "badgeStartup": "DÉCISION STARTUP",
+    "wants": "Cherche",
+    "room": "Data room",
+    "age": "il y a {n, plural, =0 {moins d'un jour} =1 {1 jour} other {# jours}}",
+    "recommend": "Transmettre avec avis favorable",
+    "forward": "Transmettre sans avis",
+    "dismiss": "Écarter",
+    "grant": "Accorder l'accès",
+    "legend": "L'entreprise tranchera — vous éclairez sa décision.",
+    "footer": "Chaque issue est écrite au journal d'audit de l'entreprise. Un refus se conserve.",
+    "emptyTitle": "Aucune demande pour l'instant",
+    "emptyBody": "Les demandes arrivent quand un investisseur consulte une fiche de votre vitrine et souhaite ouvrir la data room.",
+    "statusRecommended": "TRANSMISE AVEC AVIS",
+    "statusForwarded": "TRANSMISE",
+    "statusDismissed": "ÉCARTÉE",
+    "statusGranted": "ACCORDÉE",
+    "statusRefused": "REFUSÉE",
+    "instrEquity": "Equity",
+    "instrDette": "Dette",
+    "instrMezzanine": "Mezzanine"
   }
 }
