@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { joursRestants } from "@/lib/echeance";
+import { modeleIndicateurs, type Lecture } from "@/lib/vitrine-indicateurs";
 import { ShareButton } from "@/components/dataroom/ShareButton";
 import { OuvrirLeveeButton } from "@/components/deal/OuvrirLeveeButton";
 import { ChangerDataRoomButton } from "@/components/deal/ChangerDataRoomButton";
@@ -893,6 +894,18 @@ function VitrineEditor({
   function loadTemplate(aud: string) {
     set(aud, (VITRINE_TEMPLATES[aud] ?? []).map((x) => ({ ...x, g: false })));
   }
+  /**
+   * Charge les huit lignes que la FICHE de la vitrine sait lire.
+   *
+   * Les libellés viennent de `modeleIndicateurs`, c'est-à-dire du même module
+   * que la fiche : ce que le fondateur saisit ici est par construction ce
+   * qu'elle ira chercher. Le modèle d'audience, lui, écrivait « Revenu
+   * annualisé (ARR) » quand la fiche cherchait « ARR » — deux listes séparées
+   * dérivent toujours, et personne ne le voyait.
+   */
+  function loadFiche(aud: string, lecture: Lecture) {
+    set(aud, modeleIndicateurs(lecture).map((x) => ({ ...x, g: false })));
+  }
   function edit(aud: string, i: number, patch: Partial<Indicateur>) {
     set(aud, (data[aud] ?? []).map((r, j) => (j === i ? { ...r, ...patch } : r)));
   }
@@ -936,6 +949,19 @@ function VitrineEditor({
                   {(data[aud] ?? []).length === 0 ? t("fromTemplate") : t("resetTemplate")}
                 </button>
               )}
+            </div>
+            {/* Les deux lectures de la vitrine. Ces libellés-là remontent dans
+                la fiche que voit un investisseur ; les autres modèles restent
+                utiles, mais eux seuls la remplissent. */}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[11px] text-[#9DA0A8]">{t("ficheModels")}</span>
+              <button type="button" onClick={() => loadFiche(aud, "equity")} className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
+                {t("ficheEquity")}
+              </button>
+              <span className="text-[#D5D2CA]">·</span>
+              <button type="button" onClick={() => loadFiche(aud, "dette")} className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
+                {t("ficheDette")}
+              </button>
             </div>
             {(data[aud] ?? []).length === 0 && (
               <p className="text-[11.5px] text-[#9DA0A8] mb-2">

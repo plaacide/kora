@@ -1189,7 +1189,10 @@
       "previewKpiReadyValue": "74%",
       "previewKpiAccess": "active guests",
       "previewKpiAccessValue": "9",
-      "setupStep1CtaLink": "Link my documents"
+      "setupStep1CtaLink": "Link my documents",
+      "ficheModels": "For the showcase:",
+      "ficheEquity": "equity template",
+      "ficheDette": "debt template"
     }
   },
   "versions": {

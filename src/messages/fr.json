@@ -1189,7 +1189,10 @@
       "previewKpiReadyValue": "74 %",
       "previewKpiAccess": "accès actifs",
       "previewKpiAccessValue": "9",
-      "setupStep1CtaLink": "Rattacher mes pièces"
+      "setupStep1CtaLink": "Rattacher mes pièces",
+      "ficheModels": "Pour la vitrine :",
+      "ficheEquity": "modèle equity",
+      "ficheDette": "modèle dette"
     }
   },
   "versions": {
