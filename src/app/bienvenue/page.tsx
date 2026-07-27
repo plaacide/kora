@@ -4,7 +4,24 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ResonanceArcs } from "@/components/brand/ResonanceArcs";
 import { SanzaLogo } from "@/components/ui/SanzaLogo";
+import { personaFor } from "@/lib/persona";
 
+/**
+ * L'écran de bienvenue, commun aux quatre métiers.
+ *
+ * LE PROGRAMME Y TOMBAIT DANS LA BRANCHE FONDATEUR. Il n'a ni startup, ni
+ * levée, ni data room : la checklist lui annonçait « Fiche complète — 0 % »,
+ * « Levée — à renseigner » et « Data room — à créer », trois étapes qui
+ * n'existent pas chez lui, et le second bouton lui proposait de déposer des
+ * documents qu'il n'a pas le droit de voir. Trois mensonges sur un écran dont
+ * tout le propos est de dire où l'on en est.
+ *
+ * Sa checklist compte donc ce qui le concerne : sa cohorte, ses invitations en
+ * attente, sa double authentification. La règle §7 la veut HONNÊTE — « 3
+ * entreprises invitées, en attente de leur réponse » et non « 3 entreprises » :
+ * une invitation n'est pas une adhésion, et laisser croire le contraire se paie
+ * à la première connexion.
+ */
 export default async function BienvenuePage() {
   const t = await getTranslations("welcome");
   const supabase = await createClient();
@@ -20,8 +37,12 @@ export default async function BienvenuePage() {
     .maybeSingle();
 
   const firstName = (profile?.full_name ?? "").split(" ")[0] || "";
-  const isInvestor =
-    (profile as { account_type?: string } | null)?.account_type === "investor";
+  const accountType = (profile as { account_type?: string } | null)?.account_type;
+  // Pas de rôle à passer : cet écran précède l'ouverture d'un deal, le type de
+  // compte est la seule chose qui distingue les métiers ici.
+  const persona = personaFor(accountType, null);
+  const isInvestor = persona === "investor";
+  const isProgramme = persona === "sae";
 
   // ÉTAT RÉEL, pas une liste figée. Cet écran annonçait « Fiche complète » et
   // « Levée renseignée » quoi qu'il arrive — or ces deux étapes sont devenues
@@ -36,6 +57,69 @@ export default async function BienvenuePage() {
     .limit(1)
     .maybeSingle();
   const orgId = (membership as { org_id?: string } | null)?.org_id;
+
+  if (isProgramme) {
+    // La 2FA est PROPOSÉE, jamais imposée (règle §7) : le programme verra
+    // passer des états de dossiers qui ne lui appartiennent pas, mais un mur
+    // à la première session fait fuir avant d'avoir rien montré.
+    const { data: facteurs } = await supabase.auth.mfa.listFactors();
+    const deuxFacteurs = (facteurs?.totp ?? []).some(
+      (f) => f.status === "verified",
+    );
+
+    const [{ data: cohortes }, { data: liens }] = await Promise.all([
+      supabase
+        .from("cohorts")
+        .select("name")
+        .is("archived_at", null)
+        .order("starts_on", { ascending: false, nullsFirst: false })
+        .limit(1),
+      supabase.from("cohort_links").select("status"),
+    ]);
+
+    const cohorte = ((cohortes ?? []) as Array<{ name: string }>)[0]?.name;
+    const tous = ((liens ?? []) as Array<{ status: string }>).filter(
+      (l) => l.status !== "revoked",
+    );
+    const acceptees = tous.filter((l) => l.status === "accepted").length;
+
+    const items = [
+      {
+        done: !!cohorte,
+        label: t("programmeCohort"),
+        note: cohorte ?? t("programmeCohortNone"),
+      },
+      {
+        // Cochée seulement quand quelqu'un a ACCEPTÉ. Une invitation partie
+        // n'est pas une entreprise dans la cohorte.
+        done: acceptees > 0,
+        label: t("programmeInvited"),
+        note:
+          acceptees > 0
+            ? t("programmeInvitedAccepted", { acceptees, total: tous.length })
+            : t("programmeInvitedWaiting", { n: tous.length }),
+      },
+      {
+        done: deuxFacteurs,
+        label: t("programmeTwoFactor"),
+        note: deuxFacteurs ? t("programmeTwoFactorOn") : t("programmeTwoFactorOff"),
+      },
+    ];
+
+    return (
+      <Bienvenue
+        titre={t("title", { name: firstName })}
+        corps={t("bodyProgramme")}
+        items={items}
+        principal={{ href: "/cohortes", libelle: t("ctaCohort") }}
+        secondaire={
+          deuxFacteurs
+            ? null
+            : { href: "/securite", libelle: t("ctaTwoFactor") }
+        }
+      />
+    );
+  }
 
   const [{ data: startup }, { data: salles }, { data: profilInv }] = await Promise.all([
     supabase
@@ -84,6 +168,65 @@ export default async function BienvenuePage() {
       ];
 
   return (
+    <Bienvenue
+      titre={t("title", { name: firstName })}
+      corps={
+        isInvestor
+          ? t("bodyInvestor")
+          : aUneSalle
+            ? t("bodyFounder")
+            : t("bodyFounderNoRoom")
+      }
+      items={items}
+      principal={{ href: "/dashboard", libelle: `${t("ctaDealroom")} \u2192` }}
+      secondaire={
+        isInvestor
+          ? null
+          : {
+              // Sans data room, /data-room n'a rien à montrer : on renvoie à
+              // l'accueil, d'où la salle se crée — la règle produit interdit un
+              // lien vers un écran qui ne peut rien afficher.
+              href: aUneSalle ? "/data-room" : "/dashboard",
+              libelle: aUneSalle ? t("ctaUpload") : t("ctaCreateRoom"),
+            }
+      }
+    />
+  );
+}
+
+interface Item {
+  done: boolean;
+  label: string;
+  note: string;
+}
+
+interface Cta {
+  href: string;
+  libelle: string;
+}
+
+/**
+ * La mise en page de l'écran, commune aux quatre métiers.
+ *
+ * Extraite parce que le programme a sa propre checklist : dupliquer les arcs,
+ * la carte de verre et les deux boutons aurait garanti qu'ils divergent. Ce
+ * composant ne DÉCIDE rien — il ne connaît ni persona ni condition, il affiche
+ * ce qu'on lui donne. C'est ce qui permet d'ajouter un métier sans y revenir.
+ */
+function Bienvenue({
+  titre,
+  corps,
+  items,
+  principal,
+  secondaire,
+}: {
+  titre: string;
+  corps: string;
+  items: Item[];
+  principal: Cta;
+  secondaire: Cta | null;
+}) {
+  return (
     <main className="relative min-h-screen bg-encre text-white overflow-hidden grid place-items-center px-6">
       {/* Deux jeux d'arcs en coins opposés, 640 / 680 (handoff v2 §6). */}
       <ResonanceArcs corner="top-left" size={640} />
@@ -94,10 +237,10 @@ export default async function BienvenuePage() {
 
         <div>
           <h1 className="text-[38px] font-[700] tracking-[-0.025em] leading-tight">
-            {t("title", { name: firstName })}
+            {titre}
           </h1>
           <p className="text-[14px] text-white/70 mt-3 leading-relaxed max-w-[520px] mx-auto">
-            {isInvestor ? t("bodyInvestor") : aUneSalle ? t("bodyFounder") : t("bodyFounderNoRoom")}
+            {corps}
           </p>
         </div>
 
@@ -133,20 +276,17 @@ export default async function BienvenuePage() {
         {/* Deux CTA côte à côte : orange puis verre (handoff §6). */}
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/dashboard"
+            href={principal.href}
             className="inline-flex items-center justify-center bg-[#E85C2B] text-white font-[600] text-[13.5px] rounded-[10px] px-5 py-3 hover:bg-[#D24E1F] transition-colors"
           >
-            {`${t("ctaDealroom")} \u2192`}
+            {principal.libelle}
           </Link>
-          {/* Sans data room, /data-room n'a rien à montrer : on renvoie à
-              l'accueil, d'où la salle se crée — la règle produit interdit un
-              lien vers un écran qui ne peut rien afficher. */}
-          {!isInvestor && (
+          {secondaire && (
             <Link
-              href={aUneSalle ? "/data-room" : "/dashboard"}
+              href={secondaire.href}
               className="inline-flex items-center justify-center border border-white/15 bg-white/[0.055] text-white font-[600] text-[13.5px] rounded-[10px] px-5 py-3 hover:bg-white/[0.09] transition-colors"
             >
-              {aUneSalle ? t("ctaUpload") : t("ctaCreateRoom")}
+              {secondaire.libelle}
             </Link>
           )}
         </div>

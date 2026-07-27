@@ -1490,7 +1490,18 @@
     "investorProfileNoteTodo": "To complete",
     "investorThesisNoteTodo": "To complete",
     "ctaCreateRoom": "Create my data room",
-    "bodyFounderNoRoom": "Your profile is ready. Now create your data room: it is the vault where your documents will live, and you choose its name and folder template."
+    "bodyFounderNoRoom": "Your profile is ready. Now create your data room: it is the vault where your documents will live, and you choose its name and folder template.",
+    "bodyProgramme": "Your cohort is set up. The companies you invited decide for themselves whether to join — you will see their progress as soon as they accept.",
+    "programmeCohort": "Cohort created",
+    "programmeCohortNone": "to be created",
+    "programmeInvited": "Companies invited",
+    "programmeInvitedWaiting": "{n, plural, =0 {none yet} one {# invited — awaiting their reply} other {# invited — awaiting their replies}}",
+    "programmeInvitedAccepted": "{acceptees} of {total} have accepted",
+    "programmeTwoFactor": "Two-factor authentication",
+    "programmeTwoFactorOn": "enabled",
+    "programmeTwoFactorOff": "recommended",
+    "ctaCohort": "View my cohort",
+    "ctaTwoFactor": "Enable two-factor authentication"
   },
   "survey": {
     "inviteTitle": "A minute to help us?",
