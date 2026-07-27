@@ -6,6 +6,7 @@ import { requireInternal } from "@/lib/access";
 import { getCurrentDeal, getDealRole, getAnyRole } from "@/lib/current-deal";
 import { personaFor } from "@/lib/persona";
 import { AccueilFondateur } from "../accueil-fondateur";
+import { InvitationsEnAttente } from "@/components/cohorte/InvitationsEnAttente";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Mono } from "@/components/ui/Table";
@@ -73,7 +74,13 @@ export default async function DashboardPage() {
     const prenom = (profile?.full_name ?? user?.email ?? "").split(/[\s@]/)[0] || "—";
     if (dealCourant && user) {
       return (
-        <AccueilFondateur supabase={supabase} deal={dealCourant} prenom={prenom} userId={user.id} />
+        <div className="flex flex-col gap-5">
+          {/* Une invitation en attente se rappelle ICI, pas seulement dans un
+              e-mail qu'on peut avoir perdu. Le composant ne rend rien quand il
+              n'y a rien. */}
+          <InvitationsEnAttente />
+          <AccueilFondateur supabase={supabase} deal={dealCourant} prenom={prenom} userId={user.id} />
+        </div>
       );
     }
     // Fondateur SANS data room — première connexion (handoff §4.1).
@@ -98,6 +105,11 @@ export default async function DashboardPage() {
           <h1 className="font-display text-[27px] font-[700] tracking-[-0.02em]">{t("greetingSimple", { name: prenom })}</h1>
           <p className="text-[13.5px] text-[#6E727A] mt-1">{t("emptySubtitle")}</p>
         </div>
+
+        {/* C'est ICI que le cas se produit : l'invité vient de créer son espace,
+            n'a pas encore de data room, et son invitation dort dans un e-mail
+            qu'il ne rouvrira pas. */}
+        <InvitationsEnAttente />
 
         <div className="relative overflow-hidden rounded-[10px] bg-[#1A1B1F] px-8 py-10 md:px-11 md:py-12">
           <ResonanceArcs corner="top-right" size={560} tone="dark" />

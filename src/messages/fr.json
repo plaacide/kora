@@ -1625,7 +1625,11 @@
     "nothingListableTitle": "Aucune entreprise n'est encore listable",
     "nothingListableBody": "Vous choisissez qui apparaît, entreprise par entreprise. Deux conditions : l'entreprise a donné son accord pour être listée, et son dossier est entamé — un investisseur qui ouvre une fiche vide ne revient pas.",
     "pendingInvites": "{n, plural, one {# invitation en attente} other {# invitations en attente}}",
-    "stateNotStarted": "PAS COMMENCÉ"
+    "stateNotStarted": "PAS COMMENCÉ",
+    "pendingInviteTitle": "{programme} vous invite à rejoindre sa cohorte",
+    "pendingInviteBody": "Cohorte « {cohorte} ». Rejoindre ne donne accès à aucun de vos documents — vous restez seul maître de votre dossier.",
+    "pendingInviteBodyNoCohort": "Rejoindre ne donne accès à aucun de vos documents — vous restez seul maître de votre dossier.",
+    "pendingInviteCta": "Voir l'invitation"
   },
   "showcase": {
     "title": "Vitrine {programme}",

@@ -1625,7 +1625,11 @@
     "nothingListableTitle": "No company is listable yet",
     "nothingListableBody": "You choose who appears, company by company. Two conditions: the company has agreed to be listed, and its file is started — an investor who opens an empty profile does not come back.",
     "pendingInvites": "{n, plural, one {# invitation pending} other {# invitations pending}}",
-    "stateNotStarted": "NOT STARTED"
+    "stateNotStarted": "NOT STARTED",
+    "pendingInviteTitle": "{programme} invites you to join their cohort",
+    "pendingInviteBody": "Cohort “{cohorte}”. Joining grants access to none of your documents — you remain in sole control of your file.",
+    "pendingInviteBodyNoCohort": "Joining grants access to none of your documents — you remain in sole control of your file.",
+    "pendingInviteCta": "View the invitation"
   },
   "showcase": {
     "title": "{programme} showcase",
