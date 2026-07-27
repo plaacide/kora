@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { FormError, FieldError } from "./FormError";
 import { POSTES, POSTE_AUTRE } from "@/lib/job-titles";
 import { SsoButtons } from "./SsoButtons";
+import { cheminInterne } from "@/lib/redirect";
 import { cn } from "@/lib/cn";
 
 /**
@@ -58,7 +59,14 @@ function RoleIcon({ name }: { name: "investor" | "founder" | "sae" }) {
   );
 }
 
-export function SignupForm() {
+/**
+ * `suivant` : où reprendre après l'inscription.
+ *
+ * Même exigence que la connexion, avec une marche de plus — l'inscription
+ * passe le plus souvent par une confirmation d'e-mail, et la destination doit
+ * survivre à l'aller-retour dans la boîte mail (cf. `signup`).
+ */
+export function SignupForm({ suivant }: { suivant?: string } = {}) {
   const [state, action, pending] = useActionState(signup, undefined);
   const t = useTranslations("auth.signup");
   const locale = useLocale();
@@ -90,7 +98,16 @@ export function SignupForm() {
         </h1>
         <p className="mt-2 text-[13px] text-[#4A4E63]">
           {t("haveAccount")}{" "}
-          <Link href="/connexion" className="font-medium">
+          {/* Bascule vers la connexion : l'invité qui a DÉJÀ un compte ne
+              doit pas perdre sa destination en changeant d'écran. */}
+          <Link
+            href={
+              suivant
+                ? `/connexion?suivant=${encodeURIComponent(suivant)}`
+                : "/connexion"
+            }
+            className="font-medium"
+          >
             {t("loginLink")}
           </Link>
         </p>
@@ -136,9 +153,11 @@ export function SignupForm() {
 
       {/* SSO d'abord (handoff v2 §3). Le rôle choisi ci-dessus est transmis :
           au retour, il fixe le type de compte comme le ferait le formulaire. */}
-      <SsoButtons next="/onboarding" role={role} />
+      <SsoButtons next={cheminInterne(suivant, "/onboarding")} role={role} />
 
       <form action={action} className="flex flex-col gap-4">
+        {/* L'action serveur ne voit pas l'URL. */}
+        <input type="hidden" name="suivant" value={suivant ?? ""} />
         <input type="hidden" name="account_type" value={role} />
         <FormError errorKey={state?.errorKey} errorRaw={state?.errorRaw} />
 

@@ -1,13 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { cheminInterne } from "@/lib/redirect";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, clientIp } from "@/lib/security/rate-limit";
 import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
-import { headers } from "next/headers";
 import { originFromHeaders } from "@/lib/app-origin";
 import {
   signupSchema,
@@ -47,14 +46,35 @@ export async function signup(
   }
 
   const { full_name, job_title, email, password, locale, account_type } = parsed.data;
+
+  // Où reprendre après l'inscription. Lu brut, validé par `cheminInterne` —
+  // il n'entre pas dans `signupSchema` : ce n'est pas une donnée de compte.
+  const dest = cheminInterne(
+    formData.get("suivant") as string | null,
+    "/onboarding",
+  );
+
   // Flux implicite : le lien de confirmation doit s'ouvrir depuis n'importe
-  // quel appareil, pas seulement celui qui s'est inscrit.
+  // quel appareil, pas seulement celui qui s'est inscrit. NE PAS repasser en
+  // PKCE — le jeton arriverait préfixé `pkce_` et `verifyOtp` le rejetterait
+  // (cf. AGENTS.md, récidive du 2026-07-24).
   const supabase = await createClient({ flowType: "implicit" });
+
+  // `originFromHeaders` et non `request.url` : derrière le proxy, l'origine
+  // vaut http://0.0.0.0:8080 et le lien de confirmation part dans le vide.
+  const origin = originFromHeaders(await headers());
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name, locale, account_type } },
+    options: {
+      data: { full_name, locale, account_type },
+      // C'EST ICI QUE LA DESTINATION SURVIT À LA BOÎTE MAIL. Sans ce
+      // paramètre, l'invité sans compte confirmait son adresse puis
+      // atterrissait sur l'onboarding, son invitation perdue en route — le
+      // seul cas où le tunnel casse en silence après avoir semblé marcher.
+      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(dest)}`,
+    },
   });
 
   if (error) return mapError(error.message);
@@ -76,7 +96,10 @@ export async function signup(
   const store = await cookies();
   store.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 60 * 60 * 24 * 365 });
 
-  if (data.session) redirect("/onboarding");
+  // Confirmation d'e-mail désactivée : la session existe déjà, on va droit à
+  // la destination. Sinon elle doit voyager dans le lien de confirmation —
+  // c'est `emailRedirectTo`, posé plus haut, qui s'en charge.
+  if (data.session) redirect(dest);
   redirect("/verifier-email");
 }
 

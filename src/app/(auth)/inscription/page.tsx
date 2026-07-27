@@ -29,7 +29,12 @@ function Feature({
   );
 }
 
-export default async function InscriptionPage() {
+export default async function InscriptionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ suivant?: string }>;
+}) {
+  const { suivant } = await searchParams;
   const t = await getTranslations("auth.panel");
   return (
     <AuthSplit
@@ -61,7 +66,7 @@ export default async function InscriptionPage() {
         </div>
       }
     >
-      <SignupForm />
+      <SignupForm suivant={suivant} />
     </AuthSplit>
   );
 }

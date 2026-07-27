@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { originFromHeaders } from "@/lib/app-origin";
+import { cheminInterne } from "@/lib/redirect";
 import { sendEmail } from "@/lib/email/send";
 import {
   authEmail,
@@ -66,6 +67,24 @@ interface HookPayload {
     email_action_type?: string;
     redirect_to?: string;
   };
+}
+
+/**
+ * La destination portée par `emailRedirectTo`, si elle en porte une.
+ *
+ * Supabase nous retransmet cette valeur en `redirect_to`. On n'en garde QUE le
+ * paramètre `next`, passé par `cheminInterne` : le reste de l'URL est ignoré.
+ * Une valeur forgée ne peut donc pas transformer nos e-mails d'authentification
+ * en tremplin vers un site de hameçonnage.
+ */
+function destinationDemandee(redirectTo: string | undefined, defaut: string): string {
+  if (!redirectTo) return defaut;
+  try {
+    return cheminInterne(new URL(redirectTo).searchParams.get("next"), defaut);
+  } catch {
+    // Pas une URL absolue : certains flux passent directement un chemin.
+    return cheminInterne(redirectTo, defaut);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -141,7 +160,12 @@ export async function POST(request: NextRequest) {
     const params = new URLSearchParams({
       token_hash: tokenHash,
       type: mapping.otpType,
-      next: mapping.next,
+      // La destination demandée à l'inscription l'emporte sur le défaut de
+      // l'action. Sans cela, une entreprise invitée confirmait son adresse
+      // puis atterrissait sur l'onboarding : son invitation avait disparu en
+      // route, et c'est le seul endroit du tunnel où la perte est invisible —
+      // tout a l'air d'avoir marché.
+      next: destinationDemandee(data.redirect_to, mapping.next),
     });
     link = `${origin}/auth/confirm?${params.toString()}`;
   }
