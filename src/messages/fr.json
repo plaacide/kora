@@ -436,7 +436,9 @@
     "share": "Partager",
     "lockedPortfolio": "S'ouvre dès qu'une entreprise rejoint une cohorte",
     "lockedRequests": "S'ouvre dès qu'une entreprise est publiée dans votre vitrine",
-    "lockedReports": "S'ouvre dès qu'une entreprise a entamé son dossier"
+    "lockedReports": "S'ouvre dès qu'une entreprise a entamé son dossier",
+    "hintNoCompany": "Les écrans grisés s'activent dès qu'une entreprise a rejoint une cohorte.",
+    "hintNoDocument": "Rapports s'ouvre dès qu'une entreprise a entamé son dossier."
   },
   "dashboard": {
     "greeting": "Bonjour, {name}",
@@ -1625,7 +1627,6 @@
     "nothingListableTitle": "Aucune entreprise n'est encore listable",
     "nothingListableBody": "Vous choisissez qui apparaît, entreprise par entreprise. Deux conditions : l'entreprise a donné son accord pour être listée, et son dossier est entamé — un investisseur qui ouvre une fiche vide ne revient pas.",
     "pendingInvites": "{n, plural, one {# invitation en attente} other {# invitations en attente}}",
-    "stateNotStarted": "PAS COMMENCÉ",
     "pendingInviteTitle": "{programme} vous invite à rejoindre sa cohorte",
     "pendingInviteBody": "Cohorte « {cohorte} ». Rejoindre ne donne accès à aucun de vos documents — vous restez seul maître de votre dossier.",
     "pendingInviteBodyNoCohort": "Rejoindre ne donne accès à aucun de vos documents — vous restez seul maître de votre dossier.",
@@ -1638,7 +1639,11 @@
       "waiting": "{n, plural, one {Une invitation attend} other {# invitations attendent}} une réponse, aucune n'a encore été ouverte. Au-delà de cinq jours, un message personnel vaut mieux qu'une relance de plus."
     },
     "invitesSent": "{n, plural, one {# invitation envoyée} other {# invitations envoyées}}",
-    "invitesAccepted": "{n, plural, =0 {aucune acceptée} one {# acceptée} other {# acceptées}}"
+    "invitesAccepted": "{n, plural, =0 {aucune acceptée} one {# acceptée} other {# acceptées}}",
+    "stateNew": "NOUVELLE",
+    "notProvided": "non renseigné",
+    "funderReport": "Rapport bailleur",
+    "publishDealroom": "Publier le dealroom"
   },
   "showcase": {
     "title": "Vitrine {programme}",

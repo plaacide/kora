@@ -28,6 +28,9 @@ const PREPARATION_VERTE = 75;
 export interface LigneEntreprise {
   orgId: string;
   nom: string;
+  /** « Construction · Abidjan » sous le nom, comme la maquette. */
+  secteur: string | null;
+  pays: string | null;
   salles: number;
   recherche: number;
   preparation: number | null;
@@ -202,7 +205,7 @@ export function CohorteTable({
         // de faire, et le premier signal que le programme lui envoie.
         const etat =
           l.preparation === null
-            ? { libelle: t("stateNotStarted"), cls: "text-[#6E727A] bg-[#F1F0EB]" }
+            ? { libelle: t("stateNew"), cls: "text-[#1B6B8F] bg-[#E3F0F6]" }
             : l.preparation < PREPARATION_ROUGE
               ? { libelle: t("stateDropping"), cls: "text-[#C0392B] bg-[#FBE6E0]" }
               : l.preparation >= PREPARATION_VERTE
@@ -227,19 +230,34 @@ export function CohorteTable({
               />
             </span>
 
-            <span className="flex items-center gap-2.5 min-w-0">
-              <span className="text-[13.5px] font-[600] truncate">{l.nom}</span>
-              <span
-                style={mono}
-                className={"shrink-0 text-[8.5px] font-[700] tracking-[0.06em] rounded-[4px] px-2 py-[3px] " + etat.cls}
-              >
-                {etat.libelle}
+            {/* Nom + badge sur la première ligne, secteur · ville en dessous.
+                La maquette met « Construction · Abidjan » sous « CoolBricks » :
+                c'est ce qui permet de reconnaître une entreprise sans avoir à
+                ouvrir sa fiche. */}
+            <span className="flex flex-col min-w-0 gap-0.5">
+              <span className="flex items-center gap-2.5 min-w-0">
+                <span className="text-[13.5px] font-[600] truncate">{l.nom}</span>
+                <span
+                  style={mono}
+                  className={"shrink-0 text-[8.5px] font-[700] tracking-[0.06em] rounded-[4px] px-2 py-[3px] " + etat.cls}
+                >
+                  {etat.libelle}
+                </span>
               </span>
+              {(l.secteur || l.pays) && (
+                <span className="text-[11px] text-[#9DA0A8] truncate">
+                  {[l.secteur, l.pays].filter(Boolean).join(" · ")}
+                </span>
+              )}
             </span>
 
             <span style={mono} className="text-[12.5px] text-[#55585F]">{l.salles}</span>
             <span style={mono} className="text-[12.5px] text-[#55585F]">
-              {l.recherche > 0 ? `${argent.format(l.recherche)} ${devise}` : "—"}
+              {l.recherche > 0 ? (
+                `${argent.format(l.recherche)} ${devise}`
+              ) : (
+                <span className="text-[#A9ACBB]">{t("notProvided")}</span>
+              )}
             </span>
 
             <span>

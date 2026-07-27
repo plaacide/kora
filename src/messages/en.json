@@ -436,7 +436,9 @@
     "share": "Share",
     "lockedPortfolio": "Opens as soon as a company joins a cohort",
     "lockedRequests": "Opens as soon as a company is published in your showcase",
-    "lockedReports": "Opens as soon as a company has started its file"
+    "lockedReports": "Opens as soon as a company has started its file",
+    "hintNoCompany": "The greyed screens switch on as soon as a company joins a cohort.",
+    "hintNoDocument": "Reports opens as soon as a company has started its file."
   },
   "dashboard": {
     "greeting": "Hello, {name}",
@@ -1625,7 +1627,6 @@
     "nothingListableTitle": "No company is listable yet",
     "nothingListableBody": "You choose who appears, company by company. Two conditions: the company has agreed to be listed, and its file is started — an investor who opens an empty profile does not come back.",
     "pendingInvites": "{n, plural, one {# invitation pending} other {# invitations pending}}",
-    "stateNotStarted": "NOT STARTED",
     "pendingInviteTitle": "{programme} invites you to join their cohort",
     "pendingInviteBody": "Cohort “{cohorte}”. Joining grants access to none of your documents — you remain in sole control of your file.",
     "pendingInviteBodyNoCohort": "Joining grants access to none of your documents — you remain in sole control of your file.",
@@ -1638,7 +1639,11 @@
       "waiting": "{n, plural, one {One invitation is awaiting} other {# invitations are awaiting}} a reply, none has been opened yet. Past five days, a personal message beats another reminder."
     },
     "invitesSent": "{n, plural, one {# invitation sent} other {# invitations sent}}",
-    "invitesAccepted": "{n, plural, =0 {none accepted} one {# accepted} other {# accepted}}"
+    "invitesAccepted": "{n, plural, =0 {none accepted} one {# accepted} other {# accepted}}",
+    "stateNew": "NEW",
+    "notProvided": "not provided",
+    "funderReport": "Funder report",
+    "publishDealroom": "Publish the dealroom"
   },
   "showcase": {
     "title": "{programme} showcase",

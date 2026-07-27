@@ -117,6 +117,17 @@ export default async function AppLayout({
       .select("id", { count: "exact", head: true });
     if (!nEntamees) bloquees["/rapports"] = ts("lockedReports");
   }
+
+  // UNE phrase sous le menu, pas une par entrée grisée. On nomme la condition
+  // la PLUS PROCHE d'être remplie — celle qui débloque le plus d'écrans d'un
+  // coup. Tant qu'aucune entreprise n'a rejoint, tout dépend de ça ; ensuite
+  // c'est le premier dépôt qui commande.
+  const aideMenu =
+    Object.keys(bloquees).length === 0
+      ? undefined
+      : bloquees["/portefeuille"]
+        ? (await getTranslations("shell"))("hintNoCompany")
+        : (await getTranslations("shell"))("hintNoDocument");
   let roomCounts: { permissions?: number; checklist?: number; qa?: number } | undefined;
   if (interne && deal) {
     const [perm, chk, qa] = await Promise.all([
@@ -140,6 +151,7 @@ export default async function AppLayout({
       role={role}
       persona={persona}
       bloquees={bloquees}
+      aideMenu={aideMenu}
       roomCounts={roomCounts}
     >
       {/* Le verrouillage est brutal — plus rien n'est accessible. Il ne doit

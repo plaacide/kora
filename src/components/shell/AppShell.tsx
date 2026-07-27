@@ -15,6 +15,7 @@ export function AppShell({
   persona,
   roomCounts,
   bloquees,
+  aideMenu,
 }: {
   children: React.ReactNode;
   orgName: string;
@@ -26,6 +27,7 @@ export function AppShell({
   roomCounts?: RoomCounts;
   /** Entrées non atteignables → leur condition, déjà traduite (§8). */
   bloquees?: Record<string, string>;
+  aideMenu?: string;
 }) {
   const currentDealName =
     deals.find((d) => d.id === currentDealId)?.name ?? deals[0]?.name ?? orgName;
@@ -40,6 +42,7 @@ export function AppShell({
           role={role}
           persona={persona}
           bloquees={bloquees}
+          aideMenu={aideMenu}
         />
         {/* Fond craie #F4F1EA, le même que l'onboarding (handoff v2) : la
             plateforme et l'inscription se lisent comme un seul produit. La

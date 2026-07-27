@@ -16,6 +16,7 @@ export function Sidebar({
   role,
   persona = "fund",
   bloquees = {},
+  aideMenu,
 }: {
   deals: DealRef[];
   currentDealId: string | null;
@@ -31,6 +32,8 @@ export function Sidebar({
    * serveur connaît, et la reconstruire ici demanderait de lui redemander.
    */
   bloquees?: Record<string, string>;
+  /** La phrase unique sous le menu. Absente = plus rien n'est grisé. */
+  aideMenu?: string;
 }) {
   const pathname = usePathname();
   const t = useTranslations("shell");
@@ -72,17 +75,16 @@ export function Sidebar({
                     // Un `span`, pas un `Link` désactivé : rien à cliquer, rien
                     // à tabuler. `aria-disabled` seul laisserait le lien
                     // navigable au clavier vers un écran qui n'a rien à dire.
+                    // Grisée, SANS sa propre phrase. La maquette met UNE ligne
+                    // sous tout le menu — répéter la condition sous chaque
+                    // entrée transforme la colonne en pavé de texte, et on ne
+                    // lit plus aucune des trois.
                     <span
                       title={bloquees[item.href]}
-                      className="flex flex-col gap-0.5 rounded-[5px] px-2.5 py-2 cursor-default"
+                      className="flex items-center gap-[11px] rounded-[5px] px-2.5 py-2 text-[13.5px] font-medium text-[#B7BAC4] cursor-default"
                     >
-                      <span className="flex items-center gap-[11px] text-[13.5px] font-medium text-[#B7BAC4]">
-                        <NavIcon name={item.key} />
-                        <span className="truncate">{navLabel(item.key)}</span>
-                      </span>
-                      <span className="text-[10.5px] text-[#B7BAC4] leading-snug pl-[27px]">
-                        {bloquees[item.href]}
-                      </span>
+                      <NavIcon name={item.key} />
+                      <span className="truncate">{navLabel(item.key)}</span>
                     </span>
                   ) : (
                   <Link
@@ -106,6 +108,16 @@ export function Sidebar({
         </div>
         );
       })}
+
+      {/* UNE ligne, sous tout le menu — comme la maquette. Elle dit la
+          condition la plus proche d'être remplie, pas les trois : le programme
+          n'a qu'une chose à faire ensuite, et c'est celle-là qu'il faut
+          nommer. Rendue seulement s'il reste quelque chose de grisé. */}
+      {aideMenu && (
+        <p className="px-2.5 pt-3 mt-1 text-[10.5px] leading-snug text-[#B7BAC4] border-t border-[#EFEDE7]">
+          {aideMenu}
+        </p>
+      )}
     </nav>
   );
 }

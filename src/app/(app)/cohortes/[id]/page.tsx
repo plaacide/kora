@@ -81,9 +81,13 @@ export default async function CohortePage({
   const membresListe = ((membres ?? []) as unknown as Array<{
     startup_org_id: string;
     name: string | null;
+    sector: string | null;
+    country: string | null;
   }>).map((m) => ({
     orgId: m.startup_org_id,
     nom: m.name ?? "—",
+    secteur: m.sector,
+    pays: m.country,
   }));
   const nomParOrgId = new Map(membresListe.map((m) => [m.orgId, m.nom]));
   const orgIds = membresListe.map((m) => m.orgId);
@@ -156,6 +160,8 @@ export default async function CohortePage({
     return {
       orgId: m.orgId,
       nom: m.nom,
+      secteur: m.secteur,
+      pays: m.pays,
       salles: salles.ids.length,
       recherche: montantParOrg.get(m.orgId) ?? 0,
       preparation: salles.scores.length
@@ -324,12 +330,29 @@ export default async function CohortePage({
               )}
             </p>
           </div>
-          <span className="text-[12px] text-[#8B8FA3]">
-            {occupe} / {limite} places
-          </span>
+          {/* Actions d'en-tête de la maquette. « Rapport bailleur » avait été
+              retiré quand /rapports n'existait pas ; l'écran existe depuis, le
+              bouton revient. « Publier le dealroom » mène là où la publication
+              se pilote — il ne publie pas d'ici, ce serait un second endroit
+              pour un même geste. */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-[12px] text-[#8B8FA3]">
+              {occupe} / {limite} places
+            </span>
+            <Link
+              href={`/rapports?cohorte=${cohorteId}`}
+              className="rounded-[5px] border border-[#E4E2DC] bg-white px-3.5 py-2 text-[12.5px] font-[550] text-[#33353B] hover:border-[#C9C6BD]"
+            >
+              {t("funderReport")}
+            </Link>
+            <Link
+              href="/dealroom"
+              className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]"
+            >
+              {t("publishDealroom")}
+            </Link>
+          </div>
         </div>
-        {/* « Rapport bailleur » attend son écran (/rapports, §6 des règles) :
-            absent plutôt qu'inerte, comme la règle produit l'exige. */}
       </div>
 
       {conseil && (
