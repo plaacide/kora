@@ -54,6 +54,7 @@
 .v2-control{display:flex;height:52px;align-items:center;gap:12px;border-radius:6px;background:#fff;padding:0 16px;box-shadow:inset 0 0 0 1px #d0d5dd}
 .v2-control:focus-within{box-shadow:inset 0 0 0 1px var(--orange),0 0 0 3px var(--orange-soft)}
 .v2-control input,.v2-control select{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--text);font:400 14px var(--font-v2-sans),sans-serif;appearance:none}
+.v2-control :is(input,select):focus-visible,.v2-auth-control :is(input,select):focus-visible{outline:none}
 .v2-control input::placeholder{color:var(--text-4)}
 .v2-control .v2-icon{color:var(--text-4)}
 .v2-field-helper{color:var(--text-3);font-size:13px}
