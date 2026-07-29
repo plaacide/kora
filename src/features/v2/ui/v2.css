@@ -662,3 +662,5 @@
 .v2-invite-row b{display:block;font-size:13.5px}
 .v2-invite-row small{display:flex;margin-top:3px;align-items:center;gap:6px;color:var(--text-3);font-size:12px}
 @media(max-width:720px){.v2-invite-row{flex-wrap:wrap}.v2-invite-row .v2-journal-place{display:none}}
+.v2-journal .v2-filterbar{margin-bottom:4px}
+.v2-journal-row>.v2-tag{flex:0 0 auto}
