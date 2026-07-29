@@ -28,7 +28,7 @@ export async function signup(
   const isV2 = formData.get("auth_surface") === "v2";
   const parsed = signupSchema.safeParse({
     full_name: formData.get("full_name"),
-    job_title: formData.get("job_title") || undefined,
+    job_title: formData.get("job_title"),
     email: formData.get("email"),
     password: formData.get("password"),
     locale: formData.get("locale") ?? "fr",

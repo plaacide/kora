@@ -43,8 +43,32 @@ begin
 end;
 $$;
 
--- Répare les comptes créés avant ce correctif, sans écraser une valeur déjà
--- renseignée dans le profil.
+-- Répare aussi les comptes Auth créés alors que le schéma public n'était pas
+-- encore installé. Un simple UPDATE ne suffit pas dans ce cas : le profil
+-- n'existe pas du tout.
+insert into public.profiles (
+  id,
+  email,
+  full_name,
+  locale,
+  account_type,
+  job_title
+)
+select
+  u.id,
+  u.email,
+  coalesce(u.raw_user_meta_data->>'full_name', ''),
+  coalesce(u.raw_user_meta_data->>'locale', 'fr'),
+  case u.raw_user_meta_data->>'account_type'
+    when 'investor' then 'investor'::public.account_type
+    when 'sae' then 'sae'::public.account_type
+    else 'founder'::public.account_type
+  end,
+  nullif(trim(u.raw_user_meta_data->>'job_title'), '')
+from auth.users as u
+on conflict (id) do nothing;
+
+-- Complète les profils déjà présents sans écraser une valeur renseignée.
 update public.profiles as p
 set
   account_type = coalesce(

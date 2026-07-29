@@ -27,6 +27,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 const FIELD_MESSAGES: Record<string, string> = {
   nameMin: "Indiquez votre nom complet.",
+  jobTitleRequired: "Sélectionnez votre poste.",
   emailInvalid: "Saisissez une adresse e-mail valide.",
   passwordMin: "Le mot de passe est trop court.",
   passwordLetter: "Ajoutez au moins une lettre.",
@@ -36,6 +37,41 @@ const FIELD_MESSAGES: Record<string, string> = {
 };
 
 type AccountType = "founder" | "investor" | "sae";
+
+const JOB_TITLES_BY_ROLE: Record<AccountType, string[]> = {
+  founder: [
+    "Fondateur·rice / CEO",
+    "Cofondateur·rice",
+    "Directeur·rice général·e",
+    "Directeur·rice financier·ère / CFO",
+    "Responsable finance",
+    "Responsable juridique ou conformité",
+    "Responsable opérations",
+    "Responsable de la levée de fonds",
+    "Autre fonction",
+  ],
+  investor: [
+    "Associé·e / Partner",
+    "Directeur·rice d’investissement",
+    "Investment Manager / Principal",
+    "Chargé·e d’investissement",
+    "Analyste",
+    "Responsable portefeuille",
+    "Responsable risque ou crédit",
+    "Responsable impact / ESG",
+    "Autre fonction",
+  ],
+  sae: [
+    "Directeur·rice de programme",
+    "Responsable de programme",
+    "Responsable accélération ou incubation",
+    "Responsable investissement",
+    "Responsable suivi-évaluation",
+    "Responsable partenariats",
+    "Responsable opérations",
+    "Autre fonction",
+  ],
+};
 
 function AuthError({ state }: { state: AuthState }) {
   if (!state?.errorKey && !state?.errorRaw) return null;
@@ -99,6 +135,7 @@ function PasswordField({
       <span className="v2-auth-control">
         <Icon name="lock" />
         <input
+          aria-invalid={Boolean(state?.fieldErrors?.password)}
           autoComplete={autoComplete}
           minLength={autoComplete === "new-password" ? 12 : undefined}
           name="password"
@@ -140,6 +177,7 @@ export function SignupForm({
 }) {
   const [state, action, pending] = useActionState(signup, undefined);
   const [role, setRole] = useState<AccountType>("founder");
+  const [jobTitle, setJobTitle] = useState("");
 
   const roles: { value: AccountType; label: string }[] = [
     { value: "founder", label: "Une entreprise qui se finance" },
@@ -154,7 +192,7 @@ export function SignupForm({
         <p>Préparez votre financement dans un espace privé et sécurisé.</p>
       </div>
 
-      <form action={action} className="v2-auth-form">
+      <form action={action} className="v2-auth-form" noValidate>
         <input name="auth_surface" type="hidden" value="v2" />
         <input name="suivant" type="hidden" value={suivant} />
         <input name="account_type" type="hidden" value={role} />
@@ -167,7 +205,10 @@ export function SignupForm({
                 aria-pressed={role === item.value}
                 data-selected={role === item.value}
                 key={item.value}
-                onClick={() => setRole(item.value)}
+                onClick={() => {
+                  setRole(item.value);
+                  setJobTitle("");
+                }}
                 type="button"
               >
                 {item.label}
@@ -181,7 +222,12 @@ export function SignupForm({
         <label className="v2-auth-field">
           <span>Nom complet</span>
           <span className="v2-auth-control">
-            <input autoComplete="name" name="full_name" required />
+            <input
+              aria-invalid={Boolean(state?.fieldErrors?.full_name)}
+              autoComplete="name"
+              name="full_name"
+              required
+            />
           </span>
           <FieldError name="full_name" state={state} />
         </label>
@@ -189,11 +235,20 @@ export function SignupForm({
         <label className="v2-auth-field">
           <span>Poste</span>
           <span className="v2-auth-control">
-            <input
+            <select
+              aria-invalid={Boolean(state?.fieldErrors?.job_title)}
               autoComplete="organization-title"
               name="job_title"
-              placeholder="Fondatrice & CEO"
-            />
+              onChange={(event) => setJobTitle(event.target.value)}
+              required
+              value={jobTitle}
+            >
+              <option disabled value="">Sélectionnez votre poste</option>
+              {JOB_TITLES_BY_ROLE[role].map((title) => (
+                <option key={title} value={title}>{title}</option>
+              ))}
+            </select>
+            <Icon name="chevron" />
           </span>
           <FieldError name="job_title" state={state} />
         </label>
@@ -203,6 +258,7 @@ export function SignupForm({
           <span className="v2-auth-control">
             <Icon name="mail" />
             <input
+              aria-invalid={Boolean(state?.fieldErrors?.email)}
               autoComplete="email"
               defaultValue={email}
               name="email"
