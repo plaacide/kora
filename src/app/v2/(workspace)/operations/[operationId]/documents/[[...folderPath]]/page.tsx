@@ -1,3 +1,4 @@
+import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import Link from "next/link";
 
 import { AssociationsPanel } from "@/features/v2/ui/Associations";
@@ -39,7 +40,7 @@ export default async function DocumentsPage({
     return (
       <div className="v2-documents-page">
         <section className="v2-drop-empty">
-          <span className="v2-empty-illustration"><Icon name="file" /></span>
+          <EmptyArt name="files" />
           <h2>Déposez vos premières pièces</h2>
           <p>
             Glissez-déposez vos fichiers ici, ou choisissez un dossier. Sanza proposera

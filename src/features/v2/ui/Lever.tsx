@@ -1,3 +1,4 @@
+import { EmptyArt } from "./EmptyArt";
 import Link from "next/link";
 
 import {
@@ -142,7 +143,7 @@ function LeverEmpty() {
   return (
     <LeverFrame current="overview">
       <section className="v2-lever-empty">
-        <span className="v2-lever-empty-icon"><Icon name="trend" /></span>
+        <EmptyArt name="search" />
         <h1>Structurez votre levée</h1>
         <p>
           Définissez l’objectif, le calendrier et les investisseurs à approcher.

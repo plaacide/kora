@@ -1,3 +1,4 @@
+import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import Link from "next/link";
 
 import { Icon } from "@/features/v2/ui/Icon";
@@ -73,7 +74,7 @@ export default async function OperationOverviewPage({
       </div>
 
       <section className="v2-empty-inline">
-        <span className="v2-empty-illustration"><Icon name="folder" /></span>
+        <EmptyArt name="documents" />
         <div>
           <strong>Encore rien à suivre — c’est normal.</strong>
           <p>
