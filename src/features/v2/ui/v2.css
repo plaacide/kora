@@ -560,3 +560,16 @@
 .v2-home-progress>span{width:38px;font-size:13px;font-weight:600;text-align:right}
 .v2-home-row>.v2-icon{color:var(--text-4);transform:rotate(-90deg)}
 @media(max-width:900px){.v2-attention-grid{grid-template-columns:1fr}.v2-home-row{flex-wrap:wrap;gap:10px}.v2-home-row>b,.v2-home-type{width:auto}}
+
+/* Écrans 55 à 57 — création d'une opération */
+.v2-wizard-page{display:flex;min-height:100vh;align-items:center;flex-direction:column;gap:22px;background:var(--band);padding:32px 24px 64px}
+.v2-wizard-page .v2-steps{justify-content:center}
+.v2-wizard-page .v2-steps li[data-state=done] .v2-step-number{border-color:var(--green);background:var(--green);color:#fff}
+.v2-wizard-page .v2-steps li[data-state=current]{color:var(--text);font-weight:600}
+.v2-wizard-page .v2-steps li[data-state=current] .v2-step-number{border-color:var(--ink);background:var(--ink);color:#fff}
+.v2-wizard-page .v2-wizard-card{width:720px;max-width:100%}
+.v2-wizard-page .v2-wizard-card[data-wide=true]{width:760px}
+.v2-wizard-page .v2-objective-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.v2-wizard-page .v2-objective-grid[data-columns="2"]{grid-template-columns:1fr 1fr}
+.v2-wizard-page .v2-wizard-card>footer>a{color:var(--text-2);font-size:13px}
+@media(max-width:820px){.v2-wizard-page .v2-objective-grid[data-columns="2"]{grid-template-columns:1fr}}
