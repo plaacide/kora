@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import {
   Field,
   FormActions,
@@ -9,8 +7,15 @@ import {
   Stepper,
 } from "@/features/v2/ui/Onboarding";
 import { v2Routes } from "@/features/v2/navigation/routes";
+import { saveV2Details } from "../actions";
 
-export default function OperationDetailsOnboardingPage() {
+export default async function OperationDetailsOnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erreur?: string }>;
+}) {
+  const { erreur } = await searchParams;
+
   return (
     <div className="v2-onboard-body">
       <Stepper current={4} />
@@ -19,12 +24,17 @@ export default function OperationDetailsOnboardingPage() {
         description="Tous les champs non indispensables peuvent être remplis plus tard."
       />
 
-      <form className="v2-onboard-form">
+      <form action={saveV2Details} className="v2-onboard-form">
+        {erreur && (
+          <p className="v2-auth-error" role="alert">
+            L’enregistrement a échoué. Vérifiez les informations puis réessayez.
+          </p>
+        )}
         <div className="v2-form-grid v2-form-grid-amount">
           <Field
             label="Montant recherché"
             name="targetAmount"
-            defaultValue="500 000 000"
+            placeholder="500 000 000"
             inputMode="numeric"
           />
           <SelectField
@@ -43,17 +53,22 @@ export default function OperationDetailsOnboardingPage() {
         <Field
           label="Date cible"
           name="targetDate"
-          defaultValue="30 novembre 2026"
+          placeholder="Par exemple : 30 novembre 2026"
         />
         <InvestorTypePicker />
 
         <FormActions backHref={v2Routes.onboarding.operation}>
-          <Link className="v2-onboard-later" href={v2Routes.onboarding.result}>
+          <button
+            className="v2-onboard-later"
+            name="skipDetails"
+            type="submit"
+            value="1"
+          >
             Remplir plus tard
-          </Link>
-          <Link className="v2-onboard-primary" href={v2Routes.onboarding.result}>
+          </button>
+          <button className="v2-onboard-primary" type="submit">
             Générer mon plan
-          </Link>
+          </button>
         </FormActions>
       </form>
     </div>

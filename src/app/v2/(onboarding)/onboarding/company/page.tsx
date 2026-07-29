@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import {
   Field,
   FormActions,
@@ -8,8 +6,15 @@ import {
   Stepper,
 } from "@/features/v2/ui/Onboarding";
 import { v2Routes } from "@/features/v2/navigation/routes";
+import { saveV2Company } from "../actions";
 
-export default function CompanyOnboardingPage() {
+export default async function CompanyOnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erreur?: string }>;
+}) {
+  const { erreur } = await searchParams;
+
   return (
     <div className="v2-onboard-body">
       <Stepper current={2} />
@@ -18,8 +23,20 @@ export default function CompanyOnboardingPage() {
         description="Ces informations permettent d’adapter votre plan de préparation."
       />
 
-      <form className="v2-onboard-form">
-        <Field label="Nom commercial" name="companyName" defaultValue="Nimba Solar" />
+      <form action={saveV2Company} className="v2-onboard-form">
+        {erreur && (
+          <p className="v2-auth-error" role="alert">
+            {erreur === "nom"
+              ? "Indiquez le nom de votre entreprise pour continuer."
+              : "L’enregistrement a échoué. Vérifiez les informations puis réessayez."}
+          </p>
+        )}
+        <Field
+          label="Nom commercial"
+          name="companyName"
+          placeholder="Nom de votre entreprise"
+          required
+        />
 
         <div className="v2-form-grid">
           <SelectField
@@ -27,7 +44,7 @@ export default function CompanyOnboardingPage() {
             name="country"
             defaultValue="Sénégal"
             options={["Sénégal", "Bénin", "Côte d’Ivoire", "Cameroun", "Ghana"]}
-            helper="Pays OHADA — modèle documentaire OHADA appliqué."
+            helper="La structure documentaire sera adaptée à ce pays."
           />
           <SelectField
             label="Forme juridique"
@@ -63,7 +80,7 @@ export default function CompanyOnboardingPage() {
           label="Site internet"
           optional
           name="website"
-          defaultValue="nimbasolar.com"
+          placeholder="votreentreprise.com"
         />
         <Field
           label="Phrase de présentation"
@@ -73,9 +90,9 @@ export default function CompanyOnboardingPage() {
         />
 
         <FormActions backHref={v2Routes.root}>
-          <Link className="v2-onboard-primary" href={v2Routes.onboarding.operation}>
+          <button className="v2-onboard-primary" type="submit">
             Continuer
-          </Link>
+          </button>
         </FormActions>
       </form>
 

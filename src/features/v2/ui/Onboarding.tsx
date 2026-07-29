@@ -5,6 +5,7 @@ import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 
 import { v2Routes } from "../navigation/routes";
 import { Icon, type IconName } from "./Icon";
+import { saveV2Objective } from "@/app/v2/(onboarding)/onboarding/actions";
 
 const steps = ["Compte", "Entreprise", "Objectif", "Détails", "Plan"];
 
@@ -158,16 +159,25 @@ const objectives: Array<{
   },
 ];
 
-export function ObjectiveSelector() {
+export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) {
   const [selected, setSelected] = useState("equity");
 
   return (
-    <div className="v2-onboard-body v2-onboard-wide">
+    <form
+      action={saveV2Objective}
+      className="v2-onboard-body v2-onboard-wide"
+    >
       <Stepper current={3} />
       <OnboardingTitle
         title="Que préparez-vous aujourd’hui ?"
         description="Votre réponse adapte les pièces, les étapes et le suivi. Vous pourrez la modifier."
       />
+      {hasError && (
+        <p className="v2-auth-error" role="alert">
+          L’enregistrement a échoué. Sélectionnez votre objectif puis réessayez.
+        </p>
+      )}
+      <input name="objective" type="hidden" value={selected} />
       <div className="v2-objective-grid" role="radiogroup" aria-label="Objectif de financement">
         {objectives.map((objective) => (
           <button
@@ -189,17 +199,22 @@ export function ObjectiveSelector() {
         ))}
       </div>
       <FormActions backHref={v2Routes.onboarding.company}>
-        <Link className="v2-onboard-later" href={v2Routes.onboarding.details}>
+        <button
+          className="v2-onboard-later"
+          name="skipObjective"
+          type="submit"
+          value="1"
+        >
           Je ne sais pas encore
-        </Link>
-        <Link className="v2-onboard-primary" href={v2Routes.onboarding.details}>
+        </button>
+        <button className="v2-onboard-primary" type="submit">
           Continuer
-        </Link>
+        </button>
       </FormActions>
       <p className="v2-onboard-disclaimer">
         « Je ne sais pas encore » crée un plan de base ; vous préciserez la cible plus tard.
       </p>
-    </div>
+    </form>
   );
 }
 

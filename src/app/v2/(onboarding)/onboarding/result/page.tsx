@@ -1,11 +1,14 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
+import { v2Routes } from "@/features/v2/navigation/routes";
 import { Icon } from "@/features/v2/ui/Icon";
 import {
   OnboardingTitle,
   Stepper,
 } from "@/features/v2/ui/Onboarding";
-import { v2Routes } from "@/features/v2/navigation/routes";
+import { requireV2User } from "@/features/v2/server/session";
+import { createClient } from "@/lib/supabase/server";
+import { completeV2Onboarding } from "../actions";
 
 const folders = [
   "Société et immatriculation",
@@ -18,7 +21,39 @@ const folders = [
   "Impact et ESG",
 ];
 
-export default function OnboardingResultPage() {
+const objectiveLabels: Record<string, string> = {
+  levee: "Recherche de financement",
+  diligence: "Préparation à une diligence",
+};
+
+export default async function OnboardingResultPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erreur?: string }>;
+}) {
+  const [{ erreur }, user] = await Promise.all([
+    searchParams,
+    requireV2User(),
+  ]);
+  const supabase = await createClient();
+  const { data: startup, error } = await supabase
+    .from("startups")
+    .select("name, country, stage, objectif")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[v2 onboarding] result startup lookup failed", error);
+    redirect(`${v2Routes.onboarding.company}?erreur=enregistrement`);
+  }
+  if (!startup?.name?.trim()) redirect(v2Routes.onboarding.company);
+
+  const operationName = startup.stage
+    ? `${startup.stage} — ${startup.name}`
+    : startup.name;
+  const objective =
+    objectiveLabels[startup.objectif ?? ""] ?? "Plan de préparation";
+
   return (
     <div className="v2-onboard-body v2-onboard-wide">
       <Stepper current={5} />
@@ -30,22 +65,28 @@ export default function OnboardingResultPage() {
         />
       </div>
 
+      {erreur && (
+        <p className="v2-auth-error" role="alert">
+          Votre espace n’a pas pu être créé. Réessayez dans un instant.
+        </p>
+      )}
+
       <section className="v2-result-card">
         <div className="v2-result-cell">
-          <span>Opération créée</span>
-          <strong>Série A 2026 — Nimba Solar</strong>
+          <span>Plan préparé pour</span>
+          <strong>{operationName}</strong>
         </div>
         <div className="v2-result-cell">
-          <span>Type de financement</span>
-          <strong>Levée en capital · 500 000 000 XOF</strong>
+          <span>Objectif</span>
+          <strong>{objective}</strong>
         </div>
         <div className="v2-result-cell">
-          <span>Juridiction appliquée</span>
-          <strong>OHADA — Sénégal</strong>
+          <span>Pays d’immatriculation</span>
+          <strong>{startup.country ?? "À préciser"}</strong>
         </div>
         <div className="v2-result-cell">
-          <span>Exigences générées</span>
-          <strong>24 requises · 13 recommandées</strong>
+          <span>Structure</span>
+          <strong>Liste documentaire contextualisée</strong>
         </div>
         <div className="v2-result-folders">
           <span>Dossiers préparés</span>
@@ -64,18 +105,18 @@ export default function OnboardingResultPage() {
       </div>
 
       <div className="v2-result-actions">
-        <Link
-          className="v2-onboard-primary"
-          href={v2Routes.operations.preparation("nimba-solar")}
-        >
-          Commencer par les pièces prioritaires
-        </Link>
-        <Link
-          className="v2-onboard-secondary"
-          href={v2Routes.operations.overview("nimba-solar")}
-        >
-          Voir mon espace
-        </Link>
+        <form action={completeV2Onboarding}>
+          <input name="destination" type="hidden" value="preparation" />
+          <button className="v2-onboard-primary" type="submit">
+            Commencer par les pièces prioritaires
+          </button>
+        </form>
+        <form action={completeV2Onboarding}>
+          <input name="destination" type="hidden" value="overview" />
+          <button className="v2-onboard-secondary" type="submit">
+            Voir mon espace
+          </button>
+        </form>
       </div>
     </div>
   );
