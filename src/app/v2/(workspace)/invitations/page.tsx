@@ -1,15 +1,19 @@
-import { RoutePlaceholder } from "@/features/v2/ui/RoutePlaceholder";
+import {
+  CohortInvitationScreen,
+  DealroomConsentPanel,
+} from "@/features/v2/ui/Invitations";
 
-export default function InvitationsPage() {
+export default async function InvitationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ dealroom?: string }>;
+}) {
+  const { dealroom } = await searchParams;
+
   return (
-    <RoutePlaceholder
-      title="Invitations et demandes"
-      purpose="Traiter les invitations de programme, d’équipe et les demandes d’accès."
-      contract={[
-        "Contexte de l’organisation qui invite",
-        "Données visibles et données privées",
-        "Accepter, traiter plus tard ou décliner",
-      ]}
-    />
+    <>
+      <CohortInvitationScreen />
+      {dealroom === "1" && <DealroomConsentPanel />}
+    </>
   );
 }

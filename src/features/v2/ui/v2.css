@@ -407,3 +407,40 @@
 .v2-pipeline-wrap>footer{border-top:1px solid var(--line-soft);padding:12px 28px;color:var(--text-3);font-size:12.5px}
 @media(max-width:1100px){.v2-pipeline{min-width:1040px}}
 @media(max-width:720px){.v2-viewbar{margin:-20px -16px 0;padding:12px 16px}.v2-summarybar{margin:0 -16px;flex-wrap:wrap;gap:12px;padding:12px 16px}.v2-summarybar-note{display:none}.v2-pipeline-wrap{margin:0 -16px -42px}}
+
+/* Écrans 31 (Invitation cohorte) et 32 (Consentement dealroom) */
+.v2-centered-main{display:flex;align-items:center;flex-direction:column;background:var(--band)}
+.v2-centered-main>.v2-top{width:100%;background:#fff}
+.v2-centered-body{display:flex;width:640px;max-width:100%;flex-direction:column;gap:18px;margin:36px 0;padding:0 16px}
+.v2-invitation-card{padding:28px}
+.v2-invitation-head{display:flex;align-items:center;gap:14px}
+.v2-programme-mark{display:inline-grid;width:48px;height:48px;flex:0 0 auto;place-items:center;border-radius:10px;background:var(--ink);color:#fff;font:600 15px var(--font-v2-head),sans-serif}
+.v2-invitation-head h1{font-size:19px}
+.v2-invitation-head>div>div{color:var(--text-2);font-size:13px}
+.v2-hr{width:100%;margin:18px 0;border:0;border-top:1px solid var(--line-soft)}
+.v2-disclosure{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.v2-disclosure>div{display:flex;flex-direction:column}
+.v2-disclosure>div>span:last-child{display:flex;margin-top:4px;flex-direction:column;color:var(--text-2);font-size:13px;line-height:1.7}
+.v2-disclosure-label{font-size:12px;font-weight:600}
+.v2-disclosure-label[data-tone=green]{color:var(--green)}
+.v2-disclosure-label[data-tone=red]{color:#b42318}
+.v2-invitation-note{display:flex;margin:0;align-items:flex-start;gap:10px;border-radius:6px;background:var(--band);padding:12px 14px;color:var(--text-2);font-size:12.5px}
+.v2-invitation-actions{display:flex;margin-top:20px;align-items:center;gap:12px}
+.v2-invitation-footnote{margin:8px 0 0;color:var(--text-4);font-size:12px}
+.v2-consent-panel{width:520px}
+.v2-preview-card{border:1.5px solid var(--line);border-radius:10px;background:#fff;padding:18px}
+.v2-preview-identity{display:flex;align-items:center;gap:12px}
+.v2-company-mark{display:inline-grid;width:40px;height:40px;flex:0 0 auto;place-items:center;border-radius:8px;background:var(--orange-soft);color:var(--orange-text);font:600 13px var(--font-v2-head),sans-serif}
+.v2-preview-identity b{font-size:15px}
+.v2-preview-identity small{display:block;color:var(--text-3);font-size:12px}
+.v2-field-label{display:block;margin-bottom:6px;color:var(--text-3);font-size:12px}
+.v2-indicator-list{display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.v2-indicator-list label{display:flex;align-items:center;gap:10px;cursor:pointer}
+.v2-indicator-list input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.v2-indicator-list input:checked+.v2-remember-box{border-color:var(--orange);background:var(--orange);color:#fff}
+.v2-indicator-list input:disabled~*{opacity:.85}
+.v2-indicator-list input:disabled+.v2-remember-box{cursor:default}
+.v2-indicator-list label:has(input:disabled){cursor:default}
+.v2-indicator-list .v2-tag{margin-left:auto}
+.v2-sidepanel-footer .v2-btn{min-height:32px;padding:0 12px;font-size:12px}
+@media(max-width:720px){.v2-disclosure{grid-template-columns:1fr}.v2-invitation-actions{flex-wrap:wrap}.v2-consent-panel{width:min(520px,100%)}}
