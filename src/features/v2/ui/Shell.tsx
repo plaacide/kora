@@ -121,7 +121,11 @@ export function OperationShell({
         ? { label: "Ajouter du contenu", href: `${path}?upload=1` }
         : currentSection === "preparation"
           ? { label: "Ajouter une exigence", href: `${path}?new=1` }
+          : currentSection === "access"
+            ? { label: "Créer un accès", href: `${path}?share=recipient` }
           : null;
+
+  const shared = currentSection === "access";
 
   return (
     <>
@@ -178,7 +182,9 @@ export function OperationShell({
           {folder && <span className="v2-crumb-muted">Data room /</span>}
           <strong>{currentLabel}</strong>
           <span className="v2-spacer" />
-          <span className="v2-privacy"><i />Privée</span>
+          <span className="v2-privacy" data-shared={shared}>
+            <i />{shared ? "Partagée — 3 accès actifs" : "Privée"}
+          </span>
           <div className="v2-search"><Icon name="search" />Rechercher</div>
           {cta && <Link className="v2-btn" href={cta.href}>{cta.label}</Link>}
         </header>

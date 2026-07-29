@@ -1,16 +1,25 @@
-import { RoutePlaceholder } from "@/features/v2/ui/RoutePlaceholder";
+import { AccessTable, AccessWizard, RequestPanel } from "@/features/v2/ui/Access";
 
-export default function AccessPage() {
+export default async function AccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    share?: string;
+    request?: string;
+    preview?: string;
+    sent?: string;
+  }>;
+}) {
+  const query = await searchParams;
+
+  if (query.share) {
+    return <AccessWizard step={query.share} preview={query.preview === "1"} />;
+  }
+
   return (
-    <RoutePlaceholder
-      title="Partage et accès"
-      purpose="Créer, prévisualiser, suivre et révoquer des accès externes précis."
-      contract={[
-        "Assistant en quatre étapes",
-        "Périmètre de dossiers et exceptions par pièce",
-        "NDA, filigrane, téléchargement et expiration",
-        "Prévisualisation exacte avant envoi",
-      ]}
-    />
+    <>
+      <AccessTable sent={query.sent === "1"} />
+      {query.request === "1" && <RequestPanel />}
+    </>
   );
 }
