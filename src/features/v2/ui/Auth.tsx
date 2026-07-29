@@ -112,9 +112,84 @@ function AuthHeader() {
   );
 }
 
+/**
+ * Feuilles de dossier fantômes, derrière les pages centrées (écrans 00 à 07).
+ *
+ * Purement décoratif : hors du flux de tabulation et masqué aux lecteurs
+ * d'écran. Le voile radial rouvre le centre pour que le formulaire reste
+ * parfaitement lisible.
+ */
+const GHOST_SHEETS: React.CSSProperties[] = [
+  { width: 190, height: 250, left: "9%", top: 110, transform: "rotate(-7deg)", opacity: 0.55 },
+  { width: 170, height: 225, left: "16%", top: 170, transform: "rotate(4deg)", opacity: 0.75 },
+  { width: 185, height: 240, right: "9%", top: 130, transform: "rotate(6deg)", opacity: 0.55 },
+  { width: 165, height: 215, right: "15%", top: 190, transform: "rotate(-4deg)", opacity: 0.75 },
+];
+
+const SHEET_LINES: number[][] = [
+  [100, 100, 70, 100, 100, 55],
+  [100, 100, 64, 100, 78],
+  [100, 100, 72, 100],
+  [100, 100, 60, 80],
+];
+
+export function DocumentsBackdrop() {
+  return (
+    <div aria-hidden="true" className="v2-bg-docs">
+      {GHOST_SHEETS.map((style, index) => (
+        <div className="v2-sheet" key={index} style={style}>
+          {/* Une seule barre de titre est teintée — la dernière feuille. */}
+          <b data-tinted={index === GHOST_SHEETS.length - 1} />
+          {SHEET_LINES[index].map((width, line) => (
+            <i key={line} style={{ width: `${width}%` }} />
+          ))}
+        </div>
+      ))}
+      <div className="v2-veil" />
+    </div>
+  );
+}
+
+/**
+ * Rangée sociale et séparateur, partagés par la connexion et l'inscription.
+ *
+ * Les logos Google et LinkedIn sont la seule exception à la règle « un seul
+ * accent » : ce sont des marques officielles, leurs couleurs sont imposées.
+ */
+export function SocialAuth() {
+  return (
+    <>
+      <div className="v2-social-row">
+        <button className="v2-btn-social" type="button">
+          <svg aria-hidden="true" height="18" viewBox="0 0 24 24" width="18">
+            <path d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.09 3.57-5.16 3.57-8.81z" fill="#4285F4" />
+            <path d="M12 24c3.24 0 5.95-1.07 7.93-2.91l-3.87-3c-1.07.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.95H1.29v3.1A11.99 11.99 0 0 0 12 24z" fill="#34A853" />
+            <path d="M5.29 14.29a7.21 7.21 0 0 1 0-4.58v-3.1H1.29a12 12 0 0 0 0 10.78l4-3.1z" fill="#FBBC05" />
+            <path d="M12 4.76c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.94 1.19 15.23 0 12 0A11.99 11.99 0 0 0 1.29 6.61l4 3.1C6.23 6.87 8.88 4.76 12 4.76z" fill="#EA4335" />
+          </svg>
+          Continuer avec Google
+        </button>
+        <button className="v2-btn-social" type="button">
+          <svg aria-hidden="true" height="18" viewBox="0 0 24 24" width="18">
+            <rect fill="#0A66C2" height="24" rx="3" width="24" />
+            <path d="M6.94 8.5H4.06V19.5h2.88V8.5zM5.5 7.19a1.69 1.69 0 1 0 0-3.38 1.69 1.69 0 0 0 0 3.38zM19.94 13.47c0-3.06-1.63-4.48-3.81-4.48-1.76 0-2.55.97-2.99 1.65V8.5H10.3c.04.86 0 11 0 11h2.84v-6.14c0-.33.02-.66.12-.9.27-.65.86-1.33 1.86-1.33 1.31 0 1.98.97 1.98 2.4v5.97h2.84v-6.03z" fill="#fff" />
+          </svg>
+          Continuer avec LinkedIn
+        </button>
+      </div>
+      <div className="v2-or">
+        <span />
+        ou par e-mail
+        <span />
+      </div>
+    </>
+  );
+}
+
 export function AuthFrame({ children }: { children: React.ReactNode }) {
   return (
     <main className="v2 v2-auth-page">
+      <DocumentsBackdrop />
       <AuthHeader />
       <div className="v2-auth-body">{children}</div>
     </main>
@@ -191,6 +266,8 @@ export function SignupForm({
         <h1>Créez votre compte</h1>
         <p>Préparez votre financement dans un espace privé et sécurisé.</p>
       </div>
+
+      <SocialAuth />
 
       <form action={action} className="v2-auth-form" noValidate>
         <input name="auth_surface" type="hidden" value="v2" />
@@ -317,9 +394,11 @@ export function LoginForm({
   return (
     <>
       <div className="v2-auth-title">
-        <h1>Bon retour</h1>
-        <p>Retrouvez vos opérations, vos documents et vos investisseurs.</p>
+        <h1>Connectez-vous</h1>
+        <p>Retrouvez vos opérations, vos documents et vos accès.</p>
       </div>
+
+      <SocialAuth />
 
       <form action={action} className="v2-auth-form">
         <input name="auth_surface" type="hidden" value="v2" />
@@ -343,18 +422,32 @@ export function LoginForm({
 
         <PasswordField autoComplete="current-password" state={state} />
 
-        <Link className="v2-auth-forgot" href="/v2/mot-de-passe-oublie">
-          Mot de passe oublié ?
-        </Link>
+        <div className="v2-auth-row">
+          <label className="v2-remember">
+            <input defaultChecked name="remember" type="checkbox" />
+            <span className="v2-remember-box">
+              <Icon name="check" />
+            </span>
+            Rester connecté
+          </label>
+          <Link className="v2-auth-forgot" href="/v2/mot-de-passe-oublie">
+            Mot de passe oublié ?
+          </Link>
+        </div>
 
         <button className="v2-auth-submit" disabled={pending} type="submit">
           {pending ? "Connexion…" : "Se connecter"}
         </button>
       </form>
 
+      <p className="v2-auth-secure">
+        Connexion protégée — la vérification en deux étapes s&apos;applique si
+        elle est activée.
+      </p>
+
       <div className="v2-auth-separator" />
       <p className="v2-auth-switch">
-        Vous n&apos;avez pas encore de compte ?{" "}
+        Pas encore de compte ?{" "}
         <Link href={`/v2/inscription?suivant=${encodeURIComponent(suivant)}`}>
           Créer un compte
         </Link>
