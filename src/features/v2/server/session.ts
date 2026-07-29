@@ -23,7 +23,7 @@ export async function requireV2User(): Promise<V2UserContext> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/connexion");
+  if (!user) redirect(v2Routes.auth.login);
 
   const { data: assurance } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
@@ -32,7 +32,7 @@ export async function requireV2User(): Promise<V2UserContext> {
     assurance?.currentLevel === "aal1" &&
     assurance?.nextLevel === "aal2"
   ) {
-    redirect("/connexion/2fa");
+    redirect(v2Routes.auth.twoFactor);
   }
 
   return {

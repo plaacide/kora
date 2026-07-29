@@ -15,6 +15,33 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Le sous-domaine de recette V2 possède son propre point d'entrée public.
+  // Les anciennes URL d'auth restent valides pour app.sanza.africa, mais elles
+  // ne doivent jamais faire retomber v2.sanza.africa sur les écrans V1.
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const host = (forwardedHost ?? request.headers.get("host") ?? "")
+    .split(",")[0]
+    .trim()
+    .split(":")[0]
+    .toLowerCase();
+  if (host === "v2.sanza.africa") {
+    const v2EntryPoints: Record<string, string> = {
+      "/": "/v2",
+      "/connexion": "/v2/connexion",
+      "/connexion/2fa": "/v2/connexion/2fa",
+      "/inscription": "/v2/inscription",
+      "/mot-de-passe-oublie": "/v2/mot-de-passe-oublie",
+      "/reinitialiser": "/v2/reinitialiser",
+      "/verifier-email": "/v2/verifier-email",
+    };
+    const destination = v2EntryPoints[pathname];
+    if (destination) {
+      const url = request.nextUrl.clone();
+      url.pathname = destination;
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Un nonce neuf par requête (les routes sont rendues à la demande).
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = buildCsp(nonce);

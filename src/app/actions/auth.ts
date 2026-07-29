@@ -26,6 +26,7 @@ export async function signup(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const isV2 = formData.get("auth_surface") === "v2";
   const parsed = signupSchema.safeParse({
     full_name: formData.get("full_name"),
     job_title: formData.get("job_title") || undefined,
@@ -100,13 +101,18 @@ export async function signup(
   // la destination. Sinon elle doit voyager dans le lien de confirmation —
   // c'est `emailRedirectTo`, posé plus haut, qui s'en charge.
   if (data.session) redirect(dest);
-  redirect("/verifier-email");
+  redirect(
+    isV2
+      ? `/v2/verifier-email?email=${encodeURIComponent(email)}`
+      : "/verifier-email",
+  );
 }
 
 export async function login(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const isV2 = formData.get("auth_surface") === "v2";
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -157,7 +163,8 @@ export async function login(
   if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
     // La 2FA s'intercale : la destination doit lui survivre, sinon tout compte
     // protégé perd son invitation au moment précis où il prouve son identité.
-    redirect(`/connexion/2fa?suivant=${encodeURIComponent(dest)}`);
+    const challengePath = isV2 ? "/v2/connexion/2fa" : "/connexion/2fa";
+    redirect(`${challengePath}?suivant=${encodeURIComponent(dest)}`);
   }
 
   redirect(dest);
@@ -176,6 +183,7 @@ export async function requestPasswordReset(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const isV2 = formData.get("auth_surface") === "v2";
   const parsed = resetRequestSchema.safeParse({ email: formData.get("email") });
   if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
 
@@ -193,7 +201,11 @@ export async function requestPasswordReset(
 
   const { error } = await supabase.auth.resetPasswordForEmail(
     parsed.data.email,
-    { redirectTo: `${origin}/auth/confirm?next=/reinitialiser` },
+    {
+      redirectTo: `${origin}/auth/confirm?next=${
+        isV2 ? "/v2/reinitialiser" : "/reinitialiser"
+      }`,
+    },
   );
 
   // Une erreur de quota doit remonter : sans ça, l'utilisateur attendrait un
@@ -214,6 +226,7 @@ export async function updatePassword(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const isV2 = formData.get("auth_surface") === "v2";
   const parsed = newPasswordSchema.safeParse({
     password: formData.get("password"),
     confirm: formData.get("confirm"),
@@ -231,7 +244,7 @@ export async function updatePassword(
   });
   if (error) return mapError(error.message);
 
-  redirect("/dashboard");
+  redirect(isV2 ? "/v2" : "/dashboard");
 }
 
 export async function logout(): Promise<void> {

@@ -8,6 +8,14 @@ function folderPath(path: readonly string[]): string {
 
 export const v2Routes = {
   root: "/v2",
+  auth: {
+    login: "/v2/connexion",
+    signup: "/v2/inscription",
+    verifyEmail: "/v2/verifier-email",
+    twoFactor: "/v2/connexion/2fa",
+    forgotPassword: "/v2/mot-de-passe-oublie",
+    resetPassword: "/v2/reinitialiser",
+  },
   onboarding: {
     root: "/v2/onboarding",
     company: "/v2/onboarding/company",
