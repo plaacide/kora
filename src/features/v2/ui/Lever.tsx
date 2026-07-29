@@ -420,10 +420,6 @@ function Pipeline({
         current="pipeline"
         actions={
           <>
-            <div className="v2-view-toggle">
-              <Link data-active={mode === "table"} href={queryHref("pipeline", { mode: "table" })}><Icon name="list" />Tableau</Link>
-              <Link data-active={mode !== "table"} href={queryHref("pipeline", { mode: "columns" })}><Icon name="columns" />Colonnes</Link>
-            </div>
             <Link className="v2-btn" href={queryHref("pipeline", { mode, panel: "add" })}>
               <Icon name="plus" />Ajouter un investisseur
             </Link>
@@ -431,12 +427,22 @@ function Pipeline({
         }
       >
         <div className="v2-pipeline-filter">
-          <button type="button">Catégorie⌄</button>
-          <button type="button">Responsable⌄</button>
-          <button type="button">Accès⌄</button>
-          <button type="button">Engagement⌄</button>
+          {["Catégorie", "Responsable", "Accès", "Engagement"].map((filter) => (
+            <button key={filter} type="button">
+              {filter}
+              <Icon name="chevron" />
+            </button>
+          ))}
           <span>Relance en retard · 1</span>
           <small>Refusés (1) — repliés</small>
+          <div className="v2-view-toggle">
+            <Link data-active={mode === "table"} href={queryHref("pipeline", { mode: "table" })}>
+              <Icon name="list" />Tableau
+            </Link>
+            <Link data-active={mode !== "table"} href={queryHref("pipeline", { mode: "columns" })}>
+              <Icon name="columns" />Colonnes
+            </Link>
+          </div>
         </div>
         {mode === "table" ? <PipelineTable /> : <PipelineColumns />}
       </LeverFrame>

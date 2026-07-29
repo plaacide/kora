@@ -229,7 +229,7 @@
 
 /* Lever pipeline */
 .v2-view-toggle{display:flex;height:34px;overflow:hidden;border:1px solid var(--line);border-radius:6px;background:#fff}.v2-view-toggle>a{display:flex;align-items:center;gap:5px;border-right:1px solid var(--line);padding:0 10px;color:var(--text-3);font-size:11.5px}.v2-view-toggle>a:last-child{border:0}.v2-view-toggle>a[data-active=true]{background:var(--line-soft);color:var(--text);font-weight:600}.v2-view-toggle .v2-icon{width:14px;height:14px}
-.v2-pipeline-filter,.v2-update-filter{display:flex;align-items:center;gap:7px;margin:0 -28px 16px;border-bottom:1px solid var(--line-soft);padding:0 28px 14px}.v2-pipeline-filter button,.v2-update-filter button{height:30px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 11px;color:var(--text-2);font-size:11.5px}.v2-pipeline-filter span{margin-left:auto;border-radius:999px;background:#fef3f2;padding:4px 9px;color:#b42318;font-size:11px}.v2-pipeline-filter small,.v2-update-filter span{color:var(--text-3);font-size:11.5px}
+.v2-pipeline-filter,.v2-update-filter{display:flex;align-items:center;gap:7px;margin:0 -28px 16px;border-bottom:1px solid var(--line-soft);padding:0 28px 14px}.v2-pipeline-filter button,.v2-update-filter button{display:inline-flex;height:30px;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 11px;color:var(--text-2);font-size:11.5px;cursor:pointer}.v2-pipeline-filter button:hover,.v2-update-filter button:hover{background:var(--band)}.v2-pipeline-filter button>.v2-icon,.v2-update-filter button>.v2-icon{width:13px;height:13px;color:var(--text-4)}.v2-pipeline-filter span{margin-left:auto;border-radius:999px;background:#fef3f2;padding:4px 9px;color:#b42318;font-size:11px}.v2-pipeline-filter small,.v2-update-filter span{color:var(--text-3);font-size:11.5px}
 .v2-kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:14px}.v2-kanban-column{width:190px;min-width:190px;border:1px solid var(--line);border-radius:8px;background:var(--band)}
 .v2-kanban-column>header{display:flex;height:40px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:0 11px}.v2-kanban-column>header strong{font-size:11.5px}.v2-kanban-column>header span{display:grid;width:19px;height:19px;place-items:center;border-radius:50%;background:#fff;color:var(--text-3);font-size:10px}
 .v2-kanban-empty{display:grid;height:76px;place-items:center;color:var(--text-4);font-size:11px}.v2-investor-card{display:block;margin:7px;border:1px solid var(--line);border-radius:7px;background:#fff;padding:10px}.v2-investor-card:hover{border-color:#d0d5dd}
@@ -534,3 +534,6 @@
 .v2-segmented a+a{border-left:1px solid var(--line)}
 .v2-segmented a:hover{background:var(--band)}
 .v2-segmented a[data-active=true]{background:var(--orange-soft);color:var(--orange-text)!important;font-weight:600}
+
+.v2-pipeline-filter .v2-view-toggle{flex:0 0 auto;height:30px;margin-left:12px}
+.v2-pipeline-filter span{margin-left:auto}
