@@ -1,4 +1,4 @@
-export type IconName="home"|"briefcase"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend";
+export type IconName="home"|"briefcase"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key";
 const paths:Record<IconName,string[]>={
 home:["M3 11.5 12 4l9 7.5","M5.5 10.5V20h13v-9.5"],briefcase:["M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2","M3 7h18v13H3z"],
 mail:["M3 5h18v14H3z","m3 6 9 7 9-7"],search:["M21 21l-4.3-4.3","M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0"],
@@ -15,5 +15,6 @@ plus:["M12 5v14","M5 12h14"],calendar:["M3 5h18v16H3z","M7 3v4","M17 3v4","M3 10
 arrow:["M5 12h14","m13 6 6 6-6 6"],check:["m5 12 4 4L19 6"],
 columns:["M4 4h6v16H4z","M14 4h6v16h-6z"],list:["M8 6h13","M8 12h13","M8 18h13","M3 6h.01","M3 12h.01","M3 18h.01"],
 clock:["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20","M12 6v6l4 2"],
-trend:["m3 17 6-6 4 4 8-9","M15 6h6v6"]};
+trend:["m3 17 6-6 4 4 8-9","M15 6h6v6"],
+key:["m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"]};
 export function Icon({name}:{name:IconName}){return <svg aria-hidden="true" className="v2-icon" viewBox="0 0 24 24">{paths[name].map(d=><path d={d} key={d}/>)}</svg>}

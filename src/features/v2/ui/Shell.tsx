@@ -197,10 +197,16 @@ export function OperationShell({
 }
 
 export function Standalone({
+  action,
   children,
+  search = "Rechercher",
   title,
 }: {
+  /** Bouton primaire de la barre supérieure, quand la maquette en prévoit un. */
+  action?: ReactNode;
   children: ReactNode;
+  /** `false` sur les écrans dont la maquette ne montre pas de recherche. */
+  search?: string | false;
   title: string;
 }) {
   return (
@@ -208,7 +214,10 @@ export function Standalone({
       <header className="v2-top">
         <strong>{title}</strong>
         <span className="v2-spacer" />
-        <div className="v2-search"><Icon name="search" />Rechercher</div>
+        {search !== false && (
+          <div className="v2-search"><Icon name="search" />{search}</div>
+        )}
+        {action}
       </header>
       <main className="v2-work">{children}</main>
     </div>
