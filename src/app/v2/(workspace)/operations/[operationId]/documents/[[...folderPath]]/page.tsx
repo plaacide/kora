@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AssociationsPanel } from "@/features/v2/ui/Associations";
 import { Icon } from "@/features/v2/ui/Icon";
 import { v2Routes } from "@/features/v2/navigation/routes";
 
@@ -28,10 +29,10 @@ export default async function DocumentsPage({
   searchParams,
 }: {
   params: Promise<{ operationId: string; folderPath?: string[] }>;
-  searchParams: Promise<{ document?: string; upload?: string }>;
+  searchParams: Promise<{ document?: string; upload?: string; associations?: string }>;
 }) {
   const { operationId, folderPath } = await params;
-  const { document, upload } = await searchParams;
+  const { document, upload, associations } = await searchParams;
   const currentFolder = folderPath?.at(-1);
 
   if (!currentFolder) {
@@ -184,6 +185,7 @@ export default async function DocumentsPage({
           </aside>
         </>
       )}
+      {associations === "1" && <AssociationsPanel />}
     </>
   );
 }

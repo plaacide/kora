@@ -487,3 +487,22 @@
 .v2-watermark>span{color:rgba(16,24,40,.08);font:600 22px var(--font-v2-sans),sans-serif;letter-spacing:.06em;transform:rotate(-28deg);white-space:nowrap}
 .v2-viewer-foot{display:flex;height:44px;flex:0 0 auto;align-items:center;justify-content:center;gap:18px;background:#101828;color:rgba(255,255,255,.6);font-size:12.5px}
 @media(max-width:760px){.v2-viewer-flag,.v2-viewer-zoom,.v2-viewer-icon{display:none}.v2-viewer-stage{padding:12px}.v2-page{height:70vh}.v2-page-content{padding:28px}.v2-watermark>span{font-size:15px}}
+
+/* Écran 17 — Confirmation des associations suggérées */
+.v2-associations-panel{width:520px}
+.v2-deposit-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:14px 16px}
+.v2-deposit-file{display:flex;margin-bottom:10px;align-items:center;gap:9px}
+.v2-deposit-file .v2-icon{color:var(--text-3)}
+.v2-deposit-file b{font-size:13.5px}
+.v2-suggestion-list{display:flex;flex-direction:column;gap:8px}
+.v2-suggestion-list label{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:10px 12px;cursor:pointer}
+.v2-suggestion-list label[data-selected=true]{border-color:#f5c6ae;background:var(--orange-soft)}
+.v2-suggestion-list input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.v2-suggestion-list .v2-remember-box{margin-top:1px}
+.v2-suggestion-list input:checked+.v2-remember-box{border-color:var(--orange);background:var(--orange);color:#fff}
+.v2-suggestion-list input:focus-visible+.v2-remember-box{outline:2px solid var(--orange);outline-offset:2px}
+.v2-suggestion-list label>span:last-child{flex:1}
+.v2-suggestion-list label>span:last-child>span{display:block;font-size:13px;font-weight:500}
+.v2-suggestion-list small{display:block;color:var(--text-4);font-size:11.5px}
+.v2-associations-panel .v2-sidepanel-footer>.v2-btn:first-child{margin-right:0;border:1px solid var(--line);background:#fff;color:var(--text-2)!important}
+@media(max-width:720px){.v2-associations-panel{width:min(520px,100%)}}
