@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sanza
 
-## Getting Started
+Plateforme sécurisée de préparation, partage et suivi des opérations de
+financement.
 
-First, run the development server:
+## Développement
+
+Installer les dépendances puis lancer Next.js :
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+L’application utilise Next.js 16, React 19, TypeScript, Tailwind CSS,
+next-intl et Supabase.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Reconstruction V2
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+La V2 est développée sur la branche `v2/rebuild` et isolée sous `/v2`.
+Elle est activée localement par défaut. En environnement de production ou de
+recette, définir :
 
-## Learn More
+```text
+SANZA_V2_ENABLED=true
+```
 
-To learn more about Next.js, take a look at the following resources:
+La structure ne remplace pas encore l’interface V1. Les écrans V2 actuels sont
+des contrats fonctionnels neutres destinés à être remplacés par les maquettes
+validées.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Documentation :
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `docs/v2/ARCHITECTURE.md`
+- `docs/v2/ROUTES.md`
+- `docs/v2/DATA-MODEL.md`
+- `docs/v2/DELIVERY-PLAN.md`
+- `docs/v2/COOLIFY.md`
 
-## Deploy on Vercel
+## Vérifications
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Le déploiement cible une image Docker autonome sur Coolify. Les variables
+Supabase publiques doivent être fournies au build ; les secrets restent
+uniquement au runtime.
