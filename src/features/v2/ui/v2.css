@@ -459,3 +459,31 @@
 .v2-detected-list small{display:block;color:var(--text-4);font-size:11.5px}
 @media(max-width:720px){.v2-import-panel{width:min(520px,100%)}}
 .v2-import-panel .v2-sidepanel-footer>.v2-btn:first-child{margin-right:0;border:1px solid var(--line);background:#fff;color:var(--text-2)!important}
+
+/* Écran 19 — Visionneuse sécurisée */
+.v2-viewer{display:flex;min-height:100vh;flex-direction:column;background:#1d2433}
+.v2-viewer-bar{display:flex;height:60px;flex:0 0 auto;align-items:center;gap:14px;background:#101828;padding:0 24px;color:#fff}
+.v2-viewer-close{display:grid;width:32px;height:32px;flex:0 0 auto;place-items:center;border-radius:6px;color:rgba(255,255,255,.7)!important;font-size:22px;line-height:1}
+.v2-viewer-close:hover{background:rgba(255,255,255,.1)}
+.v2-viewer-title{min-width:0;flex:1}
+.v2-viewer-title>div:first-child{color:#fff;font:600 14px var(--font-v2-head),sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v2-viewer-title>div:last-child{color:rgba(255,255,255,.5);font-size:11.5px}
+.v2-viewer-flag{display:inline-flex;height:26px;flex:0 0 auto;align-items:center;gap:6px;border-radius:999px;background:rgba(232,92,43,.18);padding:0 10px;color:#f5c6ae;font:500 12px var(--font-v2-sans),sans-serif;white-space:nowrap}
+.v2-viewer-flag .v2-icon{width:14px;height:14px}
+.v2-viewer-icon{display:grid;width:36px;height:36px;flex:0 0 auto;place-items:center;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:transparent;color:rgba(255,255,255,.75);cursor:pointer}
+.v2-viewer-icon:hover{background:rgba(255,255,255,.08)}
+.v2-viewer-zoom{color:rgba(255,255,255,.7);font-size:12.5px;white-space:nowrap}
+.v2-viewer-download{display:inline-flex;height:36px;flex:0 0 auto;align-items:center;border-radius:6px;background:rgba(255,255,255,.1);padding:0 13px;color:rgba(255,255,255,.45);font:600 12.5px var(--font-v2-sans),sans-serif;cursor:default}
+.v2-viewer-stage{display:flex;flex:1;align-items:center;justify-content:center;padding:28px}
+.v2-page{position:relative;width:680px;max-width:100%;height:660px;overflow:hidden;border-radius:4px;background:#fff;box-shadow:0 24px 64px rgba(0,0,0,.4)}
+.v2-page-content{padding:48px 56px}
+.v2-page-title{font:600 18px var(--font-v2-head),sans-serif}
+.v2-page-sub{margin-top:2px;color:var(--text-3);font-size:12px}
+.v2-page-lines{display:flex;margin-top:28px;flex-direction:column;gap:10px}
+.v2-page-lines>span{height:10px;border-radius:3px;background:var(--line-soft)}
+.v2-page-chart{display:flex;height:130px;margin-top:16px;align-items:flex-end;gap:14px;border:1px solid var(--line);border-radius:6px;padding:16px}
+.v2-page-chart>span{flex:1;border-radius:2px 2px 0 0;background:var(--line)}
+.v2-watermark{position:absolute;display:flex;align-items:center;justify-content:center;inset:0;pointer-events:none}
+.v2-watermark>span{color:rgba(16,24,40,.08);font:600 22px var(--font-v2-sans),sans-serif;letter-spacing:.06em;transform:rotate(-28deg);white-space:nowrap}
+.v2-viewer-foot{display:flex;height:44px;flex:0 0 auto;align-items:center;justify-content:center;gap:18px;background:#101828;color:rgba(255,255,255,.6);font-size:12.5px}
+@media(max-width:760px){.v2-viewer-flag,.v2-viewer-zoom,.v2-viewer-icon{display:none}.v2-viewer-stage{padding:12px}.v2-page{height:70vh}.v2-page-content{padding:28px}.v2-watermark>span{font-size:15px}}
