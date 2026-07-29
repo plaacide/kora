@@ -1,16 +1,87 @@
-import { RoutePlaceholder } from "@/features/v2/ui/RoutePlaceholder";
+import Link from "next/link";
 
-export default function OperationOverviewPage() {
+import { Icon } from "@/features/v2/ui/Icon";
+import { v2Routes } from "@/features/v2/navigation/routes";
+
+export default async function OperationOverviewPage({
+  params,
+}: {
+  params: Promise<{ operationId: string }>;
+}) {
+  const { operationId } = await params;
+
   return (
-    <RoutePlaceholder
-      title="Vue d’ensemble"
-      purpose="Donner une prochaine action unique et une lecture factuelle de l’avancement."
-      contract={[
-        "Prochaine action expliquée",
-        "Progression des exigences requises et recommandées",
-        "Pièces à actualiser et échéance proche",
-        "Activité récente sans déduction d’intention",
-      ]}
-    />
+    <div className="v2-operation-page">
+      <div className="v2-operation-heading">
+        <div>
+          <h1>Série A 2026</h1>
+          <p>
+            <span>Levée en capital</span><b>·</b>
+            <span>500 000 000 XOF</span><b>·</b>
+            <span>Échéance 30 novembre 2026</span>
+          </p>
+        </div>
+        <button className="v2-icon-button" type="button" aria-label="Plus d’options">
+          <Icon name="more" />
+        </button>
+      </div>
+
+      <section className="v2-next-action">
+        <div>
+          <span className="v2-section-label">Prochaine action</span>
+          <h2>Déposer les statuts à jour</h2>
+          <p>
+            C’est la première pièce requise du domaine Société et immatriculation —
+            elle conditionne la vérification des autres documents juridiques.
+          </p>
+          <div>
+            <Link
+              className="v2-btn"
+              href={v2Routes.operations.documents(operationId, ["Société et immatriculation"])}
+            >
+              Déposer la pièce
+            </Link>
+            <Link
+              className="v2-btn"
+              data-variant="secondary"
+              href={v2Routes.operations.preparation(operationId)}
+            >
+              Voir le plan complet
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="v2-overview-grid">
+        <section className="v2-content-card">
+          <span className="v2-section-label">Progression</span>
+          <h3>0 sur 24 exigences requises sont prêtes</h3>
+          <div className="v2-progress"><span style={{ width: "0%" }} /></div>
+          <p>
+            24 à fournir · 13 recommandées vous attendent. Commencez par les pièces
+            prioritaires — votre plan est déjà organisé par domaine.
+          </p>
+        </section>
+        <section className="v2-content-card">
+          <span className="v2-section-label">Votre espace</span>
+          <ul className="v2-fact-list">
+            <li><Icon name="shield" />Privé — aucun accès accordé</li>
+            <li><Icon name="folder" />8 dossiers préparés, 0 pièce déposée</li>
+            <li><Icon name="file" />Modèle OHADA — Sénégal appliqué</li>
+          </ul>
+        </section>
+      </div>
+
+      <section className="v2-empty-inline">
+        <span className="v2-empty-illustration"><Icon name="folder" /></span>
+        <div>
+          <strong>Encore rien à suivre — c’est normal.</strong>
+          <p>
+            L’activité récente et le suivi investisseurs apparaîtront ici dès qu’il
+            y aura quelque chose à montrer — pas d’indicateurs à zéro.
+          </p>
+        </div>
+      </section>
+    </div>
   );
 }
