@@ -5,71 +5,74 @@ import { v2Routes } from "../navigation/routes";
 import { Icon } from "./Icon";
 import { Standalone } from "./Shell";
 
-const typeLabels: Record<OperationType, string> = {
-  equity: "Levée en capital",
-  bank_debt: "Financement bancaire",
-  dfi_or_grant: "Institution ou bailleur",
+/**
+ * Écrans 52, 53 et 54 — la liste des opérations dans ses trois états.
+ * Repris de `52-operations-vide.html`, `53-operations-une.html` et
+ * `54-operations-multiples.html`.
+ *
+ * La liste s'affiche dès la première opération : les maquettes en donnent un
+ * état dédié, il n'y a donc rien à sauter.
+ */
+
+const TYPE_LABELS: Record<OperationType, string> = {
+  equity: "Capital",
+  bank_debt: "Dette",
+  dfi_or_grant: "Institution",
   due_diligence: "Diligence",
   undecided: "Objectif à préciser",
 };
 
-function plural(count: number, singular: string, plural: string): string {
-  return `${count} ${count > 1 ? plural : singular}`;
+function plural(count: number, one: string, many: string): string {
+  return `${count} ${count > 1 ? many : one}`;
 }
 
-function lastActivityLabel(iso: string | null): string {
+function lastActivity(iso: string | null): string {
   if (!iso) return "Aucune activité";
-
-  const days = Math.floor(
-    (Date.now() - new Date(iso).getTime()) / (24 * 60 * 60 * 1000),
-  );
-
-  if (days <= 0) return "Activité aujourd’hui";
-  if (days === 1) return "Activité hier";
-  if (days < 31) return `Activité il y a ${days} jours`;
-  if (days < 62) return "Activité il y a un mois";
-  return `Activité il y a ${Math.floor(days / 31)} mois`;
+  const hours = Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000);
+  if (hours < 1) return "activité à l’instant";
+  if (hours < 24) return `activité il y a ${plural(hours, "heure", "heures")}`;
+  const days = Math.floor(hours / 24);
+  return `activité il y a ${plural(days, "jour", "jours")}`;
 }
 
-function OperationTile({ operation }: { operation: OperationCard }) {
+function Row({ operation }: { operation: OperationCard }) {
   const archived = operation.lifecycle === "archived";
-  const shared = operation.sharingState === "shared";
+  const href = v2Routes.operations.overview(operation.id);
 
   return (
-    <Link
-      className="v2-operation-card"
-      data-archived={archived}
-      href={v2Routes.operations.overview(operation.id)}
-    >
-      <header>
-        <strong>{operation.name}</strong>
-        <span className="v2-status" data-tone={shared ? "blue" : undefined}>
-          {shared ? `Partagée — ${plural(operation.guestCount, "invité", "invités")}` : "Privée"}
-        </span>
-      </header>
-      <p>
-        {typeLabels[operation.type]}
-        {archived && <span className="v2-badge">Archivée</span>}
-      </p>
-      <div className="v2-progress">
-        <span style={{ width: `${operation.preparation}%` }} />
+    <article className="v2-op-row">
+      <div>
+        <div className="v2-op-name">
+          <b>{operation.name}</b>
+          {archived && <span className="v2-status">Lecture seule</span>}
+        </div>
+        <div className="v2-op-meta">
+          {TYPE_LABELS[operation.type]} ·{" "}
+          {archived ? (
+            "Clôturée"
+          ) : (
+            <>
+              <span className="v2-status" data-tone="green">
+                <i className="v2-dot" />
+                Active
+              </span>{" "}
+              · {operation.preparation} % prête
+            </>
+          )}
+        </div>
+        {!archived && (
+          <div className="v2-op-sub">
+            {operation.guestCount > 0
+              ? `${plural(operation.guestCount, "invité", "invités")} · ${lastActivity(operation.lastActivityAt)}`
+              : "Aucun accès externe"}
+          </div>
+        )}
       </div>
-      <small>{operation.preparation} % préparé</small>
-      <footer>
-        <span>
-          <Icon name="file" />
-          {plural(operation.documentCount, "pièce", "pièces")}
-        </span>
-        <span>
-          <Icon name="users" />
-          {plural(operation.guestCount, "invité", "invités")}
-        </span>
-        <span>
-          <Icon name="clock" />
-          {lastActivityLabel(operation.lastActivityAt)}
-        </span>
-      </footer>
-    </Link>
+      <Link className="v2-btn-mini" href={href}>Ouvrir</Link>
+      <button aria-label={`Options — ${operation.name}`} className="v2-icon-button" type="button">
+        <Icon name="more" />
+      </button>
+    </article>
   );
 }
 
@@ -78,28 +81,64 @@ export function OperationsList({
 }: {
   operations: readonly OperationCard[];
 }) {
-  return (
-    <Standalone title="Opérations">
-      {operations.length === 0 ? (
-        <section className="v2-empty-inline">
-          <span className="v2-empty-illustration">
-            <Icon name="briefcase" />
-          </span>
+  if (operations.length === 0) {
+    return (
+      <Standalone search={false} title="Opérations">
+        <div className="v2-op-empty">
           <div>
-            <strong>Aucune opération</strong>
-            <p>
-              Une data room réunit les documents d’une opération. Vous en créerez
-              une par levée, ou une seule si vous n’en menez qu’une.
-            </p>
+            <h1>Opérations</h1>
+            <p>Retrouvez ici vos levées, financements et diligences.</p>
           </div>
-        </section>
-      ) : (
-        <div className="v2-operation-list">
-          {operations.map((operation) => (
-            <OperationTile key={operation.id} operation={operation} />
-          ))}
+          <section>
+            <span className="v2-op-empty-mark"><Icon name="briefcase" /></span>
+            <div>
+              <h2>Aucune opération</h2>
+              <p>
+                Créez votre première opération pour préparer une levée, un
+                financement bancaire ou une diligence.
+              </p>
+            </div>
+            <Link className="v2-btn" href="/v2/operations/nouvelle">
+              Créer une opération
+            </Link>
+            <span className="v2-op-empty-note">
+              <Icon name="lock" />
+              Votre data room restera privée jusqu’à ce que vous décidiez de la
+              partager.
+            </span>
+          </section>
         </div>
-      )}
+      </Standalone>
+    );
+  }
+
+  const active = operations.filter((item) => item.lifecycle !== "archived");
+  const archived = operations.filter((item) => item.lifecycle === "archived");
+
+  return (
+    <Standalone
+      action={
+        <Link className="v2-btn" href="/v2/operations/nouvelle">
+          <Icon name="plus" />
+          Nouvelle opération
+        </Link>
+      }
+      search={false}
+      title="Opérations"
+    >
+      <div className="v2-op-list">
+        {active.length > 0 && <div className="v2-nav-label">Actives</div>}
+        {active.map((operation) => (
+          <Row key={operation.id} operation={operation} />
+        ))}
+
+        {archived.length > 0 && (
+          <div className="v2-nav-label" data-spaced="true">Archivées</div>
+        )}
+        {archived.map((operation) => (
+          <Row key={operation.id} operation={operation} />
+        ))}
+      </div>
     </Standalone>
   );
 }

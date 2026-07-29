@@ -590,3 +590,26 @@
 .v2-rail[data-expanded=true] .v2-rail-link>span{font-size:13px;white-space:nowrap}
 .v2-rail[data-expanded=true] .v2-avatar{align-self:flex-start;margin-left:6px}
 @media(max-width:720px){.v2-rail[data-expanded=true]{width:100%;flex-basis:auto;align-items:center;padding:7px}.v2-rail-head,.v2-rail-brand,.v2-rail-toggle{display:none}.v2-rail[data-expanded=true] .v2-rail-link{width:38px;justify-content:center;padding:0}.v2-rail[data-expanded=true] .v2-rail-link>span{display:none}}
+
+/* Écrans 52, 53 et 54 — liste des opérations */
+.v2-op-list{display:flex;max-width:860px;flex-direction:column;gap:12px}
+.v2-op-list .v2-nav-label{padding:0}
+.v2-op-list .v2-nav-label[data-spaced=true]{padding-top:14px}
+.v2-op-row{display:flex;align-items:center;gap:16px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:18px 22px}
+.v2-op-row:hover{border-color:#dcdad3}
+.v2-op-row>div:first-child{flex:1;min-width:0}
+.v2-op-name{display:flex;align-items:center;gap:10px}
+.v2-op-name b{font:600 15px var(--font-v2-head),sans-serif}
+.v2-op-meta{display:flex;margin-top:3px;align-items:center;gap:5px;color:var(--text-2);font-size:13px}
+.v2-op-sub{margin-top:2px;color:var(--text-3);font-size:12.5px}
+.v2-op-empty{display:flex;align-items:center;flex-direction:column;padding-top:64px}
+.v2-op-empty>div:first-child{display:flex;width:560px;max-width:100%;flex-direction:column;gap:8px}
+.v2-op-empty h1{font-size:24px;letter-spacing:-.01em}
+.v2-op-empty>div:first-child>p{margin:0;color:var(--text-2);font-size:14px}
+.v2-op-empty>section{display:flex;width:560px;max-width:100%;margin-top:20px;align-items:center;flex-direction:column;gap:14px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:40px;text-align:center}
+.v2-op-empty-mark{display:inline-grid;width:52px;height:52px;place-items:center;border-radius:50%;background:var(--orange-soft);color:var(--orange-text)}
+.v2-op-empty h2{font-size:17px}
+.v2-op-empty>section p{max-width:400px;margin:6px 0 0;color:var(--text-2);font-size:13.5px}
+.v2-op-empty-note{display:flex;align-items:center;gap:6px;color:var(--text-3);font-size:12.5px;font-style:italic}
+.v2-op-empty-note .v2-icon{width:14px;height:14px}
+@media(max-width:720px){.v2-op-row{flex-wrap:wrap}.v2-op-empty>section{padding:28px 20px}}
