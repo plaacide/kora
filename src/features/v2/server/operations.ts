@@ -28,15 +28,20 @@ interface DealRow {
 }
 
 /**
- * `deals.objectif` ne connaît que deux valeurs — l'onboarding replie
- * « financement bancaire » et « institution ou bailleur » sur `levee`. Les
- * types `bank_debt` et `dfi_or_grant` sont donc inatteignables tant que
- * l'objectif n'est pas stocké tel qu'il a été choisi.
+ * Les comptes créés avant l'élargissement de `objectif` portent tous `levee`,
+ * y compris ceux qui avaient répondu « financement bancaire » ou « institution
+ * ou bailleur » : leur réponse n'a pas été enregistrée et ne se devine pas.
  */
+const OPERATION_TYPES_BY_OBJECTIF: Record<string, OperationType> = {
+  levee: "equity",
+  dette: "bank_debt",
+  dfi: "dfi_or_grant",
+  diligence: "due_diligence",
+};
+
 function operationType(objectif: string | null): OperationType {
-  if (objectif === "diligence") return "due_diligence";
-  if (objectif === "levee") return "equity";
-  return "undecided";
+  if (!objectif) return "undecided";
+  return OPERATION_TYPES_BY_OBJECTIF[objectif] ?? "undecided";
 }
 
 /** `draft` et `closed` n'ont pas de source : seul l'archivage est enregistré. */

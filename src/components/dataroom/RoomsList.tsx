@@ -50,14 +50,21 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
 
   // « Archivées » = les salles rangées ; les autres onglets ne montrent que les
   // salles ACTIVES (archivées exclues), filtrées par objectif.
+  //
+  // `objectif` connaît quatre valeurs depuis que l'onboarding enregistre le
+  // choix réel du fondateur, mais le filtre n'en propose que deux : 'dette' et
+  // 'dfi' sont des financements et se rangent donc sous « Levée ». Sans ce
+  // repli, une salle bancaire n'apparaîtrait sous aucun onglet.
+  const famille = (objectif: string) =>
+    objectif === "diligence" ? "diligence" : "levee";
   const filtered =
     filter === "archived"
       ? rooms.filter((r) => r.archived)
-      : rooms.filter((r) => !r.archived && (filter === "all" || r.objectif === filter));
+      : rooms.filter((r) => !r.archived && (filter === "all" || famille(r.objectif) === filter));
   const count = (k: string) =>
     k === "archived"
       ? rooms.filter((r) => r.archived).length
-      : rooms.filter((r) => !r.archived && (k === "all" || r.objectif === k)).length;
+      : rooms.filter((r) => !r.archived && (k === "all" || famille(r.objectif) === k)).length;
 
   function open(id: string) {
     start(async () => {

@@ -46,14 +46,25 @@ export async function saveV2Company(formData: FormData) {
   redirect(v2Routes.onboarding.operation);
 }
 
+/**
+ * Les quatre objectifs de l'écran, tels que la base les enregistre.
+ *
+ * Un objectif inconnu retombe sur `levee`, comme le garde-fou de
+ * `save_startup` : mieux vaut la valeur par défaut qu'un enregistrement refusé.
+ */
+const OBJECTIVES: Record<string, string> = {
+  equity: "levee",
+  debt: "dette",
+  dfi: "dfi",
+  diligence: "diligence",
+};
+
 export async function saveV2Objective(formData: FormData) {
   const selected = value(formData, "objective");
   const objective =
     formData.get("skipObjective") === "1"
       ? null
-      : selected === "diligence"
-        ? "diligence"
-        : "levee";
+      : (selected ? OBJECTIVES[selected] : undefined) ?? "levee";
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("save_startup", {
