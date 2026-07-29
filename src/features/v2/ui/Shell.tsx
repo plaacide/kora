@@ -16,7 +16,7 @@ const rail: Array<{
   { href: "/v2/accueil", label: "Accueil", icon: "home" },
   { href: "/v2/operations", label: "Opérations", icon: "grid" },
   { href: "/v2/invitations", label: "Invitations", icon: "inbox" },
-  { href: "/v2/operations?search=1", label: "Recherche", icon: "search", mobile: true },
+  { href: "/v2/recherche", label: "Recherche", icon: "search", mobile: true },
 ];
 
 export function WorkspaceShell({
