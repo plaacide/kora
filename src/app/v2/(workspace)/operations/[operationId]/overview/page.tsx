@@ -1,3 +1,4 @@
+import { OverviewPreparation, OverviewShared } from "@/features/v2/ui/OverviewStates";
 import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import Link from "next/link";
 
@@ -6,10 +7,18 @@ import { v2Routes } from "@/features/v2/navigation/routes";
 
 export default async function OperationOverviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ operationId: string }>;
+  searchParams: Promise<{ etat?: string }>;
 }) {
   const { operationId } = await params;
+  const { etat } = await searchParams;
+
+  // Les trois états de la vue d'ensemble : arrivée (08), préparation (09) et
+  // dossier partagé (10).
+  if (etat === "preparation") return <OverviewPreparation />;
+  if (etat === "partagee") return <OverviewShared />;
 
   return (
     <div className="v2-operation-page">

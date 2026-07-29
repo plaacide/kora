@@ -522,3 +522,11 @@
 .v2-upload-bar{width:160px;flex:0 0 auto;margin:0}
 .v2-upload-progress>footer{padding:12px 18px;color:var(--text-3);font-size:12.5px}
 @media(max-width:720px){.v2-upload-bar{display:none}}
+
+/* Écrans 09 et 10 — états de la vue d'ensemble */
+.v2-deadline{display:flex;margin:10px 0 0;align-items:center;gap:7px;color:var(--text-3);font-size:12.5px}
+.v2-deadline .v2-icon{width:15px;height:15px}
+.v2-quiet-link{margin-left:auto;color:var(--orange-text);font-size:12.5px}
+.v2-relation-note{border-top:1px solid var(--line-soft);padding:12px 18px;color:var(--text-3);font-size:12.5px}
+.v2-relation-note b{color:var(--text)}
+.v2-operation-page .v2-journal-row>p{font-size:13.5px}
