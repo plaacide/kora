@@ -1,20 +1,42 @@
-export type IconName="home"|"briefcase"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key";
-const paths:Record<IconName,string[]>={
-home:["M3 11.5 12 4l9 7.5","M5.5 10.5V20h13v-9.5"],briefcase:["M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2","M3 7h18v13H3z"],
-mail:["M3 5h18v14H3z","m3 6 9 7 9-7"],search:["M21 21l-4.3-4.3","M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0"],
-users:["M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2","M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"],
-shield:["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"],help:["M9 9a3 3 0 1 1 5.5 1.8c-.9.9-2.5 1.4-2.5 3.2","M12 18h.01"],
+export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key";
+
+const paths:Record<string,string[]>={
+// Rail — tracés repris à l'identique des maquettes du handoff.
+home:["m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z","M9 22V12h6v10"],
+inbox:["M22 12h-6l-2 3h-4l-2-3H2","M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"],
+users:["M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2","M22 21v-2a4 4 0 0 0-3-3.87","M16 3.13a4 4 0 0 1 0 7.75"],
+shield:["M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"],
+help:["M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3","M12 17h.01"],
+search:["m21 21-4.3-4.3"],
+briefcase:["M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2","M3 7h18v13H3z"],
+mail:["M3 5h18v14H3z","m3 6 9 7 9-7"],
 folder:["M3 6h7l2 2h9v11H3z"],more:["M5 12h.01","M12 12h.01","M19 12h.01"],
-"shield-check":["M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z","m9 12 2 2 4-4"],
+"shield-check":["M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1z","m9 12 2 2 4-4"],
 pulse:["M22 12h-4l-3 9L9 3l-3 9H2"],landmark:["M2 20h20","M5 20V8l7-5 7 5v12","M9 20v-6h6v6"],
-globe:["M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10","M2 12h20","M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20"],
+globe:["M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10","M2 12h20"],
 file:["M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z","M15 2v5h5"],
 lock:["M7 11V7a5 5 0 0 1 10 0v4","M5 11h14v10H5z"],chevron:["m6 9 6 6 6-6"],
-eye:["M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7","M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6"],
+eye:["M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7"],
 plus:["M12 5v14","M5 12h14"],calendar:["M3 5h18v16H3z","M7 3v4","M17 3v4","M3 10h18"],
 arrow:["M5 12h14","m13 6 6 6-6 6"],check:["m5 12 4 4L19 6"],
 columns:["M4 4h6v16H4z","M14 4h6v16h-6z"],list:["M8 6h13","M8 12h13","M8 18h13","M3 6h.01","M3 12h.01","M3 18h.01"],
-clock:["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20","M12 6v6l4 2"],
-trend:["m3 17 6-6 4 4 8-9","M15 6h6v6"],
+clock:["M12 6v6l4 2"],trend:["m3 17 6-6 4 4 8-9","M15 6h6v6"],
 key:["m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"]};
-export function Icon({name}:{name:IconName}){return <svg aria-hidden="true" className="v2-icon" viewBox="0 0 24 24">{paths[name].map(d=><path d={d} key={d}/>)}</svg>}
+
+/** Cercles des maquettes : `<circle>`, pas un chemin approché. */
+const circles:Record<string,Array<[number,number,number]>>={
+search:[[11,11,8]],help:[[12,12,10]],users:[[9,7,4]],eye:[[12,12,3]],
+clock:[[12,12,10]],globe:[[12,12,10]]};
+
+/** Grille de l'item « Opérations » : quatre carrés arrondis. */
+const rects:Record<string,Array<[number,number]>>={grid:[[3,3],[14,3],[14,14],[3,14]]};
+
+export function Icon({name}:{name:IconName}){
+  return (
+    <svg aria-hidden="true" className="v2-icon" viewBox="0 0 24 24">
+      {(rects[name]??[]).map(([x,y])=><rect height="7" key={`${x}-${y}`} rx="1" width="7" x={x} y={y}/>)}
+      {(circles[name]??[]).map(([cx,cy,r])=><circle cx={cx} cy={cy} key={`${cx}-${cy}`} r={r}/>)}
+      {(paths[name]??[]).map(d=><path d={d} key={d}/>)}
+    </svg>
+  );
+}

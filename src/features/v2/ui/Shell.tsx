@@ -13,8 +13,8 @@ const rail: Array<{
   mobile?: boolean;
 }> = [
   { href: "/v2", label: "Accueil", icon: "home" },
-  { href: "/v2/operations", label: "Opérations", icon: "briefcase" },
-  { href: "/v2/invitations", label: "Invitations", icon: "mail" },
+  { href: "/v2/operations", label: "Opérations", icon: "grid" },
+  { href: "/v2/invitations", label: "Invitations", icon: "inbox" },
   { href: "/v2/operations?search=1", label: "Recherche", icon: "search", mobile: true },
 ];
 
