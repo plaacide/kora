@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sanza v2 — système basé sur Product Plan DS</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="pp/bundle/fig-assets.css">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="pp/bundle/Components.bundle.js"></script>
+<style>
+body{margin:0;padding:48px 40px 80px;max-width:1240px;margin:0 auto;background:#fff;font-family:Inter,-apple-system,sans-serif;color:rgb(16,24,40)}
+h1{font:600 32px/1.15 Archivo,sans-serif;letter-spacing:-0.02em;margin:8px 0 6px}
+h2{font:600 22px/1.2 Archivo,sans-serif;letter-spacing:-0.01em;margin:56px 0 6px}
+.sub{font-size:13px;color:rgb(102,112,133);margin:0 0 16px}
+.kick{font:600 12px Inter,sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:rgb(152,162,179)}
+.spec{border:1px solid rgb(228,231,236);border-radius:10px;background:#fff;padding:24px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.spec.col{flex-direction:column;align-items:flex-start}
+.note{font-size:12px;color:rgb(102,112,133);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="kick">Système design · v2</div>
+<h1>Sanza — base Product Plan DS</h1>
+<p class="sub" style="font-size:14px;max-width:620px">Les composants ci-dessous sont les <strong>vrais composants du fichier Figma</strong> que vous m'avez envoyé (extraits tels quels, valeurs exactes). L'accent a été re-teinté aux couleurs Sanza : #E85C2B (base), #D24E1F (hover), fonds doux #FDF4EF.</p>
+<div id="root"></div>
+<h2>Icônes</h2>
+<p class="sub">198 icônes extraites du fichier — styles linear et bold, encre par défaut, orange au survol (currentColor)</p>
+<div id="icons" class="spec" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:4px"></div>
+<script>
+window.addEventListener('load', function () {
+  const e = React.createElement;
+  const S = (title, sub, children, col) => e('div', null,
+    e('h2', null, title),
+    e('p', { className: 'sub' }, sub),
+    e('div', { className: 'spec' + (col ? ' col' : '') }, children)
+  );
+  const app = e(React.Fragment, null,
+    S('Boutons', 'Button / primary · secondary · greys · texts — tailles sm/lg, états réels du fichier', [
+      e(window.ButtonPrimary, { key: 1, text1: 'Partager la data room', size: 'lg' }),
+      e(window.ButtonPrimary, { key: 2, text1: 'Partager', size: 'sm' }),
+      e(window.ButtonSecondary, { key: 3, text1: 'Inviter un investisseur', size: 'lg' }),
+      e(window.ButtonGreys, { key: 4, text1: 'Annuler', size: 'lg', type: 'outlined' }),
+      e(window.ButtonTexts, { key: 5, text1: 'Voir l\u2019activité', size: 'lg', type: 'primary' }),
+      e(window.ButtonDestructive, { key: 6, text1: 'Révoquer', size: 'lg', type: 'outlined' }),
+      e(window.ButtonPrimary, { key: 7, text1: 'Désactivé', size: 'lg', state: 'de-activated' })
+    ]),
+    S('Boutons — états', 'default · hover · focused · disabled, pour chaque hiérarchie', [
+      e(window.ButtonPrimary, { key: 1, text1: 'Default', size: 'lg', state: 'default' }),
+      e(window.ButtonPrimary, { key: 2, text1: 'Hover', size: 'lg', state: 'hover' }),
+      e(window.ButtonPrimary, { key: 3, text1: 'Focused', size: 'lg', state: 'focused' }),
+      e(window.ButtonPrimary, { key: 4, text1: 'Disabled', size: 'lg', state: 'de-activated' }),
+      e(window.ButtonSecondary, { key: 5, text1: 'Default', size: 'lg', state: 'default' }),
+      e(window.ButtonSecondary, { key: 6, text1: 'Hover', size: 'lg', state: 'hover' }),
+      e(window.ButtonSecondary, { key: 7, text1: 'Focused', size: 'lg', state: 'focused' }),
+      e(window.ButtonSecondary, { key: 8, text1: 'Disabled', size: 'lg', state: 'disabled' }),
+      e(window.ButtonGreys, { key: 9, text1: 'Default', size: 'lg', type: 'outlined', state: 'default' }),
+      e(window.ButtonGreys, { key: 10, text1: 'Hover', size: 'lg', type: 'outlined', state: 'hover' }),
+      e(window.ButtonGreys, { key: 11, text1: 'Focused', size: 'lg', type: 'outlined', state: 'focused' }),
+      e(window.ButtonDestructive, { key: 12, text1: 'Hover', size: 'lg', type: 'solid', state: 'hover' })
+    ]),
+    S('Button Group', 'first / middle / last — états regular/hover/focused', [
+      e('div', { key: 1, style: { display: 'flex' } },
+        e(window.ButtonGroup, { style2: 'first', text1: 'Documents' }),
+        e(window.ButtonGroup, { style2: 'middle', text1: 'Accès', state: 'focused' }),
+        e(window.ButtonGroup, { style2: 'last', text1: 'Due diligence' })
+      )
+    ]),
+    S('Badges', 'Badge — 7 couleurs × filled/accent/outline × 3 tailles', [
+      e(window.Badge, { key: 1, text1: 'Signé', appearance: 'success', type: 'accent', size: 'md' }),
+      e(window.Badge, { key: 2, text1: 'En revue', appearance: 'blue', type: 'accent', size: 'md' }),
+      e(window.Badge, { key: 3, text1: 'En attente', appearance: 'neutral', type: 'accent', size: 'md' }),
+      e(window.Badge, { key: 4, text1: 'Relance due', appearance: 'orange', type: 'filled', size: 'md' }),
+      e(window.Badge, { key: 5, text1: 'Erreur', appearance: 'error', type: 'outline', size: 'md' }),
+      e(window.Badge, { key: 6, text1: 'Confidentiel', appearance: 'warning', type: 'accent', size: 'md' })
+    ]),
+    S('Champs de saisie', 'Input — label, icônes, helper, états default/typing/success/error, tailles lg (56px) et sm', [
+      e(window.Input, { key: 1, text1: 'Email professionnel', text2: 'nom@fonds.com', text4: 'Un NDA sera demandé avant l\u2019accès.', size: 'lg', style: { width: 340 } }),
+      e(window.Input, { key: 2, text1: 'Montant recherché', text2: '1 500 000', size: 'lg', state: 'success', text4: 'Montant valide', style: { width: 340 } }),
+      e(window.Input, { key: 3, text1: 'Référence', text2: 'SZ-2214', size: 'sm', state: 'error', text4: 'Référence inconnue', style: { width: 340 } })
+    ]),
+    S('Champs — états', 'hover · active · typing · filled · read only', [
+      e(window.Input, { key: 1, text1: 'Hover', text2: 'Placeholder', size: 'sm', state: 'hover', style: { width: 300 } }),
+      e(window.Input, { key: 2, text1: 'Active', text2: 'Placeholder', size: 'sm', state: 'active', style: { width: 300 } }),
+      e(window.Input, { key: 3, text1: 'Typing', text2: 'Kepple Vent', size: 'sm', state: 'typing', style: { width: 300 } }),
+      e(window.Input, { key: 4, text1: 'Filled', text2: 'Kepple Ventures', size: 'sm', state: 'filled', style: { width: 300 } }),
+      e(window.Input, { key: 5, text1: 'Read only', text2: 'SZ-2214', size: 'sm', state: 'read only', style: { width: 300 } })
+    ]),
+    S('Contrôles de formulaire', 'Form Control Component — checkbox, radio, toggle, checkcircle avec titre + description', [
+      e(window.FormControlComponent, { key: 1, controlType: 'checkbox', active: true, text1: 'Exiger un NDA', text2: 'Signature avant l\u2019accès à la data room' }),
+      e(window.FormControlComponent, { key: 2, controlType: 'toggle', active: true, text1: 'Notifier chaque ouverture', text2: 'Email à chaque consultation du dossier' }),
+      e(window.FormControlComponent, { key: 3, controlType: 'radio', active: false, text1: 'Accès lecture seule', text2: 'Téléchargement désactivé' })
+    ]),
+    S('Checkbox / Radio — états', 'checked · indeterminate · hover · focused · disabled, tailles sm/md', [
+      e(window.CheckboxBase2, { key: 1, type: 'checkbox', checked: false, size: 'md' }),
+      e(window.CheckboxBase2, { key: 2, type: 'checkbox', checked: true, size: 'md' }),
+      e(window.CheckboxBase2, { key: 3, type: 'checkbox', checked: true, indeterminate: true, size: 'md' }),
+      e(window.CheckboxBase2, { key: 4, type: 'checkbox', checked: true, size: 'md', state: 'focused' }),
+      e(window.CheckboxBase2, { key: 5, type: 'checkbox', checked: false, size: 'md', state: 'disbaled' }),
+      e(window.CheckboxBase2, { key: 6, type: 'radio', checked: false, size: 'md' }),
+      e(window.CheckboxBase2, { key: 7, type: 'radio', checked: true, size: 'md' }),
+      e(window.CheckboxBase2, { key: 8, type: 'radio', checked: true, size: 'md', state: 'focused' }),
+      e(window.CheckboxBase2, { key: 9, type: 'check circle', checked: true, size: 'md' }),
+      e(window.Checkbox, { key: 10, checked: true, text: true, supportingText: true, text1: 'Exiger un NDA', text2: 'Signature avant l\u2019accès.' })
+    ]),
+    S('Avatars', 'Avatar — xs→2xl, image/initiales/placeholder, indicateurs de statut + groupe', [
+      e(window.Avatars, { key: 1, type: 'initials', size: 'sm', statusIcon: 'none', text1: 'AD' }),
+      e(window.Avatars, { key: 2, type: 'initials', size: 'md', statusIcon: 'online', text1: 'KV' }),
+      e(window.AvatarStyleLargeWithImage, { key: 3 }),
+      e(window.Avatars, { key: 4, type: 'icon', size: 'xl', statusIcon: 'verified' }),
+      e(window.AvatarGroups, { key: 5, size: 'md' }),
+      e(window.AvatarLabelGroup, { key: 6, size: 'md', statusIcon: 'online indicator', text1: 'Amara Diallo', text2: 'amara@company.com' }),
+      e(window.AvatarEdit, { key: 7, size: 'lg', type: 'initials', text1: 'AD' })
+    ]),
+    S('Chips', 'Chip — input/filter, avec icône et bouton de fermeture', [
+      e(window.Chip, { key: 1, text1: 'Fintech', type: 'input' }),
+      e(window.Chip, { key: 2, text1: 'Série A', type: 'filter' }),
+      e(window.Chip, { key: 3, text1: 'DFI', type: 'input', hasCloseButton: true })
+    ]),
+    S('Alertes', 'Alert banners — les 5 statuts (style accent)', [
+      e(window.AlertBanners, { key: 1, status: 'base', style2: 'accent', text1: 'Information générale', text2: 'Votre data room est à jour.', hasActions: false, style: { maxWidth: 560 } }),
+      e(window.AlertBanners, { key: 2, status: 'information', style2: 'accent', text1: 'Nouvelle demande de pièce', text2: 'Proparco demande la checklist E&S — 6 pièces attendues.', hasActions: false, style: { maxWidth: 560 } }),
+      e(window.AlertBanners, { key: 3, status: 'success', style2: 'accent', text1: 'Term sheet signé', text2: 'Kepple Ventures a signé électroniquement le 21-07-2026.', hasActions: false, style: { maxWidth: 560 } }),
+      e(window.AlertBanners, { key: 4, status: 'warning', style2: 'accent', text1: 'NDA expirant — Kepple Ventures', text2: 'Le NDA expire dans 5 jours. Renouvelez-le avant le 01-08-2026.', style: { maxWidth: 560 } }),
+      e(window.AlertBanners, { key: 5, status: 'error', style2: 'accent', text1: 'Accès révoqué', text2: 'EchoVC ne peut plus ouvrir la data room.', hasActions: false, style: { maxWidth: 560 } })
+    ], true),
+    S('Alertes — styles', 'Le même statut en filled / accent / outlined', [
+      e(window.AlertBanners, { key: 1, status: 'information', style2: 'filled', text1: 'Nouvelle demande', text2: 'Checklist E&S — 6 pièces attendues.', hasActions: false, style: { maxWidth: 560 } }),
+      e(window.AlertBanners, { key: 2, status: 'information', style2: 'accent', text1: 'Nouvelle demande', text2: 'Checklist E&S — 6 pièces attendues.', hasActions: false, style: { maxWidth: 560 } }),
+      e(window.AlertBanners, { key: 3, status: 'information', style2: 'outlined', text1: 'Nouvelle demande', text2: 'Checklist E&S — 6 pièces attendues.', hasActions: false, style: { maxWidth: 560 } })
+    ], true),
+    S('Toasts', 'alert toasts — les 5 statuts', [
+      e(window.AlertToasts, { key: 1, status: 'base', text1: 'Brouillon enregistré', text2: 'Dernière sauvegarde à l\u2019instant' }),
+      e(window.AlertToasts, { key: 2, status: 'information', text1: 'Relance programmée', text2: 'Proparco — demain 08:00' }),
+      e(window.AlertToasts, { key: 3, status: 'success', text1: 'Document partagé', text2: '3 investisseurs notifiés' }),
+      e(window.AlertToasts, { key: 4, status: 'warning', text1: 'NDA expirant', text2: 'Kepple Ventures — 5 jours restants' }),
+      e(window.AlertToasts, { key: 5, status: 'error', text1: 'Échec de l\u2019envoi', text2: 'Le document dépasse la taille maximale' })
+    ], true),
+    S('Featured icons', 'Featured icon — 5 tailles × 6 couleurs × round/square', [
+      e(window.FeaturedIcon, { key: 1, size: 'md - 40px', color: 'primary', type: 'square' }),
+      e(window.FeaturedIcon, { key: 2, size: 'md - 40px', color: 'success', type: 'round' }),
+      e(window.FeaturedIcon, { key: 3, size: 'lg - 48px', color: 'warning', type: 'square' }),
+      e(window.FeaturedIcon, { key: 4, size: 'sm - 32px', color: 'gray', type: 'round' })
+    ]),
+    S('Progression', 'Progress bar (labels 4 positions) + Circular progress', [
+      e(window.ProgressBar, { key: 1, progress: '70%', label: 'right', text1: '18/24', style: { width: 320 } }),
+      e(window.ProgressBar, { key: 2, progress: '40%', label: 'right', text1: '43 %', style: { width: 320 } }),
+      e(window.CircularProgressIndicator, { key: 3, progress: '75%' })
+    ]),
+    S('Dividers', 'Dividers — les 6 types', [
+      e(window.Dividers, { key: 1, type: 'default', style: { width: 480 } }),
+      e(window.Dividers, { key: 2, type: 'with icon', style: { width: 480 } }),
+      e(window.Dividers, { key: 3, type: 'with label', text1: 'ou', style: { width: 480 } }),
+      e(window.Dividers, { key: 4, type: 'with title only', text1: 'Documents', style: { width: 480 } }),
+      e(window.Dividers, { key: 5, type: 'with button only', text1: 'Ajouter', style: { width: 480 } }),
+      e(window.Dividers, { key: 6, type: 'with title and button', text1: 'Documents', style: { width: 480 } })
+    ], true),
+    S('Breadcrumb + Pagination', 'Breadcrumb 4 états · Pagination 5 variations', [
+      e(window.Breadcrumb, { key: 1, text1: 'Data room' }),
+      e('div', { key: 2, style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 640 } },
+        e(window.ButtonGreys, { type: 'outlined', size: 'sm', text1: 'Précédent', iconStyle: 'leading icon', icon: e(window.IconChevronLeft, { style2: 'linear', style: { width: 20, height: 20 } }) }),
+        e('span', { style: { font: '500 14px Inter,sans-serif', color: 'rgb(71,84,103)' } }, 'Page 1 sur 4'),
+        e(window.ButtonGreys, { type: 'outlined', size: 'sm', text1: 'Suivant', iconStyle: 'trailing icon', icon: e(window.IconChevronRight, { style2: 'linear', style: { width: 20, height: 20 } }) })
+      )
+    ], true),
+    S('Upload de fichiers', 'File Upload — default / in progress / complete / error', [
+      e(window.FileUpload, { key: 1, state: 'default', layout: 'desktop 1', style: { maxWidth: 480 } }),
+      e(window.FileUpload, { key: 2, state: 'in progress', layout: 'desktop 1', text1: 'Envoi en cours…', text2: 'pitch-deck-v4.pdf — 2,4 MB', style: { maxWidth: 480 } }),
+      e(window.FileUpload, { key: 3, state: 'complete', layout: 'desktop 1', text1: 'Envoi réussi', text2: 'pitch-deck-v4.pdf ajouté à la data room', style: { maxWidth: 480 } }),
+      e(window.FileUpload, { key: 4, state: 'error', layout: 'desktop 1', text1: 'Échec de l\u2019envoi', text2: 'Le fichier dépasse la taille maximale.', text3: 'Réessayer', style: { maxWidth: 480 } })
+    ]),
+    S('État vide', 'Empty State — les 23 illustrations, version couleur et noir & blanc', [
+      'calendar', 'chat or messaging history', 'contacts or address book', 'contacts or address book no color', 'dashboard', 'empty calendar', 'favorites or bookmarks', 'favorites or bookmarks color', 'file manager', 'forms', 'inbox', 'invoice or payment history', 'library or gallery', 'media library or gallery', 'notifications', 'product catalog or inventory', 'project or task listrd', 'search results', 'shopping cart', 'subscriptions or billing history', 'survey or feedback results', 'task or workflow templates', 'team or collaboration space'
+    ].map(function (p, i) {
+      return e('div', { key: i, style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: 260 } },
+        e('div', { style: { display: 'flex', alignItems: 'center', gap: 8 } },
+          e(window.EmptyState, { property1: p, color: true }),
+          e('div', { style: { filter: 'grayscale(1)' } }, e(window.EmptyState, { property1: p, color: false }))
+        ),
+        e('span', { style: { fontSize: 11, color: 'rgb(102,112,133)', textAlign: 'center' } }, p)
+      );
+    })),
+    S('Tabs', 'Tab — line/pill × default/hover/active/disabled, avec compteur', [
+      e('div', { key: 1, style: { display: 'flex', gap: 4, borderBottom: '1px solid rgb(228,231,236)', width: '100%' } },
+        e(window.Tab, { style2: 'line', state: 'active', text1: 'Documents', hasNumberTag: true }),
+        e(window.Tab, { style2: 'line', state: 'default', text1: 'Accès' }),
+        e(window.Tab, { style2: 'line', state: 'hover', text1: 'Due diligence' }),
+        e(window.Tab, { style2: 'line', state: 'disabled', text1: 'Archives' })
+      ),
+      e('div', { key: 2, style: { display: 'flex', gap: 8, marginTop: 12 } },
+        e(window.Tab, { style2: 'pill', state: 'active', text1: 'Tous' }),
+        e(window.Tab, { style2: 'pill', state: 'default', text1: 'Signés' }),
+        e(window.Tab, { style2: 'pill', state: 'default', text1: 'En attente' })
+      )
+    ], true),
+    S('Table', 'Content — 14 types de cellules × default/hover/selected · avec séparateurs', [
+      e('div', { key: 1, style: { border: '1px solid rgb(228,231,236)', borderRadius: 10, overflow: 'hidden', width: 720 } },
+        e(window.Content, { content: 'avatar + label + description', state: 'default', text1: 'Kepple Ventures', text2: 'VC · Tokyo / Nairobi', style: { width: '100%' } }),
+        e(window.Content, { content: 'avatar + label + description', state: 'hover', text1: 'Proparco', text2: 'DFI · Paris / Abidjan', style: { width: '100%' } }),
+        e(window.Content, { content: 'avatar + label + description', state: 'selected', text1: 'Norrsken22', text2: 'VC · Stockholm / Lagos', style: { width: '100%' } })
+      ),
+      e('div', { key: 2, style: { display: 'flex', gap: 0, border: '1px solid rgb(228,231,236)', borderRadius: 10, overflow: 'hidden', marginTop: 12 } },
+        e(window.Content, { content: 'badge', state: 'default' }),
+        e(window.Content, { content: 'progress bar', state: 'default' }),
+        e(window.Content, { content: 'avatar group', state: 'default' }),
+        e(window.Content, { content: 'actions', state: 'default' })
+      )
+    ], true),
+    S('Charts', 'Bar chart (légende, axes) · Circular bar chart 4 tailles', [
+      e(window.BarChart, { key: 1, legend: 'top', axisLabels: true, breakpoint: 'desktop', orientation: 'vertical', style: { maxWidth: 560 } }),
+      e(window.CircularBarChart, { key: 2, size: '200' })
+    ]),
+    S('Feed / Messagerie', '_Feed item base — default/file/labels/supporting text/actions', [
+      e(window.FeedItemBase, { key: 1, type: 'default', text1: 'Amara Diallo', text2: 'Hier' }),
+      e(window.FeedItemBase, { key: 2, type: 'file', text1: 'Kepple Ventures', text2: '09:05', text4: '2,4 MB' }),
+      e(window.FeedItemBase, { key: 3, type: 'actions', text1: 'Proparco', text2: 'Aujourd\u2019hui' })
+    ], true),
+    S('Date picker', 'Date picker menu (single/dual) + états de jour (today, selection start/mid/end)', [
+      e(window.DatePickerMenu, { key: 1, type: 'single date', device: 'desktop', action: true, text1: 'Juillet 2026' }),
+      e('div', { key: 2, style: { display: 'flex', gap: 8 } },
+        e(window.DatePickerMaster, { type: 'default', text1: '27' }),
+        e(window.DatePickerMaster, { type: 'today', text1: '28' }),
+        e(window.DatePickerMaster, { type: 'selection - start', text1: '29' }),
+        e(window.DatePickerMaster, { type: 'selection - mid', text1: '30' }),
+        e(window.DatePickerMaster, { type: 'selection - end', text1: '31' }),
+        e(window.DatePickerMaster, { type: 'inactive', text1: '1' })
+      )
+    ]),
+    S('Tooltip + raccourcis', 'Tooltip light/dark avec flèche · Command shortcut mac/windows', [
+      e(window.Tooltip, { key: 1, theme: 'dark', arrow: 'bottom center', text1: 'Téléchargement désactivé', supportingText: false }),
+      e(window.Tooltip, { key: 2, theme: 'light', arrow: 'left', text1: 'NDA requis', supportingText: false }),
+      e(window.CommandShortcut, { key: 3, type: 'mac os', text1: '⌘K' }),
+      e(window.CommandShortcut, { key: 4, type: 'windows os', text1: 'Ctrl+K' })
+    ]),
+    S('Header d\u2019application', 'Header — 10 variantes (recherche, actions, avatar)', [
+      e('div', { key: 1, style: { width: '100%', overflow: 'hidden' } },
+        e('div', { style: { width: 1440, transform: 'scale(0.55)', transformOrigin: 'top left', height: 80 } },
+          e(window.Header, { variant: '1' })
+        )
+      )
+    ], true),
+    S('Sidebar', 'Sidebar claire — recherche, sections, compteurs, profil', [
+      e(window.Sidebar, { key: 1, theme: 'light', variant: '1', state: 'default', hasSearch: true, has2MenuSections: true, footerMenuSection: true, text1: 'Sanza', text2: 'Amara Diallo', text3: 'amara@company.com', style: { width: 280, height: 720, border: '1px solid rgb(228,231,236)' } })
+    ]),
+    S('Footer', 'Footers — 13 variantes', [
+      e('div', { key: 1, style: { width: '100%', overflow: 'hidden' } },
+        e('div', { style: { width: 1440, transform: 'scale(0.55)', transformOrigin: 'top left' } },
+          e(window.Footers, { variant: '1' })
+        )
+      )
+    ], true),
+    S('Dropdown', 'Dropdown / Selectors + menu ouvert (Dropdown / menu item)', [
+      e(window.DropdownSelectors, { key: 1, text1: 'Type d\u2019investisseur', state: 'default' }),
+      e('div', { key: 2, style: { width: 260, border: '1px solid rgb(228,231,236)', borderRadius: 8, overflow: 'hidden', boxShadow: '0 8px 24px rgba(16,24,40,.08)' } },
+        e(window.DropdownMenuItem, { menuText: 'VC', state: 'selected', style: { width: '100%' } }),
+        e(window.DropdownMenuItem, { menuText: 'DFI', state: 'default', style: { width: '100%' } }),
+        e(window.DropdownMenuItem, { menuText: 'Banque', state: 'default', style: { width: '100%' } })
+      )
+    ])
+  );
+  ReactDOM.createRoot(document.getElementById('root')).render(app);
+  // Correctifs post-rendu
+  setTimeout(function () {
+    // 1. Centrer verticalement les icônes des toasts et bannières (transcription Figma top-aligned)
+    document.querySelectorAll('#root .spec > div').forEach(function (card) {
+      card.querySelectorAll('div').forEach(function (d) {
+        var s = d.style;
+        if (s.display === 'flex' && (s.flexFlow || '').indexOf('row') === 0 && s.alignItems === 'flex-start') {
+          var iconSq = [...d.children].find(function (c) { return c.style && c.style.width === '32px' && c.style.height === '32px'; });
+          if (iconSq) s.alignItems = 'center';
+        }
+      });
+    });
+    // 1b. Recolorer les bannières par statut (les deltas de variante n'ont pas survécu à l'extraction)
+    var BANNER = {
+      base:        { bg: 'rgb(249,250,251)', title: 'rgb(16,24,40)',  ic: 'rgb(71,84,103)' },
+      information: { bg: 'rgb(239,248,255)', title: 'rgb(23,92,211)', ic: 'rgb(23,92,211)' },
+      success:     { bg: 'rgb(236,253,243)', title: 'rgb(2,122,72)',  ic: 'rgb(2,122,72)' },
+      warning:     { bg: 'rgb(255,250,235)', title: 'rgb(181,71,8)',  ic: 'rgb(181,71,8)' },
+      error:       { bg: 'rgb(254,243,242)', title: 'rgb(180,35,24)', ic: 'rgb(180,35,24)' }
+    };
+    var patchBanner = function (el, c, mode) {
+      el.style.backgroundColor = c.bg;
+      el.style.boxShadow = 'inset 0 0 0 1px ' + c.ic.replace('rgb', 'rgba').replace(')', ',.35)');
+      var spans = el.querySelectorAll('span');
+      if (spans[0]) spans[0].style.color = c.title;
+      if (spans[1]) spans[1].style.color = 'rgb(71,84,103)';
+      el.querySelectorAll('svg').forEach(function (s) { if (!s.closest('[aria-label]')) s.style.color = c.ic; });
+      if (mode === 'filled') {
+        el.style.backgroundColor = c.title; el.style.boxShadow = 'none';
+        spans.forEach(function (sp) { sp.style.color = '#fff'; });
+      }
+      if (mode === 'outlined') {
+        el.style.backgroundColor = '#fff';
+      }
+    };
+    var alertH = [...document.querySelectorAll('h2')].find(function (x) { return x.textContent === 'Alertes'; });
+    if (alertH) {
+      var kids = [...alertH.nextElementSibling.nextElementSibling.children];
+      var order = ['base', 'information', 'success', 'warning', 'error'];
+      kids.forEach(function (k, i) { if (BANNER[order[i]]) patchBanner(k, BANNER[order[i]]); });
+    }
+    var styleH = [...document.querySelectorAll('h2')].find(function (x) { return x.textContent === 'Alertes — styles'; });
+    if (styleH) {
+      var kids2 = [...styleH.nextElementSibling.nextElementSibling.children];
+      var modes = ['filled', 'accent', 'outlined'];
+      kids2.forEach(function (k, i) { patchBanner(k, BANNER.information, modes[i]); });
+    }
+    // 2. Remplacer le logo Product Plan de la sidebar par la marque Sanza
+    document.querySelectorAll('#root img, #root div').forEach(function () {});
+    var sbH = [...document.querySelectorAll('h2')].find(function (x) { return x.textContent === 'Sidebar'; });
+    if (sbH) {
+      var card = sbH.nextElementSibling.nextElementSibling;
+      var logoRow = card.querySelector('div[style*="padding: 8px 24px"]');
+      if (logoRow) {
+        logoRow.innerHTML = '<span style="width:28px;height:28px;border-radius:6px;background:rgb(232,92,43);display:inline-flex;align-items:center;justify-content:center;color:#fff;font:600 15px Archivo,sans-serif">S</span><span style="font:600 19px Archivo,sans-serif;letter-spacing:-0.02em;color:rgb(16,24,40);margin-left:8px">Sanza</span>';
+        logoRow.style.alignItems = 'center';
+      }
+    }
+  }, 400);
+});
+</script>
+<script type="module">
+import icons from './pp/icons/icon-data.js';
+const grid = document.getElementById('icons');
+const frag = document.createDocumentFragment();
+for (const [name, d] of Object.entries(icons)) {
+  const label = name.replace(/^Icon/, '').replace(/Style(Bold|Linear)$/, ' · $1').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  const cell = document.createElement('div');
+  cell.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:8px;color:rgb(16,24,40);cursor:default';
+  cell.onmouseenter = () => { cell.style.background = 'rgb(253,244,239)'; cell.style.color = 'rgb(232,92,43)'; };
+  cell.onmouseleave = () => { cell.style.background = ''; cell.style.color = 'rgb(16,24,40)'; };
+  cell.innerHTML = '<svg width="22" height="22" viewBox="' + d.viewBox + '">' + d.body + '</svg>' +
+    '<span style="font-size:9.5px;color:rgb(152,162,179);text-align:center;line-height:1.3;word-break:break-word">' + label + '</span>';
+  frag.appendChild(cell);
+}
+grid.appendChild(frag);
+</script>
+</body>
+</html>
