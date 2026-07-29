@@ -573,3 +573,20 @@
 .v2-wizard-page .v2-objective-grid[data-columns="2"]{grid-template-columns:1fr 1fr}
 .v2-wizard-page .v2-wizard-card>footer>a{color:var(--text-2);font-size:13px}
 @media(max-width:820px){.v2-wizard-page .v2-objective-grid[data-columns="2"]{grid-template-columns:1fr}}
+
+/* Rail dépliable — le bouton n'est pas dans les maquettes, les libellés en viennent */
+.v2-rail{transition:width .16s ease,flex-basis .16s ease}
+.v2-rail[data-expanded=true]{width:216px;flex:0 0 216px;align-items:stretch;padding:14px 10px}
+.v2-rail-head{display:flex;width:100%;align-items:center;gap:9px;margin-bottom:14px}
+.v2-rail[data-expanded=false] .v2-rail-head{justify-content:center}
+.v2-rail .v2-mark{margin-bottom:0}
+.v2-rail-brand{flex:1;font:600 15px var(--font-v2-head),sans-serif;letter-spacing:-.02em}
+.v2-rail-toggle{display:grid;width:26px;height:26px;flex:0 0 auto;place-items:center;border:0;border-radius:5px;background:transparent;color:var(--text-4);cursor:pointer}
+.v2-rail-toggle:hover{background:var(--line-soft);color:var(--text-2)}
+.v2-rail-toggle .v2-icon{width:15px;height:15px;transform:rotate(-90deg)}
+.v2-rail[data-expanded=true] .v2-rail-toggle .v2-icon{transform:rotate(90deg)}
+.v2-rail[data-expanded=false] .v2-rail-toggle{position:absolute;top:56px;left:44px;z-index:2;border:1px solid var(--line);background:#fff}
+.v2-rail[data-expanded=true] .v2-rail-link{display:flex;width:100%;height:36px;align-items:center;justify-content:flex-start;gap:10px;padding:0 10px}
+.v2-rail[data-expanded=true] .v2-rail-link>span{font-size:13px;white-space:nowrap}
+.v2-rail[data-expanded=true] .v2-avatar{align-self:flex-start;margin-left:6px}
+@media(max-width:720px){.v2-rail[data-expanded=true]{width:100%;flex-basis:auto;align-items:center;padding:7px}.v2-rail-head,.v2-rail-brand,.v2-rail-toggle{display:none}.v2-rail[data-expanded=true] .v2-rail-link{width:38px;justify-content:center;padding:0}.v2-rail[data-expanded=true] .v2-rail-link>span{display:none}}

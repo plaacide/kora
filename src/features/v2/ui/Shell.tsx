@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 import { Icon, type IconName } from "./Icon";
@@ -26,43 +27,58 @@ export function WorkspaceShell({
   email: string;
 }) {
   const path = usePathname();
+  const [expanded, setExpanded] = useState(false);
+
+  // Libellés repris des attributs `title` du rail dans les maquettes.
+  const bottom: Array<{ href: string; label: string; icon: IconName; mobile?: boolean }> = [
+    { href: "/v2/team", label: "Équipe", icon: "users" },
+    { href: "/v2/security", label: "Sécurité", icon: "shield" },
+    { href: "/v2/roadmap", label: "Aide", icon: "help", mobile: true },
+  ];
+
+  const link = (item: { href: string; label: string; icon: IconName; mobile?: boolean }) => (
+    <Link
+      aria-label={expanded ? undefined : item.label}
+      className="v2-rail-link"
+      data-active={
+        item.href === "/v2/operations"
+          ? path.startsWith("/v2/operations")
+          : path === item.href
+      }
+      data-mobile-hide={item.mobile}
+      href={item.href}
+      key={item.label}
+      title={expanded ? undefined : item.label}
+    >
+      <Icon name={item.icon} />
+      {expanded && <span>{item.label}</span>}
+    </Link>
+  );
 
   return (
     <div className="v2">
       <div className="v2-shell">
-        <nav className="v2-rail" aria-label="Navigation principale">
-          <Link className="v2-mark" href="/v2" aria-label="Sanza">S</Link>
-          {rail.map((item) => (
-            <Link
-              aria-label={item.label}
-              className="v2-rail-link"
-              data-active={
-                item.href === "/v2/operations"
-                  ? path.startsWith("/v2/operations")
-                  : path === item.href
-              }
-              data-mobile-hide={item.mobile}
-              href={item.href}
-              key={item.label}
+        <nav
+          aria-label="Navigation principale"
+          className="v2-rail"
+          data-expanded={expanded}
+        >
+          <div className="v2-rail-head">
+            <Link className="v2-mark" href="/v2" aria-label="Sanza">S</Link>
+            {expanded && <span className="v2-rail-brand">Sanza</span>}
+            <button
+              aria-expanded={expanded}
+              aria-label={expanded ? "Replier la navigation" : "Déplier la navigation"}
+              className="v2-rail-toggle"
+              onClick={() => setExpanded((value) => !value)}
+              type="button"
             >
-              <Icon name={item.icon} />
-            </Link>
-          ))}
+              <Icon name="chevron" />
+            </button>
+          </div>
+          {rail.map(link)}
           <span className="v2-rail-space" />
-          <Link aria-label="Équipe" className="v2-rail-link" href="/v2/team">
-            <Icon name="users" />
-          </Link>
-          <Link aria-label="Sécurité" className="v2-rail-link" href="/v2/security">
-            <Icon name="shield" />
-          </Link>
-          <Link
-            aria-label="Aide"
-            className="v2-rail-link"
-            data-mobile-hide="true"
-            href="/roadmap"
-          >
-            <Icon name="help" />
-          </Link>
+          {bottom.map(link)}
           <span className="v2-avatar">{email.slice(0, 2).toUpperCase() || "SA"}</span>
         </nav>
         {children}
