@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Icon } from "@/features/v2/ui/Icon";
+import { ImportListPanel } from "@/features/v2/ui/ImportList";
 
 interface RequirementItem {
   title: string;
@@ -112,9 +113,9 @@ const groups: RequirementGroup[] = [
 export default async function PreparationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ requirement?: string }>;
+  searchParams: Promise<{ requirement?: string; import?: string }>;
 }) {
-  const { requirement } = await searchParams;
+  const { requirement, import: importList } = await searchParams;
 
   return (
     <>
@@ -199,6 +200,7 @@ export default async function PreparationPage({
           </aside>
         </>
       )}
+      {importList === "1" && <ImportListPanel />}
     </>
   );
 }
