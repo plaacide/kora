@@ -336,7 +336,7 @@
 .v2-btn-quiet{border:0;border-radius:6px;background:transparent;padding:0 8px;color:var(--text-2);font:600 13px var(--font-v2-sans),sans-serif;cursor:pointer}
 .v2-btn-quiet:hover{color:var(--text)}
 .v2-btn-quiet[data-tone=red]{color:#b42318}
-.v2-btn-mini{height:28px;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;color:var(--text-2);font-size:12px;cursor:pointer}
+.v2-btn-mini{display:inline-flex;height:28px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;color:var(--text-2)!important;font-size:12px;line-height:1;white-space:nowrap;cursor:pointer}
 .v2-btn-mini:hover{background:var(--band)}
 .v2-folder-head-action{display:flex;align-items:center}
 .v2-folder-head-action>strong{flex:1}
