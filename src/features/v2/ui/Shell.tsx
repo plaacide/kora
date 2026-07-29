@@ -123,9 +123,11 @@ export function OperationShell({
           ? { label: "Ajouter une exigence", href: `${path}?new=1` }
           : currentSection === "access"
             ? { label: "Créer un accès", href: `${path}?share=recipient` }
+          : currentSection === "lever"
+            ? { label: "Ajouter un investisseur", href: `${root}/lever?view=pipeline&panel=add` }
           : null;
 
-  const shared = currentSection === "access";
+  const shared = currentSection === "access" || currentSection === "lever";
 
   return (
     <>

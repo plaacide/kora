@@ -27,6 +27,8 @@ export const v2Routes = {
       `/v2/operations/${segment(operationId)}/documents${folderPath(path)}`,
     access: (operationId: string) =>
       `/v2/operations/${segment(operationId)}/access`,
+    lever: (operationId: string) =>
+      `/v2/operations/${segment(operationId)}/lever`,
     investors: (operationId: string) =>
       `/v2/operations/${segment(operationId)}/investors`,
     activity: (operationId: string) =>
