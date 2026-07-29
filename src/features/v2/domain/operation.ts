@@ -33,6 +33,26 @@ export interface OperationSummary {
   tracksMultipleFunders: boolean;
 }
 
+/**
+ * Opération telle que la liste l'affiche.
+ *
+ * `OperationSummary` décrit le modèle cible ; cette carte décrit ce que les
+ * colonnes réellement présentes permettent de montrer aujourd'hui. `targetDate`
+ * et `tracksMultipleFunders` en sont absents faute de source en base.
+ */
+export interface OperationCard {
+  id: string;
+  name: string;
+  type: OperationType;
+  lifecycle: OperationLifecycle;
+  sharingState: OperationSharingState;
+  /** Préparation du dossier, de 0 à 100. */
+  preparation: number;
+  documentCount: number;
+  guestCount: number;
+  lastActivityAt: string | null;
+}
+
 export function operationSupportsInvestorTracking(
   operation: Pick<OperationSummary, "type" | "tracksMultipleFunders">,
 ): boolean {
