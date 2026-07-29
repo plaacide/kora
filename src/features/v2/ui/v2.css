@@ -381,3 +381,29 @@
 .v2-journal-place{color:var(--text-4);font-size:12px;white-space:nowrap}
 .v2-journal-time{width:44px;color:var(--text-3);font-size:12.5px;text-align:right}
 @media(max-width:720px){.v2-journal-place{display:none}}
+
+/* Écran 27 — Pipeline investisseurs */
+.v2-viewbar{display:flex;margin:-26px -28px 0;justify-content:flex-end;border-bottom:1px solid var(--line-soft);padding:12px 28px}
+.v2-segmented{display:flex;overflow:hidden;border:1px solid var(--line);border-radius:6px}
+.v2-segmented button{border:0;background:#fff;padding:7px 14px;color:var(--text-2);font:500 13px var(--font-v2-sans),sans-serif;cursor:pointer}
+.v2-segmented button+button{border-left:1px solid var(--line)}
+.v2-segmented button[data-active=true]{background:var(--orange-soft);color:var(--orange-text);font-weight:600}
+.v2-summarybar{display:flex;margin:0 -28px 0;align-items:center;gap:22px;border-bottom:1px solid var(--line-soft);padding:14px 28px;color:var(--text-2);font-size:13px}
+.v2-summarybar b{color:var(--text)}
+.v2-summarybar-note{color:var(--text-4)}
+.v2-pipeline-wrap{margin:0 -28px -56px;overflow-x:auto}
+.v2-pipeline{width:100%;border-collapse:collapse;font-size:13.5px}
+.v2-pipeline th{border-bottom:1px solid var(--line);padding:10px 12px;color:var(--text-3);font:500 12px var(--font-v2-sans),sans-serif;text-align:left;white-space:nowrap}
+.v2-pipeline th:first-child,.v2-pipeline td:first-child{padding-left:28px}
+.v2-pipeline th:last-child,.v2-pipeline td:last-child{width:44px;padding-right:28px}
+.v2-pipeline td{border-bottom:1px solid var(--line-soft);padding:12px;vertical-align:middle}
+.v2-pipeline tr:hover td{background:var(--band)}
+.v2-pipeline .v2-cell-2{color:var(--text-2);font-size:12.5px}
+.v2-pipeline .v2-cell-3{color:var(--text-3);font-size:12.5px}
+.v2-pipeline .v2-num{text-align:right}
+.v2-pipeline .v2-declared{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.v2-pipeline .v2-status{gap:6px}
+.v2-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.v2-pipeline-wrap>footer{border-top:1px solid var(--line-soft);padding:12px 28px;color:var(--text-3);font-size:12.5px}
+@media(max-width:1100px){.v2-pipeline{min-width:1040px}}
+@media(max-width:720px){.v2-viewbar{margin:-20px -16px 0;padding:12px 16px}.v2-summarybar{margin:0 -16px;flex-wrap:wrap;gap:12px;padding:12px 16px}.v2-summarybar-note{display:none}.v2-pipeline-wrap{margin:0 -16px -42px}}

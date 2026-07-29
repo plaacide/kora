@@ -127,11 +127,17 @@ export function OperationShell({
             ? { label: "Ajouter un investisseur", href: `${root}/lever?view=pipeline&panel=add` }
           : currentSection === "activity"
             ? { label: "Exporter", href: `${path}?export=1`, secondary: true }
+          : currentSection === "investors"
+            ? { label: "Ajouter un investisseur", href: `${path}?panel=add` }
           : null;
 
-  // L'écran 30 cherche dans le journal, pas dans les documents.
+  // Chaque écran cherche dans ce qu'il montre, pas dans les documents.
   const searchLabel =
-    currentSection === "activity" ? "Rechercher dans le journal…" : "Rechercher";
+    currentSection === "activity"
+      ? "Rechercher dans le journal…"
+      : currentSection === "investors"
+        ? "Rechercher un investisseur…"
+        : "Rechercher";
 
   const shared = currentSection === "access" || currentSection === "lever";
 
