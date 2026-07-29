@@ -530,3 +530,7 @@
 .v2-relation-note{border-top:1px solid var(--line-soft);padding:12px 18px;color:var(--text-3);font-size:12.5px}
 .v2-relation-note b{color:var(--text)}
 .v2-operation-page .v2-journal-row>p{font-size:13.5px}
+.v2-segmented a{display:inline-flex;align-items:center;border:0;background:#fff;padding:7px 14px;color:var(--text-2)!important;font:500 13px var(--font-v2-sans),sans-serif}
+.v2-segmented a+a{border-left:1px solid var(--line)}
+.v2-segmented a:hover{background:var(--band)}
+.v2-segmented a[data-active=true]{background:var(--orange-soft);color:var(--orange-text)!important;font-weight:600}

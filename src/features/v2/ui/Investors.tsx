@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { v2Routes } from "../navigation/routes";
 import { Icon } from "./Icon";
 
 /**
@@ -68,13 +71,22 @@ const RELATIONS: Relation[] = [
   },
 ];
 
-export function InvestorsScreen() {
+export function InvestorsScreen({ operationId }: { operationId: string }) {
   return (
     <>
       <div className="v2-viewbar">
+        {/*
+         * Le handoff ne fournit pas de vue Colonnes propre à cet écran : la
+         * seule qui existe est celle du pipeline de Lever (écran 38). On y
+         * renvoie plutôt que d'en inventer une.
+         */}
         <div className="v2-segmented">
-          <button data-active="true" type="button">Tableau</button>
-          <button type="button">Colonnes</button>
+          <Link data-active="true" href={v2Routes.operations.investors(operationId)}>
+            Tableau
+          </Link>
+          <Link href={`${v2Routes.operations.lever(operationId)}?view=pipeline&mode=columns`}>
+            Colonnes
+          </Link>
         </div>
       </div>
 
