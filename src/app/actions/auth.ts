@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { cheminInterne } from "@/lib/redirect";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, clientIp } from "@/lib/security/rate-limit";
 import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
 import { originFromHeaders } from "@/lib/app-origin";
@@ -69,7 +68,11 @@ export async function signup(
     email,
     password,
     options: {
-      data: { full_name, locale, account_type },
+      // Ces attributs sont consommés par `handle_new_user` dans la même
+      // transaction que la création Auth. L'inscription ne doit pas dépendre
+      // du client service-role : une clé d'administration absente ne doit
+      // jamais transformer un compte créé en erreur 500 côté interface.
+      data: { full_name, locale, account_type, job_title: job_title ?? null },
       // C'EST ICI QUE LA DESTINATION SURVIT À LA BOÎTE MAIL. Sans ce
       // paramètre, l'invité sans compte confirmait son adresse puis
       // atterrissait sur l'onboarding, son invitation perdue en route — le
@@ -79,19 +82,6 @@ export async function signup(
   });
 
   if (error) return mapError(error.message);
-
-  // Le type de compte (investisseur/fondateur) pilote l'onboarding. On le pose
-  // sur le profil via la clé privilégiée : le trigger a déjà créé le profil,
-  // et l'utilisateur n'a pas forcément de session (email à confirmer).
-  // Le poste (CEO, CFO…) suit le même chemin : il s'affiche dans « Équipe sur
-  // la levée » et vaut aussi pour les membres d'équipe invités ensuite.
-  if (data.user) {
-    const admin = createAdminClient();
-    await admin
-      .from("profiles")
-      .update({ account_type, ...(job_title ? { job_title } : {}) })
-      .eq("id", data.user.id);
-  }
 
   // La langue choisie à l'inscription pilote l'UI immédiatement.
   const store = await cookies();
