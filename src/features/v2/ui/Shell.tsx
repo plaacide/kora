@@ -125,7 +125,13 @@ export function OperationShell({
             ? { label: "Créer un accès", href: `${path}?share=recipient` }
           : currentSection === "lever"
             ? { label: "Ajouter un investisseur", href: `${root}/lever?view=pipeline&panel=add` }
+          : currentSection === "activity"
+            ? { label: "Exporter", href: `${path}?export=1`, secondary: true }
           : null;
+
+  // L'écran 30 cherche dans le journal, pas dans les documents.
+  const searchLabel =
+    currentSection === "activity" ? "Rechercher dans le journal…" : "Rechercher";
 
   const shared = currentSection === "access" || currentSection === "lever";
 
@@ -187,8 +193,16 @@ export function OperationShell({
           <span className="v2-privacy" data-shared={shared}>
             <i />{shared ? "Partagée — 3 accès actifs" : "Privée"}
           </span>
-          <div className="v2-search"><Icon name="search" />Rechercher</div>
-          {cta && <Link className="v2-btn" href={cta.href}>{cta.label}</Link>}
+          <div className="v2-search"><Icon name="search" />{searchLabel}</div>
+          {cta && (
+            <Link
+              className="v2-btn"
+              data-variant={cta.secondary ? "secondary" : undefined}
+              href={cta.href}
+            >
+              {cta.label}
+            </Link>
+          )}
         </header>
         <main className="v2-work">{children}</main>
       </div>
