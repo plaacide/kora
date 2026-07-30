@@ -38,8 +38,12 @@ const RESULTS: Array<{ file: string; path: string; meta: string }> = [
 
 export function SearchScreen() {
   return (
-    <Standalone search="Rechercher partout…" title="Recherche">
+    <Standalone search={false} title="Recherche">
       <div className="v2-search-page">
+        <label className="v2-control v2-search-field">
+          <Icon name="search" />
+          <input defaultValue="business plan" />
+        </label>
         <div className="v2-filterbar">
           {SCOPES.map((scope) => (
             <button data-active={scope === SCOPES[0]} key={scope} type="button">

@@ -72,7 +72,15 @@ function Row({ item }: { item: Item }) {
       <div>
         <b>{item.title}</b>
         <small>
-          <span className="v2-tag">{item.operation}</span> {item.detail}
+          {item.operation === "Programme" ? (
+            <span className="v2-status" data-tone="blue">
+              <i className="v2-dot" />
+              {item.operation}
+            </span>
+          ) : (
+            <span className="v2-tag">{item.operation}</span>
+          )}{" "}
+          {item.detail}
         </small>
       </div>
       <span className="v2-journal-place">{item.when}</span>
