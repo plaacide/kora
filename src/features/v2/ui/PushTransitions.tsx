@@ -7,49 +7,75 @@ import type { MouseEvent, ReactNode } from "react";
 /**
  * Push plein écran — TRANSITIONS.md §3.
  *
- * L'écran sortant doit glisser à -24 % PENDANT que l'entrant arrive : les deux
- * coexistent le temps du mouvement. C'est exactement ce que l'API View
- * Transitions du navigateur produit, et rien d'autre ne le fait sans garder
- * l'ancienne page montée à la main.
+ * L'écran entrant vient de la droite pendant que le sortant recule d'un quart
+ * de largeur en s'estompant : les deux coexistent le temps du mouvement.
+ * C'est exactement ce que l'API View Transitions du navigateur produit, et
+ * rien d'autre ne le fait sans garder l'ancienne page montée à la main.
  *
- * Next expose bien un drapeau `experimental.viewTransition`, mais il s'appuie
- * sur le composant `<ViewTransition>` de React, absent de React 19.2 stable —
- * il faudrait passer React en canary. On appelle donc `startViewTransition`
- * nous-mêmes.
+ * Next expose bien `experimental.viewTransition`, mais il s'appuie sur le
+ * composant `<ViewTransition>` de React, absent de React 19.2 stable — il
+ * aurait fallu passer React en canary. On appelle donc `startViewTransition`
+ * directement.
  *
- * La difficulté tient à un point : le navigateur capture l'état d'arrivée dès
- * que la promesse rendue se résout. Il faut donc la tenir ouverte jusqu'à ce
- * que le routeur ait vraiment rendu la nouvelle page — d'où le rendez-vous
- * entre `PushLink`, qui l'ouvre, et `PushTransitions`, qui la referme au
- * changement de chemin.
+ * Deux difficultés, deux rendez-vous.
+ *
+ * 1. Le navigateur fige l'état d'arrivée dès que la promesse rendue se
+ *    résout. Elle reste donc ouverte jusqu'à ce que le routeur ait rendu la
+ *    nouvelle page — `PushLink` l'ouvre, `PushTransitions` la referme au
+ *    changement de chemin.
+ *
+ * 2. Le sens du retour (`data-nav="back"`) doit rester posé jusqu'à la fin
+ *    RÉELLE du mouvement, pas un délai estimé. En développement, le rendu de
+ *    la page suivante peut prendre plusieurs centaines de millisecondes
+ *    (compilation à la volée) avant même que l'animation ne démarre — un
+ *    délai fixe trop court retirerait le marqueur EN PLEIN MOUVEMENT. Le
+ *    navigateur, voyant le nom d'animation changer en cours de route,
+ *    interromprait le retour et repartirait de zéro en sens inverse : un
+ *    à-coup visible au milieu du geste. Le marqueur se retire donc sur
+ *    `transition.finished`, jamais sur une horloge.
  */
 
 const MARKER = "data-nav";
-const CLEAR_AFTER = 520;
 
 /** Filet de sécurité : une navigation avortée laisserait l'écran figé. */
 const NAVIGATION_TIMEOUT = 2000;
 
 let releaseNavigation: (() => void) | null = null;
-let clearTimer: number | undefined;
 
 function supportsViewTransitions(): boolean {
   return typeof document !== "undefined" && "startViewTransition" in document;
 }
 
-/**
- * Marque la navigation qui suit comme un retour.
- *
- * Sans ce marqueur, revenir en arrière pousserait encore vers la gauche et la
- * profondeur mentirait sur le sens du parcours.
- */
-export function markBackNavigation(): void {
-  document.documentElement.setAttribute(MARKER, "back");
+function runTransition(navigate: () => void, back: boolean): void {
+  if (back) document.documentElement.setAttribute(MARKER, "back");
 
-  window.clearTimeout(clearTimer);
-  clearTimer = window.setTimeout(() => {
-    document.documentElement.removeAttribute(MARKER);
-  }, CLEAR_AFTER);
+  // Là où l'API manque (Firefox à ce jour), la navigation reste instantanée.
+  if (!supportsViewTransitions()) {
+    navigate();
+    if (back) document.documentElement.removeAttribute(MARKER);
+    return;
+  }
+
+  const transition = document.startViewTransition(
+    () =>
+      new Promise<void>((resolve) => {
+        const finish = () => {
+          window.clearTimeout(guard);
+          releaseNavigation = null;
+          resolve();
+        };
+
+        const guard = window.setTimeout(finish, NAVIGATION_TIMEOUT);
+        releaseNavigation = finish;
+        navigate();
+      }),
+  );
+
+  if (back) {
+    transition.finished.finally(() => {
+      document.documentElement.removeAttribute(MARKER);
+    });
+  }
 }
 
 /** Un clic qui doit garder son comportement natif : nouvel onglet, téléchargement… */
@@ -83,29 +109,7 @@ export function PushLink({
   function onClick(event: MouseEvent<HTMLAnchorElement>) {
     if (isModifiedClick(event)) return;
     event.preventDefault();
-
-    if (back) markBackNavigation();
-
-    // Là où l'API manque (Firefox à ce jour), la navigation reste instantanée.
-    if (!supportsViewTransitions()) {
-      router.push(href);
-      return;
-    }
-
-    document.startViewTransition(
-      () =>
-        new Promise<void>((resolve) => {
-          const finish = () => {
-            window.clearTimeout(guard);
-            releaseNavigation = null;
-            resolve();
-          };
-
-          const guard = window.setTimeout(finish, NAVIGATION_TIMEOUT);
-          releaseNavigation = finish;
-          router.push(href);
-        }),
-    );
+    runTransition(() => router.push(href), back);
   }
 
   return (
@@ -118,9 +122,14 @@ export function PushLink({
 /**
  * Monté une fois par le layout V2.
  *
- * Referme la transition dès que le nouveau chemin est rendu, et marque les
- * retours du navigateur — `popstate` précède le rendu, le marqueur arrive donc
- * à temps.
+ * Referme la transition dès que le nouveau chemin est rendu — ce même effet
+ * sert `PushLink` et le bouton retour du navigateur.
+ *
+ * Note : le bouton retour du navigateur (`popstate`) n'est pas encore
+ * enveloppé dans une transition — Next.js gère cette navigation par ses
+ * propres moyens, en dehors de `PushLink`. Il navigue donc pour l'instant
+ * sans le mouvement animé ; seul le lien « ← Toutes les opérations » (et tout
+ * futur usage de `PushLink`) en bénéficie.
  */
 export function PushTransitions() {
   const pathname = usePathname();
@@ -128,16 +137,6 @@ export function PushTransitions() {
   useEffect(() => {
     releaseNavigation?.();
   }, [pathname]);
-
-  useEffect(() => {
-    const onPopState = () => markBackNavigation();
-    window.addEventListener("popstate", onPopState);
-
-    return () => {
-      window.removeEventListener("popstate", onPopState);
-      window.clearTimeout(clearTimer);
-    };
-  }, []);
 
   return null;
 }
