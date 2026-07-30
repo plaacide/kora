@@ -87,6 +87,9 @@ export function WorkspaceShell({
   );
 }
 
+/** Sélecteur rapide de l’écran 63 — les noms viennent de la maquette. */
+const OTHER_OPERATIONS = ["Série A 2026", "Prêt Ecobank", "Diligence IFC"];
+
 const folders = [
   "Société et immatriculation",
   "Gouvernance et actionnariat",
@@ -116,6 +119,7 @@ export function OperationShell({
   operationId: string;
 }) {
   const path = usePathname();
+  const [pickerOpen, setPickerOpen] = useState(false);
   const root = `/v2/operations/${encodeURIComponent(operationId)}`;
   const currentSection =
     Object.keys(pageLabels).find((section) => path.includes(`/${section}`)) ??
@@ -162,14 +166,37 @@ export function OperationShell({
       <aside className="v2-ctx">
         <div className="v2-ctx-head">
           <Link className="v2-back" href="/v2/operations">← Toutes les opérations</Link>
-          <div className="v2-ctx-title">
+          <button
+            aria-expanded={pickerOpen}
+            className="v2-ctx-title"
+            onClick={() => setPickerOpen((value) => !value)}
+            type="button"
+          >
             Série A 2026
-            <Icon name="more" />
-          </div>
+            <Icon name="chevron" />
+          </button>
           <div className="v2-ctx-sub">
             <span>Levée en capital</span>
             <span className="v2-badge">Privée</span>
           </div>
+
+          {pickerOpen && (
+            <div className="v2-ctx-picker">
+              <div className="v2-nav-label">Vos opérations</div>
+              {OTHER_OPERATIONS.map((name, index) => (
+                <Link data-current={index === 0} href="/v2/operations" key={name}>
+                  <i />
+                  {name}
+                </Link>
+              ))}
+              <hr className="v2-hr" />
+              <Link href="/v2/operations">Voir toutes les opérations</Link>
+              <Link href="/v2/operations/nouvelle">
+                <Icon name="plus" />
+                Nouvelle opération
+              </Link>
+            </div>
+          )}
         </div>
         <div className="v2-nav-group">
           <div className="v2-nav-label">Piloter</div>

@@ -664,3 +664,18 @@
 @media(max-width:720px){.v2-invite-row{flex-wrap:wrap}.v2-invite-row .v2-journal-place{display:none}}
 .v2-journal .v2-filterbar{margin-bottom:4px}
 .v2-journal-row>.v2-tag{flex:0 0 auto}
+
+/* Écran 63 — sélecteur rapide d'opération */
+.v2-ctx-head{position:relative}
+button.v2-ctx-title{width:100%;border:0;background:transparent;padding:0;color:inherit;text-align:left;cursor:pointer}
+button.v2-ctx-title .v2-icon{width:15px;height:15px;color:var(--text-3)}
+button.v2-ctx-title[aria-expanded=true] .v2-icon{transform:rotate(180deg)}
+.v2-ctx-picker{position:absolute;top:66px;left:12px;z-index:30;width:230px;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 12px 32px rgba(16,24,40,.14);padding:6px}
+.v2-ctx-picker .v2-nav-label{padding:8px 10px 4px}
+.v2-ctx-picker a{display:flex;align-items:center;gap:8px;border-radius:6px;padding:8px 10px;color:var(--text-2);font-size:13px}
+.v2-ctx-picker a:hover{background:var(--line-soft)}
+.v2-ctx-picker a[data-current=true]{background:var(--orange-soft);color:var(--text);font-weight:600}
+.v2-ctx-picker a>i{display:inline-block;width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:var(--line)}
+.v2-ctx-picker a[data-current=true]>i{background:var(--orange)}
+.v2-ctx-picker .v2-hr{margin:6px 0}
+.v2-ctx-picker .v2-icon{width:14px;height:14px}
