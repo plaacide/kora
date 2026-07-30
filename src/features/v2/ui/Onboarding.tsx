@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 
 import { v2Routes } from "../navigation/routes";
+import { ChipField } from "./ChipField";
 import { Icon, type IconName } from "./Icon";
 import { saveV2Objective } from "@/app/v2/(onboarding)/onboarding/actions";
 
@@ -226,35 +227,11 @@ const investorTypes = [
 ];
 
 export function InvestorTypePicker() {
-  const [selected, setSelected] = useState([
-    "Fonds de capital-risque",
-    "Fonds à impact",
-  ]);
-
-  function toggle(value: string) {
-    setSelected((current) =>
-      current.includes(value)
-        ? current.filter((item) => item !== value)
-        : [...current, value],
-    );
-  }
-
   return (
-    <fieldset className="v2-chip-field">
-      <legend>Type d’investisseurs visés</legend>
-      <div>
-        {investorTypes.map((type) => (
-          <button
-            key={type}
-            type="button"
-            aria-pressed={selected.includes(type)}
-            data-selected={selected.includes(type)}
-            onClick={() => toggle(type)}
-          >
-            {type}
-          </button>
-        ))}
-      </div>
-    </fieldset>
+    <ChipField
+      defaultSelected={["Fonds de capital-risque", "Fonds à impact"]}
+      label="Type d’investisseurs visés"
+      options={investorTypes}
+    />
   );
 }

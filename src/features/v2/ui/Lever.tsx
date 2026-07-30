@@ -10,6 +10,7 @@ import {
   type RelationshipStage,
 } from "@/features/v2/domain/lever";
 import { v2Routes } from "@/features/v2/navigation/routes";
+import { ChipField } from "./ChipField";
 
 import { Icon } from "./Icon";
 import { LeverUpdates } from "./LeverUpdates";
@@ -220,9 +221,17 @@ function ConfigureRaise() {
           <span className="v2-configure-number">3</span>
           <div>
             <h2>Cibles</h2>
-            <Field label="Types d’investisseurs" value="VC · Fonds à impact · DFI" />
+            <ChipField
+              defaultSelected={["VC", "Fonds à impact", "DFI"]}
+              label="Types d’investisseurs"
+              options={INVESTOR_CATEGORIES}
+            />
             <div className="v2-configure-gap" />
-            <Field label="Zones géographiques" value="Afrique de l’Ouest · Europe" />
+            <ChipField
+              defaultSelected={["Afrique de l’Ouest", "Europe"]}
+              label="Zones géographiques"
+              options={REGIONS}
+            />
             <div className="v2-configure-gap" />
             <Field
               label="Secteurs ou thèses pertinentes"
@@ -346,6 +355,15 @@ const PIPELINE_STAGES = [
   "Diligence",
   "Engagé",
   "Écarté",
+];
+const REGIONS = [
+  "Afrique de l’Ouest",
+  "Afrique Centrale",
+  "Afrique de l’Est",
+  "Afrique Australe",
+  "Europe",
+  "Amérique du Nord",
+  "Moyen-Orient",
 ];
 const TEAM = ["Amara Diallo", "Ibrahima Sy", "Fatou Ndiaye"];
 const INVESTORS = [
