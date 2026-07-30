@@ -11,7 +11,9 @@ import {
   listFolders,
   resolveFolderPath,
 } from "@/features/v2/server/documents";
+import { requireV2Workspace } from "@/features/v2/server/session";
 import { AssociationsPanel } from "@/features/v2/ui/Associations";
+import { DocumentUpload } from "@/features/v2/ui/DocumentUpload";
 import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import { Icon } from "@/features/v2/ui/Icon";
 import { SampleRowMenu } from "@/features/v2/ui/RowMenu";
@@ -40,7 +42,12 @@ export default async function DocumentsPage({
   const { operationId, folderPath } = await params;
   const { document, upload, associations, depot } = await searchParams;
 
-  const folder = await resolveFolderPath(operationId, folderPath ?? []);
+  // L'organisation compose le premier segment de la clé de stockage : c'est
+  // sur lui que la policy du bucket vérifie l'appartenance.
+  const [{ organization }, folder] = await Promise.all([
+    requireV2Workspace(),
+    resolveFolderPath(operationId, folderPath ?? []),
+  ]);
 
   // Un dossier nommé dans l'URL mais introuvable n'est pas une data room vide :
   // c'est un lien périmé, et le dire vaut mieux que de montrer un écran vide.
@@ -62,11 +69,21 @@ export default async function DocumentsPage({
               confirmez toujours.
             </p>
             <div>
-              <button className="v2-btn" type="button">Choisir des fichiers</button>
+              <DocumentUpload
+                folderId={null}
+                operationId={operationId}
+                organizationId={organization.id}
+              >
+                Choisir des fichiers
+              </DocumentUpload>
               <button className="v2-btn" data-variant="secondary" type="button">
                 Créer un dossier
               </button>
             </div>
+            <small className="v2-drop-note">
+              Déposées ici, vos pièces restent visibles de votre équipe seule.
+              Rangez-les dans un dossier pour pouvoir les partager.
+            </small>
           </section>
         )}
 
@@ -124,7 +141,13 @@ export default async function DocumentsPage({
             <h2>Ce dossier est vide</h2>
             <p>Déposez-y vos pièces, ou choisissez un autre dossier.</p>
             <div>
-              <button className="v2-btn" type="button">Choisir des fichiers</button>
+              <DocumentUpload
+                folderId={folder.id}
+                operationId={operationId}
+                organizationId={organization.id}
+              >
+                Choisir des fichiers
+              </DocumentUpload>
             </div>
           </section>
         ) : (
@@ -191,7 +214,13 @@ export default async function DocumentsPage({
                     <Icon name="file" />
                     <strong>Déposez plusieurs fichiers</strong>
                     <span>PDF, DOCX, XLSX, PPTX · 20 Mo par fichier</span>
-                    <button className="v2-btn" type="button">Choisir des fichiers</button>
+                    <DocumentUpload
+                      folderId={folder.id}
+                      operationId={operationId}
+                      organizationId={organization.id}
+                    >
+                      Choisir des fichiers
+                    </DocumentUpload>
                   </section>
                   <p className="v2-panel-note">
                     Chaque association pièce ↔ exigence vous sera présentée pour
