@@ -579,6 +579,9 @@
 .v2-wizard-page .v2-objective-grid{display:grid;grid-template-columns:1fr;gap:12px}
 .v2-wizard-page .v2-objective-grid[data-columns="2"]{grid-template-columns:1fr 1fr}
 .v2-wizard-page .v2-wizard-card>footer>a{color:var(--text-2);font-size:13px}
+.v2-wizard-page .v2-hr{margin:2px 0 0}
+.v2-wizard-note{display:flex;margin:0;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:8px;background:var(--band);padding:12px 14px;color:var(--text-2);font-size:13px}
+.v2-wizard-note .v2-icon{flex:0 0 auto;margin-top:2px;color:var(--green)}
 @media(max-width:820px){.v2-wizard-page .v2-objective-grid[data-columns="2"]{grid-template-columns:1fr}}
 
 /* Rail dépliable — le bouton n'est pas dans les maquettes, les libellés en viennent */

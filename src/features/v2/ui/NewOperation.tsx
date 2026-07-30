@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { createOperation } from "@/app/v2/operations/nouvelle/actions";
+import { intentCanCarryRaise } from "../domain/operation";
 import { Icon, type IconName } from "./Icon";
 
 /**
@@ -8,16 +9,31 @@ import { Icon, type IconName } from "./Icon";
  * Repris de `55-nouvelle-operation-type.html`, `56-…-infos.html` et
  * `57-…-structure.html`.
  *
- * Chaque étape est un vrai `<form>` (GET pour type/infos, qui ne font que
- * naviguer vers l'étape suivante en portant leurs valeurs dans l'URL ; POST
- * via Server Action pour structure, qui crée réellement l'opération via
- * `create_data_room`). Le bouton du pied de page est rattaché au formulaire
- * de l'étape via `form="v2-new-operation-form"` : le pied reste un enfant
- * direct de `.v2-wizard-card`, comme sur les autres écrans-assistants qui
- * partagent cette même feuille de style.
+ * Chaque étape est un vrai `<form>` (GET pour type/infos, qui naviguent vers
+ * l'étape suivante en portant leurs valeurs dans l'URL ; POST via Server
+ * Action pour structure, qui crée réellement l'opération). Le bouton du pied
+ * de page est rattaché au formulaire par `form="v2-new-operation-form"` : le
+ * pied reste un enfant direct de `.v2-wizard-card`, comme sur les autres
+ * écrans-assistants qui partagent cette feuille de style.
+ *
+ * Seul le nom est requis. Tout le reste est facultatif : le fondateur décide
+ * de ce qu'il renseigne maintenant et de ce qu'il complètera plus tard.
  */
 
 export type Step = "type" | "infos" | "structure";
+
+/** Ce que les trois étapes se transmettent, d'abord par l'URL puis en champs cachés. */
+export interface OperationDraft {
+  type: string;
+  nom: string;
+  pays: string;
+  financeur: string;
+  stade: string;
+  montant: string;
+  devise: string;
+  tour: string;
+  horizon: string;
+}
 
 type Choice = {
   value: string;
@@ -69,21 +85,34 @@ const STRUCTURES: Choice[] = [
   { value: "vide", title: "Data room vide", body: "Construisez votre arborescence librement.", icon: "folder" },
 ];
 
-/** Sans colonne source côté RPC pour l'instant : affichés, mais pas transmis. */
-const FIELDS = [
-  "Pays ou juridiction",
-  "Type de financeur",
-  "Stade",
-  "Montant recherché",
-  "Devise",
-  "Tour",
-  "Horizon de clôture",
+const COUNTRIES = ["Sénégal", "Bénin", "Côte d’Ivoire", "Cameroun", "Ghana"];
+
+/** Valeurs alignées sur `raises.audience` (vc | dfi | banque). */
+const FUNDERS: Array<[string, string]> = [
+  ["vc", "Fonds d’investissement"],
+  ["dfi", "Institution ou bailleur"],
+  ["banque", "Banque"],
+];
+
+/** Mêmes intitulés qu'à l'onboarding, pour ne pas décrire deux fois la même chose. */
+const STAGES = ["Pré-amorçage", "Amorçage", "Série A", "Série B et plus"];
+
+const CURRENCIES = ["XOF", "EUR", "USD", "GHS"];
+
+/** Valeurs alignées sur `raises.type_tour` (equity | dette | safe | convertible). */
+const ROUNDS: Array<[string, string]> = [
+  ["equity", "Equity"],
+  ["dette", "Dette"],
+  ["safe", "SAFE"],
+  ["convertible", "Obligation convertible"],
 ];
 
 const ERROR_MESSAGES: Record<string, string> = {
   nom: "Donnez un nom à cette opération avant de continuer.",
   structure: "Choisissez une structure disponible.",
   enregistrement: "L’opération n’a pas pu être créée. Réessayez.",
+  levee:
+    "L’opération est créée, mais les détails de la levée n’ont pas pu être enregistrés. Reprenez-les depuis l’onglet « Lever ».",
 };
 
 function Stepper({ current }: { current: Step }) {
@@ -146,6 +175,75 @@ function Choices({
   );
 }
 
+function TextField({
+  label,
+  name,
+  value,
+  placeholder,
+  type,
+  required,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  placeholder?: string;
+  type?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="v2-field">
+      <span>{label}</span>
+      <span className="v2-control">
+        <input
+          defaultValue={value}
+          inputMode={name === "montant" ? "numeric" : undefined}
+          name={name}
+          placeholder={placeholder}
+          required={required}
+          type={type ?? "text"}
+        />
+      </span>
+    </label>
+  );
+}
+
+/**
+ * Toutes les listes s'ouvrent sur une option vide, et c'est le comportement
+ * par défaut : ne rien choisir est une réponse valable, pas un oubli.
+ */
+function SelectField({
+  label,
+  name,
+  value,
+  options,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  options: Array<[string, string]>;
+}) {
+  return (
+    <label className="v2-field">
+      <span>{label}</span>
+      <span className="v2-control">
+        <select defaultValue={value} name={name}>
+          <option value="">—</option>
+          {options.map(([optionValue, optionLabel]) => (
+            <option key={optionValue} value={optionValue}>
+              {optionLabel}
+            </option>
+          ))}
+        </select>
+        <Icon name="chevron" />
+      </span>
+    </label>
+  );
+}
+
+function sameValue(values: string[]): Array<[string, string]> {
+  return values.map((value) => [value, value]);
+}
+
 const COPY: Record<Step, { title: string; lead: string; cta: string }> = {
   type: {
     title: "Que préparez-vous ?",
@@ -164,18 +262,30 @@ const COPY: Record<Step, { title: string; lead: string; cta: string }> = {
   },
 };
 
+/** Les valeurs déjà saisies voyagent en champs cachés jusqu'à la création. */
+function Carried({ draft, except }: { draft: OperationDraft; except: readonly string[] }) {
+  return (
+    <>
+      {Object.entries(draft)
+        .filter(([name, value]) => value && !except.includes(name))
+        .map(([name, value]) => (
+          <input key={name} name={name} type="hidden" value={value} />
+        ))}
+    </>
+  );
+}
+
 export function NewOperationWizard({
   step,
-  type,
-  nom,
+  draft,
   erreur,
 }: {
   step: Step;
-  type: string;
-  nom: string;
+  draft: OperationDraft;
   erreur?: string;
 }) {
   const copy = COPY[step];
+  const showRaise = intentCanCarryRaise(draft.type);
 
   return (
     <div className="v2 v2-wizard-page">
@@ -196,8 +306,9 @@ export function NewOperationWizard({
         {step === "type" && (
           <form action="/v2/operations/nouvelle" id="v2-new-operation-form" method="get">
             <input name="etape" type="hidden" value="infos" />
+            <Carried draft={draft} except={["type"]} />
             <div className="v2-wizard-body">
-              <Choices items={TYPES} name="type" selected={type} wide />
+              <Choices items={TYPES} name="type" selected={draft.type} wide />
             </div>
           </form>
         )}
@@ -205,33 +316,81 @@ export function NewOperationWizard({
         {step === "infos" && (
           <form action="/v2/operations/nouvelle" id="v2-new-operation-form" method="get">
             <input name="etape" type="hidden" value="structure" />
-            <input name="type" type="hidden" value={type} />
+            <input name="type" type="hidden" value={draft.type} />
             <div className="v2-wizard-body">
               <div className="v2-wizard-grid">
-                <label className="v2-field">
-                  <span>Nom de l’opération</span>
-                  <span className="v2-control">
-                    <input defaultValue={nom} name="nom" placeholder="Série A 2026" required />
-                  </span>
-                </label>
-                {FIELDS.map((label) => (
-                  <label className="v2-field" key={label}>
-                    <span>{label}</span>
-                    <span className="v2-control">
-                      <select />
-                      <Icon name="chevron" />
-                    </span>
-                  </label>
-                ))}
+                <TextField
+                  label="Nom de l’opération"
+                  name="nom"
+                  placeholder="Série A 2026"
+                  required
+                  value={draft.nom}
+                />
+                <SelectField
+                  label="Pays ou juridiction"
+                  name="pays"
+                  options={sameValue(COUNTRIES)}
+                  value={draft.pays}
+                />
+                <SelectField
+                  label="Type de financeur"
+                  name="financeur"
+                  options={FUNDERS}
+                  value={draft.financeur}
+                />
+                <SelectField
+                  label="Stade"
+                  name="stade"
+                  options={sameValue(STAGES)}
+                  value={draft.stade}
+                />
               </div>
+
+              {showRaise && (
+                <>
+                  <hr className="v2-hr" />
+                  <span className="v2-section-label">Détails de la levée</span>
+                  <div className="v2-wizard-grid">
+                    <TextField
+                      label="Montant recherché"
+                      name="montant"
+                      placeholder="500 000 000"
+                      value={draft.montant}
+                    />
+                    <SelectField
+                      label="Devise"
+                      name="devise"
+                      options={sameValue(CURRENCIES)}
+                      value={draft.devise}
+                    />
+                    <SelectField
+                      label="Tour"
+                      name="tour"
+                      options={ROUNDS}
+                      value={draft.tour}
+                    />
+                    <TextField
+                      label="Horizon de clôture"
+                      name="horizon"
+                      type="date"
+                      value={draft.horizon}
+                    />
+                  </div>
+                  <p className="v2-wizard-note">
+                    <Icon name="check" />
+                    Ces détails ouvrent la levée de cette opération. Laissez-les
+                    vides pour créer l’opération seule — vous pourrez ouvrir la
+                    levée plus tard.
+                  </p>
+                </>
+              )}
             </div>
           </form>
         )}
 
         {step === "structure" && (
           <form action={createOperation} id="v2-new-operation-form">
-            <input name="type" type="hidden" value={type} />
-            <input name="nom" type="hidden" value={nom} />
+            <Carried draft={draft} except={[]} />
             <div className="v2-wizard-body">
               <Choices items={STRUCTURES} name="structure" selected="recommandee" wide={false} />
             </div>

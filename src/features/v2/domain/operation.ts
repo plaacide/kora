@@ -84,3 +84,48 @@ export function operationLifecycle(archivedAt: string | null): OperationLifecycl
 export function sharingState(guestCount: number): OperationSharingState {
   return guestCount > 0 ? "shared" : "private";
 }
+
+/**
+ * Les six intentions proposées à la création d'une opération (écran 55).
+ *
+ * Elles ne se confondent pas avec `OperationType` : ce sont les mots de
+ * l'écran, six choix, quand la base n'enregistre que quatre `objectif`.
+ */
+export const OPERATION_INTENTS = [
+  "equity",
+  "debt",
+  "dfi",
+  "diligence",
+  "audit",
+  "other",
+] as const;
+
+export type OperationIntent = (typeof OPERATION_INTENTS)[number];
+
+/**
+ * Une levée ne se conçoit que là où un montant est recherché : une diligence
+ * subie ou un audit n'en portent pas. Cela ne dit pas qu'une levée sera
+ * ouverte — depuis le découplage data room ↔ levée, seule une saisie
+ * explicite du fondateur l'ouvre — seulement qu'elle serait légitime.
+ */
+export function intentCanCarryRaise(intent: string): boolean {
+  return intent === "equity" || intent === "debt" || intent === "dfi";
+}
+
+/**
+ * Les comptes créés avant l'élargissement de `objectif` portent tous `levee`.
+ * Les intentions sans correspondance en base y retombent aussi : mieux vaut
+ * l'objectif par défaut qu'un enregistrement refusé.
+ */
+const OBJECTIVES_BY_INTENT: Record<string, string> = {
+  equity: "levee",
+  debt: "dette",
+  dfi: "dfi",
+  diligence: "diligence",
+  audit: "levee",
+  other: "levee",
+};
+
+export function intentObjective(intent: string): string {
+  return OBJECTIVES_BY_INTENT[intent] ?? "levee";
+}
