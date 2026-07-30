@@ -6,6 +6,7 @@ import { useState } from "react";
 import { updateIndicators } from "@/features/v2/domain/lever";
 
 import { Icon } from "./Icon";
+import { SampleRowMenu } from "./RowMenu";
 
 function href(view: string, step?: string): string {
   const params = new URLSearchParams({ view });
@@ -95,7 +96,7 @@ function UpdatesList() {
       </div>
       <div className="v2-update-table-wrap">
         <table className="v2-update-table">
-          <thead><tr><th>Période</th><th>Audience</th><th>Instrument</th><th>Destinataires</th><th>État</th><th>Date</th><th>Consultations</th></tr></thead>
+          <thead><tr><th>Période</th><th>Audience</th><th>Instrument</th><th>Destinataires</th><th>État</th><th>Date</th><th>Consultations</th><th /></tr></thead>
           <tbody>
             {updates.map((row) => (
               <tr key={`${row[0]}-${row[1]}`}>
@@ -103,6 +104,7 @@ function UpdatesList() {
                 <td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td>
                 <td><span className="v2-status" data-tone={row[4] === "Publiée" ? "green" : "neutral"}>{row[4]}</span></td>
                 <td>{row[5]}</td><td>{row[6]}</td>
+                <td><SampleRowMenu label={row[0]} /></td>
               </tr>
             ))}
           </tbody>

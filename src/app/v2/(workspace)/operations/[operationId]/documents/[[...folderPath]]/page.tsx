@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AssociationsPanel } from "@/features/v2/ui/Associations";
 import { UploadProgress } from "@/features/v2/ui/Upload";
 import { Icon } from "@/features/v2/ui/Icon";
+import { SampleRowMenu } from "@/features/v2/ui/RowMenu";
 import { v2Routes } from "@/features/v2/navigation/routes";
 
 const folders = [
@@ -58,17 +59,18 @@ export default async function DocumentsPage({
             <span>— modifiable ; les exigences restent indépendantes de l’arborescence</span>
           </header>
           {folders.map(([name, count]) => (
-            <Link
-              href={v2Routes.operations.documents(operationId, [name])}
-              className="v2-folder-row"
-              key={name}
-            >
-              <Icon name="folder" />
-              <strong>{name}</strong>
-              <span>{count} · 0 pièce</span>
-              <span className="v2-status" data-tone="neutral">Privé</span>
-              <Icon name="more" />
-            </Link>
+            <div className="v2-folder-row" key={name}>
+              <Link
+                className="v2-folder-link"
+                href={v2Routes.operations.documents(operationId, [name])}
+              >
+                <Icon name="folder" />
+                <strong>{name}</strong>
+                <span>{count} · 0 pièce</span>
+                <span className="v2-status" data-tone="neutral">Privé</span>
+              </Link>
+              <SampleRowMenu label={name} />
+            </div>
           ))}
         </section>
       </div>
@@ -100,7 +102,7 @@ export default async function DocumentsPage({
                 <td>{row[5]}</td>
                 <td>{row[6]}</td>
                 <td><span className="v2-status" data-tone={row[8]}>{row[7]}</span></td>
-                <td><Icon name="more" /></td>
+                <td><SampleRowMenu label={row[1]} /></td>
               </tr>
             ))}
           </tbody>

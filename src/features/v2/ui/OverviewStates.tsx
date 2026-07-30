@@ -1,4 +1,5 @@
 import { Icon } from "./Icon";
+import { SampleRowMenu } from "./RowMenu";
 
 /**
  * Écrans 09 et 10 — les deux autres états de la vue d'ensemble.
@@ -18,9 +19,7 @@ const HEADING = (
         <span>Échéance 30 novembre 2026</span>
       </p>
     </div>
-    <button className="v2-icon-button" type="button" aria-label="Plus d’options">
-      <Icon name="more" />
-    </button>
+    <SampleRowMenu label="Série A 2026" />
   </div>
 );
 

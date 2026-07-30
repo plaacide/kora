@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { v2Routes } from "../navigation/routes";
-import { Icon } from "./Icon";
+import { SampleRowMenu } from "./RowMenu";
 
 /**
  * Écran 27 — Pipeline investisseurs.
@@ -142,13 +142,7 @@ export function InvestorsScreen({ operationId }: { operationId: string }) {
                 <td className="v2-num v2-declared">{relation.declared}</td>
                 <td className="v2-cell-3">{relation.engagement}</td>
                 <td>
-                  <button
-                    aria-label={`Options — ${relation.organisation}`}
-                    className="v2-icon-button"
-                    type="button"
-                  >
-                    <Icon name="more" />
-                  </button>
+                  <SampleRowMenu label={relation.organisation} />
                 </td>
               </tr>
             ))}

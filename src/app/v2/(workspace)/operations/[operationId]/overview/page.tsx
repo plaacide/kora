@@ -3,6 +3,7 @@ import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import Link from "next/link";
 
 import { Icon } from "@/features/v2/ui/Icon";
+import { SampleRowMenu } from "@/features/v2/ui/RowMenu";
 import { v2Routes } from "@/features/v2/navigation/routes";
 
 export default async function OperationOverviewPage({
@@ -31,9 +32,7 @@ export default async function OperationOverviewPage({
             <span>Échéance 30 novembre 2026</span>
           </p>
         </div>
-        <button className="v2-icon-button" type="button" aria-label="Plus d’options">
-          <Icon name="more" />
-        </button>
+        <SampleRowMenu label="Série A 2026" />
       </div>
 
       <section className="v2-next-action">
