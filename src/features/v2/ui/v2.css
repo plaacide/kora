@@ -738,3 +738,9 @@ button.v2-ctx-title[aria-expanded=true] .v2-icon{transform:rotate(180deg)}
 .v2-update-filter button>.v2-icon{width:13px;height:13px;color:var(--text-4)}
 .v2-update-filter button{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
 .v2-access-filters button>.v2-icon{width:13px;height:13px;color:var(--text-4)}
+
+/* Écran 54 — menu « ⋯ » d'une ligne d'opération */
+.v2-row-menu{position:relative;flex:0 0 auto}
+.v2-row-menu-list{position:absolute;top:34px;right:0;z-index:20;display:flex;width:210px;flex-direction:column;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 12px 32px rgba(16,24,40,.14);padding:6px;animation:v2-drop var(--motion-fast) var(--motion-ease-enter) both;transform-origin:top right}
+.v2-row-menu-list>*{display:flex;align-items:center;gap:9px;border:0;border-radius:6px;background:transparent;padding:8px 10px;color:var(--text-2)!important;font:400 13px var(--font-v2-sans),sans-serif;text-align:left;cursor:pointer}
+.v2-row-menu-list>*:hover{background:var(--line-soft);color:var(--text)!important}

@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { OperationCard, OperationType } from "../domain/operation";
 import { v2Routes } from "../navigation/routes";
 import { Icon } from "./Icon";
+import { RowMenu } from "./RowMenu";
 import { Standalone } from "./Shell";
 
 /**
@@ -69,9 +70,7 @@ function Row({ operation }: { operation: OperationCard }) {
         )}
       </div>
       <Link className="v2-btn-mini" href={href}>Ouvrir</Link>
-      <button aria-label={`Options — ${operation.name}`} className="v2-icon-button" type="button">
-        <Icon name="more" />
-      </button>
+      <RowMenu href={href} label={operation.name} />
     </article>
   );
 }
