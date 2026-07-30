@@ -3,11 +3,11 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/server";
-import type {
-  OperationCard,
-  OperationLifecycle,
-  OperationSharingState,
-  OperationType,
+import type { OperationCard } from "../domain/operation";
+import {
+  operationLifecycle,
+  operationType,
+  sharingState,
 } from "../domain/operation";
 
 /**
@@ -17,6 +17,10 @@ import type {
  * qui n'existe pas encore : la V1 range tout dans `deals`. On dérive donc ce
  * que les colonnes réelles permettent, et on omet le reste plutôt que de
  * l'inventer.
+ *
+ * `operationType`, `operationLifecycle` et `sharingState` vivent dans le
+ * domaine (`../domain/operation`) plutôt qu'ici : ce sont des règles pures,
+ * sans dépendance à Supabase — les y garder les rend testables sans mock.
  */
 
 interface DealRow {
@@ -25,32 +29,6 @@ interface DealRow {
   objectif: string | null;
   readiness_score: number | null;
   archived_at: string | null;
-}
-
-/**
- * Les comptes créés avant l'élargissement de `objectif` portent tous `levee`,
- * y compris ceux qui avaient répondu « financement bancaire » ou « institution
- * ou bailleur » : leur réponse n'a pas été enregistrée et ne se devine pas.
- */
-const OPERATION_TYPES_BY_OBJECTIF: Record<string, OperationType> = {
-  levee: "equity",
-  dette: "bank_debt",
-  dfi: "dfi_or_grant",
-  diligence: "due_diligence",
-};
-
-function operationType(objectif: string | null): OperationType {
-  if (!objectif) return "undecided";
-  return OPERATION_TYPES_BY_OBJECTIF[objectif] ?? "undecided";
-}
-
-/** `draft` et `closed` n'ont pas de source : seul l'archivage est enregistré. */
-function operationLifecycle(archivedAt: string | null): OperationLifecycle {
-  return archivedAt ? "archived" : "active";
-}
-
-function sharingState(guestCount: number): OperationSharingState {
-  return guestCount > 0 ? "shared" : "private";
 }
 
 /**

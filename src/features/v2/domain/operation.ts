@@ -58,3 +58,29 @@ export function operationSupportsInvestorTracking(
 ): boolean {
   return operation.type === "equity" || operation.tracksMultipleFunders;
 }
+
+/**
+ * Les comptes créés avant l'élargissement de `objectif` portent tous `levee`,
+ * y compris ceux qui avaient répondu « financement bancaire » ou « institution
+ * ou bailleur » : leur réponse n'a pas été enregistrée et ne se devine pas.
+ */
+const OPERATION_TYPES_BY_OBJECTIF: Record<string, OperationType> = {
+  levee: "equity",
+  dette: "bank_debt",
+  dfi: "dfi_or_grant",
+  diligence: "due_diligence",
+};
+
+export function operationType(objectif: string | null): OperationType {
+  if (!objectif) return "undecided";
+  return OPERATION_TYPES_BY_OBJECTIF[objectif] ?? "undecided";
+}
+
+/** `draft` et `closed` n'ont pas de source : seul l'archivage est enregistré. */
+export function operationLifecycle(archivedAt: string | null): OperationLifecycle {
+  return archivedAt ? "archived" : "active";
+}
+
+export function sharingState(guestCount: number): OperationSharingState {
+  return guestCount > 0 ? "shared" : "private";
+}
