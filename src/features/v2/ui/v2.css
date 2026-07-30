@@ -76,13 +76,17 @@
 .v2-objective-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .v2-objective{position:relative;display:flex;min-height:108px;gap:14px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:18px;text-align:left;cursor:pointer}
 .v2-objective:hover{border-color:#d0d5dd;background:var(--band)}
-.v2-objective[data-selected=true]{border:1.5px solid var(--orange);background:var(--orange-soft)}
+.v2-objective input{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.v2-objective:has(input:checked){border:1.5px solid var(--orange);background:var(--orange-soft)}
+.v2-objective:has(input:focus-visible){outline:2px solid var(--orange);outline-offset:2px}
+.v2-objective:has(input:disabled){cursor:not-allowed;opacity:.55}
+.v2-objective:has(input:disabled):hover{border-color:var(--line);background:#fff}
 .v2-objective-icon{display:inline-flex;width:40px;height:40px;flex:0 0 auto;align-items:center;justify-content:center;border-radius:6px;background:var(--orange-soft);color:var(--orange-text)}
-.v2-objective[data-selected=true] .v2-objective-icon{background:#fff}
+.v2-objective:has(input:checked) .v2-objective-icon{background:#fff}
 .v2-objective strong{display:block;padding-right:12px;font:600 15px var(--font-v2-head),sans-serif}
 .v2-objective small{display:block;margin-top:2px;color:var(--text-2);font:400 13px/1.5 var(--font-v2-sans),sans-serif}
 .v2-objective-check{position:absolute;top:14px;right:14px;display:none;width:18px;height:18px;align-items:center;justify-content:center;border-radius:50%;background:var(--orange);color:#fff;font-size:11px;font-weight:700}
-.v2-objective[data-selected=true] .v2-objective-check{display:inline-flex}
+.v2-objective:has(input:checked) .v2-objective-check{display:inline-flex}
 .v2-chip-field{margin:0;border:0;padding:0}
 .v2-chip-field legend{margin-bottom:8px}
 .v2-chip-field>div{display:flex;flex-wrap:wrap;gap:8px}

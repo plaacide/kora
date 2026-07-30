@@ -8,12 +8,14 @@ import { NewOperationWizard, type Step } from "@/features/v2/ui/NewOperation";
 export default async function NewOperationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ etape?: string }>;
+  searchParams: Promise<{ etape?: string; type?: string; nom?: string; erreur?: string }>;
 }) {
   await requireV2Workspace();
-  const { etape } = await searchParams;
+  const { etape, type, nom, erreur } = await searchParams;
   const step: Step =
     etape === "infos" || etape === "structure" ? etape : "type";
 
-  return <NewOperationWizard step={step} />;
+  return (
+    <NewOperationWizard erreur={erreur} nom={nom ?? ""} step={step} type={type ?? "equity"} />
+  );
 }

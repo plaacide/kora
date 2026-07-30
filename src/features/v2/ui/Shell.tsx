@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { ReactNode } from "react";
 
+import { v2Routes } from "../navigation/routes";
 import { Icon, type IconName } from "./Icon";
 
 const rail: Array<{
@@ -193,7 +194,7 @@ export function OperationShell({
               ))}
               <hr className="v2-hr" />
               <Link href="/v2/operations">Voir toutes les opérations</Link>
-              <Link href="/v2/operations/nouvelle">
+              <Link href={v2Routes.operations.new}>
                 <Icon name="plus" />
                 Nouvelle opération
               </Link>

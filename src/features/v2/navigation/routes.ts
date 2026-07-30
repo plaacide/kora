@@ -25,6 +25,7 @@ export const v2Routes = {
   },
   operations: {
     list: "/v2/operations",
+    new: "/v2/operations/nouvelle",
     root: (operationId: string) =>
       `/v2/operations/${segment(operationId)}`,
     overview: (operationId: string) =>

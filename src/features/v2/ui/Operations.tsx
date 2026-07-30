@@ -97,7 +97,7 @@ export function OperationsList({
                 financement bancaire ou une diligence.
               </p>
             </div>
-            <Link className="v2-btn" href="/v2/operations/nouvelle">
+            <Link className="v2-btn" href={v2Routes.operations.new}>
               Créer une opération
             </Link>
             <span className="v2-op-empty-note">
@@ -117,7 +117,7 @@ export function OperationsList({
   return (
     <Standalone
       action={
-        <Link className="v2-btn" href="/v2/operations/nouvelle">
+        <Link className="v2-btn" href={v2Routes.operations.new}>
           <Icon name="plus" />
           Nouvelle opération
         </Link>
