@@ -5,10 +5,12 @@ import {
   CHART_LEFT,
   CHART_RIGHT,
   CHART_TOP,
+  accessLevelLabel,
   chartCeiling,
   chartGeometry,
   chartLabels,
   initials,
+  invitationStatusLabel,
   readingTime,
 } from "./activity";
 
@@ -105,6 +107,39 @@ describe("readingTime", () => {
 
   it("ne dit jamais « 0 min » d'une lecture qui a eu lieu", () => {
     expect(readingTime(3000)).toBe("moins d’une minute");
+  });
+});
+
+describe("accessLevelLabel", () => {
+  it("dit ce que la personne peut faire, pas le nom technique du niveau", () => {
+    expect(accessLevelLabel("watermark")).toBe("Lecture filigranée");
+    expect(accessLevelLabel("download")).toBe("Téléchargement");
+  });
+
+  it("laisse passer un niveau inconnu plutôt que de l'effacer", () => {
+    expect(accessLevelLabel("niveau-futur")).toBe("niveau-futur");
+  });
+});
+
+describe("invitationStatusLabel", () => {
+  const now = new Date("2026-07-30T12:00:00Z");
+
+  it("nomme les statuts courants", () => {
+    expect(invitationStatusLabel("sent", null, now).label).toBe("Invitation envoyée");
+    expect(invitationStatusLabel("accepted", null, now).label).toBe("Actif");
+  });
+
+  it("déclasse un accès accepté dont l'échéance est passée", () => {
+    // La base garde `accepted` après l'échéance : l'afficher tel quel ferait
+    // croire à un accès encore ouvert.
+    const verdict = invitationStatusLabel("accepted", "2026-07-01T00:00:00Z", now);
+    expect(verdict.label).toBe("Expiré");
+  });
+
+  it("laisse actif un accès dont l'échéance est à venir", () => {
+    expect(
+      invitationStatusLabel("accepted", "2026-12-31T00:00:00Z", now).label,
+    ).toBe("Actif");
   });
 });
 

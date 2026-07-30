@@ -4,12 +4,20 @@ import {
   CHART_BASELINE,
   CHART_LEFT,
   CHART_RIGHT,
+  accessLevelLabel,
   chartGeometry,
   chartLabels,
   initials,
+  invitationStatusLabel,
   readingTime,
 } from "../domain/activity";
-import type { DailyViews, Reading } from "../server/activity";
+import type {
+  AccessEntry,
+  DailyViews,
+  DocumentActivity,
+  GuestActivity,
+  Reading,
+} from "../server/activity";
 import { v2Routes } from "../navigation/routes";
 import { EmptyArt } from "./EmptyArt";
 import { Standalone } from "./Shell";
@@ -24,7 +32,45 @@ import { Standalone } from "./Shell";
  * et ce qui manque est nommé plutôt que masqué.
  */
 
-const TABS = ["Consultations récentes", "Accès", "Documents", "Invités"];
+export const ACTIVITY_TABS = [
+  ["consultations", "Consultations récentes"],
+  ["acces", "Accès"],
+  ["documents", "Documents"],
+  ["invites", "Invités"],
+] as const;
+
+export type ActivityTab = (typeof ACTIVITY_TABS)[number][0];
+
+export function isActivityTab(value: string | undefined): value is ActivityTab {
+  return ACTIVITY_TABS.some(([key]) => key === value);
+}
+
+/** Les colonnes changent d'un onglet à l'autre ; la grille les suit. */
+const TAB_COLUMNS: Record<ActivityTab, string[]> = {
+  consultations: ["Invité", "Document", "Opération", "Temps passé"],
+  acces: ["Invité", "Opération", "Niveau", "Échéance"],
+  documents: ["Document", "Opération", "Lecteurs", "Temps cumulé"],
+  invites: ["Invité", "Dernière visite", "Pièces lues", "Temps cumulé"],
+};
+
+function EmptyTab({ title, note }: { title: string; note: string }) {
+  return (
+    <div className="v2-home-activity-empty">
+      <EmptyArt name="files" />
+      <strong>{title}</strong>
+      <p>{note}</p>
+    </div>
+  );
+}
+
+function shortDate(value: string): string {
+  return new Date(value).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 function Chart({ series }: { series: readonly DailyViews[] }) {
   const geometry = chartGeometry(series);
@@ -97,14 +143,10 @@ function Chart({ series }: { series: readonly DailyViews[] }) {
 function ReadingRows({ readings }: { readings: readonly Reading[] }) {
   if (readings.length === 0) {
     return (
-      <div className="v2-home-activity-empty">
-        <EmptyArt name="files" />
-        <strong>Encore aucune activité</strong>
-        <p>
-          Quand vous partagerez votre data room, chaque consultation de vos
-          invités apparaîtra ici, document par document.
-        </p>
-      </div>
+      <EmptyTab
+        note="Quand vous partagerez votre data room, chaque consultation de vos invités apparaîtra ici, document par document."
+        title="Encore aucune activité"
+      />
     );
   }
 
@@ -124,17 +166,113 @@ function ReadingRows({ readings }: { readings: readonly Reading[] }) {
           </div>
           <div>
             <span className="v2-home-activity-doc">{reading.documentName}</span>
-            <small>
-              {new Date(reading.lastReadAt).toLocaleDateString("fr-FR", {
-                day: "numeric",
-                month: "short",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </small>
+            <small>{shortDate(reading.lastReadAt)}</small>
           </div>
           <span className="v2-tag">{reading.operationName}</span>
           <span className="v2-home-activity-time">{readingTime(reading.totalMs)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AccessRows({ entries }: { entries: readonly AccessEntry[] }) {
+  if (entries.length === 0) {
+    return (
+      <EmptyTab
+        note="Votre data room reste privée tant que vous n’invitez personne. Chaque accès accordé apparaîtra ici, avec son échéance."
+        title="Aucun accès accordé"
+      />
+    );
+  }
+
+  return (
+    <div className="v2-home-activity-rows">
+      {entries.map((entry) => {
+        const status = invitationStatusLabel(entry.status, entry.expiresAt);
+
+        return (
+          <div
+            className="v2-home-activity-row"
+            key={`${entry.email}-${entry.operationName}-${entry.expiresAt ?? ""}`}
+          >
+            <div>
+              <span className="v2-avatar-chip">{initials(entry.email)}</span>
+              <div>
+                <strong>{entry.email}</strong>
+                <small>
+                  <span className="v2-status" data-tone={status.tone}>
+                    {status.label}
+                  </span>
+                </small>
+              </div>
+            </div>
+            <span className="v2-tag">{entry.operationName}</span>
+            <span>{accessLevelLabel(entry.level)}</span>
+            <span className="v2-home-activity-time">
+              {entry.expiresAt ? shortDate(entry.expiresAt) : "Sans échéance"}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function DocumentRows({ documents }: { documents: readonly DocumentActivity[] }) {
+  if (documents.length === 0) {
+    return (
+      <EmptyTab
+        note="Dès qu’un invité ouvrira une pièce, elle apparaîtra ici avec le temps qu’il y a passé."
+        title="Aucune pièce consultée"
+      />
+    );
+  }
+
+  return (
+    <div className="v2-home-activity-rows">
+      {documents.map((row) => (
+        <div className="v2-home-activity-row" key={row.documentName}>
+          <div>
+            <span className="v2-home-activity-doc">{row.documentName}</span>
+          </div>
+          <span className="v2-tag">{row.operationName}</span>
+          <span>
+            {row.readers} lecteur{row.readers > 1 ? "s" : ""}
+          </span>
+          <span className="v2-home-activity-time">{readingTime(row.totalMs)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function GuestRows({ guests }: { guests: readonly GuestActivity[] }) {
+  if (guests.length === 0) {
+    return (
+      <EmptyTab
+        note="Les personnes à qui vous ouvrirez votre data room apparaîtront ici, avec ce qu’elles ont consulté."
+        title="Aucun invité pour le moment"
+      />
+    );
+  }
+
+  return (
+    <div className="v2-home-activity-rows">
+      {guests.map((guest) => (
+        <div className="v2-home-activity-row" key={guest.email || guest.name}>
+          <div>
+            <span className="v2-avatar-chip">{initials(guest.name)}</span>
+            <div>
+              <strong>{guest.name}</strong>
+              <small>{guest.email}</small>
+            </div>
+          </div>
+          <span>{shortDate(guest.lastSeenAt)}</span>
+          <span>
+            {guest.documents} pièce{guest.documents > 1 ? "s" : ""}
+          </span>
+          <span className="v2-home-activity-time">{readingTime(guest.totalMs)}</span>
         </div>
       ))}
     </div>
@@ -145,12 +283,20 @@ export function HomeScreen({
   firstName,
   operationCount,
   views,
+  tab,
   readings,
+  accesses,
+  documents,
+  guests,
 }: {
   firstName: string;
   operationCount: number;
   views: readonly DailyViews[];
+  tab: ActivityTab;
   readings: readonly Reading[];
+  accesses: readonly AccessEntry[];
+  documents: readonly DocumentActivity[];
+  guests: readonly GuestActivity[];
 }) {
   const firstDay = operationCount === 0;
 
@@ -200,19 +346,21 @@ export function HomeScreen({
         <section className="v2-home-activity">
           <span className="v2-section-label">Détail de l’activité</span>
           <div className="v2-home-tabs">
-            {TABS.map((tab, index) => (
-              <span data-active={index === 0} key={tab}>
-                {tab}
-              </span>
+            {ACTIVITY_TABS.map(([key, label]) => (
+              <Link data-active={key === tab} href={`?onglet=${key}`} key={key}>
+                {label}
+              </Link>
             ))}
           </div>
           <div className="v2-home-activity-head">
-            <span>Invité</span>
-            <span>Document</span>
-            <span>Opération</span>
-            <span>Temps passé</span>
+            {TAB_COLUMNS[tab].map((column) => (
+              <span key={column}>{column}</span>
+            ))}
           </div>
-          <ReadingRows readings={readings} />
+          {tab === "consultations" && <ReadingRows readings={readings} />}
+          {tab === "acces" && <AccessRows entries={accesses} />}
+          {tab === "documents" && <DocumentRows documents={documents} />}
+          {tab === "invites" && <GuestRows guests={guests} />}
         </section>
       </div>
     </Standalone>

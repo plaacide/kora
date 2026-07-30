@@ -108,6 +108,45 @@ export function readingTime(totalMs: number): string {
   return rest === 0 ? `${hours} h` : `${hours} h ${String(rest).padStart(2, "0")}`;
 }
 
+/**
+ * Ce que `perm_level` autorise, dit en clair.
+ *
+ * « watermark » ne veut rien dire pour un fondateur ; ce qui compte est ce
+ * que la personne peut faire du document, pas le nom technique du niveau.
+ */
+const LEVEL_LABELS: Record<string, string> = {
+  none: "Aucun accès",
+  watermark: "Lecture filigranée",
+  view: "Lecture",
+  download: "Téléchargement",
+  edit: "Modification",
+};
+
+export function accessLevelLabel(level: string): string {
+  return LEVEL_LABELS[level] ?? level;
+}
+
+const STATUS_LABELS: Record<string, { label: string; tone: string }> = {
+  sent: { label: "Invitation envoyée", tone: "blue" },
+  accepted: { label: "Actif", tone: "green" },
+  expired: { label: "Expiré", tone: "neutral" },
+  revoked: { label: "Révoqué", tone: "red" },
+};
+
+export function invitationStatusLabel(
+  status: string,
+  expiresAt: string | null,
+  now: Date = new Date(),
+): { label: string; tone: string } {
+  // Une invitation acceptée dont l'échéance est passée n'ouvre plus rien : la
+  // base garde `accepted`, mais l'afficher tel quel ferait croire à un accès
+  // encore vivant.
+  if (expiresAt && new Date(expiresAt) < now) {
+    return STATUS_LABELS.expired;
+  }
+  return STATUS_LABELS[status] ?? { label: status, tone: "neutral" };
+}
+
 /** Deux lettres pour la pastille : « Amina Diallo » → « AD ». */
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);

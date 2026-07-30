@@ -95,28 +95,10 @@ export async function recentReadings(
   organizationId: string,
   limit = 20,
 ): Promise<Reading[]> {
-  const supabase = await createClient();
-
-  const { data: deals } = await supabase
-    .from("deals")
-    .select("id")
-    .eq("org_id", organizationId);
-
-  const dealIds = ((deals ?? []) as Array<{ id: string }>).map((row) => row.id);
-  if (dealIds.length === 0) return [];
-
-  const { data, error } = await supabase
-    .from("page_dwell")
-    .select("ms, created_at, actor_id, documents(name), deals(name)")
-    .in("deal_id", dealIds)
-    .order("created_at", { ascending: false })
-    .limit(1000);
-
-  if (error) return [];
-
-  const rows = (data ?? []) as unknown as DwellRow[];
+  const rows = await rawDwell(organizationId);
   if (rows.length === 0) return [];
 
+  const supabase = await createClient();
   const names = await namesByProfile(
     supabase,
     rows.map((row) => row.actor_id),
@@ -178,6 +160,166 @@ async function namesByProfile(
       },
     ]),
   );
+}
+
+export interface AccessEntry {
+  email: string;
+  operationName: string;
+  level: string;
+  status: string;
+  expiresAt: string | null;
+}
+
+/**
+ * Onglet « Accès » — qui peut entrer, et jusqu'à quand.
+ *
+ * Les invitations portent le niveau accordé et l'échéance ; elles couvrent
+ * aussi bien l'invité déjà entré que celui qui n'a pas encore répondu. Les
+ * révoquées sont écartées : elles ne donnent plus rien.
+ */
+export async function accessOverview(
+  organizationId: string,
+  limit = 30,
+): Promise<AccessEntry[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("invitations")
+    .select("email, level, status, expires_at, created_at, deals(name)")
+    .neq("status", "revoked")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+
+  return ((data ?? []) as unknown as Array<{
+    email: string;
+    level: string;
+    status: string;
+    expires_at: string | null;
+    deals: { name: string } | Array<{ name: string }> | null;
+  }>).map((row) => ({
+    email: row.email,
+    operationName: first(row.deals)?.name ?? "—",
+    level: row.level,
+    status: row.status,
+    expiresAt: row.expires_at,
+  }));
+}
+
+export interface DocumentActivity {
+  documentName: string;
+  operationName: string;
+  readers: number;
+  totalMs: number;
+}
+
+/** Onglet « Documents » — ce qui est le plus lu, et par combien de personnes. */
+export async function documentActivity(
+  organizationId: string,
+  limit = 20,
+): Promise<DocumentActivity[]> {
+  const rows = await rawDwell(organizationId);
+
+  const grouped = new Map<
+    string,
+    { documentName: string; operationName: string; readers: Set<string>; totalMs: number }
+  >();
+
+  for (const row of rows) {
+    const documentName = first(row.documents)?.name ?? "Document supprimé";
+    const entry = grouped.get(documentName) ?? {
+      documentName,
+      operationName: first(row.deals)?.name ?? "—",
+      readers: new Set<string>(),
+      totalMs: 0,
+    };
+    entry.readers.add(row.actor_id);
+    entry.totalMs += row.ms;
+    grouped.set(documentName, entry);
+  }
+
+  return [...grouped.values()]
+    .map(({ readers, ...rest }) => ({ ...rest, readers: readers.size }))
+    .sort((a, b) => b.totalMs - a.totalMs)
+    .slice(0, limit);
+}
+
+export interface GuestActivity {
+  name: string;
+  email: string;
+  documents: number;
+  totalMs: number;
+  lastSeenAt: string;
+}
+
+/** Onglet « Invités » — qui lit, combien de pièces, et quand pour la dernière fois. */
+export async function guestActivity(
+  organizationId: string,
+  limit = 20,
+): Promise<GuestActivity[]> {
+  const rows = await rawDwell(organizationId);
+  if (rows.length === 0) return [];
+
+  const supabase = await createClient();
+  const names = await namesByProfile(
+    supabase,
+    rows.map((row) => row.actor_id),
+  );
+
+  const grouped = new Map<
+    string,
+    { name: string; email: string; documents: Set<string>; totalMs: number; lastSeenAt: string }
+  >();
+
+  for (const row of rows) {
+    const profile = names.get(row.actor_id);
+    const entry = grouped.get(row.actor_id) ?? {
+      name: profile?.name ?? "Invité",
+      email: profile?.email ?? "",
+      documents: new Set<string>(),
+      totalMs: 0,
+      // Les lignes arrivent triées du plus récent au plus ancien.
+      lastSeenAt: row.created_at,
+    };
+    entry.documents.add(first(row.documents)?.name ?? "?");
+    entry.totalMs += row.ms;
+    grouped.set(row.actor_id, entry);
+  }
+
+  return [...grouped.values()]
+    .map(({ documents, ...rest }) => ({ ...rest, documents: documents.size }))
+    .sort((a, b) => b.lastSeenAt.localeCompare(a.lastSeenAt))
+    .slice(0, limit);
+}
+
+/**
+ * Les tranches de lecture brutes des opérations de l'organisation.
+ *
+ * Mutualisé par les trois onglets qui en dérivent des agrégats différents :
+ * les relire une fois par onglet reviendrait à interroger trois fois la même
+ * table pour un seul affichage.
+ */
+async function rawDwell(organizationId: string): Promise<DwellRow[]> {
+  const supabase = await createClient();
+
+  const { data: deals } = await supabase
+    .from("deals")
+    .select("id")
+    .eq("org_id", organizationId);
+
+  const dealIds = ((deals ?? []) as Array<{ id: string }>).map((row) => row.id);
+  if (dealIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("page_dwell")
+    .select("ms, created_at, actor_id, documents(name), deals(name)")
+    .in("deal_id", dealIds)
+    .order("created_at", { ascending: false })
+    .limit(1000);
+
+  if (error) return [];
+  return (data ?? []) as unknown as DwellRow[];
 }
 
 /** Nombre d'opérations actives, pour la phrase d'accroche de l'accueil. */

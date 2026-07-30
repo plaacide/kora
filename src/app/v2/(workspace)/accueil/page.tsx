@@ -1,10 +1,13 @@
 import {
+  accessOverview,
   activeOperationCount,
   dailyViews,
+  documentActivity,
+  guestActivity,
   recentReadings,
 } from "@/features/v2/server/activity";
 import { requireV2Workspace } from "@/features/v2/server/session";
-import { HomeScreen } from "@/features/v2/ui/Home";
+import { HomeScreen, isActivityTab } from "@/features/v2/ui/Home";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -29,21 +32,42 @@ async function firstNameOf(userId: string, email: string): Promise<string> {
   return first[0].toUpperCase() + first.slice(1);
 }
 
-export default async function AccueilPage() {
-  const { user, organization } = await requireV2Workspace();
-
-  const [firstName, operationCount, views, readings] = await Promise.all([
-    firstNameOf(user.id, user.email),
-    activeOperationCount(organization.id),
-    dailyViews(organization.id),
-    recentReadings(organization.id),
+export default async function AccueilPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ onglet?: string }>;
+}) {
+  const [{ user, organization }, { onglet }] = await Promise.all([
+    requireV2Workspace(),
+    searchParams,
   ]);
+
+  const tab = isActivityTab(onglet) ? onglet : "consultations";
+
+  // Les quatre onglets se lisent d'un coup : ils dérivent tous des mêmes
+  // tranches de lecture, et l'onglet n'est qu'un changement de regroupement.
+  // Recharger la page à chaque clic pour une seule liste serait plus lent que
+  // de tout tenir prêt.
+  const [firstName, operationCount, views, readings, accesses, documents, guests] =
+    await Promise.all([
+      firstNameOf(user.id, user.email),
+      activeOperationCount(organization.id),
+      dailyViews(organization.id),
+      recentReadings(organization.id),
+      accessOverview(organization.id),
+      documentActivity(organization.id),
+      guestActivity(organization.id),
+    ]);
 
   return (
     <HomeScreen
+      accesses={accesses}
+      documents={documents}
       firstName={firstName}
+      guests={guests}
       operationCount={operationCount}
       readings={readings}
+      tab={tab}
       views={views}
     />
   );

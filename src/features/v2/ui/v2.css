@@ -1,7 +1,13 @@
 .v2 {
-  /* Motion — durées et courbes centralisées (cf. audit micro-animations) */
+  /* Motion — durées et courbes de TRANSITIONS.md.
+     La courbe est UNIQUE pour tout ce qui relève de la navigation : deux
+     courbes voisines se remarquent quand deux éléments bougent ensemble.
+     Les durées courtes (retours d'état : survol, bascule) restent en deçà —
+     un survol à 480 ms donnerait une interface qui traîne. */
   --motion-instant:80ms;--motion-fast:120ms;--motion-default:180ms;--motion-slow:240ms;
-  --motion-ease:cubic-bezier(.2,0,0,1);--motion-ease-enter:cubic-bezier(0,0,.2,1);
+  --motion-rail:240ms;--motion-view:300ms;--motion-cascade:340ms;--motion-push:480ms;
+  --motion-stagger:40ms;
+  --motion-ease:cubic-bezier(.32,.72,.24,1);--motion-ease-enter:cubic-bezier(.32,.72,.24,1);
   --orange:#e85c2b;--orange-h:#d24e1f;--orange-text:#c24619;--orange-soft:#fdf4ef;
   --ink:#14161f;--text:#1a1b1f;--text-2:#475467;--text-3:#667085;--text-4:#98a2b3;
   --line:#ecebe6;--line-soft:#f1f0ec;--band:#fafaf8;--green:#147a5c;--green-bg:#eaf4f1;
@@ -569,8 +575,9 @@
 
 .v2-home-activity{display:flex;flex-direction:column}
 .v2-home-tabs{display:flex;margin:10px 0 0;gap:22px;border-bottom:1px solid var(--line)}
-.v2-home-tabs>span{padding:0 0 10px;color:var(--text-3);font-size:13.5px}
-.v2-home-tabs>span[data-active=true]{box-shadow:inset 0 -2px 0 var(--orange);color:var(--orange-text);font-weight:600}
+.v2-home-tabs>a{padding:0 0 10px;color:var(--text-3);font-size:13.5px;transition:color var(--motion-fast) var(--motion-ease)}
+.v2-home-tabs>a:hover{color:var(--text)}
+.v2-home-tabs>a[data-active=true]{box-shadow:inset 0 -2px 0 var(--orange);color:var(--orange-text);font-weight:600}
 .v2-home-activity-head,.v2-home-activity-row{display:grid;grid-template-columns:2fr 2.2fr 1.4fr 1fr;align-items:center;gap:12px}
 .v2-home-activity-head{border-bottom:1px solid var(--line-soft);padding:12px 20px;background:var(--band);color:var(--text-3);font-size:12px}
 .v2-home-activity-head>span:last-child{text-align:right}
@@ -609,7 +616,7 @@
 @media(max-width:820px){.v2-wizard-page .v2-objective-grid[data-columns="2"]{grid-template-columns:1fr}}
 
 /* Rail dépliable — le bouton n'est pas dans les maquettes, les libellés en viennent */
-.v2-rail{transition:width var(--motion-default) var(--motion-ease),flex-basis var(--motion-default) var(--motion-ease)}
+.v2-rail{transition:width var(--motion-rail) var(--motion-ease),flex-basis var(--motion-rail) var(--motion-ease)}
 .v2-rail[data-expanded=true]{width:216px;flex:0 0 216px;align-items:stretch;padding:14px 10px}
 .v2-rail-head{display:flex;width:100%;align-items:center;gap:9px;margin-bottom:14px}
 .v2-rail[data-expanded=false] .v2-rail-head{justify-content:center}
@@ -745,10 +752,34 @@ button.v2-ctx-title[aria-expanded=true] .v2-icon{transform:rotate(180deg)}
 @keyframes v2-slide{from{transform:translateX(16px);opacity:.6}to{transform:translateX(0);opacity:1}}
 @keyframes v2-drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
-.v2-scrim{animation:v2-fade var(--motion-default) var(--motion-ease-enter) both}
-.v2-dialog{animation:v2-rise var(--motion-default) var(--motion-ease-enter) both}
-.v2-sidepanel{animation:v2-slide var(--motion-slow) var(--motion-ease-enter) both}
-.v2-ctx-picker{animation:v2-drop var(--motion-fast) var(--motion-ease-enter) both;transform-origin:top left}
+/* Le tiroir entre depuis le bord droit, pas de seize pixels : TRANSITIONS.md
+   §4 demande `translateX(100%) → 0` en 480 ms, voile en fondu. */
+@keyframes v2-drawer{from{transform:translateX(100%)}to{transform:translateX(0)}}
+/* Changement de vue interne — §2, 300 ms, fondu + dix pixels. */
+@keyframes v2-view{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* Cascade de listes — §5, chaque ligne arrive de la droite, décalée. */
+@keyframes v2-cascade{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+
+.v2-scrim{animation:v2-fade var(--motion-push) var(--motion-ease) both}
+.v2-dialog{animation:v2-rise var(--motion-default) var(--motion-ease) both}
+.v2-sidepanel{animation:v2-drawer var(--motion-push) var(--motion-ease) both}
+.v2-ctx-picker{animation:v2-drop var(--motion-fast) var(--motion-ease) both;transform-origin:top left}
+
+/* Le contenu d'une vue qui change (onglets, drill-down) respire à 300 ms. */
+.v2-home-activity-rows,.v2-document-table-wrap,.v2-documents-page{animation:v2-view var(--motion-view) var(--motion-ease) both}
+
+/* Cascade : les huit premières lignes se décalent, les suivantes suivent le
+   train. Au-delà, l'attente cumulée dépasserait la demi-seconde et l'écran
+   paraîtrait lent au lieu d'être vivant. */
+.v2-home-activity-row,.v2-folder-row,.v2-document-table tbody tr{animation:v2-cascade var(--motion-cascade) var(--motion-ease) both}
+.v2-home-activity-row:nth-child(1),.v2-folder-row:nth-child(1),.v2-document-table tbody tr:nth-child(1){animation-delay:0ms}
+.v2-home-activity-row:nth-child(2),.v2-folder-row:nth-child(2),.v2-document-table tbody tr:nth-child(2){animation-delay:calc(var(--motion-stagger)*1)}
+.v2-home-activity-row:nth-child(3),.v2-folder-row:nth-child(3),.v2-document-table tbody tr:nth-child(3){animation-delay:calc(var(--motion-stagger)*2)}
+.v2-home-activity-row:nth-child(4),.v2-folder-row:nth-child(4),.v2-document-table tbody tr:nth-child(4){animation-delay:calc(var(--motion-stagger)*3)}
+.v2-home-activity-row:nth-child(5),.v2-folder-row:nth-child(5),.v2-document-table tbody tr:nth-child(5){animation-delay:calc(var(--motion-stagger)*4)}
+.v2-home-activity-row:nth-child(6),.v2-folder-row:nth-child(6),.v2-document-table tbody tr:nth-child(6){animation-delay:calc(var(--motion-stagger)*5)}
+.v2-home-activity-row:nth-child(7),.v2-folder-row:nth-child(7),.v2-document-table tbody tr:nth-child(7){animation-delay:calc(var(--motion-stagger)*6)}
+.v2-home-activity-row:nth-child(n+8),.v2-folder-row:nth-child(n+8),.v2-document-table tbody tr:nth-child(n+8){animation-delay:calc(var(--motion-stagger)*7)}
 
 /* Boutons — l'état pressé descend d'un pixel, pas plus (§8.7). */
 .v2-btn,.v2-btn-mini,.v2-btn-social,.v2-btn-quiet,.v2-icon-button,.v2-auth-submit{transition:background var(--motion-instant) var(--motion-ease),border-color var(--motion-instant) var(--motion-ease),color var(--motion-instant) var(--motion-ease),transform var(--motion-instant) var(--motion-ease)}
@@ -758,9 +789,19 @@ button.v2-ctx-title[aria-expanded=true] .v2-icon{transform:rotate(180deg)}
 /* La barre ne bouge que sur un vrai changement de valeur (§8.12). */
 .v2-progress>span{transition:width var(--motion-slow) var(--motion-ease)}
 
-/* Aucune information ne doit dépendre du mouvement (§11). */
+/* Mouvement réduit — TRANSITIONS.md §2 : REMPLACER les mouvements par un
+   fondu de 150 ms, pas les supprimer. Tout couper ferait apparaître les
+   panneaux d'un coup, sans qu'on sache d'où ils viennent ; le fondu garde le
+   fait qu'un élément arrive, en lui retirant le déplacement. */
 @media(prefers-reduced-motion:reduce){
-  .v2 *,.v2 *::before,.v2 *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .v2 *,.v2 *::before,.v2 *::after{
+    animation-name:v2-fade!important;
+    animation-duration:150ms!important;
+    animation-delay:0ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:150ms!important;
+  }
+  .v2 *{transform:none!important}
 }
 
 /* Écran 66 — le champ de recherche est dans le contenu, pas dans la barre */
