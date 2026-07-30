@@ -2,12 +2,72 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 
 import { v2Routes } from "../navigation/routes";
 import { Icon, type IconName } from "./Icon";
 import { PushLink } from "./PushTransitions";
+
+/**
+ * Préférence de repli du rail — TRANSITIONS.md §1.
+ *
+ * « Dépliée par défaut […] C'est l'état initial pour tout nouvel
+ * utilisateur », et le choix « est persisté et ne change jamais tout seul ».
+ * D'où ces deux règles : on part déplié, et seul un clic sur le chevron
+ * modifie la préférence — jamais un redimensionnement.
+ *
+ * `localStorage` est une source extérieure à React, avec une valeur au rendu
+ * serveur (déplié) qui diffère de celle du navigateur : c'est précisément ce
+ * que `useSyncExternalStore` sait faire. Lire la préférence dans un effet et
+ * appeler `setState` provoquerait un rendu en cascade — et le signaler est le
+ * rôle du garde-fou `react-hooks/set-state-in-effect`.
+ */
+const RAIL_PREFERENCE = "sanza.v2.rail";
+
+const railListeners = new Set<() => void>();
+
+/**
+ * L'instantané doit rester identique d'un appel à l'autre tant que rien n'a
+ * changé, faute de quoi React rendrait sans fin. D'où ce cache.
+ */
+let railSnapshot: boolean | null = null;
+
+function readRailPreference(): boolean {
+  try {
+    const stored = window.localStorage.getItem(RAIL_PREFERENCE);
+    if (stored === "collapsed") return false;
+    if (stored === "expanded") return true;
+  } catch {
+    // Navigation privée, stockage refusé : on garde le défaut déplié.
+  }
+  return true;
+}
+
+function subscribeToRail(onChange: () => void): () => void {
+  railListeners.add(onChange);
+  return () => railListeners.delete(onChange);
+}
+
+function railIsExpanded(): boolean {
+  railSnapshot ??= readRailPreference();
+  return railSnapshot;
+}
+
+/** Au rendu serveur, le rail est déplié : le défaut de la spec. */
+function railIsExpandedOnServer(): boolean {
+  return true;
+}
+
+function setRailExpanded(next: boolean): void {
+  railSnapshot = next;
+  try {
+    window.localStorage.setItem(RAIL_PREFERENCE, next ? "expanded" : "collapsed");
+  } catch {
+    // Préférence non mémorisable : le choix reste valable pour la session.
+  }
+  railListeners.forEach((listener) => listener());
+}
 
 const rail: Array<{
   href: string;
@@ -29,7 +89,11 @@ export function WorkspaceShell({
   email: string;
 }) {
   const path = usePathname();
-  const [expanded, setExpanded] = useState(false);
+  const expanded = useSyncExternalStore(
+    subscribeToRail,
+    railIsExpanded,
+    railIsExpandedOnServer,
+  );
 
   // Libellés repris des attributs `title` du rail dans les maquettes.
   const bottom: Array<{ href: string; label: string; icon: IconName; mobile?: boolean }> = [
@@ -72,7 +136,7 @@ export function WorkspaceShell({
               aria-expanded={expanded}
               aria-label={expanded ? "Replier la navigation" : "Déplier la navigation"}
               className="v2-rail-toggle"
-              onClick={() => setExpanded((value) => !value)}
+              onClick={() => setRailExpanded(!expanded)}
               type="button"
             >
               <Icon name="chevron" />
