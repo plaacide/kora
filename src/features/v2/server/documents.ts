@@ -1,0 +1,271 @@
+import "server-only";
+
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import { createClient } from "@/lib/supabase/server";
+
+/**
+ * Lecture de l'arborescence documentaire d'une opération.
+ *
+ * Rien n'est inventé ici : chaque colonne affichée vient d'une colonne réelle.
+ * Ce que la base ne sait pas — la visibilité par pièce, les états
+ * « à actualiser » ou « archivée » — est omis plutôt que simulé. Voir les
+ * notes de `../domain/documents`.
+ */
+
+export interface FolderRow {
+  id: string;
+  name: string;
+  indexPath: string;
+  documentCount: number;
+  guestCount: number;
+}
+
+export interface DocumentRow {
+  id: string;
+  indexPath: string;
+  name: string;
+  requirement: string | null;
+  guestCount: number;
+  versionNo: number | null;
+  updatedAt: string | null;
+  owner: string | null;
+  status: string;
+}
+
+interface FolderRecord {
+  id: string;
+  name: string;
+  index_path: string;
+  parent_id: string | null;
+  position: number;
+}
+
+/**
+ * Nombre d'INVITÉS ayant un accès effectif à chaque dossier.
+ *
+ * `deal_folder_access` liste tous les membres de l'organisation, fondateur
+ * compris — il a évidemment accès à ses propres dossiers. Les compter ferait
+ * afficher « Visible par 1 accès » sur une data room que personne d'extérieur
+ * n'a jamais vue. Seuls les `guest` disent quelque chose du partage.
+ */
+async function guestCountByFolder(
+  supabase: SupabaseClient,
+  operationId: string,
+): Promise<Map<string, number>> {
+  const { data, error } = await supabase.rpc("deal_folder_access", {
+    p_deal: operationId,
+  });
+
+  // Un accès illisible ne doit pas faire disparaître la data room : on
+  // affichera « Privée » partout, ce qui est le défaut le moins trompeur.
+  if (error) return new Map();
+
+  const counts = new Map<string, number>();
+  for (const row of (data ?? []) as Array<{
+    folder_id: string;
+    role: string;
+    level: string;
+  }>) {
+    if (row.level === "none" || row.role !== "guest") continue;
+    counts.set(row.folder_id, (counts.get(row.folder_id) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/**
+ * Résout un chemin de dossiers exprimé en NOMS vers son identifiant.
+ *
+ * Les URL de la V2 portent les noms (`/documents/Finance et comptabilité`),
+ * la base indexe par identifiant. On descend donc niveau par niveau en
+ * suivant `parent_id` : deux dossiers homonymes sous des parents différents
+ * ne se confondent pas. Restent les homonymes entre frères — la base ne
+ * l'interdit pas ; le premier par position gagne, faute de mieux.
+ */
+export async function resolveFolderPath(
+  operationId: string,
+  path: readonly string[],
+): Promise<{ id: string; name: string } | null> {
+  if (path.length === 0) return null;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("folders")
+    .select("id, name, index_path, parent_id, position")
+    .eq("deal_id", operationId)
+    .order("position");
+
+  if (error) throw error;
+
+  const rows = (data ?? []) as FolderRecord[];
+  let parentId: string | null = null;
+  let current: FolderRecord | undefined;
+
+  for (const segment of path) {
+    current = rows.find(
+      (row) => row.parent_id === parentId && row.name === segment,
+    );
+    if (!current) return null;
+    parentId = current.id;
+  }
+
+  return current ? { id: current.id, name: current.name } : null;
+}
+
+export async function listFolders(operationId: string): Promise<FolderRow[]> {
+  const supabase = await createClient();
+
+  const [{ data, error }, guests] = await Promise.all([
+    supabase
+      .from("folders")
+      .select("id, name, index_path, parent_id, position")
+      .eq("deal_id", operationId)
+      .is("parent_id", null)
+      .order("position"),
+    guestCountByFolder(supabase, operationId),
+  ]);
+
+  if (error) throw error;
+
+  const rows = (data ?? []) as FolderRecord[];
+  if (rows.length === 0) return [];
+
+  const { data: documents } = await supabase
+    .from("documents")
+    .select("folder_id")
+    .eq("deal_id", operationId);
+
+  const documentCounts = new Map<string, number>();
+  for (const row of (documents ?? []) as Array<{ folder_id: string }>) {
+    documentCounts.set(row.folder_id, (documentCounts.get(row.folder_id) ?? 0) + 1);
+  }
+
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    indexPath: row.index_path,
+    documentCount: documentCounts.get(row.id) ?? 0,
+    guestCount: guests.get(row.id) ?? 0,
+  }));
+}
+
+interface DocumentRecord {
+  id: string;
+  name: string;
+  index_path: string;
+  status: string;
+  folder_id: string;
+  created_by: string | null;
+  document_versions: {
+    version_no: number;
+    created_at: string;
+    uploaded_by: string | null;
+  } | null;
+}
+
+/**
+ * Exigences satisfaites par chaque pièce.
+ *
+ * L'association vit dans `checklist_item_documents` depuis que
+ * `checklist_items.document_id` a été retirée : une pièce peut servir
+ * plusieurs exigences, et une exigence accepter plusieurs preuves.
+ */
+async function requirementByDocument(
+  supabase: SupabaseClient,
+  documentIds: readonly string[],
+): Promise<Map<string, string>> {
+  if (documentIds.length === 0) return new Map();
+
+  const { data, error } = await supabase
+    .from("checklist_item_documents")
+    .select("document_id, checklist_items(label)")
+    .in("document_id", documentIds);
+
+  if (error) return new Map();
+
+  // Supabase type la jointure comme un tableau ; elle n'en rend qu'un ici.
+  const labels = new Map<string, string>();
+  for (const row of (data ?? []) as unknown as Array<{
+    document_id: string;
+    checklist_items: { label: string } | Array<{ label: string }> | null;
+  }>) {
+    const joined = Array.isArray(row.checklist_items)
+      ? row.checklist_items[0]
+      : row.checklist_items;
+    if (!joined?.label || labels.has(row.document_id)) continue;
+    labels.set(row.document_id, joined.label);
+  }
+  return labels;
+}
+
+async function namesByProfile(
+  supabase: SupabaseClient,
+  ids: readonly string[],
+): Promise<Map<string, string>> {
+  const unique = [...new Set(ids)];
+  if (unique.length === 0) return new Map();
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, full_name")
+    .in("id", unique);
+
+  return new Map(
+    ((data ?? []) as Array<{ id: string; full_name: string | null }>).map(
+      (row) => [row.id, row.full_name ?? "—"],
+    ),
+  );
+}
+
+export async function listDocuments(
+  operationId: string,
+  folderId: string,
+): Promise<DocumentRow[]> {
+  const supabase = await createClient();
+
+  // `documents_current_version_fk` désigne la version ACTIVE, pas la dernière
+  // déposée : après une restauration, les deux diffèrent.
+  const { data, error } = await supabase
+    .from("documents")
+    .select(
+      "id, name, index_path, status, folder_id, created_by, document_versions!documents_current_version_fk(version_no, created_at, uploaded_by)",
+    )
+    .eq("deal_id", operationId)
+    .eq("folder_id", folderId)
+    .order("position");
+
+  if (error) throw error;
+
+  const rows = (data ?? []) as unknown as DocumentRecord[];
+  if (rows.length === 0) return [];
+
+  const ids = rows.map((row) => row.id);
+  const authorIds = rows
+    .map((row) => row.document_versions?.uploaded_by ?? row.created_by)
+    .filter((id): id is string => Boolean(id));
+
+  const [requirements, authors, guests] = await Promise.all([
+    requirementByDocument(supabase, ids),
+    namesByProfile(supabase, authorIds),
+    guestCountByFolder(supabase, operationId),
+  ]);
+
+  const guestCount = guests.get(folderId) ?? 0;
+
+  return rows.map((row) => {
+    const version = row.document_versions;
+    const authorId = version?.uploaded_by ?? row.created_by;
+
+    return {
+      id: row.id,
+      indexPath: row.index_path,
+      name: row.name,
+      requirement: requirements.get(row.id) ?? null,
+      guestCount,
+      versionNo: version?.version_no ?? null,
+      updatedAt: version?.created_at ?? null,
+      owner: authorId ? authors.get(authorId) ?? null : null,
+      status: row.status,
+    };
+  });
+}

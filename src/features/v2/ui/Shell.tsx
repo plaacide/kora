@@ -91,16 +91,6 @@ export function WorkspaceShell({
 /** Sélecteur rapide de l’écran 63 — les noms viennent de la maquette. */
 const OTHER_OPERATIONS = ["Série A 2026", "Prêt Ecobank", "Diligence IFC"];
 
-const folders = [
-  "Société et immatriculation",
-  "Gouvernance et actionnariat",
-  "Finance et comptabilité",
-  "Fiscalité",
-  "Commercial et marché",
-  "Équipe et RH",
-  "Technologie et PI",
-  "Impact et ESG",
-];
 
 const pageLabels: Record<string, string> = {
   overview: "Vue d’ensemble",
@@ -115,9 +105,12 @@ const pageLabels: Record<string, string> = {
 export function OperationShell({
   children,
   operationId,
+  folders = [],
 }: {
   children: ReactNode;
   operationId: string;
+  /** Dossiers racine de l'opération, lus en base par le layout. */
+  folders?: readonly string[];
 }) {
   const path = usePathname();
   const [pickerOpen, setPickerOpen] = useState(false);
