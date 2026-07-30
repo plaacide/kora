@@ -46,4 +46,5 @@ export const v2Routes = {
   invitations: "/v2/invitations",
   team: "/v2/team",
   security: "/v2/security",
+  help: "/v2/roadmap",
 } as const;
