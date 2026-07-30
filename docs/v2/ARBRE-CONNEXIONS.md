@@ -93,18 +93,23 @@ après toute migration : une politique se casse en modifiant une AUTRE table.
 `domain/documents.ts` — testables sans base ni mock. 46 tests. Toute logique
 qui ne fait pas d'entrée-sortie a vocation à y descendre.
 
-## Trois décisions en attente
+## Décisions
 
-Elles bloquent le dépôt de fichiers et la fidélité des maquettes. Aucune n'est
-technique : ce sont des choix produit.
+**Tranchée — le dépôt à la racine** (30 juillet 2026). `documents.folder_id`
+est devenu nullable (`20260731210000_documents_racine.sql`) : on dépose
+d'abord, on range ensuite, ou jamais.
 
-1. **`documents.folder_id` est NOT NULL** — on ne peut pas déposer « à la
-   racine » de la data room. Créer un dossier d'accueil implicite, ou relâcher
-   la contrainte ?
-2. **Pas de visibilité par pièce** — le droit se pose sur le DOSSIER
+Conséquence à connaître : **une pièce à la racine ne se partage pas.** Un accès
+se pose sur un dossier ; sans dossier, il n'y a nulle part où accorder — ni
+retirer — un droit. La racine est donc réservée à l'équipe interne, et le geste
+qui partage une pièce est celui qui la range.
+
+**En attente** — deux choix produit, tous deux sur la fidélité des maquettes :
+
+1. **Pas de visibilité par pièce** — le droit se pose sur le DOSSIER
    (`permissions.folder_id`). Les maquettes montrent « Masquée aux invités »
    par document. Dériver du dossier (ce qui est fait), ou migrer ?
-3. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
+2. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
    `failed`). Les maquettes en montrent sept — « À actualiser », « Archivée »
    n'existent pas en base.
 
@@ -112,7 +117,8 @@ technique : ce sont des choix produit.
 
 Le chemin le plus court vers un produit utilisable de bout en bout :
 
-1. **Dépôt de fichiers** — débloque la data room, mais demande la décision n° 1.
+1. **Dépôt de fichiers** — la base est prête (racine autorisée) ; reste le
+   téléversement vers le bucket privé puis `register_document`.
 2. **Visionneuse** — l'API V1 (`/api/viewer`) est complète et sérieuse :
    filigrane incrusté dans les pixels, audit page par page. Il s'agit de la
    brancher, pas de l'écrire.

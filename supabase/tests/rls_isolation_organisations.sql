@@ -92,6 +92,11 @@ begin
   insert into public.documents (deal_id, folder_id, name, created_by)
   values (v_deal_alpha, v_folder, 'Term sheet Sequoia.pdf', v_user_alpha);
 
+  -- Une pièce laissée à la RACINE, sans dossier. Sans elle, le contrôle 12
+  -- compterait zéro faute d'objet et passerait au vert sans rien vérifier.
+  insert into public.documents (deal_id, folder_id, name, created_by)
+  values (v_deal_alpha, null, 'Note interne — racine.pdf', v_user_alpha);
+
   insert into public.raises (deal_id, org_id, name, montant_cible, devise, statut)
   values (v_deal_alpha, v_org_alpha, 'Série B 2026', 900000000, 'XOF', 'en_cours');
 
@@ -264,16 +269,29 @@ begin
   end;
 end $$;
 
+-- ── LA RACINE DE LA DATA ROOM ──────────────────────────────────────────────
+-- Depuis `20260731210000_documents_racine.sql`, une pièce peut n'être rangée
+-- dans aucun dossier. Or un accès se pose SUR un dossier : une pièce à la
+-- racine n'a nulle part où recevoir — ou perdre — un droit. Elle est donc
+-- réservée à l'équipe interne, et ce contrôle veille à ce qu'elle ne dérive
+-- jamais vers les invités ni vers une autre organisation.
+insert into rlstest_resultats
+select 12, 'pièce à la racine d''Alpha', count(*)::text, '0',
+  case when count(*) = 0 then 'OK' else 'ÉCHEC — la racine fuit entre organisations' end
+from public.documents
+where deal_id = current_setting('rlstest.deal_alpha')::uuid
+  and folder_id is null;
+
 -- ── LES CONTRÔLES INVERSES ─────────────────────────────────────────────────
 -- Aussi importants que les autres : une RLS qui bloque TOUT passerait tous
 -- les contrôles précédents tout en rendant le produit inutilisable.
 insert into rlstest_resultats
-select 12, 'sa propre opération (doit être visible)', count(*)::text, '1',
+select 13, 'sa propre opération (doit être visible)', count(*)::text, '1',
   case when count(*) = 1 then 'OK' else 'ÉCHEC — Beta ne voit plus ses propres données' end
 from public.deals where id = current_setting('rlstest.deal_beta')::uuid;
 
 insert into rlstest_resultats
-select 13, 'sa propre organisation (doit être visible)', count(*)::text, '1',
+select 14, 'sa propre organisation (doit être visible)', count(*)::text, '1',
   case when count(*) = 1 then 'OK' else 'ÉCHEC — Beta ne voit plus son organisation' end
 from public.organizations where id = current_setting('rlstest.org_beta')::uuid;
 
@@ -284,11 +302,11 @@ begin
   begin
     perform public.create_raise(current_setting('rlstest.deal_beta')::uuid, 'Ma levée');
     insert into rlstest_resultats values
-      (14, 'ouvrir une levée chez soi (doit être permis)', 'acceptée', 'acceptée', 'OK');
+      (15, 'ouvrir une levée chez soi (doit être permis)', 'acceptée', 'acceptée', 'OK');
   exception when others then
     get stacked diagnostics v_msg = message_text;
     insert into rlstest_resultats values
-      (14, 'ouvrir une levée chez soi (doit être permis)',
+      (15, 'ouvrir une levée chez soi (doit être permis)',
        'refusée (' || v_msg || ')', 'acceptée',
        'ÉCHEC — Beta ne peut plus travailler sur sa propre opération');
   end;
