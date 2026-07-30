@@ -2,11 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "kora-dev",
+      "name": "kora-v2",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "cwd": "/Users/placidebakala/Webcode/kora",
-      "port": 3000
+      "runtimeArgs": ["run", "dev", "--", "--port", "3001"],
+      "port": 3001
     }
   ]
 }
