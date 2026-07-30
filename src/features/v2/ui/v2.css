@@ -679,3 +679,23 @@ button.v2-ctx-title[aria-expanded=true] .v2-icon{transform:rotate(180deg)}
 .v2-ctx-picker a[data-current=true]>i{background:var(--orange)}
 .v2-ctx-picker .v2-hr{margin:6px 0}
 .v2-ctx-picker .v2-icon{width:14px;height:14px}
+
+/* Écran 64 — le partage nomme son opération */
+.v2-wizard-heading>em{flex:1;color:var(--text-3);font-size:12px;font-style:normal}
+.v2-review-grid>div[data-wide=true]{grid-column:1 / -1}
+
+/* Écran 69 — rejoindre une cohorte, liée à une opération */
+.v2-join-page{display:flex;min-height:100vh;align-items:center;flex-direction:column;gap:22px;background:var(--band);padding:36px 24px 64px}
+.v2-join-head{display:flex;width:640px;max-width:100%;align-items:center;flex-direction:column;gap:8px;text-align:center}
+.v2-join-mark{display:inline-grid;width:48px;height:48px;place-items:center;border-radius:10px;background:var(--ink);color:#fff;font:600 15px var(--font-v2-head),sans-serif}
+.v2-join-head h1{font-size:20px}
+.v2-join-head p{max-width:520px;margin:0;color:var(--text-2);font-size:13.5px}
+.v2-join-page .v2-wizard-card{width:640px;max-width:100%}
+.v2-join-pick{display:flex;align-items:center;justify-content:space-between;padding:20px 28px 0}
+.v2-join-pick .v2-nav-label{padding:0}
+.v2-join-operation{display:flex;align-items:center;gap:12px;border:1.5px solid #f5c6ae;border-radius:6px;background:var(--orange-soft);padding:12px 14px}
+.v2-join-operation>div{flex:1}
+.v2-join-operation b{display:block;font-size:13.5px}
+.v2-join-operation small{display:block;color:var(--text-3);font-size:12px}
+.v2-join-rules{display:flex;margin:0;padding:0;flex-direction:column;gap:8px;color:var(--text-2);font-size:12.5px;list-style:none}
+.v2-join-rules li{border-radius:6px;background:var(--band);padding:11px 12px}

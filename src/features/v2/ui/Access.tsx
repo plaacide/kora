@@ -93,7 +93,8 @@ export function AccessWizard({
       <div className="v2-access-wizard">
         <div className="v2-wizard-heading">
           <span>Partage et accès /</span>
-          <strong>Créer un accès</strong>
+          <strong>Série A 2026.</strong>
+          <em>Vous allez ouvrir une partie de cette data room à un invité.</em>
           <Link href="?">×</Link>
         </div>
         <AccessStepper current={current} />
@@ -271,6 +272,10 @@ function ReviewStep() {
       }
     >
       <div className="v2-review-grid">
+        <div data-wide="true">
+          <small>Opération</small>
+          <strong>Série A 2026 — Levée en capital · Nimba Solar</strong>
+        </div>
         <div>
           <small>Destinataire</small>
           <strong>Amina Diallo · Sahel Growth Fund</strong>
