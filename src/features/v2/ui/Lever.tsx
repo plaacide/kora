@@ -189,10 +189,15 @@ function ConfigureRaise() {
             <h2>Objectif</h2>
             <div className="v2-wizard-grid">
               <Field label="Nom de la levée" value="Série A 2026" />
-              <Field label="Stade" value="Série A" select />
+              <Field label="Stade" options={STAGES} value="Série A" />
               <Field label="Montant recherché" value="500 000 000" />
-              <Field label="Devise" value="XOF — Franc CFA" select />
-              <Field label="Instrument envisagé" value="Prise de participation" select wide />
+              <Field label="Devise" options={CURRENCIES} value="XOF — Franc CFA" />
+              <Field
+                label="Instrument envisagé"
+                options={INSTRUMENTS}
+                value="Prise de participation"
+                wide
+              />
             </div>
           </div>
         </div>
@@ -202,11 +207,11 @@ function ConfigureRaise() {
           <div>
             <h2>Conditions déclarées</h2>
             <div className="v2-wizard-grid">
-              <Field label="Ticket minimum" value="25 000 000" />
-              <Field label="Ticket maximum" value="150 000 000" />
-              <Field label="Recherche d’un lead" value="Oui" select />
-              <Field label="Valorisation déclarée" value="— facultatif" />
-              <Field label="Part de capital envisagée" value="— facultatif" wide />
+              <Field label="Ticket minimum" optional value="25 000 000" />
+              <Field label="Ticket maximum" optional value="150 000 000" />
+              <Field label="Recherche d’un lead" options={YES_NO} value="Oui" />
+              <Field label="Valorisation déclarée" optional value="" />
+              <Field label="Part de capital envisagée" optional value="20 – 25 %" wide />
             </div>
           </div>
         </div>
@@ -219,7 +224,11 @@ function ConfigureRaise() {
             <div className="v2-configure-gap" />
             <Field label="Zones géographiques" value="Afrique de l’Ouest · Europe" />
             <div className="v2-configure-gap" />
-            <Field label="Secteurs ou thèses pertinentes" value="Énergie distribuée · Climat" />
+            <Field
+              label="Secteurs ou thèses pertinentes"
+              optional
+              value="Énergie distribuée · Climat"
+            />
           </div>
         </div>
 
@@ -228,8 +237,8 @@ function ConfigureRaise() {
           <div>
             <h2>Calendrier et utilisation</h2>
             <div className="v2-wizard-grid">
-              <Field label="Date d’ouverture" value="29 juillet 2026" />
-              <Field label="Date cible de clôture" value="30 novembre 2026" />
+              <Field label="Date d’ouverture" type="date" value="2026-06-01" />
+              <Field label="Date cible de clôture" type="date" value="2026-11-30" />
             </div>
             <label className="v2-field v2-configure-textarea">
               <span>Principaux usages des fonds</span>
@@ -265,27 +274,85 @@ function ConfigureRaise() {
   );
 }
 
+/**
+ * Un champ du formulaire de levée.
+ *
+ * `options` rend une vraie liste déroulante. Le chevron seul ne suffisait
+ * pas : il donnait l'apparence d'une liste à un champ de saisie libre, où
+ * l'on pouvait taper n'importe quoi et où cliquer n'ouvrait rien.
+ *
+ * `type="date"` rend le sélecteur de date natif — un mini calendrier — au
+ * lieu d'une date écrite à la main, qu'il aurait fallu deviner à la lecture.
+ */
 function Field({
   label,
   value,
-  select = false,
+  options,
+  type,
+  optional = false,
   wide = false,
 }: {
   label: string;
   value: string;
-  select?: boolean;
+  options?: readonly string[];
+  type?: "date";
+  optional?: boolean;
   wide?: boolean;
 }) {
   return (
     <label className="v2-field" data-wide={wide}>
-      <span>{label}</span>
+      <span>
+        {label}
+        {optional && <small> — facultatif</small>}
+      </span>
       <span className="v2-control">
-        <input defaultValue={value} />
-        {select && <Icon name="chevron" />}
+        {options ? (
+          <>
+            <select defaultValue={value}>
+              {options.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
+            </select>
+            <Icon name="chevron" />
+          </>
+        ) : (
+          <input defaultValue={value} type={type ?? "text"} />
+        )}
       </span>
     </label>
   );
 }
+
+const STAGES = ["Pré-amorçage", "Amorçage", "Série A", "Série B", "Série C et plus"];
+const CURRENCIES = ["XOF — Franc CFA", "EUR — Euro", "USD — Dollar US", "GHS — Cedi"];
+const INSTRUMENTS = [
+  "Prise de participation",
+  "Obligation convertible",
+  "SAFE",
+  "Dette",
+];
+const YES_NO = ["Oui", "Non"];
+const INVESTOR_CATEGORIES = [
+  "VC",
+  "Fonds à impact",
+  "DFI",
+  "Business angel",
+  "Investisseur stratégique",
+  "Banque",
+];
+const PIPELINE_STAGES = [
+  "Contacté",
+  "En discussion",
+  "Diligence",
+  "Engagé",
+  "Écarté",
+];
+const TEAM = ["Amara Diallo", "Ibrahima Sy", "Fatou Ndiaye"];
+const INVESTORS = [
+  "Horizon Ventures — Kwame Mensah",
+  "Sahel Growth Fund — Aïcha Bâ",
+  "Kora Impact Partners — Nadia Mensah",
+];
 
 function RaiseOverview({ configured }: { configured: boolean }) {
   return (
@@ -573,7 +640,7 @@ function AddInvestorPanel() {
       </p>
       <div className="v2-wizard-grid">
         <Field label="Organisation" value="Kora Impact Partners" wide />
-        <Field label="Catégorie" value="VC" select />
+        <Field label="Catégorie" options={INVESTOR_CATEGORIES} value="VC" />
         <Field label="Contact principal" value="Nadia Mensah" />
         <Field label="Fonction" value="Partner" />
         <Field label="E-mail" value="nadia@koraimpact.com" wide />
@@ -583,10 +650,10 @@ function AddInvestorPanel() {
       <small className="v2-field-helper">Indicatif — jamais compté comme engagement.</small>
       <div className="v2-wizard-grid">
         <Field label="Source de la relation" value="Introduction — Dakar Accelerator" wide />
-        <Field label="Responsable interne" value="Amara Diallo" select />
-        <Field label="Étape initiale" value="Contacté" select />
+        <Field label="Responsable interne" options={TEAM} value="Amara Diallo" />
+        <Field label="Étape initiale" options={PIPELINE_STAGES} value="Contacté" />
         <Field label="Prochaine action" value="Envoyer le teaser" />
-        <Field label="Date de relance" value="2 août 2026" />
+        <Field label="Date de relance" type="date" value="2026-08-02" />
       </div>
       <label className="v2-field v2-configure-textarea">
         <span>Notes internes</span>
@@ -653,11 +720,11 @@ function InteractionPanel() {
         <legend>Type</legend>
         <div>{["E-mail", "Appel", "Réunion", "Événement", "Note", "Autre"].map((type) => <button data-active={type === "Réunion"} key={type} type="button">{type}</button>)}</div>
       </fieldset>
-      <div className="v2-wizard-grid"><Field label="Date" value="29 juillet 2026" /><Field label="Responsable" value="Ibrahima Sy" select /></div>
+      <div className="v2-wizard-grid"><Field label="Date" type="date" value="2026-07-29" /><Field label="Responsable" options={TEAM} value="Ibrahima Sy" /></div>
       <Field label="Participants" value="Kwame Mensah · Amara Diallo" wide />
       <label className="v2-field v2-configure-textarea"><span>Résumé</span><textarea defaultValue="Revue du plan de trésorerie. Kwame veut la table de capitalisation détaillée avant son comité interne du 8 août. Ton positif, questions sur la structure du tour." /></label>
       <Field label="Résultat" value="Positif — attend la cap table" wide />
-      <div className="v2-wizard-grid"><Field label="Prochaine action" value="Envoyer la cap table" /><Field label="Date de relance" value="30 juillet 2026" /></div>
+      <div className="v2-wizard-grid"><Field label="Prochaine action" value="Envoyer la cap table" /><Field label="Date de relance" type="date" value="2026-07-30" /></div>
       <p className="v2-panel-callout"><Icon name="mail" />Cette interaction est consignée par votre équipe — Sanza n’envoie ni ne détecte d’e-mail.</p>
     </PanelShell>
   );
@@ -667,14 +734,19 @@ function CommitmentPanel({ backView }: { backView: string }) {
   const close = queryHref(backView, backView === "pipeline" ? { panel: "investor" } : {});
   return (
     <PanelShell eyebrow="Déclaration de l’équipe" title="Enregistrer un engagement" closeHref={close} footer={<><Link href={close}>Annuler</Link><Link className="v2-btn" href={queryHref(backView)}>Enregistrer l’engagement</Link></>}>
-      <Field label="Investisseur" value="Horizon Ventures — Kwame Mensah" select wide />
+      <Field
+        label="Investisseur"
+        options={INVESTORS}
+        value="Horizon Ventures — Kwame Mensah"
+        wide
+      />
       <fieldset className="v2-level-choice">
         <legend>Niveau</legend>
         <label><input name="level" type="radio" /><span><strong>Intérêt indicatif</strong><small>Un ordre de grandeur évoqué — non compté dans le montant sécurisé</small></span></label>
         <label data-active="true"><input defaultChecked name="level" type="radio" /><span><strong>Soft-commit déclaré</strong><small>Intention communiquée explicitement, non contractuelle</small></span></label>
         <label><input name="level" type="radio" /><span><strong>Engagement confirmé</strong><small>Confirmation écrite ou term sheet signé</small></span></label>
       </fieldset>
-      <div className="v2-wizard-grid"><Field label="Montant" value="80 000 000" /><Field label="Devise" value="XOF" select /><Field label="Date" value="29 juillet 2026" wide /></div>
+      <div className="v2-wizard-grid"><Field label="Montant" value="80 000 000" /><Field label="Devise" options={CURRENCIES} value="XOF — Franc CFA" /><Field label="Date" type="date" value="2026-07-29" wide /></div>
       <Field label="Preuve ou référence" value="E-mail du 27-07-2026" wide />
       <label className="v2-field v2-configure-textarea"><span>Commentaire</span><textarea defaultValue="Confirmé oralement puis par e-mail — sous réserve du comité du 8 août." /></label>
       <p className="v2-panel-callout"><Icon name="shield" />Cet engagement est déclaré par votre équipe. Il n’est pas déduit de l’activité documentaire de l’investisseur.</p>

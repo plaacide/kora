@@ -126,6 +126,20 @@ const wizardSteps = [
   ["review", "Vérification"],
 ] as const;
 
+const RECIPIENTS = [
+  "Awa Cissé — Proparco",
+  "Kwame Mensah — Horizon Ventures",
+  "Aïcha Bâ — Sahel Growth Fund",
+  "Nadia Mensah — Kora Impact Partners",
+];
+
+const PERIODS = [
+  "Trimestre — T3 2026",
+  "Trimestre — T2 2026",
+  "Semestre — S1 2026",
+  "Exercice — 2025",
+];
+
 function UpdateWizard({ step }: { step: string }) {
   const currentIndex = Math.max(0, wizardSteps.findIndex(([key]) => key === step));
   return (
@@ -183,12 +197,26 @@ function AudienceStep() {
         </fieldset>
         <label className="v2-field">
           <span>Destinataires</span>
-          <span className="v2-control"><input defaultValue="Awa Cissé — Proparco" /><Icon name="chevron" /></span>
+          <span className="v2-control">
+            <select defaultValue="Awa Cissé — Proparco">
+              {RECIPIENTS.map((recipient) => (
+                <option key={recipient}>{recipient}</option>
+              ))}
+            </select>
+            <Icon name="chevron" />
+          </span>
           <small className="v2-field-helper">Une audience ne voit jamais les autres destinataires.</small>
         </label>
         <label className="v2-field">
           <span>Période</span>
-          <span className="v2-control"><input defaultValue="Trimestre — T3 2026" /><Icon name="chevron" /></span>
+          <span className="v2-control">
+            <select defaultValue="Trimestre — T3 2026">
+              {PERIODS.map((period) => (
+                <option key={period}>{period}</option>
+              ))}
+            </select>
+            <Icon name="chevron" />
+          </span>
         </label>
         <div className="v2-audience-summary">
           <Icon name="trend" />
