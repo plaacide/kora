@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Icon } from "./Icon";
 
 /**
@@ -80,7 +82,7 @@ export function CohortInvitationScreen() {
           </p>
 
           <div className="v2-invitation-actions">
-            <button className="v2-btn" type="button">Rejoindre la cohorte</button>
+            <Link className="v2-btn" href="?vue=cohorte&dealroom=1">Rejoindre la cohorte</Link>
             <button className="v2-btn" data-variant="secondary" type="button">
               Plus tard
             </button>
@@ -125,7 +127,7 @@ const CARD_FACTS: Array<[string, string]> = [
 export function DealroomConsentPanel() {
   return (
     <>
-      <div className="v2-scrim" />
+      <Link aria-label="Fermer" className="v2-scrim" href="?vue=cohorte" />
       <aside className="v2-sidepanel v2-consent-panel">
         <header>
           <div>
@@ -135,7 +137,7 @@ export function DealroomConsentPanel() {
               Dakar Accelerator.
             </p>
           </div>
-          <a aria-label="Fermer" href="#">×</a>
+          <Link aria-label="Fermer" href="?vue=cohorte">×</Link>
         </header>
 
         <div className="v2-sidepanel-body">
@@ -193,7 +195,7 @@ export function DealroomConsentPanel() {
         </div>
 
         <footer className="v2-sidepanel-footer">
-          <button className="v2-btn-quiet" type="button">Annuler</button>
+          <Link className="v2-btn-quiet" href="?vue=cohorte">Annuler</Link>
           <span className="v2-spacer" />
           <button className="v2-btn" data-variant="secondary" type="button">
             <Icon name="eye" />

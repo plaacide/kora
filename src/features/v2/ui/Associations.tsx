@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Icon } from "./Icon";
 
 /**
@@ -70,7 +72,7 @@ const SUGGESTED = DEPOSITS.reduce(
 export function AssociationsPanel() {
   return (
     <>
-      <div className="v2-scrim" />
+      <Link aria-label="Fermer" className="v2-scrim" href="?" />
       <aside className="v2-sidepanel v2-associations-panel">
         <header>
           <div>
@@ -80,7 +82,7 @@ export function AssociationsPanel() {
               avant de confirmer.
             </p>
           </div>
-          <a aria-label="Fermer" href="#">×</a>
+          <Link aria-label="Fermer" href="?">×</Link>
         </header>
 
         <div className="v2-sidepanel-body">
@@ -117,9 +119,9 @@ export function AssociationsPanel() {
         </div>
 
         <footer className="v2-sidepanel-footer">
-          <button className="v2-btn" data-variant="secondary" type="button">
+          <Link className="v2-btn" data-variant="secondary" href="?">
             Plus tard
-          </button>
+          </Link>
           <button className="v2-btn" type="button">
             Confirmer {CONFIRMED} associations
           </button>

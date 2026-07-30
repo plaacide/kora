@@ -115,7 +115,7 @@ export function GlobalActivityScreen() {
                   <p>
                     <b>{event.who}</b> <span className="v2-muted-3">{event.from}</span>{" "}
                     <span className="v2-muted-2">{event.verb}</span>{" "}
-                    <a href="#">{event.target}</a>
+                    <span className="v2-journal-target">{event.target}</span>
                   </p>
                   <span className="v2-tag">{event.operation}</span>
                   <span className="v2-journal-time">{event.time}</span>

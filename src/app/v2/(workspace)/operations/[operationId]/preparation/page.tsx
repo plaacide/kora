@@ -124,8 +124,8 @@ export default async function PreparationPage({
           <button data-active={filter === "À traiter"} key={filter} type="button">{filter}</button>
         ))}
         <i />
-        <button type="button">Par financeur⌄</button>
-        <button type="button">Par juridiction⌄</button>
+        <button type="button">Par financeur<Icon name="chevron" /></button>
+        <button type="button">Par juridiction<Icon name="chevron" /></button>
         <span><b>18</b> prêtes · <b>4</b> à fournir · <b>2</b> à actualiser</span>
       </div>
 

@@ -120,7 +120,7 @@ export function ActivityScreen() {
                   <p>
                     <b>{entry.who}</b> <span className="v2-muted-3">{entry.from}</span>{" "}
                     <span className="v2-muted-2">{entry.verb}</span>{" "}
-                    <a href="#">{entry.target}</a>
+                    <span className="v2-journal-target">{entry.target}</span>
                   </p>
                   <span className="v2-journal-place">{entry.place}</span>
                   <span className="v2-journal-time">{entry.time}</span>

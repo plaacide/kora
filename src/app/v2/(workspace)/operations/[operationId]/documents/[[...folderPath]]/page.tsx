@@ -37,6 +37,10 @@ export default async function DocumentsPage({
   const { operationId, folderPath } = await params;
   const { document, upload, associations, depot } = await searchParams;
   const currentFolder = folderPath?.at(-1);
+  // Pour que la visionneuse sache où revenir en fermant.
+  const viewerHref = `/v2/visionneuse?retour=${encodeURIComponent(
+    `${v2Routes.operations.documents(operationId, folderPath ?? [])}?document=financial-2025`,
+  )}`;
 
   if (!currentFolder) {
     return (
@@ -181,7 +185,9 @@ export default async function DocumentsPage({
                 </div>
                 <footer className="v2-sidepanel-footer">
                   <button type="button">Archiver</button>
-                  <button className="v2-btn" data-variant="secondary" type="button">Ouvrir la visionneuse</button>
+                  <Link className="v2-btn" data-variant="secondary" href={viewerHref}>
+                    Ouvrir la visionneuse
+                  </Link>
                   <button className="v2-btn" type="button">Remplacer (v3)</button>
                 </footer>
               </>

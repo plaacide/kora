@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Icon } from "./Icon";
 
 /**
@@ -13,13 +15,17 @@ import { Icon } from "./Icon";
 const PARAGRAPH_WIDTHS = [86, 70, 92, 64, 78, 58, 88, 72, 40];
 const CHART_BARS = [40, 62, 48, 80, 66, 92];
 
-export function SecureViewer() {
+export function SecureViewer({ retour }: { retour?: string }) {
   return (
     <div className="v2-viewer">
       <header className="v2-viewer-bar">
-        <a aria-label="Fermer la visionneuse" className="v2-viewer-close" href="#">
+        <Link
+          aria-label="Fermer la visionneuse"
+          className="v2-viewer-close"
+          href={retour || "/v2/operations"}
+        >
           ×
-        </a>
+        </Link>
         <div className="v2-viewer-title">
           <div>États financiers 2025.pdf</div>
           <div>Version active v2 · Finance et comptabilité · Série A 2026</div>

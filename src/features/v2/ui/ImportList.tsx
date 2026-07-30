@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Icon } from "./Icon";
 
 /**
@@ -46,14 +48,14 @@ const DETECTED: Array<{ title: string; origin: string; action: "Fusionner" | "Aj
 export function ImportListPanel() {
   return (
     <>
-      <div className="v2-scrim" />
+      <Link aria-label="Fermer" className="v2-scrim" href="?" />
       <aside className="v2-sidepanel v2-import-panel">
         <header>
           <div>
             <h2>Importer une liste de pièces reçue</h2>
             <p>Sanza convertit la liste en exigences, rattachées à leur source.</p>
           </div>
-          <a aria-label="Fermer" href="#">×</a>
+          <Link aria-label="Fermer" href="?">×</Link>
         </header>
 
         <div className="v2-sidepanel-body">
@@ -104,9 +106,9 @@ export function ImportListPanel() {
         </div>
 
         <footer className="v2-sidepanel-footer">
-          <button className="v2-btn" data-variant="secondary" type="button">
+          <Link className="v2-btn" data-variant="secondary" href="?">
             Annuler
-          </button>
+          </Link>
           <button className="v2-btn" type="button">
             Importer {DETECTED.length} exigences
           </button>
