@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 
 import { v2Routes } from "../navigation/routes";
 import { Icon, type IconName } from "./Icon";
+import { PushLink } from "./PushTransitions";
 
 const rail: Array<{
   href: string;
@@ -161,7 +162,9 @@ export function OperationShell({
     <>
       <aside className="v2-ctx">
         <div className="v2-ctx-head">
-          <Link className="v2-back" href="/v2/operations">← Toutes les opérations</Link>
+          <PushLink back className="v2-back" href={v2Routes.operations.list}>
+            ← Toutes les opérations
+          </PushLink>
           <button
             aria-expanded={pickerOpen}
             className="v2-ctx-title"

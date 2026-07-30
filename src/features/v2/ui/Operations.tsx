@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { OperationCard, OperationType } from "../domain/operation";
 import { v2Routes } from "../navigation/routes";
 import { Icon } from "./Icon";
+import { PushLink } from "./PushTransitions";
 import { RowMenu } from "./RowMenu";
 import { Standalone } from "./Shell";
 
@@ -69,7 +70,8 @@ function Row({ operation }: { operation: OperationCard }) {
           </div>
         )}
       </div>
-      <Link className="v2-btn-mini" href={href}>Ouvrir</Link>
+      {/* Entrer dans une opération est un changement de contexte : push. */}
+      <PushLink className="v2-btn-mini" href={href}>Ouvrir</PushLink>
       <RowMenu href={href} label={operation.name} />
     </article>
   );

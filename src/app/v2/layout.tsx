@@ -1,4 +1,5 @@
 import { requireV2Enabled } from "@/features/v2/server/feature";
+import { PushTransitions } from "@/features/v2/ui/PushTransitions";
 import "@/features/v2/ui/v2.css";
 
 export default async function V2Layout({
@@ -8,5 +9,10 @@ export default async function V2Layout({
 }) {
   await requireV2Enabled();
 
-  return children;
+  return (
+    <>
+      <PushTransitions />
+      {children}
+    </>
+  );
 }

@@ -789,6 +789,48 @@ button.v2-ctx-title[aria-expanded=true] .v2-icon{transform:rotate(180deg)}
 /* La barre ne bouge que sur un vrai changement de valeur (§8.12). */
 .v2-progress>span{transition:width var(--motion-slow) var(--motion-ease)}
 
+/* ---------------------------------------------------------------------------
+   Push plein écran — TRANSITIONS.md §3.
+   L'écran entrant vient de la droite ; le sortant recule d'un quart de largeur
+   en s'estompant, ce qui donne la profondeur. Les deux coexistent le temps de
+   l'animation : c'est précisément ce que l'API View Transitions permet, et la
+   raison pour laquelle `experimental.viewTransition` est activé.
+
+   Ces sélecteurs vivent hors de `.v2` : les pseudo-éléments de transition sont
+   attachés à la racine du document, pas au conteneur. La feuille n'est chargée
+   que par le layout `/v2`, donc la portée reste celle de la V2.
+   --------------------------------------------------------------------------- */
+@keyframes v2-push-in{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes v2-push-out{from{transform:translateX(0);opacity:1}to{transform:translateX(-24%);opacity:.55}}
+@keyframes v2-pop-in{from{transform:translateX(-24%);opacity:.55}to{transform:translateX(0);opacity:1}}
+@keyframes v2-pop-out{from{transform:translateX(0)}to{transform:translateX(100%)}}
+
+::view-transition-old(root){animation:v2-push-out var(--motion-push,480ms) cubic-bezier(.32,.72,.24,1) both}
+::view-transition-new(root){animation:v2-push-in var(--motion-push,480ms) cubic-bezier(.32,.72,.24,1) both}
+
+/* Retour : le mouvement strictement inverse. `data-nav="back"` est posé sur
+   `<html>` juste avant la navigation — sans lui, revenir en arrière pousserait
+   encore vers la gauche et la profondeur mentirait sur le sens du parcours. */
+html[data-nav="back"]::view-transition-old(root){animation:v2-pop-out var(--motion-push,480ms) cubic-bezier(.32,.72,.24,1) both}
+html[data-nav="back"]::view-transition-new(root){animation:v2-pop-in var(--motion-push,480ms) cubic-bezier(.32,.72,.24,1) both}
+
+/* Le sortant passe au-dessus au retour, sinon il disparaît sous l'entrant. */
+::view-transition-group(root){isolation:auto}
+html[data-nav="back"]::view-transition-old(root){z-index:1}
+
+/* Le rail global ne participe pas au push : il est identique des deux côtés,
+   et le voir glisser donnerait l'impression que toute l'application part. */
+.v2-rail{view-transition-name:v2-rail}
+::view-transition-group(v2-rail){animation-duration:0s}
+
+@media(prefers-reduced-motion:reduce){
+  ::view-transition-old(root),::view-transition-new(root),
+  html[data-nav="back"]::view-transition-old(root),
+  html[data-nav="back"]::view-transition-new(root){
+    animation:v2-fade 150ms linear both!important;
+  }
+}
+
 /* Mouvement réduit — TRANSITIONS.md §2 : REMPLACER les mouvements par un
    fondu de 150 ms, pas les supprimer. Tout couper ferait apparaître les
    panneaux d'un coup, sans qu'on sache d'où ils viennent ; le fondu garde le
