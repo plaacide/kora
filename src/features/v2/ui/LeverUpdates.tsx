@@ -85,9 +85,12 @@ function UpdatesList() {
       }
     >
       <div className="v2-update-filter">
-        <button type="button">Période⌄</button>
-        <button type="button">Audience⌄</button>
-        <button type="button">Instrument⌄</button>
+        {["Période", "Audience", "Instrument"].map((filter) => (
+          <button key={filter} type="button">
+            {filter}
+            <Icon name="chevron" />
+          </button>
+        ))}
         <span>4 mises à jour</span>
       </div>
       <div className="v2-update-table-wrap">

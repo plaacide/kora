@@ -235,7 +235,7 @@ function SecurityStep() {
               <span />
             </button>
             <div><strong>{title}</strong><small>{description}</small></div>
-            {key === "nda" ? <button type="button">NDA standard⌄</button> : key !== "download" && <span className="v2-tag">Recommandé</span>}
+            {key === "nda" ? <button type="button">NDA standard<Icon name="chevron" /></button> : key !== "download" && <span className="v2-tag">Recommandé</span>}
           </div>
         ))}
       </div>

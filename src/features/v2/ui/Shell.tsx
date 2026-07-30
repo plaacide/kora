@@ -144,7 +144,7 @@ export function OperationShell({
           : currentSection === "access"
             ? { label: "Créer un accès", href: `${path}?share=recipient` }
           : currentSection === "lever"
-            ? { label: "Ajouter un investisseur", href: `${root}/lever?view=pipeline&panel=add` }
+            ? null // Lever affiche ses propres actions dans sa page.
           : currentSection === "activity"
             ? { label: "Exporter", href: `${path}?export=1`, secondary: true }
           : currentSection === "investors"
