@@ -58,8 +58,14 @@ export async function resolveVersionAccess(
 
   const doc = version.documents as unknown as ViewerDoc;
 
-  const { data: level } = await supabase.rpc("my_permission", {
-    p_folder: doc.folder_id,
+  // `my_document_permission` et non `my_permission` : depuis
+  // `20260731210000_documents_racine.sql`, une pièce peut n'avoir aucun
+  // dossier. `my_permission(null)` rend « none » — la visionneuse aurait
+  // refusé la pièce à celui-là même qui vient de la déposer. La nouvelle
+  // fonction part du document : elle remonte l'arborescence quand il est
+  // rangé, et s'en tient à l'équipe interne quand il est à la racine.
+  const { data: level } = await supabase.rpc("my_document_permission", {
+    p_doc: doc.id,
   });
 
   if (!level || level === "none") {

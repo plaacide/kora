@@ -1,81 +1,114 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
+import { useCallback, useState } from "react";
+
+import { PageImage } from "@/components/viewer/PageImage";
+import type { ViewerDocument } from "@/features/v2/server/viewer";
 import { Icon } from "./Icon";
 
 /**
  * Écran 19 — Visionneuse sécurisée.
  * Repris de `sanza_handoff/maquettes/screens/19-visionneuse.html`.
  *
- * Le fichier source ne quitte jamais le serveur : la page est rendue, puis
- * filigranée au nom du lecteur et à l'horodatage de sa consultation. Le
- * téléchargement reste désactivé tant que l'accès ne l'autorise pas — le
- * bouton est visible mais inerte, et son titre dit pourquoi.
+ * Le fichier source ne quitte jamais le serveur. Chaque page arrive en image
+ * DÉJÀ rendue par `/api/viewer/[versionId]/[page]`, et le filigrane y est
+ * incrusté dans les pixels — pas posé en surimpression CSS, qui se retire en
+ * trois clics dans l'inspecteur.
+ *
+ * Le rendu des pages réutilise `PageImage` de la V1 : chargement à l'approche
+ * de l'écran, libération mémoire au défilement, filet de secours quand
+ * l'observateur d'intersection ne se déclenche pas. Le réécrire pour la V2
+ * aurait dupliqué un mécanisme éprouvé — et ses correctifs.
  */
 
-const PARAGRAPH_WIDTHS = [86, 70, 92, 64, 78, 58, 88, 72, 40];
-const CHART_BARS = [40, 62, 48, 80, 66, 92];
+/** Ce que chaque niveau autorise, dit au lecteur. */
+const LEVEL_NOTE: Record<string, string> = {
+  watermark: "Lecture filigranée active",
+  view: "Lecture seule",
+  download: "Lecture et téléchargement",
+  edit: "Accès complet",
+};
 
-export function SecureViewer({ retour }: { retour?: string }) {
+export function SecureViewer({
+  document,
+  retour,
+}: {
+  document: ViewerDocument;
+  retour?: string;
+}) {
+  const [pageCount, setPageCount] = useState(0);
+  const [current, setCurrent] = useState(1);
+
+  const onPageCount = useCallback((n: number) => setPageCount(n), []);
+  const onVisible = useCallback((page: number) => setCurrent(page), []);
+
+  const canDownload = document.level === "download" || document.level === "edit";
+  const pages = pageCount > 0 ? pageCount : 1;
+
   return (
     <div className="v2-viewer">
       <header className="v2-viewer-bar">
         <Link
           aria-label="Fermer la visionneuse"
           className="v2-viewer-close"
-          href={retour || "/v2/operations"}
+          href={retour || `/v2/operations/${document.operationId}/documents`}
         >
           ×
         </Link>
         <div className="v2-viewer-title">
-          <div>États financiers 2025.pdf</div>
-          <div>Version active v2 · Finance et comptabilité · Série A 2026</div>
+          <div>{document.documentName}</div>
+          <div>
+            Version active v{document.versionNo}
+            {document.folderName ? ` · ${document.folderName}` : " · Racine"} ·{" "}
+            {document.operationName}
+          </div>
         </div>
         <span className="v2-viewer-flag">
           <Icon name="eye" />
-          Lecture filigranée active
+          {LEVEL_NOTE[document.level] ?? "Lecture"}
         </span>
-        <button className="v2-viewer-icon" type="button" aria-label="Réduire">
-          <Icon name="chevron" />
-        </button>
-        <span className="v2-viewer-zoom">92 %</span>
-        <button className="v2-viewer-icon" type="button" aria-label="Agrandir">
-          <Icon name="plus" />
-        </button>
-        <span
-          className="v2-viewer-download"
-          title="Téléchargement désactivé pour votre accès"
-        >
-          Télécharger
-        </span>
+
+        {canDownload ? (
+          <a
+            className="v2-viewer-download"
+            data-active="true"
+            href={`/api/document/${document.versionId}/download`}
+          >
+            Télécharger
+          </a>
+        ) : (
+          <span
+            className="v2-viewer-download"
+            title="Téléchargement désactivé pour votre accès"
+          >
+            Télécharger
+          </span>
+        )}
       </header>
 
       <div className="v2-viewer-stage">
-        <div className="v2-page">
-          <div className="v2-page-content">
-            <div className="v2-page-title">Nimba Solar SAS</div>
-            <div className="v2-page-sub">
-              États financiers — exercice clos le 31 décembre 2025
-            </div>
-            <div className="v2-page-lines">
-              {PARAGRAPH_WIDTHS.map((width, index) => (
-                <span key={index} style={{ width: `${width}%` }} />
-              ))}
-              <div className="v2-page-chart">
-                {CHART_BARS.map((height, index) => (
-                  <span key={index} style={{ height: `${height}%` }} />
-                ))}
-              </div>
-            </div>
-          </div>
-          {/* Le filigrane porte le lecteur et l'heure — il identifie une fuite. */}
-          <div aria-hidden="true" className="v2-watermark">
-            <span>amina.diallo@sahelgrowth.com · 28-07-2026 14:12</span>
-          </div>
-        </div>
+        {/* `PageImage` porte son propre état d'échec : un format non rendable
+            (tableur, archive) affiche sa propre explication à la place de
+            l'image, sans faire tomber la visionneuse entière. */}
+        {Array.from({ length: pages }, (_, index) => (
+          <PageImage
+            alt={`${document.documentName} — page ${index + 1}`}
+            className="v2-page"
+            eager={index < 2}
+            key={index}
+            onPageCount={onPageCount}
+            onVisible={onVisible}
+            page={index + 1}
+            versionId={document.versionId}
+          />
+        ))}
       </div>
 
       <footer className="v2-viewer-foot">
-        <span>Page 3 sur 24</span>
+        <span>
+          {pageCount > 0 ? `Page ${current} sur ${pageCount}` : "Chargement…"}
+        </span>
         <span>·</span>
         <span>Chaque consultation est journalisée</span>
       </footer>

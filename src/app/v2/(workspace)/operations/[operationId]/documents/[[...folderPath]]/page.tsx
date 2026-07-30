@@ -268,6 +268,17 @@ export default async function DocumentsPage({
                       </div>
                     </div>
                   </div>
+                  <footer className="v2-sidepanel-footer">
+                    <Link
+                      className="v2-btn"
+                      data-variant="secondary"
+                      href={`/v2/visionneuse?document=${opened.id}&retour=${encodeURIComponent(
+                        `${v2Routes.operations.documents(operationId, folderPath ?? [])}?document=${opened.id}`,
+                      )}`}
+                    >
+                      Ouvrir la visionneuse
+                    </Link>
+                  </footer>
                 </>
               )
             )}

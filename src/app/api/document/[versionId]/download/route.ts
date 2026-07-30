@@ -46,8 +46,11 @@ export async function GET(
     deals: { id: string; org_id: string };
   };
 
-  const { data: level } = await supabase.rpc("my_permission", {
-    p_folder: doc.folder_id,
+  // Part du DOCUMENT, pas du dossier : une pièce déposée à la racine n'en a
+  // pas, et `my_permission(null)` l'aurait rendue intéléchargeable même pour
+  // son auteur. Voir `20260731210000_documents_racine.sql`.
+  const { data: level } = await supabase.rpc("my_document_permission", {
+    p_doc: doc.id,
   });
 
   // Fermé par défaut : seuls 'download' et 'edit' ouvrent l'original.
