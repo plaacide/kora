@@ -201,7 +201,21 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ ⚪ Liste des appareils      Supabase ne l'expose pas. L'écran le dit.
    └─ ⚪ Codes de récupération    non faits : les générer serait facile, les
                                     faire fonctionner ne l'est pas
-🔴 Abonnement                     —                     ATTEND : décisions produit
+🟢 Abonnement (68)                workspacePlan(), workspaceConsumption()
+   ├─ 🟢 Plan en cours            les neuf plans, leurs prix réels en base
+   ├─ 🟢 Usage                    compté sur les données, jamais incrémenté
+   ├─ 🟢 Opérations comptées      une archive ne compte pas
+   ├─ 🟢 Droits du plan           43 fonctionnalités, entitlements par plan
+   ├─ 🟢 Changer de plan          set_workspace_plan() — §14 montée immédiate,
+   │                                §15 descente ANNONCÉE, jamais appliquée
+   │                                avant la fin de la période payée
+   ├─ 🟢 Résilier                 cancel_workspace_subscription()
+   ├─ 🟡 Prestataire de paiement  BillingProvider posé ; seul le mode MANUEL
+   │                                est implémenté (virement, facture,
+   │                                activation). Genius Pay attend leur doc.
+   └─ 🔴 Faire respecter la limite §15 : empêcher la CRÉATION au-delà, sans
+                                    jamais supprimer. Écrit en base, pas
+                                    encore appliqué aux écrans.
 ```
 
 ## Ce que le rail affiche
@@ -332,8 +346,8 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 Toutes appliquées sur staging (`jourzsgjnutktsrgxkoo`), y compris
 `lecteur_interne`, `engagements`, `mises_a_jour`, `gerer_l_equipe`,
 `inviter_un_collaborateur`, `journal_de_securite` et
-`interactions_pipeline` et `engagement_de_la_relation`. Aucune n'est en
-attente.
+`interactions_pipeline`, `engagement_de_la_relation`, `socle_abonnements`,
+`changer_de_plan` et `descente_differee`. Aucune n'est en attente.
 
 Aucune n'a été portée en production. Le fondateur a levé la contrainte de
 compatibilité V1 : produit en pré-lancement, les changements de modèle sont
@@ -355,5 +369,6 @@ autorisés — mais staging reste la première étape.
 9. **Cohortes** (31-32) — `cohort_links` n'existe pas.
 10. ~~Sécurité~~ — faite le 2 août. Restent les codes de récupération, qui
    demandent une mécanique de secours propre.
-11. **Abonnement** — `/v2/abonnement` affiche une fixture et n'est atteignable
-   depuis aucun rail : à trancher avant de le brancher.
+11. ~~Abonnement~~ — socle, service d'entitlements et écran faits le 3 août.
+   Restent deux choses : faire RESPECTER les limites (§15) et brancher
+   Genius Pay derrière `BillingProvider`.
