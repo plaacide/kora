@@ -1045,8 +1045,13 @@ function ReviewStep({
           </section>
 
           {demande.trim() && (
+            // Même forme que sur la mise à jour publiée : l'aperçu ne vaut que
+            // s'il montre ce que le destinataire verra, à la virgule près.
             <section className="v2-preview-request">
-              <strong>Demande :</strong> {demande}
+              <Icon name="trend" />
+              <span>
+                <strong>Demande :</strong> {demande}
+              </span>
             </section>
           )}
         </div>
@@ -1182,7 +1187,10 @@ function UpdatePublished({
 
       {maj.demande && (
         <p className="v2-preview-request">
-          <strong>Demande :</strong> {maj.demande}
+          <Icon name="trend" />
+          <span>
+            <strong>Demande :</strong> {maj.demande}
+          </span>
         </p>
       )}
 
