@@ -362,9 +362,67 @@ export interface IndicateurRetenu {
   definition: string;
   periode: string;
   valeur: string;
+  /**
+   * L'unité du chiffre : « XOF », « % », « x », « mois »…
+   *
+   * Elle est saisie AVEC la valeur et non déduite du catalogue : « 123 000 »
+   * ne veut rien dire sans savoir en quoi, et l'entreprise qui lève en euros
+   * ne se laissera pas afficher des francs CFA parce que le catalogue dit
+   * « montant ».
+   */
+  unite?: string;
   /** « +9 % vs T1 », « stable » — la comparaison, facultative. */
   precision?: string;
   verification: "declare" | "verifie";
+}
+
+/**
+ * Les unités proposées, par famille d'indicateur.
+ *
+ * Une liste fermée serait fausse — une entreprise mesure ce qu'elle veut — donc
+ * c'est une SUGGESTION : le champ reste libre. Les devises viennent en tête
+ * pour les montants, parce que c'est le cas qui revient.
+ */
+export const DEVISES = ["XOF", "EUR", "USD", "GHS", "NGN", "MAD", "TND"] as const;
+
+export function unitesSuggerees(d: Definition | null): readonly string[] {
+  if (!d) return [...DEVISES];
+  if (d.unite === "montant" || d.unite.startsWith("montant"))
+    return [...DEVISES];
+  return [d.unite];
+}
+
+/**
+ * La valeur telle qu'elle se lit — « 123 000 XOF », « 10 % », « 1,6x ».
+ *
+ * Le chiffre est saisi à la main : on le formate s'il EST un nombre, et on le
+ * laisse tel quel sinon. « Respectés » n'a pas de séparateur de milliers, et
+ * forcer un format sur ce qu'on ne comprend pas revient à effacer ce que le
+ * fondateur a voulu écrire.
+ */
+export function valeurLisible(indicateur: {
+  valeur: string;
+  unite?: string;
+}): string {
+  const brut = indicateur.valeur.trim();
+  if (!brut) return "—";
+
+  const unite = indicateur.unite?.trim();
+  const nombre = Number(brut.replace(/\s/g, "").replace(",", "."));
+
+  if (!Number.isFinite(nombre) || brut === "") {
+    return unite ? `${brut} ${unite}` : brut;
+  }
+
+  const chiffres = nombre.toLocaleString("fr-FR", {
+    maximumFractionDigits: 2,
+  });
+
+  if (!unite) return chiffres;
+  // « 1,6x » et « 10 % » ne se ponctuent pas pareil : le signe pourcent prend
+  // une espace en français, le multiplicateur se colle au nombre.
+  if (unite === "x") return `${chiffres}${unite}`;
+  return `${chiffres} ${unite}`;
 }
 
 export const VERIFICATIONS = [

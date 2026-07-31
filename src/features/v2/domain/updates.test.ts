@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   CATALOGUE,
+  definition,
+  unitesSuggerees,
+  valeurLisible,
   disponibles,
   famillesRecommandees,
   pourquoiCesIndicateurs,
@@ -110,5 +113,40 @@ describe("catalogue", () => {
     for (const d of CATALOGUE) {
       expect(d.definition.trim().length).toBeGreaterThan(10);
     }
+  });
+});
+
+describe("valeurLisible", () => {
+  it("sépare les milliers et pose l'unité", () => {
+    expect(valeurLisible({ valeur: "123000", unite: "XOF" })).toBe(
+      "123\u202f000 XOF",
+    );
+  });
+
+  it("colle le multiplicateur au nombre, contrairement au pourcent", () => {
+    expect(valeurLisible({ valeur: "1,6", unite: "x" })).toBe("1,6x");
+    expect(valeurLisible({ valeur: "10", unite: "%" })).toBe("10 %");
+  });
+
+  it("laisse tel quel ce qui n'est pas un nombre", () => {
+    expect(valeurLisible({ valeur: "Respectés" })).toBe("Respectés");
+  });
+
+  it("rend un tiret sur une valeur vide", () => {
+    expect(valeurLisible({ valeur: "   " })).toBe("—");
+  });
+
+  it("n'invente aucune unité quand aucune n'est donnée", () => {
+    expect(valeurLisible({ valeur: "68" })).toBe("68");
+  });
+});
+
+describe("unitesSuggerees", () => {
+  it("propose les devises pour un montant", () => {
+    expect(unitesSuggerees(definition("revenu"))).toContain("XOF");
+  });
+
+  it("propose l'unité propre à l'indicateur sinon", () => {
+    expect(unitesSuggerees(definition("dscr"))).toEqual(["x"]);
   });
 });

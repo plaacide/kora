@@ -25,6 +25,8 @@ import {
   pourquoiCesIndicateurs,
   recommandes,
   trimestreEchu,
+  unitesSuggerees,
+  valeurLisible,
   VERIFICATIONS,
   type Definition,
   type Financeur,
@@ -622,6 +624,7 @@ function IndicatorStep({
               definition: d.definition,
               periode,
               valeur: "",
+              unite: unitesSuggerees(d)[0],
               verification: "declare",
             },
           ],
@@ -724,11 +727,28 @@ function IndicatorStep({
                 <label>
                   <span>Valeur</span>
                   <input
+                    inputMode="decimal"
                     onChange={(event) =>
                       modifier(i.cle, { valeur: event.target.value })
                     }
                     value={i.valeur}
                   />
+                </label>
+                <label>
+                  <span>Unité</span>
+                  <input
+                    list="unites-perso"
+                    onChange={(event) =>
+                      modifier(i.cle, { unite: event.target.value })
+                    }
+                    placeholder="XOF, %, jours…"
+                    value={i.unite ?? ""}
+                  />
+                  <datalist id="unites-perso">
+                    {unitesSuggerees(null).map((u) => (
+                      <option key={u} value={u} />
+                    ))}
+                  </datalist>
                 </label>
                 <label>
                   <span>Statut</span>
@@ -856,12 +876,34 @@ function IndicatorGroup({
               <span>Valeur</span>
               <input
                 disabled={!retenu}
+                inputMode="decimal"
                 onChange={(event) =>
                   modifier(d.cle, { valeur: event.target.value })
                 }
-                placeholder={d.unite}
+                placeholder="0"
                 value={retenu?.valeur ?? ""}
               />
+            </label>
+            <label>
+              {/* L'unité se saisit AVEC la valeur : « 123 000 » ne veut rien
+                  dire sans savoir en quoi, et une entreprise qui lève en euros
+                  ne se laissera pas afficher des francs CFA. La liste suggère,
+                  le champ reste libre. */}
+              <span>Unité</span>
+              <input
+                disabled={!retenu}
+                list={`unites-${d.cle}`}
+                onChange={(event) =>
+                  modifier(d.cle, { unite: event.target.value })
+                }
+                placeholder={d.unite}
+                value={retenu?.unite ?? ""}
+              />
+              <datalist id={`unites-${d.cle}`}>
+                {unitesSuggerees(d).map((u) => (
+                  <option key={u} value={u} />
+                ))}
+              </datalist>
             </label>
             <label>
               <span>Statut</span>
@@ -1053,7 +1095,7 @@ function ReviewStep({
                 {publiables.map((i) => (
                   <div key={i.cle}>
                     <span>{i.libelle}</span>
-                    <strong>{i.valeur}</strong>
+                    <strong>{valeurLisible(i)}</strong>
                     <small>{i.precision ?? "—"}</small>
                     <em>{libelleVerification(i.verification)}</em>
                   </div>
@@ -1063,13 +1105,19 @@ function ReviewStep({
           </section>
 
           {demande.trim() && (
-            // Même forme que sur la mise à jour publiée : l'aperçu ne vaut que
-            // s'il montre ce que le destinataire verra, à la virgule près.
-            <section className="v2-preview-request">
-              <Icon name="trend" />
-              <span>
-                <strong>Demande :</strong> {demande}
-              </span>
+            // La demande est un bloc DANS une section, pas la section
+            // elle-même : sinon son fond prend toute la largeur de l'aperçu
+            // pendant que le tableau d'indicateurs reste en retrait, et les
+            // deux ne s'alignent plus. Même forme que sur la mise à jour
+            // publiée — l'aperçu ne vaut que s'il montre ce que le
+            // destinataire verra, à la virgule près.
+            <section>
+              <p className="v2-preview-request">
+                <Icon name="trend" />
+                <span>
+                  <strong>Demande :</strong> {demande}
+                </span>
+              </p>
             </section>
           )}
         </div>
@@ -1156,7 +1204,19 @@ function UpdatePublished({
   }
 
   return (
-    <article className="v2-published-update">
+    <>
+      {/* Le fil d'Ariane de la maquette 50 : sans lui, la carte se collait au
+          bandeau et rien ne disait d'où l'on venait. */}
+      <div className="v2-updates-crumb">
+        <Link href={href("updates")}>Lever · Mises à jour</Link>
+        <span>›</span>
+        <strong>
+          {maj.periode} — {financeurCourt(maj.financeur)} (
+          {instrumentCourt(maj.instrument).toLowerCase()})
+        </strong>
+      </div>
+
+      <article className="v2-published-update">
       <div className="v2-lever-actions">
         <button
           className="v2-btn"
@@ -1196,7 +1256,7 @@ function UpdatePublished({
             .map((i) => (
               <div key={i.cle}>
                 <span>{i.libelle}</span>
-                <strong>{i.valeur}</strong>
+                <strong>{valeurLisible(i)}</strong>
                 <small>{libelleVerification(i.verification)}</small>
               </div>
             ))}
@@ -1273,7 +1333,8 @@ function UpdatePublished({
           Les consultations sont des signaux de lecture — ni une approbation du
           contenu, ni une intention de financement.
         </p>
-      </section>
-    </article>
+        </section>
+      </article>
+    </>
   );
 }

@@ -13,6 +13,7 @@ import type { AuthState } from "@/lib/validation/auth";
 import { createClient } from "@/lib/supabase/client";
 import { cheminInterne } from "@/lib/redirect";
 import { Icon } from "./Icon";
+import { SanzaWordmark } from "./Logo";
 
 const ERROR_MESSAGES: Record<string, string> = {
   invalidCredentials: "Adresse e-mail ou mot de passe incorrect.",
@@ -103,9 +104,8 @@ function FieldError({
 function AuthHeader() {
   return (
     <header className="v2-auth-header">
-      <Link className="v2-brand" href="/v2">
-        <span>S</span>
-        Sanza
+      <Link aria-label="Sanza" className="v2-brand" href="/v2">
+        <SanzaWordmark height={24} />
       </Link>
       <span className="v2-auth-language">Français</span>
     </header>

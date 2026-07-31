@@ -161,10 +161,12 @@ export function Lever({
     );
   }
   if (current === "updates") {
-    // L'assistant et la mise à jour publiée occupent tout l'écran : les
-    // onglets ne s'affichent qu'au-dessus de la LISTE, comme la maquette 46 le
-    // montre et comme les maquettes 47 à 49 l'omettent.
-    const pleinEcran = majCourante !== null || query.step === "nouvelle";
+    // Seul l'ASSISTANT occupe tout l'écran : les maquettes 47 à 49 n'ont ni
+    // onglets ni fil d'Ariane, on y est en train de composer. La maquette 50,
+    // elle, remet les deux au-dessus de la mise à jour publiée — sans eux la
+    // carte se collait au bandeau et on ne savait plus d'où l'on venait.
+    const pleinEcran =
+      query.step === "nouvelle" || majCourante?.statut === "brouillon";
 
     const contenu = (
       <LeverUpdates
@@ -182,7 +184,9 @@ export function Lever({
       <LeverFrame
         current="updates"
         actions={
-          majListe.length > 0 ? (
+          // La mise à jour publiée porte ses propres actions — corriger,
+          // enchaîner — et n'a que faire de « Créer une mise à jour ».
+          majCourante === null && majListe.length > 0 ? (
             <Link
               className="v2-btn"
               href={queryHref("updates", { step: "nouvelle" })}

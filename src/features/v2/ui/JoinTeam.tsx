@@ -8,6 +8,7 @@ import { acceptV2TeamInvitation } from "@/app/v2/rejoindre-equipe/actions";
 import { v2Routes } from "@/features/v2/navigation/routes";
 
 import { Icon } from "./Icon";
+import { SanzaMark } from "./Logo";
 
 export type EtatInvitation =
   | "valide"
@@ -78,7 +79,7 @@ export function JoinTeam({
   return (
     <main className="v2-auth-page">
       <section className="v2-auth-card">
-        <span className="v2-auth-logo">a</span>
+        <SanzaMark size={38} />
 
         {etat !== "valide" ? (
           <>

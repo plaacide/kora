@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 
 import { v2Routes } from "../navigation/routes";
 import { Icon, type IconName } from "./Icon";
+import { SanzaMark, SanzaWordmark } from "./Logo";
 import { PushLink } from "./PushTransitions";
 
 /**
@@ -130,8 +131,14 @@ export function WorkspaceShell({
           data-expanded={expanded}
         >
           <div className="v2-rail-head">
-            <Link className="v2-mark" href="/v2" aria-label="Sanza">S</Link>
-            {expanded && <span className="v2-rail-brand">Sanza</span>}
+            <Link className="v2-mark" href="/v2" aria-label="Sanza">
+              <SanzaMark size={30} />
+            </Link>
+            {expanded && (
+              <span className="v2-rail-brand">
+                <SanzaWordmark height={20} />
+              </span>
+            )}
             <button
               aria-expanded={expanded}
               aria-label={expanded ? "Replier la navigation" : "Déplier la navigation"}
