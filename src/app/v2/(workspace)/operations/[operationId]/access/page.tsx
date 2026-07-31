@@ -1,24 +1,109 @@
-import { AccessTable, AccessWizard, RequestPanel } from "@/features/v2/ui/Access";
+import { listAccesses, shareableFolders } from "@/features/v2/server/access";
+import { listDocuments } from "@/features/v2/server/documents";
+import { listOperations } from "@/features/v2/server/operations";
+import { requireV2Workspace } from "@/features/v2/server/session";
+import {
+  AccessTable,
+  AccessWizard,
+  GuestPreview,
+  RequestPanel,
+} from "@/features/v2/ui/Access";
 
+/**
+ * Écrans 20 à 25 — le partage.
+ *
+ * L'assistant porte ses valeurs dans l'URL d'une étape à l'autre : un
+ * rechargement en cours de route ne perd rien, et rien n'est écrit avant la
+ * dernière étape.
+ */
 export default async function AccessPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ operationId: string }>;
   searchParams: Promise<{
     share?: string;
     request?: string;
-    preview?: string;
     sent?: string;
+    lien?: string;
+    apercu?: string;
+    dossier?: string;
+    email?: string;
+    level?: string;
+    nda?: string;
+    expires?: string;
   }>;
 }) {
-  const query = await searchParams;
+  const [{ operationId }, query] = await Promise.all([params, searchParams]);
+  const { organization } = await requireV2Workspace();
+
+  const nomOperation = async () => {
+    const operations = await listOperations(organization.id);
+    return (
+      operations.find((operation) => operation.id === operationId)?.name ??
+      "cette opération"
+    );
+  };
 
   if (query.share) {
-    return <AccessWizard step={query.share} preview={query.preview === "1"} />;
+    const [folders, name] = await Promise.all([
+      shareableFolders(operationId),
+      nomOperation(),
+    ]);
+
+    return (
+      <AccessWizard
+        draft={{
+          email: query.email ?? "",
+          level: query.level ?? "watermark",
+          nda: query.nda ?? "1",
+          expires: query.expires ?? "",
+        }}
+        folders={folders}
+        operationId={operationId}
+        operationName={name}
+        step={query.share}
+      />
+    );
+  }
+
+  const accesses = await listAccesses(operationId);
+
+  if (query.apercu) {
+    const acces = accesses.find((row) => row.id === query.apercu);
+
+    if (acces) {
+      const [folders, name] = await Promise.all([
+        shareableFolders(operationId),
+        nomOperation(),
+      ]);
+
+      // Sans dossier choisi, on ouvre le premier : un aperçu vide n'apprend
+      // rien à qui veut vérifier ce que l'invité voit.
+      const folderId = query.dossier || folders[0]?.id || null;
+      const documents = folderId
+        ? await listDocuments(operationId, folderId)
+        : [];
+
+      return (
+        <GuestPreview
+          access={acces}
+          documents={documents}
+          folderId={folderId}
+          folders={folders}
+          operationName={name}
+        />
+      );
+    }
   }
 
   return (
     <>
-      <AccessTable sent={query.sent === "1"} />
+      <AccessTable
+        accesses={accesses}
+        lien={query.lien ?? null}
+        sent={query.sent === "1" ? "1" : query.sent === "manuel" ? "manuel" : null}
+      />
       {query.request === "1" && <RequestPanel />}
     </>
   );

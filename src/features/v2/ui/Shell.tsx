@@ -171,11 +171,14 @@ export function OperationShell({
   children,
   operationId,
   folders = [],
+  activeAccesses = 0,
 }: {
   children: ReactNode;
   operationId: string;
   /** Dossiers racine de l'opération, lus en base par le layout. */
   folders?: readonly string[];
+  /** Accès réellement ouverts. Le bandeau annonçait « 3 » en toutes lettres. */
+  activeAccesses?: number;
 }) {
   const path = usePathname();
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -220,7 +223,10 @@ export function OperationShell({
           ? "Rechercher…"
           : "Rechercher";
 
-  const shared = currentSection === "access" || currentSection === "lever";
+  // « Partagée » ne dépend pas de l'écran qu'on regarde mais de l'existence
+  // d'un accès ouvert : la data room ne devenait « partagée » que parce qu'on
+  // avait cliqué sur l'onglet Partage.
+  const shared = activeAccesses > 0;
 
   return (
     <>
@@ -304,7 +310,10 @@ export function OperationShell({
           <span className="v2-spacer" />
           {currentSection !== "lever" && (
             <span className="v2-privacy" data-shared={shared}>
-              <i />{shared ? "Partagée — 3 accès actifs" : "Privée"}
+              <i />
+              {shared
+                ? `Partagée — ${activeAccesses} accès actif${activeAccesses > 1 ? "s" : ""}`
+                : "Privée"}
             </span>
           )}
           {currentSection !== "lever" && (

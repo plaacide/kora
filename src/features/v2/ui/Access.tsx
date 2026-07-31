@@ -1,9 +1,42 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { createV2Access } from "@/app/v2/(workspace)/operations/[operationId]/access/actions";
+import {
+  correspondAuFiltre,
+  etatAcces,
+  etatLabel,
+  perimetreLabel,
+  type FiltreAcces,
+} from "@/features/v2/domain/access";
+import { accessLevelLabel, initials } from "@/features/v2/domain/activity";
+import type { AccessRow, ShareFolder } from "@/features/v2/server/access";
+import { EmptyArt } from "./EmptyArt";
 import { Icon } from "./Icon";
+
+/** « 12 juil. 2026 » — même format que le reste du produit. */
+function shortDate(value: string): string {
+  return new Date(value).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+/** « il y a 2 h », « hier », « le 12 juil. » — pour la dernière activité. */
+function depuis(value: string, maintenant: Date): string {
+  const ecart = maintenant.getTime() - new Date(value).getTime();
+  const heures = Math.floor(ecart / 3_600_000);
+  if (heures < 1) return "à l’instant";
+  if (heures < 24) return `il y a ${heures} h`;
+  const jours = Math.floor(heures / 24);
+  if (jours === 1) return "hier";
+  if (jours < 7) return `il y a ${jours} j`;
+  return `le ${shortDate(value)}`;
+}
 
 const wizardSteps = ["Destinataire", "Contenu", "Sécurité", "Vérification"];
 const stepOrder: Record<string, number> = {
@@ -12,17 +45,6 @@ const stepOrder: Record<string, number> = {
   security: 3,
   review: 4,
 };
-
-const folderOptions = [
-  ["Société et immatriculation", "5 pièces", true],
-  ["Gouvernance et actionnariat", "4 pièces", true],
-  ["Finance et comptabilité", "11 sur 12 pièces", true],
-  ["Fiscalité", "3 pièces", false],
-  ["Commercial et marché", "4 pièces", true],
-  ["Équipe et RH", "2 pièces", false],
-  ["Technologie et PI", "1 pièce", false],
-  ["Impact et ESG", "2 pièces", false],
-] as const;
 
 function AccessStepper({ current }: { current: number }) {
   return (
@@ -44,6 +66,13 @@ function AccessStepper({ current }: { current: number }) {
   );
 }
 
+/**
+ * La carte d'une étape.
+ *
+ * L'action de pied est soit un LIEN (on avance d'une étape), soit un BOUTON
+ * (on exécute — dernière étape). Les deux ne se confondent pas : un lien qui
+ * déclenche une écriture serait rejoué par un simple retour arrière.
+ */
 function WizardCard({
   children,
   title,
@@ -51,15 +80,21 @@ function WizardCard({
   backHref,
   nextHref,
   nextLabel,
-  footerExtra,
+  nextDisabled = false,
+  onConfirm,
+  confirmLabel,
+  confirmDisabled = false,
 }: {
   children: React.ReactNode;
   title: string;
   description: string;
   backHref: string;
-  nextHref: string;
-  nextLabel: string;
-  footerExtra?: React.ReactNode;
+  nextHref?: string;
+  nextLabel?: string;
+  nextDisabled?: boolean;
+  onConfirm?: () => void;
+  confirmLabel?: string;
+  confirmDisabled?: boolean;
 }) {
   return (
     <section className="v2-wizard-card">
@@ -71,276 +106,496 @@ function WizardCard({
       <footer>
         <Link href={backHref}>{backHref === "?" ? "Annuler" : "← Retour"}</Link>
         <div>
-          {footerExtra}
-          <Link className="v2-btn" href={nextHref}>{nextLabel}</Link>
+          {onConfirm ? (
+            <button
+              className="v2-btn"
+              disabled={confirmDisabled}
+              onClick={onConfirm}
+              type="button"
+            >
+              {confirmLabel}
+            </button>
+          ) : (
+            nextHref && (
+              <Link
+                aria-disabled={nextDisabled}
+                className="v2-btn"
+                data-disabled={nextDisabled}
+                href={nextDisabled ? "#" : nextHref}
+              >
+                {nextLabel}
+              </Link>
+            )
+          )}
         </div>
       </footer>
     </section>
   );
 }
 
+/** Ce que chaque niveau autorise, dit au fondateur au moment de choisir. */
+const NIVEAUX: Array<[string, string, string]> = [
+  ["watermark", "Lecture filigranée", "Chaque page porte le nom du lecteur. Aucun téléchargement."],
+  ["view", "Lecture seule", "Consultation à l’écran, sans filigrane ni téléchargement."],
+  ["download", "Téléchargement", "L’invité peut récupérer les fichiers d’origine."],
+];
+
 export function AccessWizard({
   step,
-  preview,
+  operationId,
+  operationName,
+  folders,
+  draft,
 }: {
   step: string;
-  preview: boolean;
+  operationId: string;
+  operationName: string;
+  folders: readonly ShareFolder[];
+  draft: { email: string; level: string; nda: string; expires: string };
 }) {
   const current = stepOrder[step] ?? 1;
 
   return (
-    <>
-      <div className="v2-access-wizard">
-        <div className="v2-wizard-heading">
-          <span>Partage et accès /</span>
-          <strong>Série A 2026.</strong>
-          <em>Vous allez ouvrir une partie de cette data room à un invité.</em>
-          <Link href="?">×</Link>
-        </div>
-        <AccessStepper current={current} />
-        {current === 1 && <RecipientStep />}
-        {current === 2 && <ContentStep />}
-        {current === 3 && <SecurityStep />}
-        {current === 4 && <ReviewStep />}
+    <div className="v2-access-wizard">
+      <div className="v2-wizard-heading">
+        <span>Partage et accès /</span>
+        <strong>{operationName}</strong>
+        <em>Vous allez ouvrir cette data room à un invité.</em>
+        <Link href="?">×</Link>
       </div>
-      {preview && <GuestPreview />}
-    </>
+      <AccessStepper current={current} />
+      {current === 1 && <RecipientStep draft={draft} />}
+      {current === 2 && <ContentStep draft={draft} folders={folders} />}
+      {current === 3 && <SecurityStep draft={draft} />}
+      {current === 4 && (
+        <ReviewStep draft={draft} folders={folders} operationId={operationId} />
+      )}
+    </div>
   );
 }
 
-function RecipientStep() {
+/** Les valeurs déjà saisies voyagent d'une étape à l'autre par l'URL. */
+function lien(
+  etape: string,
+  draft: { email: string; level: string; nda: string; expires: string },
+  patch: Partial<{ email: string; level: string; nda: string; expires: string }> = {},
+): string {
+  const valeurs = { ...draft, ...patch };
+  const params = new URLSearchParams({ share: etape });
+  for (const [cle, valeur] of Object.entries(valeurs)) {
+    if (valeur) params.set(cle, valeur);
+  }
+  return `?${params}`;
+}
+
+function RecipientStep({
+  draft,
+}: {
+  draft: { email: string; level: string; nda: string; expires: string };
+}) {
+  const [email, setEmail] = useState(draft.email);
+
   return (
     <WizardCard
       title="À qui donnez-vous accès ?"
       description="L’accès est nominatif : chaque personne est identifiée et journalisée."
       backHref="?"
-      nextHref="?share=content"
+      nextHref={lien("content", draft, { email })}
       nextLabel="Continuer → Contenu"
+      nextDisabled={!email.includes("@")}
     >
-      <div className="v2-wizard-grid">
-        <label className="v2-field">
-          <span>Nom complet</span>
-          <span className="v2-control"><input defaultValue="Amina Diallo" /></span>
-        </label>
-        <label className="v2-field">
-          <span>E-mail professionnel</span>
-          <span className="v2-control"><input defaultValue="amina.diallo@sahelgrowth.com" type="email" /></span>
-        </label>
-        <label className="v2-field">
-          <span>Organisation</span>
-          <span className="v2-control"><input defaultValue="Sahel Growth Fund" /></span>
-        </label>
-        <label className="v2-field">
-          <span>Type</span>
-          <span className="v2-control">
-            <select defaultValue="Investisseur">
-              <option>Investisseur</option><option>Banque</option><option>DFI</option>
-              <option>Auditeur</option><option>Conseil</option>
-            </select>
-            <Icon name="chevron" />
-          </span>
-        </label>
-      </div>
-      <div className="v2-group-note">
-        <Icon name="users" />
-        <span>
-          Plusieurs personnes de Sahel Growth Fund ? Créez un groupe : mêmes règles,
-          activité individuelle.
+      <label className="v2-field">
+        <span>E-mail professionnel</span>
+        <span className="v2-control">
+          <input
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="prenom.nom@fonds.com"
+            type="email"
+            value={email}
+          />
         </span>
-        <button type="button">Ajouter au groupe</button>
-      </div>
-    </WizardCard>
-  );
-}
-
-function ContentStep() {
-  const defaults = Object.fromEntries(folderOptions.map(([name, , active]) => [name, active]));
-  const [selected, setSelected] = useState<Record<string, boolean>>(defaults);
-
-  return (
-    <WizardCard
-      title="Que verra Amina Diallo ?"
-      description="Sélectionnez les dossiers ; ajoutez des exceptions pièce par pièce si nécessaire."
-      backHref="?share=recipient"
-      nextHref="?share=security"
-      nextLabel="Continuer → Sécurité"
-    >
-      <div className="v2-content-mode">
-        <button data-active="true" type="button">Sélection de dossiers</button>
-        <button type="button">Tous les dossiers autorisés</button>
-      </div>
-      <div className="v2-share-folders">
-        {folderOptions.map(([name, count]) => (
-          <button
-            aria-pressed={selected[name]}
-            data-selected={selected[name]}
-            key={name}
-            type="button"
-            onClick={() => setSelected((value) => ({ ...value, [name]: !value[name] }))}
-          >
-            <span>{selected[name] ? "✓" : ""}</span>
-            <Icon name="folder" />
-            <strong>{name}</strong>
-            <small>{count}</small>
-          </button>
-        ))}
-      </div>
-      <div className="v2-share-warning">
-        <Icon name="eye" />
-        <span>
-          <strong>1 exception :</strong> « Rapport d’audit 2024.pdf » restera masqué
-          dans Finance et comptabilité. <button type="button">Gérer les exceptions</button>
-        </span>
-      </div>
-      <p className="v2-share-summary">
-        Résumé : <strong>4 dossiers · 24 pièces visibles</strong> · 8 pièces masquées
+      </label>
+      <p className="v2-panel-note">
+        L’invitation part à cette adresse et à elle seule : un lien transféré à
+        quelqu’un d’autre est refusé.
       </p>
     </WizardCard>
   );
 }
 
-function SecurityStep() {
-  const [settings, setSettings] = useState({
-    email: true,
-    nda: true,
-    watermark: true,
-    download: false,
-  });
+function ContentStep({
+  draft,
+  folders,
+}: {
+  draft: { email: string; level: string; nda: string; expires: string };
+  folders: readonly ShareFolder[];
+}) {
+  const total = folders.reduce((somme, f) => somme + f.documentCount, 0);
 
-  const rows = [
-    ["email", "Vérification de l’e-mail", "Amina devra confirmer son adresse avant d’ouvrir le dossier."],
-    ["nda", "Accord de confidentialité (NDA)", "Signature électronique requise avant le premier accès."],
-    ["watermark", "Lecture filigranée", "Chaque page porte l’e-mail du lecteur et l’horodatage."],
-    ["download", "Téléchargement", "Désactivé : consultation uniquement dans la visionneuse sécurisée."],
-  ] as const;
+  return (
+    <WizardCard
+      title={`Que verra ${draft.email || "cet invité"} ?`}
+      description="Un accès s’accorde sur des dossiers — jamais sur une pièce isolée."
+      backHref={lien("recipient", draft)}
+      nextHref={lien("security", draft)}
+      nextLabel="Continuer → Sécurité"
+    >
+      <div className="v2-share-folders">
+        {folders.map((folder) => (
+          <div key={folder.id}>
+            <Icon name="folder" />
+            <strong>{folder.name}</strong>
+            <span>
+              {folder.documentCount} pièce{folder.documentCount > 1 ? "s" : ""}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <p className="v2-panel-note">
+        Ces {folders.length} dossiers seront ouverts avec tous leurs
+        sous-dossiers, soit {total} pièce{total > 1 ? "s" : ""} au total. Les
+        pièces laissées à la racine de la data room restent invisibles. Vous
+        pourrez restreindre dossier par dossier une fois l’invitation acceptée.
+      </p>
+    </WizardCard>
+  );
+}
+
+function SecurityStep({
+  draft,
+}: {
+  draft: { email: string; level: string; nda: string; expires: string };
+}) {
+  const [level, setLevel] = useState(draft.level || "watermark");
+  const [nda, setNda] = useState(draft.nda !== "0");
+  const [expires, setExpires] = useState(draft.expires);
 
   return (
     <WizardCard
       title="Règles de sécurité de cet accès"
-      description="Les réglages recommandés sont déjà activés — vous gardez la main sur chacun."
-      backHref="?share=content"
-      nextHref="?share=review"
+      description="Les valeurs par défaut sont les plus prudentes."
+      backHref={lien("content", draft)}
+      nextHref={lien("verify", draft, {
+        level,
+        nda: nda ? "1" : "0",
+        expires,
+      })}
       nextLabel="Continuer → Vérification"
     >
-      <div className="v2-security-list">
-        {rows.map(([key, title, description]) => (
-          <div key={key}>
-            <button
-              className="v2-switch"
-              aria-pressed={settings[key]}
-              data-active={settings[key]}
-              type="button"
-              onClick={() => setSettings((value) => ({ ...value, [key]: !value[key] }))}
+      <fieldset className="v2-chip-field">
+        <legend>Ce que l’invité pourra faire</legend>
+        <div className="v2-level-choices">
+          {NIVEAUX.map(([valeur, titre, detail]) => (
+            <label
+              className="v2-level-choice"
+              data-selected={level === valeur}
+              key={valeur}
             >
-              <span />
-            </button>
-            <div><strong>{title}</strong><small>{description}</small></div>
-            {key === "nda" ? <button type="button">NDA standard<Icon name="chevron" /></button> : key !== "download" && <span className="v2-tag">Recommandé</span>}
-          </div>
-        ))}
-      </div>
-      <div className="v2-wizard-grid">
-        <label className="v2-field">
-          <span>Date d’expiration</span>
-          <span className="v2-control"><input defaultValue="30 novembre 2026" /></span>
-          <small className="v2-field-helper">L’accès se fermera automatiquement à cette date.</small>
-        </label>
-        <label className="v2-field">
-          <span>Code d’accès <small>— facultatif</small></span>
-          <span className="v2-control">
-            <select defaultValue="Aucun"><option>Aucun</option><option>Code à 6 chiffres</option></select>
-            <Icon name="chevron" />
-          </span>
-        </label>
-      </div>
+              <input
+                checked={level === valeur}
+                name="level"
+                onChange={() => setLevel(valeur)}
+                type="radio"
+                value={valeur}
+              />
+              <span>
+                <strong>{titre}</strong>
+                <small>{detail}</small>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <label className="v2-level-choice" data-selected={nda}>
+        <input checked={nda} onChange={(e) => setNda(e.target.checked)} type="checkbox" />
+        <span>
+          <strong>Signature d’un accord de confidentialité</strong>
+          <small>L’accès reste fermé tant que le NDA n’est pas signé.</small>
+        </span>
+      </label>
+
+      <label className="v2-field">
+        <span>
+          Échéance de l’accès <small>— 90 jours par défaut</small>
+        </span>
+        <span className="v2-control">
+          <input
+            onChange={(event) => setExpires(event.target.value)}
+            type="date"
+            value={expires}
+          />
+        </span>
+      </label>
     </WizardCard>
   );
 }
 
-function ReviewStep() {
+function ReviewStep({
+  draft,
+  folders,
+  operationId,
+}: {
+  draft: { email: string; level: string; nda: string; expires: string };
+  folders: readonly ShareFolder[];
+  operationId: string;
+}) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  const nda = draft.nda !== "0";
+  const niveau = NIVEAUX.find(([valeur]) => valeur === draft.level) ?? NIVEAUX[0];
+
+  async function envoyer() {
+    setErreur(null);
+    setBusy(true);
+
+    const res = await createV2Access({
+      operationId,
+      email: draft.email,
+      level: draft.level || "watermark",
+      ndaRequired: nda,
+      expiresAt: draft.expires ? new Date(draft.expires).toISOString() : null,
+    });
+
+    setBusy(false);
+    if (!res.ok) {
+      setErreur(res.error ?? "L’accès n’a pas pu être créé.");
+      return;
+    }
+
+    // Le lien ne transite par l'URL que si l'e-mail n'est PAS parti : c'est
+    // alors la seule façon pour le fondateur de le transmettre lui-même.
+    const suffixe = res.emailFailed && res.link
+      ? `?sent=manuel&lien=${encodeURIComponent(res.link)}`
+      : "?sent=1";
+    router.push(`/v2/operations/${operationId}/access${suffixe}`);
+  }
+
   return (
     <WizardCard
       title="Vérifiez avant d’envoyer"
-      description="Voici exactement ce qu’Amina Diallo recevra — rien de plus."
-      backHref="?share=security"
-      nextHref="?sent=1"
-      nextLabel="Envoyer l’accès"
-      footerExtra={
-        <Link className="v2-btn" data-variant="secondary" href="?share=review&preview=1">
-          <Icon name="eye" />Prévisualiser comme l’invité
-        </Link>
-      }
+      description="Rien n’est envoyé tant que vous n’avez pas confirmé."
+      backHref={lien("security", draft)}
+      onConfirm={envoyer}
+      confirmLabel={busy ? "Envoi…" : "Envoyer l’accès"}
+      confirmDisabled={busy}
     >
-      <div className="v2-review-grid">
-        <div data-wide="true">
-          <small>Opération</small>
-          <strong>Série A 2026 — Levée en capital · Nimba Solar</strong>
+      {erreur && (
+        <p className="v2-auth-error" role="alert">
+          {erreur}
+        </p>
+      )}
+
+      <div className="v2-detail-grid">
+        <div><small>Destinataire</small><strong>{draft.email}</strong></div>
+        <div><small>Niveau</small><strong>{niveau[1]}</strong></div>
+        <div>
+          <small>Accord de confidentialité</small>
+          <strong>{nda ? "Requis avant tout accès" : "Non requis"}</strong>
         </div>
         <div>
-          <small>Destinataire</small>
-          <strong>Amina Diallo · Sahel Growth Fund</strong>
-          <span>amina.diallo@sahelgrowth.com · Investisseur</span>
+          <small>Échéance</small>
+          <strong>
+            {draft.expires
+              ? new Date(draft.expires).toLocaleDateString("fr-FR")
+              : "90 jours"}
+          </strong>
         </div>
         <div>
-          <small>Expiration</small>
-          <strong>30 novembre 2026</strong>
-          <span>fermeture automatique, révocable à tout moment</span>
-        </div>
-        <div>
-          <small>Sera visible</small>
-          <span>Société et immatriculation (5)<br />Gouvernance et actionnariat (4)<br />Finance et comptabilité (11)<br />Commercial et marché (4)</span>
-        </div>
-        <div>
-          <small>Restera masqué</small>
-          <span>Fiscalité · Équipe et RH · Technologie et PI · Impact et ESG<br />+ Rapport d’audit 2024.pdf</span>
+          <small>Périmètre</small>
+          <strong>
+            {folders.length} dossier{folders.length > 1 ? "s" : ""}
+          </strong>
         </div>
       </div>
-      <div className="v2-review-badges">
-        <span className="v2-status" data-tone="green">E-mail vérifié requis</span>
-        <span className="v2-status" data-tone="green">NDA standard requis</span>
-        <span className="v2-status" data-tone="green">Lecture filigranée</span>
-        <span className="v2-status" data-tone="neutral">Téléchargement désactivé</span>
-      </div>
+
+      <p className="v2-panel-note">
+        {niveau[2]} L’accès s’ouvrira à la vérification de l’adresse
+        {nda ? " et à la signature du NDA" : ""}.
+      </p>
     </WizardCard>
   );
 }
 
-const accessRows = [
-  ["AD", "Amina Diallo", "Sahel Growth Fund · Investisseur", "Accès actif", "green", "4 dossiers · 24 pièces", "Signé le 12-07", "il y a 2 h", "30-11-2026", "Détail"],
-  ["KM", "Kwame Mensah", "Horizon Ventures · Investisseur", "Accès actif", "green", "3 dossiers · 18 pièces", "Signé hier", "hier 16:40", "30-11-2026", "Détail"],
-  ["CM", "Clara Morel", "Impact Capital Africa · Investisseur", "NDA en attente", "blue", "3 dossiers · 18 pièces", "Envoyé", "—", "30-11-2026", "Relancer"],
-  ["BA", "Moussa Ndao", "Banque Atlantique · Banque", "Invitation envoyée", "neutral", "2 dossiers · 14 pièces", "Requis", "—", "15-08-2026", "Renvoyer"],
-  ["FA", "Cabinet Fall & Associés", "Auditeur", "Expire bientôt", "amber", "1 dossier · 6 pièces", "Signé le 02-05", "il y a 4 j", "dans 5 jours", "Prolonger"],
-  ["EV", "Elikem Vondee", "EchoVC · Investisseur", "Révoqué", "red", "—", "Signé le 10-04", "12-06-2026", "—", "Historique"],
-];
+/**
+ * Écran 24 — le tableau des accès, sur les invitations réelles.
+ *
+ * Une invitation révoquée ou expirée reste affichée : un auditeur doit pouvoir
+ * constater qu'un accès a existé, et à quelles conditions. L'effacer
+ * effacerait la preuve.
+ */
+export function AccessTable({
+  accesses,
+  sent,
+  lien,
+}: {
+  accesses: readonly AccessRow[];
+  sent: "1" | "manuel" | null;
+  /** Lien nominatif à transmettre à la main quand l'e-mail n'est pas parti. */
+  lien: string | null;
+}) {
+  const [filtre, setFiltre] = useState<FiltreAcces>("tous");
+  const [recherche, setRecherche] = useState("");
 
-export function AccessTable({ sent }: { sent: boolean }) {
+  // Une seule référence de temps pour toute la table : deux appels à `new
+  // Date()` dans la même liste peuvent classer deux lignes différemment.
+  const maintenant = new Date();
+
+  const etats = accesses.map((row) => etatAcces(row.status, row.expiresAt, maintenant));
+  const actifs = etats.filter((etat) => etat === "active" || etat === "expiring").length;
+
+  const terme = recherche.trim().toLowerCase();
+  const visibles = accesses.filter((row, index) => {
+    if (!correspondAuFiltre(etats[index], filtre)) return false;
+    if (!terme) return true;
+    return (
+      row.email.toLowerCase().includes(terme) ||
+      (row.name ?? "").toLowerCase().includes(terme)
+    );
+  });
+
   return (
     <div className="v2-access-page">
-      {sent && <div className="v2-success-banner"><Icon name="shield-check" />Accès envoyé à Amina Diallo. Il reste inactif jusqu’à la vérification de son e-mail et la signature du NDA.</div>}
+      {sent === "1" && (
+        <div className="v2-success-banner">
+          <Icon name="shield-check" />
+          Accès envoyé. Il reste inactif jusqu’à la vérification de l’e-mail
+          {" "}et la signature du NDA.
+        </div>
+      )}
+
+      {sent === "manuel" && (
+        <div className="v2-success-banner" data-tone="amber">
+          <Icon name="shield-check" />
+          <span>
+            L’accès est créé, mais l’e-mail n’est pas parti. Transmettez ce lien
+            nominatif vous-même : <code>{lien}</code>
+          </span>
+        </div>
+      )}
+
       <div className="v2-access-filters">
-        {["Tous", "Actifs", "En attente", "Expirés / révoqués"].map((label) => (
-          <button data-active={label === "Tous"} key={label} type="button">{label}</button>
-        ))}
-        <Link href="?request=1">1 demande d’accès</Link>
-        <span>Invités externes uniquement — <Link href="/v2/team">gérer l’équipe</Link></span>
+        <div className="v2-access-tabs" role="tablist">
+          {(
+            [
+              ["tous", "Tous"],
+              ["actifs", "Actifs"],
+              ["attente", "En attente"],
+              ["clos", "Expirés / révoqués"],
+            ] as Array<[FiltreAcces, string]>
+          ).map(([valeur, label]) => (
+            <button
+              aria-selected={filtre === valeur}
+              key={valeur}
+              onClick={() => setFiltre(valeur)}
+              role="tab"
+              type="button"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <input
+          aria-label="Rechercher un accès"
+          onChange={(event) => setRecherche(event.target.value)}
+          placeholder="Rechercher un accès…"
+          type="search"
+          value={recherche}
+        />
+        <span>
+          {actifs === 0
+            ? "Aucun accès actif"
+            : `${actifs} accès actif${actifs > 1 ? "s" : ""}`}
+          {" · invités externes uniquement — "}
+          <Link href="/v2/team">gérer l’équipe</Link>
+        </span>
       </div>
-      <div className="v2-access-table-wrap">
-        <table className="v2-access-table">
-          <thead><tr><th>Personne · organisation</th><th>État d’accès</th><th>Périmètre</th><th>NDA</th><th>Dernière activité</th><th>Expiration</th><th>Action</th></tr></thead>
-          <tbody>
-            {accessRows.map((row) => (
-              <tr key={row[1]}>
-                <td><span className="v2-person-avatar">{row[0]}</span><div><strong>{row[1]}</strong><small>{row[2]}</small></div></td>
-                <td><span className="v2-status" data-tone={row[4]}>{row[3]}</span></td>
-                <td>{row[5]}</td><td>{row[6]}</td><td>{row[7]}</td><td>{row[8]}</td>
-                <td><button type="button">{row[9]}</button></td>
+
+      {accesses.length === 0 ? (
+        <section className="v2-drop-empty">
+          <EmptyArt name="files" />
+          <h2>Personne n’a accès à cette opération</h2>
+          <p>
+            Votre data room reste privée tant que vous n’invitez personne. Chaque
+            accès est nominatif, daté, et son activité est journalisée.
+          </p>
+          <div>
+            <Link className="v2-btn" href="?share=recipient">Créer un accès</Link>
+          </div>
+        </section>
+      ) : (
+        <div className="v2-access-table-wrap">
+          <table className="v2-access-table">
+            <thead>
+              <tr>
+                <th>Personne</th><th>État d’accès</th><th>Périmètre</th>
+                <th>Niveau</th><th>NDA</th><th>Dernière activité</th>
+                <th>Expiration</th><th />
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <footer>L’historique d’activité est conservé après révocation ou expiration.</footer>
-      </div>
+            </thead>
+            <tbody>
+              {visibles.map((row) => {
+                const etat = etatLabel(
+                  etatAcces(row.status, row.expiresAt, maintenant),
+                );
+
+                return (
+                  <tr key={row.id}>
+                    <td>
+                      <span className="v2-person-avatar">
+                        {initials(row.name ?? row.email)}
+                      </span>
+                      <div>
+                        <strong>{row.name ?? row.email}</strong>
+                        {row.name && <small>{row.email}</small>}
+                      </div>
+                    </td>
+                    <td>
+                      <span className="v2-status" data-tone={etat.tone}>
+                        {etat.label}
+                      </span>
+                    </td>
+                    <td>
+                      {perimetreLabel(row.scope)}
+                      {row.scopePending ? (
+                        <small>à l’acceptation</small>
+                      ) : (
+                        row.scope.folders === 0 && <small>aucun droit écrit</small>
+                      )}
+                    </td>
+                    <td>{accessLevelLabel(row.level)}</td>
+                    <td>
+                      {row.ndaSignedAt
+                        ? `Signé le ${shortDate(row.ndaSignedAt)}`
+                        : row.ndaRequired
+                          ? "Requis"
+                          : "Non requis"}
+                    </td>
+                    <td>
+                      {row.lastActivityAt
+                        ? depuis(row.lastActivityAt, maintenant)
+                        : "—"}
+                    </td>
+                    <td>{row.expiresAt ? shortDate(row.expiresAt) : "Sans échéance"}</td>
+                    <td>
+                      <Link href={`?apercu=${row.id}`}>Détail</Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {visibles.length === 0 && (
+            <p className="v2-panel-note">Aucun accès ne correspond à ce filtre.</p>
+          )}
+          <footer>
+            L’historique d’activité est conservé après révocation ou expiration.
+          </footer>
+        </div>
+      )}
     </div>
   );
 }
@@ -378,25 +633,101 @@ export function RequestPanel() {
   );
 }
 
-function GuestPreview() {
+/**
+ * Écran 25 — voir la data room avec les yeux de l'invité.
+ *
+ * Ce n'est pas une illustration : les dossiers, les comptes et les pièces
+ * viennent de la base, filtrés par ce que cet accès ouvre vraiment. C'est le
+ * seul écran qui répond à la question qui inquiète un fondateur avant
+ * d'envoyer — « qu'est-ce qu'il voit, exactement ? ».
+ */
+export function GuestPreview({
+  access,
+  operationName,
+  folders,
+  documents,
+  folderId,
+}: {
+  access: AccessRow;
+  operationName: string;
+  folders: readonly ShareFolder[];
+  documents: readonly { id: string; name: string }[];
+  folderId: string | null;
+}) {
+  const niveau = NIVEAUX.find(([valeur]) => valeur === access.level);
+  const ouvert = folders.find((folder) => folder.id === folderId);
+
   return (
-    <>
-      <Link className="v2-scrim" href="?share=review" aria-label="Fermer la prévisualisation" />
-      <aside className="v2-sidepanel">
-        <header>
-          <div><span className="v2-status" data-tone="green">Prévisualisation invitée</span><h2>Ce qu’Amina Diallo verra</h2></div>
-          <Link href="?share=review" aria-label="Fermer">×</Link>
-        </header>
-        <div className="v2-sidepanel-body">
-          <p className="v2-panel-note">Mode lecture seule · filigrane actif · téléchargement désactivé</p>
-          <section className="v2-preview-folders">
-            {folderOptions.filter(([, , active]) => active).map(([name, count]) => (
-              <div key={name}><Icon name="folder" /><strong>{name}</strong><span>{count}</span></div>
-            ))}
-          </section>
-          <p className="v2-panel-note">Les dossiers non sélectionnés et les exceptions ne sont pas visibles.</p>
+    <div className="v2-guest-preview">
+      <header className="v2-preview-bar">
+        <div>
+          <span className="v2-status" data-tone="green">Prévisualisation</span>
+          <strong>Vous voyez le dossier comme {access.name ?? access.email}</strong>
+          <em>
+            {/* Le compte annoncé est celui du rail ci-dessous : le périmètre
+                total (sous-dossiers compris) est dans le tableau des accès. */}
+            {folders.length} dossier{folders.length > 1 ? "s" : ""} ·{" "}
+            {access.scope.documents} pièce
+            {access.scope.documents > 1 ? "s" : ""} visibles ·{" "}
+            {access.level === "download"
+              ? "téléchargement autorisé"
+              : "téléchargement désactivé"}
+          </em>
         </div>
-      </aside>
-    </>
+        <Link className="v2-btn" data-variant="secondary" href="?">
+          Quitter la prévisualisation
+        </Link>
+      </header>
+
+      <div className="v2-preview-body">
+        <aside>
+          <small>Dossier partagé par</small>
+          <strong>{operationName}</strong>
+          <nav>
+            {folders.map((folder) => (
+              <Link
+                data-current={folder.id === folderId}
+                href={`?apercu=${access.id}&dossier=${folder.id}`}
+                key={folder.id}
+              >
+                <Icon name="folder" />
+                <span>{folder.name}</span>
+                <em>{folder.documentCount}</em>
+              </Link>
+            ))}
+          </nav>
+          <p className="v2-panel-note">
+            {niveau ? `${niveau[1]} · ` : ""}consultation journalisée
+            {access.expiresAt
+              ? ` · expire le ${shortDate(access.expiresAt)}`
+              : ""}
+          </p>
+        </aside>
+
+        <section>
+          <h2>{ouvert?.name ?? "Aucun dossier ouvert"}</h2>
+          {documents.length === 0 ? (
+            <p className="v2-panel-note">
+              Ce dossier ne contient aucune pièce visible.
+            </p>
+          ) : (
+            <ul className="v2-preview-files">
+              {documents.map((document) => (
+                <li key={document.id}>
+                  <Icon name="file" />
+                  <strong>{document.name}</strong>
+                  <Link href={`/v2/documents/${document.id}`}>Consulter</Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="v2-panel-note">
+            Les invités ne voient jamais ce qui leur est masqué — pas même son
+            existence. Les pièces laissées à la racine de la data room
+            n’apparaissent nulle part ici.
+          </p>
+        </section>
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,17 @@
-import type { InternalRoleV2 } from "./access";
+/**
+ * Les rôles internes des maquettes — quatre, quand la base n'en connaît que
+ * `owner | admin | member | guest`. Aucun écran ne consomme encore ce tableau
+ * de capacités : le jour où l'écran Équipe se branchera, il faudra soit
+ * projeter ces quatre rôles sur les quatre de la base, soit migrer l'énumération.
+ */
+export const INTERNAL_ROLES_V2 = [
+  "owner",
+  "administrator",
+  "contributor",
+  "internal_viewer",
+] as const;
+
+export type InternalRoleV2 = (typeof INTERNAL_ROLES_V2)[number];
 
 export const V2_CAPABILITIES = [
   "operation.read",

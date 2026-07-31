@@ -549,6 +549,54 @@
 .v2-upload-line-percent{flex:0 0 auto;color:var(--orange-text);font-size:12px;font-weight:600}
 .v2-upload-card-body>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;color:var(--text-3);font-size:12px}
 .v2-upload-card-body>footer .v2-btn-quiet{flex:0 0 auto}
+/* Écran 24 — onglets, recherche et compte au-dessus du tableau */
+.v2-access-tabs{display:flex;gap:2px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:2px}
+.v2-access-tabs button{border:0;border-radius:6px;background:none;padding:5px 11px;color:var(--text-3);font-size:12.5px;cursor:pointer}
+.v2-access-tabs button[aria-selected=true]{background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.06);color:var(--text-1);font-weight:500}
+.v2-access-filters input[type=search]{border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px 11px;width:210px;font-size:12.5px}
+.v2-access-table td small{display:block;color:var(--text-4);font-size:11.5px}
+.v2-access-table td a{color:var(--orange);font-size:12.5px}
+.v2-success-banner[data-tone=amber]{border-color:#f5c6ae;background:var(--orange-soft)}
+.v2-success-banner code{border-radius:4px;background:#fff;padding:1px 5px;font-size:11.5px;word-break:break-all}
+
+/* Écran 25 — la data room vue par l'invité */
+.v2-guest-preview{display:flex;flex-direction:column;gap:14px}
+.v2-preview-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid #cdeadb;border-radius:10px;background:#f2faf5;padding:12px 16px}
+.v2-preview-bar strong{display:block;margin-top:6px;font-size:14px;font-weight:500}
+.v2-preview-bar em{display:block;margin-top:2px;color:var(--text-3);font-size:12px;font-style:normal}
+.v2-preview-body{display:grid;grid-template-columns:250px 1fr;gap:14px;align-items:start}
+.v2-preview-body>aside{border:1px solid var(--line);border-radius:10px;background:#fff;padding:14px}
+.v2-preview-body>aside>small{color:var(--text-4);font-size:11px}
+.v2-preview-body>aside>strong{display:block;margin-top:2px;font-size:13.5px;font-weight:500}
+.v2-preview-body>aside nav{display:flex;flex-direction:column;gap:1px;margin:12px 0}
+.v2-preview-body>aside nav a{display:flex;align-items:center;gap:8px;border-radius:7px;padding:7px 9px;color:var(--text-2);font-size:13px;text-decoration:none}
+.v2-preview-body>aside nav a:hover{background:var(--surface-2)}
+.v2-preview-body>aside nav a[data-current=true]{background:var(--orange-soft);color:var(--text-1);font-weight:500}
+.v2-preview-body>aside nav span{flex:1}
+.v2-preview-body>aside nav em{color:var(--text-4);font-size:11.5px;font-style:normal}
+.v2-preview-body>section{border:1px solid var(--line);border-radius:10px;background:#fff;padding:16px}
+.v2-preview-body>section h2{font-size:15px;font-weight:500}
+.v2-preview-files{display:flex;flex-direction:column;margin:12px 0;list-style:none}
+.v2-preview-files li{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:10px 0}
+.v2-preview-files li:last-child{border-bottom:0}
+.v2-preview-files strong{flex:1;font-size:13.5px;font-weight:400}
+@media (max-width:900px){.v2-preview-body{grid-template-columns:1fr}}
+
+/* Écrans 20-23 — assistant de partage */
+.v2-share-folders{display:flex;flex-direction:column;gap:2px}
+.v2-share-folders>div{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:10px 0}
+.v2-share-folders>div:last-child{border-bottom:0}
+.v2-share-folders .v2-icon{flex:0 0 auto;color:var(--text-3)}
+.v2-share-folders strong{flex:1;font-size:13.5px;font-weight:500}
+.v2-share-folders span{color:var(--text-4);font-size:12px}
+.v2-level-choices{display:flex;flex-direction:column;gap:8px;width:100%}
+.v2-level-choice{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:12px 14px;cursor:pointer}
+.v2-level-choice[data-selected=true]{border-color:#f5c6ae;background:var(--orange-soft)}
+.v2-level-choice input{margin-top:2px;width:16px;height:16px;flex:0 0 auto;accent-color:var(--orange)}
+.v2-level-choice strong{display:block;font-size:13.5px;font-weight:500}
+.v2-level-choice small{display:block;margin-top:2px;color:var(--text-3);font-size:12px;line-height:1.45}
+.v2-btn[data-disabled=true]{opacity:.5;pointer-events:none}
+
 /* Écran 17 — une carte par pièce déposée, sa suggestion cochée d'avance. */
 .v2-association-card{border:1px solid var(--line);border-radius:8px;background:#fff;padding:14px 16px}
 .v2-association-file{display:flex;align-items:center;gap:9px;margin-bottom:10px}
