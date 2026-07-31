@@ -69,6 +69,12 @@ export function InvestorsScreen({
   /** Identifiant de l'investisseur en cours d'édition, `add` pour un nouveau. */
   edite: string | null;
 }) {
+  // Le pipeline vit sous l'onglet `?view=pipeline` de Lever : chaque lien doit
+  // le reconduire, sans quoi le premier clic sort de l'écran.
+  const lien = (extra: Record<string, string>) => {
+    const params = new URLSearchParams({ view: "pipeline", ...extra });
+    return `?${params}`;
+  };
   const enColonnes = vue !== "tableau";
   const cumul = ticketsCumules(investisseurs);
   const enCours = edite
@@ -78,8 +84,8 @@ export function InvestorsScreen({
   return (
     <div className="v2-pipeline-page">
       <div className="v2-filterbar">
-        <Link data-active={enColonnes} href="?vue=colonnes">Colonnes</Link>
-        <Link data-active={!enColonnes} href="?vue=tableau">Tableau</Link>
+        <Link data-active={enColonnes} href={lien({ mode: "colonnes" })}>Colonnes</Link>
+        <Link data-active={!enColonnes} href={lien({ mode: "tableau" })}>Tableau</Link>
         <i />
         {investisseurs.length > 0 && (
           <span>
@@ -87,7 +93,7 @@ export function InvestorsScreen({
             <b>{cumul.toLocaleString("fr-FR")}</b> {devise} de tickets indicatifs
           </span>
         )}
-        <Link className="v2-btn" href="?panel=add">
+        <Link className="v2-btn" href={lien({ panel: "add" })}>
           <Icon name="plus" />
           Ajouter un investisseur
         </Link>
@@ -104,7 +110,7 @@ export function InvestorsScreen({
             sienne.
           </p>
           <div>
-            <Link className="v2-btn" href="?panel=add">Ajouter un investisseur</Link>
+            <Link className="v2-btn" href={lien({ panel: "add" })}>Ajouter un investisseur</Link>
           </div>
         </section>
       ) : enColonnes ? (
@@ -144,7 +150,7 @@ function PipelineColonnes({
             <p>Aucune relation</p>
           ) : (
             colonne.investisseurs.map((item) => (
-              <Link href={`?panel=${item.id}`} key={item.id}>
+              <Link href={`?view=pipeline&panel=${item.id}`} key={item.id}>
                 <span className="v2-person-avatar">
                   {initials(item.organisation ?? item.nom)}
                 </span>
@@ -262,7 +268,7 @@ function PipelineTableau({
                 {item.ticket != null ? item.ticket.toLocaleString("fr-FR") : "—"}
               </td>
               <td>
-                <Link href={`?panel=${item.id}`}>Modifier</Link>
+                <Link href={`?view=pipeline&panel=${item.id}`}>Modifier</Link>
               </td>
             </tr>
           ))}
@@ -328,7 +334,7 @@ function InvestorPanel({
       return;
     }
 
-    router.push("?");
+    router.push("?view=pipeline");
     router.refresh();
   }
 
@@ -361,13 +367,13 @@ function InvestorPanel({
       return;
     }
 
-    router.push("?");
+    router.push("?view=pipeline");
     router.refresh();
   }
 
   return (
     <>
-      <Link aria-label="Fermer" className="v2-scrim" href="?" />
+      <Link aria-label="Fermer" className="v2-scrim" href="?view=pipeline" />
       <aside className="v2-sidepanel">
         <header>
           <div>
@@ -378,7 +384,7 @@ function InvestorPanel({
                 "Ajouter un investisseur"}
             </h2>
           </div>
-          <Link aria-label="Fermer" href="?">×</Link>
+          <Link aria-label="Fermer" href="?view=pipeline">×</Link>
         </header>
 
         <div className="v2-sidepanel-body">
@@ -687,7 +693,7 @@ function InvestorPanel({
         </div>
 
         <footer className="v2-sidepanel-footer">
-          <Link href="?">Annuler</Link>
+          <Link href="?view=pipeline">Annuler</Link>
           <button
             className="v2-btn"
             disabled={busy || nom.trim().length < 2}

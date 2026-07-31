@@ -1,33 +1,18 @@
-import { activeRaise, pipelineInvestors } from "@/features/v2/server/raise";
-import { InvestorsScreen } from "@/features/v2/ui/Investors";
+import { redirect } from "next/navigation";
 
 /**
- * Écrans 38 à 40 — le pipeline investisseur.
+ * Le pipeline vit dans Lever, pas sur sa propre route.
  *
- * La devise vient de la levée : un ticket sans devise ne veut rien dire, et
- * une opération sans levée n'a pas encore de monnaie de compte.
+ * Cette page existait et personne ne pouvait l'atteindre : le rail ne la
+ * listait pas, et l'onglet « Pipeline » de Lever menait à des fixtures. Elle
+ * redirige plutôt que de disparaître — un lien enregistré quelque part doit
+ * continuer de mener au bon endroit.
  */
 export default async function InvestorsPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ operationId: string }>;
-  searchParams: Promise<{ vue?: string; panel?: string }>;
 }) {
-  const [{ operationId }, query] = await Promise.all([params, searchParams]);
-
-  const [investisseurs, raise] = await Promise.all([
-    pipelineInvestors(operationId),
-    activeRaise(operationId),
-  ]);
-
-  return (
-    <InvestorsScreen
-      devise={raise?.currency ?? "XOF"}
-      edite={query.panel ?? null}
-      investisseurs={investisseurs}
-      operationId={operationId}
-      vue={query.vue ?? "colonnes"}
-    />
-  );
+  const { operationId } = await params;
+  redirect(`/v2/operations/${operationId}/lever?view=pipeline`);
 }
