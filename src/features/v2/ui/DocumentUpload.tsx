@@ -7,7 +7,6 @@ import type { ChangeEvent, DragEvent, ReactNode } from "react";
 import { registerV2Document } from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
 import { cleStockage } from "@/lib/storage-key";
 import { createClient } from "@/lib/supabase/client";
-import { Icon } from "./Icon";
 import { UploadProgress, type UploadRow } from "./Upload";
 
 /**
@@ -24,16 +23,13 @@ import { UploadProgress, type UploadRow } from "./Upload";
  * Le nom n'est assaini QUE pour la clé — Supabase refuse les caractères
  * non-ASCII. « Statuts — société.pdf » reste lisible tel quel dans la data
  * room ; c'est `documents.name` qui porte le nom d'origine, intact.
- */
-
-/**
- * À partir de combien de pièces l'écran 16 s'ouvre.
  *
- * Pour une seule, la ligne de retour sous le bouton dit tout — déployer un
- * tableau ferait plus de bruit que d'information. Dès la deuxième, il faut
- * pouvoir suivre laquelle passe et laquelle a échoué.
+ * ⚠️ Le téléversement passe par `XMLHttpRequest` et non par
+ * `supabase.storage.upload()`. La méthode du client n'expose aucun
+ * avancement, alors que la maquette affiche un pourcentage par pièce — et
+ * `xhr.upload.onprogress` le donne. Le même objet sert à interrompre le
+ * dépôt (« Tout annuler »), ce qu'une promesse ne permet pas.
  */
-const SEUIL_TABLEAU = 2;
 
 export function DocumentUpload({
   operationId,
@@ -53,13 +49,82 @@ export function DocumentUpload({
 }) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
+  const encours = useRef<XMLHttpRequest | null>(null);
+  const annule = useRef(false);
+
   const [uploads, setUploads] = useState<UploadRow[]>([]);
+  const [visible, setVisible] = useState(true);
   const [busy, setBusy] = useState(false);
+
+  function majLigne(index: number, patch: Partial<UploadRow>) {
+    setUploads((current) =>
+      current.map((row, i) => (i === index ? { ...row, ...patch } : row)),
+    );
+  }
+
+  /**
+   * Téléverse un fichier en rendant son avancement.
+   *
+   * Résout avec l'erreur plutôt que de la lever : l'échec d'une pièce ne doit
+   * pas interrompre le lot, et l'appelant décide quoi en faire.
+   */
+  function televerser(
+    file: File,
+    key: string,
+    token: string,
+    onProgress: (pourcent: number) => void,
+  ): Promise<{ ok: boolean; error?: string }> {
+    return new Promise((resolve) => {
+      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/documents/${key}`;
+      const xhr = new XMLHttpRequest();
+      encours.current = xhr;
+
+      xhr.open("POST", url);
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      xhr.setRequestHeader("x-upsert", "false");
+      if (file.type) xhr.setRequestHeader("Content-Type", file.type);
+
+      xhr.upload.onprogress = (event) => {
+        if (!event.lengthComputable) return;
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      };
+
+      xhr.onload = () => {
+        encours.current = null;
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve({ ok: true });
+          return;
+        }
+        let message = `dépôt refusé (${xhr.status})`;
+        try {
+          const corps = JSON.parse(xhr.responseText);
+          if (corps?.message) message = corps.message;
+        } catch {
+          // Réponse non-JSON : on garde le message par défaut.
+        }
+        resolve({ ok: false, error: message });
+      };
+
+      xhr.onerror = () => {
+        encours.current = null;
+        resolve({ ok: false, error: "connexion interrompue" });
+      };
+
+      xhr.onabort = () => {
+        encours.current = null;
+        resolve({ ok: false, error: "annulé" });
+      };
+
+      xhr.send(file);
+    });
+  }
 
   async function send(files: FileList | File[]) {
     const list = Array.from(files);
     if (list.length === 0) return;
 
+    annule.current = false;
+    setVisible(true);
     setBusy(true);
     setUploads(
       list.map((file) => ({
@@ -70,29 +135,43 @@ export function DocumentUpload({
     );
 
     const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const token = session?.access_token;
+    if (!token) {
+      setUploads((current) =>
+        current.map((row) => ({ ...row, state: "failed", error: "session expirée" })),
+      );
+      setBusy(false);
+      return;
+    }
+
     let echecs = false;
 
     for (const [index, file] of list.entries()) {
-      setUploads((current) =>
-        current.map((row, i) => (i === index ? { ...row, state: "uploading" } : row)),
-      );
+      if (annule.current) {
+        majLigne(index, { state: "canceled" });
+        echecs = true;
+        continue;
+      }
+
+      majLigne(index, { state: "uploading", progress: 0 });
 
       const key = `${organizationId}/${operationId}/${crypto.randomUUID()}/${cleStockage(file.name)}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("documents")
-        .upload(key, file, { upsert: false, contentType: file.type });
+      const envoi = await televerser(file, key, token, (pourcent) =>
+        majLigne(index, { progress: pourcent }),
+      );
 
-      if (uploadError) {
+      if (!envoi.ok) {
         echecs = true;
-        setUploads((current) =>
-          current.map((row, i) =>
-            i === index
-              ? { ...row, state: "failed", error: uploadError.message }
-              : row,
-          ),
-        );
-        // On continue : l'échec d'une pièce ne doit pas retenir les suivantes.
+        majLigne(index, {
+          state: envoi.error === "annulé" ? "canceled" : "failed",
+          error: envoi.error,
+          progress: undefined,
+        });
         continue;
       }
 
@@ -107,26 +186,26 @@ export function DocumentUpload({
 
       if (!registered.ok) echecs = true;
 
-      setUploads((current) =>
-        current.map((row, i) =>
-          i === index
-            ? registered.ok
-              ? { ...row, state: "done" }
-              : { ...row, state: "failed", error: registered.error }
-            : row,
-        ),
-      );
+      majLigne(index, {
+        state: registered.ok ? "done" : "failed",
+        error: registered.error,
+        progress: undefined,
+      });
     }
 
     setBusy(false);
 
-    // Rafraîchir remonte l'écran : un dossier qui passe de vide à rempli
-    // change de branche, et ce composant est démonté avec son compte rendu.
-    // Tant qu'une pièce a échoué, on ne rafraîchit donc pas — sinon la seule
-    // trace de l'échec disparaîtrait et le fondateur croirait tout déposé.
-    // Les pièces passées restent lisibles dans le tableau, marquées
-    // « Déposée » ; le prochain chargement montrera la data room à jour.
+    // Rafraîchir remonte l'écran : un dossier qui passe de vide à rempli change
+    // de branche, et cette carte est démontée avec son compte rendu. Tant
+    // qu'une pièce a échoué ou été annulée, on ne rafraîchit donc pas — sinon
+    // la seule trace de l'échec disparaîtrait et le fondateur croirait tout
+    // déposé.
     if (!echecs) router.refresh();
+  }
+
+  function annulerTout() {
+    annule.current = true;
+    encours.current?.abort();
   }
 
   function onPick(event: ChangeEvent<HTMLInputElement>) {
@@ -141,17 +220,9 @@ export function DocumentUpload({
     void send(event.dataTransfer.files);
   }
 
-  const failed = uploads.filter((row) => row.state === "failed");
-
   return (
     <>
-      <input
-        hidden
-        multiple
-        onChange={onPick}
-        ref={input}
-        type="file"
-      />
+      <input hidden multiple onChange={onPick} ref={input} type="file" />
       <button
         className={className ?? "v2-btn"}
         data-variant={variant}
@@ -164,26 +235,12 @@ export function DocumentUpload({
         {busy ? "Dépôt en cours…" : children}
       </button>
 
-      {/* Plusieurs pièces : l'écran 16, qui dit laquelle passe et laquelle a
-          échoué. Une seule : la ligne ci-dessous suffit. */}
-      {uploads.length >= SEUIL_TABLEAU && <UploadProgress uploads={uploads} />}
-
-      {uploads.length > 0 && uploads.length < SEUIL_TABLEAU && (
-        <div className="v2-upload-feedback" role="status">
-          {busy && <span>Dépôt en cours…</span>}
-          {!busy && failed.length === 0 && (
-            <span data-tone="green">
-              <Icon name="check" />
-              Pièce déposée.
-            </span>
-          )}
-          {!busy &&
-            failed.map((row) => (
-              <span data-tone="red" key={row.name}>
-                {row.name} — {row.error ?? "dépôt refusé"}
-              </span>
-            ))}
-        </div>
+      {visible && (
+        <UploadProgress
+          onCancelAll={annulerTout}
+          onClose={() => setVisible(false)}
+          uploads={uploads}
+        />
       )}
     </>
   );

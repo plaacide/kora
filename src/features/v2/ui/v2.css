@@ -527,19 +527,28 @@
 .v2-empty-art[data-art=search]{width:170px;height:170px;margin-bottom:-6px}
 
 /* Écran 16 — Dépôt multiple en cours */
-.v2-upload-progress{max-width:1080px;margin-top:16px}
-.v2-upload-row{display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line-soft);padding:12px 18px}
-.v2-upload-row>div:first-child{min-width:0;flex:1}
-.v2-upload-row b{display:block;font-size:13.5px;font-weight:500}
-.v2-upload-row small{display:block;color:var(--text-4);font-size:11.5px}
-.v2-upload-bar{width:160px;flex:0 0 auto;margin:0}
-/* Barre indéterminée : le téléversement vers le bucket ne rend pas
-   d'avancement exploitable. Un va-et-vient dit « ça travaille » sans
-   prétendre à un pourcentage que personne ne mesure. */
-.v2-upload-bar[data-indeterminate=true] span{width:40%;animation:v2-indeterminate 1.1s var(--motion-ease) infinite}
-@keyframes v2-indeterminate{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
-.v2-upload-progress>footer{padding:12px 18px;color:var(--text-3);font-size:12.5px}
-@media(max-width:720px){.v2-upload-bar{display:none}}
+/* Écran 16 — carte flottante en bas à droite, 420 px, comme la maquette.
+   Le dépôt n'interrompt pas la lecture de la data room derrière. */
+.v2-upload-card{position:fixed;right:28px;bottom:28px;z-index:20;width:420px;max-width:calc(100vw - 32px);border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 12px 32px rgba(16,24,40,.10);animation:v2-rise-corner var(--motion-default) var(--motion-ease) both}
+@keyframes v2-rise-corner{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.v2-upload-card>header{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:14px 18px}
+.v2-upload-card>header>b{flex:1;font:600 14px var(--font-v2-head),sans-serif}
+.v2-upload-card[data-reduced=true]>header{border-bottom:0}
+.v2-upload-card-icon{display:grid;width:26px;height:26px;place-items:center;border:0;border-radius:6px;background:transparent;color:var(--text-3);font-size:17px;line-height:1;cursor:pointer;transition:background var(--motion-fast) var(--motion-ease)}
+.v2-upload-card-icon:hover{background:var(--line-soft);color:var(--text)}
+.v2-upload-card[data-reduced=true] .v2-upload-card-icon:first-of-type .v2-icon{transform:rotate(180deg)}
+.v2-upload-card-body{display:flex;flex-direction:column;padding:8px 18px 14px}
+.v2-upload-line{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line-soft);padding:9px 0}
+.v2-upload-line-icon{display:inline-flex;flex:0 0 auto;color:var(--text-3)}
+.v2-upload-line>div{min-width:0;flex:1}
+.v2-upload-line>div>div:first-child{display:flex;justify-content:space-between;gap:8px}
+.v2-upload-line>div>div:first-child>span:first-child{overflow:hidden;font-size:13px;font-weight:500;text-overflow:ellipsis;white-space:nowrap}
+.v2-upload-line>div>div:first-child>span:last-child{flex:0 0 auto;color:var(--text-4);font-size:11.5px}
+.v2-upload-line-bar{height:4px;margin-top:6px;border-radius:2px;background:var(--line-soft);overflow:hidden}
+.v2-upload-line-bar>div{height:100%;border-radius:2px;background:var(--orange);transition:width var(--motion-fast) linear}
+.v2-upload-line-percent{flex:0 0 auto;color:var(--orange-text);font-size:12px;font-weight:600}
+.v2-upload-card-body>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;color:var(--text-3);font-size:12px}
+.v2-upload-card-body>footer .v2-btn-quiet{flex:0 0 auto}
 
 /* Écrans 09 et 10 — états de la vue d'ensemble */
 .v2-deadline{display:flex;margin:10px 0 0;align-items:center;gap:7px;color:var(--text-3);font-size:12.5px}
@@ -573,11 +582,6 @@
 
 /* Dépôt de pièces — retour d'état sous le bouton, jamais une modale : le
    fondateur doit voir sa data room se remplir pendant que ça monte. */
-.v2-upload-feedback{display:flex;flex-direction:column;gap:4px;margin-top:12px;font-size:12.5px;color:var(--text-3)}
-.v2-upload-feedback>span{display:flex;align-items:center;gap:6px}
-.v2-upload-feedback>span[data-tone=green]{color:#067647}
-.v2-upload-feedback>span[data-tone=red]{color:#b42318}
-.v2-upload-feedback .v2-icon{width:14px;height:14px}
 .v2-drop-note{max-width:520px;margin-top:14px;color:var(--text-4);font-size:12.5px;line-height:1.5}
 
 .v2-home-chart{border:1px solid var(--line);border-radius:10px;background:#fff;padding:18px 20px 6px}
