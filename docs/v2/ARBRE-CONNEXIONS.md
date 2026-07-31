@@ -3,7 +3,7 @@
 La boussole du branchement : ce qui lit vraiment la base, ce qui affiche encore
 des données écrites en dur, et ce qui manque côté serveur pour finir.
 
-**Dernière vérification : 30 juillet 2026**, branche `v2/rebuild`, par
+**Dernière vérification : 31 juillet 2026**, branche `v2/rebuild`, par
 inventaire du code (`grep` des fichiers V2 touchant Supabase, puis lecture
 écran par écran). Ce document se périme : le relire avant de s'y fier.
 
@@ -53,16 +53,17 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ```
 🔴 Vue d'ensemble                 —                     ATTEND : lecture deals + readiness
 🔴 Préparation (exigences)        —                     ATTEND : checklist_items, apply_checklist_template
-🟡 Data room                      listFolders(), listDocuments(), resolveFolderPath()
+🟢 Data room                      listFolders(), listDocuments(), resolveFolderPath()
    ├─ 🟢 Arborescence             → folders (+ compte de pièces, accès invités)
    ├─ 🟢 Table des pièces         → documents + document_versions + checklist_item_documents
-   ├─ 🟡 Panneau de détail        → infos réelles, mais versions et journal RETIRÉS (pas inventés)
-   └─ 🔴 Dépôt de fichiers        —  ATTEND : Storage + register_document
+   ├─ 🟢 Détail, versions, journal → document_versions + audit_log ; restaurer et remplacer
+   ├─ 🟢 Dépôt (écran 16)         → Storage direct + register_document, % réel, annulation
+   └─ 🟢 Associations (écran 17)  → suggestions depuis le modèle + attach_checklist_document
 🔴 Partage et accès               —                     ATTEND : permissions, create_invitation
 🔴 Lever                          —                     ATTEND : raises, save_raise (écrans déjà faits)
 🔴 Investisseurs                  —                     ATTEND : raise_investors
 🔴 Activité (journal)             —                     ATTEND : audit_log par opération
-🔴 Visionneuse                    —                     ATTEND : /api/viewer (existe en V1, complet)
+🟢 Visionneuse                    → /api/viewer, filigrane incrusté, audit par page
 ```
 
 ## Le reste du produit
@@ -117,12 +118,13 @@ qui partage une pièce est celui qui la range.
 
 Le chemin le plus court vers un produit utilisable de bout en bout :
 
-1. **Dépôt de fichiers** — la base est prête (racine autorisée) ; reste le
-   téléversement vers le bucket privé puis `register_document`.
-2. **Visionneuse** — l'API V1 (`/api/viewer`) est complète et sérieuse :
-   filigrane incrusté dans les pixels, audit page par page. Il s'agit de la
-   brancher, pas de l'écrire.
-3. **Partage et accès** — invitations, niveaux, expirations.
-4. **Préparation et vue d'ensemble** — les exigences existent déjà en base,
-   posées à la création de l'opération.
-5. **Le reste** — recherche, équipe, activité globale, abonnement.
+1. ~~Dépôt de fichiers~~ — fait le 31 juillet.
+2. ~~Visionneuse~~ — fait le 31 juillet.
+3. **Partage et accès** — `create_invitation` et `set_permission` sont prêtes
+   et inutilisées. C'est ce qui donne son sens au filigrane : sans invité, la
+   visionneuse ne protège personne.
+4. **Préparation** — `apply_checklist_template` et `sync_checklist_status`
+   sont prêtes. Les exigences existent déjà en base ; l'écran les ignore.
+5. **Vue d'ensemble** — dépend des deux précédents (prochaine action,
+   progression, activité récente).
+6. **Le reste** — recherche, équipe, activité globale, abonnement.
