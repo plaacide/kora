@@ -161,10 +161,19 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
                                    d'entrée, la maquette n'en prévoit pas)
 🟢 Recherche                      searchDocuments()     → documents par nom, filtrées
                                                         par opération, chemin complet
-🔴 Équipe                         —                     ATTEND : l'écran (33).
-                                  La base est prête : org_role porte désormais
-                                  `internal_viewer`, le quatrième rôle de la
-                                  maquette.
+🟢 Équipe (33)                    teamMembers(), myRole(), pendingInvitations()
+   ├─ 🟢 Tableau                  memberships + profiles + audit_log
+   │                                les `guest` sont écartés À LA LECTURE
+   ├─ 🟢 Gérer un rôle            set_member_role() — dernier propriétaire,
+   │                                retrait de soi, admin qui se promeut : refusés
+   ├─ 🟢 Retirer                  remove_member() — dépôts et journal conservés
+   ├─ 🟢 Inviter                  invite_member() + e-mail + lien de secours
+   ├─ 🟢 Révoquer                 revoke_org_invitation()
+   ├─ 🟢 Rejoindre                accept_org_invitation()
+   │                                /v2/rejoindre-equipe, HORS du poste de
+   │                                pilotage : l'invité n'est pas encore membre
+   └─ 🔴 Périmètre par opération  n'existe pas : un interne voit toutes les
+                                    opérations. La colonne le dit.
 🔴 Sécurité                       —                     ATTEND : MFA, audit_log
 🔴 Abonnement                     —                     ATTEND : décisions produit
 ```
@@ -295,7 +304,8 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 ## Migrations
 
 Toutes appliquées sur staging (`jourzsgjnutktsrgxkoo`), y compris
-`lecteur_interne`, `engagements` et `mises_a_jour`. Aucune n'est en attente.
+`lecteur_interne`, `engagements`, `mises_a_jour`, `gerer_l_equipe` et
+`inviter_un_collaborateur`. Aucune n'est en attente.
 
 Aucune n'a été portée en production. Le fondateur a levé la contrainte de
 compatibilité V1 : produit en pré-lancement, les changements de modèle sont
@@ -311,7 +321,8 @@ autorisés — mais staging reste la première étape.
    exigence ou un dossier reste à décider.
 5. ~~Lever~~ — fait. Vue, pipeline, engagements et mises à jour sont branchés.
 6. ~~Investisseurs~~ — fait le 1er août. Restent les interactions (41-42).
-7. **Équipe** (33) — la base est prête, l'écran reste à faire.
+7. ~~Équipe~~ — faite le 2 août, invitation comprise. Reste le périmètre par
+   opération, qui n'existe pas en base.
 8. **Interactions du pipeline** (41-42) — la table n'existe pas.
 9. **Cohortes** (31-32) — `cohort_links` n'existe pas.
 10. **Sécurité**, **Abonnement** — décisions produit d'abord. `/v2/abonnement`
