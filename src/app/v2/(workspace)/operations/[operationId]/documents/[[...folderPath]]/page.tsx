@@ -7,12 +7,14 @@ import {
 } from "@/features/v2/domain/documents";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import {
+  documentDetail,
   listDocuments,
   listFolders,
   resolveFolderPath,
 } from "@/features/v2/server/documents";
 import { requireV2Workspace } from "@/features/v2/server/session";
 import { AssociationsPanel } from "@/features/v2/ui/Associations";
+import { DocumentPanel } from "@/features/v2/ui/DocumentPanel";
 import { DocumentUpload } from "@/features/v2/ui/DocumentUpload";
 import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import { Icon } from "@/features/v2/ui/Icon";
@@ -128,7 +130,9 @@ export default async function DocumentsPage({
   }
 
   const documents = await listDocuments(operationId, folder.id);
-  const opened = documents.find((row) => row.id === document);
+  // Le panneau lit le détail complet — versions et journal compris — que la
+  // liste ne porte pas.
+  const detail = document ? await documentDetail(operationId, document) : null;
 
   return (
     <>
@@ -194,94 +198,49 @@ export default async function DocumentsPage({
         )}
       </div>
 
-      {(opened || upload === "1") && (
+      {upload === "1" && (
         <>
           <Link className="v2-scrim" href="?" aria-label="Fermer le panneau" />
           <aside className="v2-sidepanel">
-            {upload === "1" ? (
-              <>
-                <header>
-                  <div>
-                    <span className="v2-status" data-tone="neutral">Privé</span>
-                    <h2>Ajouter du contenu</h2>
-                  </div>
-                  <Link href="?" aria-label="Fermer">×</Link>
-                </header>
-                <div className="v2-sidepanel-body">
-                  <section className="v2-upload-zone v2-upload-zone-large">
-                    <Icon name="file" />
-                    <strong>Déposez plusieurs fichiers</strong>
-                    <span>PDF, DOCX, XLSX, PPTX · 20 Mo par fichier</span>
-                    <DocumentUpload
-                      folderId={folder.id}
-                      operationId={operationId}
-                      organizationId={organization.id}
-                    >
-                      Choisir des fichiers
-                    </DocumentUpload>
-                  </section>
-                  <p className="v2-panel-note">
-                    Chaque association pièce ↔ exigence vous sera présentée pour
-                    confirmation.
-                  </p>
-                </div>
-              </>
-            ) : (
-              opened && (
-                <>
-                  <header>
-                    <div>
-                      <span
-                        className="v2-status"
-                        data-tone={documentStateLabel(opened.status).tone}
-                      >
-                        {documentStateLabel(opened.status).label}
-                      </span>
-                      <h2>{opened.name}</h2>
-                    </div>
-                    <Link href="?" aria-label="Fermer">×</Link>
-                  </header>
-                  <div className="v2-sidepanel-body">
-                    <div className="v2-detail-grid">
-                      <div>
-                        <small>Exigence associée</small>
-                        <strong>{opened.requirement ?? "Aucune"}</strong>
-                      </div>
-                      <div><small>Dossier</small><strong>{folder.name}</strong></div>
-                      <div>
-                        <small>Visibilité</small>
-                        <strong>{folderVisibilityLabel(opened.guestCount)}</strong>
-                      </div>
-                      <div>
-                        <small>Version active</small>
-                        <strong>{opened.versionNo ? `v${opened.versionNo}` : "—"}</strong>
-                      </div>
-                      <div>
-                        <small>Déposée par</small>
-                        <strong>{opened.owner ?? "—"}</strong>
-                      </div>
-                      <div>
-                        <small>Mise à jour</small>
-                        <strong>{frenchDate(opened.updatedAt)}</strong>
-                      </div>
-                    </div>
-                  </div>
-                  <footer className="v2-sidepanel-footer">
-                    <Link
-                      className="v2-btn"
-                      data-variant="secondary"
-                      href={`/v2/visionneuse?document=${opened.id}&retour=${encodeURIComponent(
-                        `${v2Routes.operations.documents(operationId, folderPath ?? [])}?document=${opened.id}`,
-                      )}`}
-                    >
-                      Ouvrir la visionneuse
-                    </Link>
-                  </footer>
-                </>
-              )
-            )}
+            <header>
+              <div>
+                <span className="v2-status" data-tone="neutral">Privé</span>
+                <h2>Ajouter du contenu</h2>
+              </div>
+              <Link href="?" aria-label="Fermer">×</Link>
+            </header>
+            <div className="v2-sidepanel-body">
+              <section className="v2-upload-zone v2-upload-zone-large">
+                <Icon name="file" />
+                <strong>Déposez plusieurs fichiers</strong>
+                <span>PDF, DOCX, XLSX, PPTX · 20 Mo par fichier</span>
+                <DocumentUpload
+                  folderId={folder.id}
+                  operationId={operationId}
+                  organizationId={organization.id}
+                >
+                  Choisir des fichiers
+                </DocumentUpload>
+              </section>
+              <p className="v2-panel-note">
+                Chaque association pièce ↔ exigence vous sera présentée pour
+                confirmation.
+              </p>
+            </div>
           </aside>
         </>
+      )}
+
+      {detail && (
+        <DocumentPanel
+          closeHref="?"
+          detail={detail}
+          operationId={operationId}
+          organizationId={organization.id}
+          viewerHref={`/v2/visionneuse?document=${detail.id}&retour=${encodeURIComponent(
+            `${v2Routes.operations.documents(operationId, folderPath ?? [])}?document=${detail.id}`,
+          )}`}
+        />
       )}
       {associations === "1" && <AssociationsPanel />}
     </>

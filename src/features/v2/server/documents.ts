@@ -233,6 +233,147 @@ async function namesByProfile(
   );
 }
 
+export interface DocumentVersion {
+  id: string;
+  versionNo: number;
+  createdAt: string;
+  author: string | null;
+  sizeBytes: number | null;
+  mimeType: string | null;
+  active: boolean;
+}
+
+export interface DocumentEvent {
+  action: string;
+  actor: string;
+  at: string;
+  page: number | null;
+}
+
+export interface DocumentDetail {
+  id: string;
+  name: string;
+  status: string;
+  folderName: string | null;
+  requirement: string | null;
+  guestCount: number;
+  versions: DocumentVersion[];
+  events: DocumentEvent[];
+}
+
+/** « application/pdf » → « PDF ». Ce que le fondateur lit, pas le type MIME. */
+export function fileKind(mime: string | null): string {
+  if (!mime) return "Fichier";
+  if (mime.includes("pdf")) return "PDF";
+  if (mime.includes("spreadsheet") || mime.includes("excel")) return "XLSX";
+  if (mime.includes("presentation") || mime.includes("powerpoint")) return "PPTX";
+  if (mime.includes("word") || mime.includes("document")) return "DOCX";
+  if (mime.startsWith("image/")) return "Image";
+  return "Fichier";
+}
+
+/**
+ * Tout ce que le panneau de détail montre d'une pièce (écran 18).
+ *
+ * Les versions et le journal viennent de deux sources distinctes :
+ * `document_versions` porte l'historique des dépôts, `audit_log` celui des
+ * consultations. Aucune des deux n'était lue jusqu'ici — le panneau affichait
+ * quatre champs sur sept.
+ */
+export async function documentDetail(
+  operationId: string,
+  documentId: string,
+): Promise<DocumentDetail | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("documents")
+    .select(
+      "id, name, status, folder_id, current_version_id, folders(name)",
+    )
+    .eq("id", documentId)
+    .eq("deal_id", operationId)
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  const row = data as unknown as {
+    id: string;
+    name: string;
+    status: string;
+    folder_id: string | null;
+    current_version_id: string | null;
+    folders: { name: string } | Array<{ name: string }> | null;
+  };
+
+  const { data: versionRows } = await supabase
+    .from("document_versions")
+    .select("id, version_no, created_at, uploaded_by, size_bytes, mime_type")
+    .eq("document_id", documentId)
+    .order("version_no", { ascending: false });
+
+  const versions = (versionRows ?? []) as Array<{
+    id: string;
+    version_no: number;
+    created_at: string;
+    uploaded_by: string | null;
+    size_bytes: number | null;
+    mime_type: string | null;
+  }>;
+
+  // Le journal ne porte que l'identifiant de l'acteur et son e-mail : on
+  // préfère le nom déclaré quand il existe.
+  const { data: eventRows } = await supabase
+    .from("audit_log")
+    .select("action, actor_email, created_at, metadata")
+    .eq("target_id", documentId)
+    .order("created_at", { ascending: false })
+    .limit(12);
+
+  const [requirements, authors, guests] = await Promise.all([
+    requirementByDocument(supabase, [documentId]),
+    namesByProfile(
+      supabase,
+      versions.map((v) => v.uploaded_by).filter((id): id is string => Boolean(id)),
+    ),
+    guestCountByFolder(supabase, operationId),
+  ]);
+
+  const first = <T,>(value: T | T[] | null): T | null =>
+    Array.isArray(value) ? value[0] ?? null : value;
+
+  return {
+    id: row.id,
+    name: row.name,
+    status: row.status,
+    folderName: first(row.folders)?.name ?? null,
+    requirement: requirements.get(documentId) ?? null,
+    guestCount: row.folder_id ? guests.get(row.folder_id) ?? 0 : 0,
+    versions: versions.map((version) => ({
+      id: version.id,
+      versionNo: version.version_no,
+      createdAt: version.created_at,
+      author: version.uploaded_by ? authors.get(version.uploaded_by) ?? null : null,
+      sizeBytes: version.size_bytes,
+      mimeType: version.mime_type,
+      active: version.id === row.current_version_id,
+    })),
+    events: (
+      (eventRows ?? []) as Array<{
+        action: string;
+        actor_email: string | null;
+        created_at: string;
+        metadata: { page?: number } | null;
+      }>
+    ).map((event) => ({
+      action: event.action,
+      actor: event.actor_email ?? "—",
+      at: event.created_at,
+      page: event.metadata?.page ?? null,
+    })),
+  };
+}
+
 export async function listDocuments(
   operationId: string,
   folderId: string,

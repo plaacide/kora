@@ -34,20 +34,25 @@ pourcentages, personnes qui n'existent pas.
 
 Atteignables, mais il leur manque des blocs de la maquette.
 
-### 18 · Détail d'une pièce — 4 blocs sur 7
+### 18 · Détail d'une pièce — complété le 31 juillet 2026
 
 | Bloc de la maquette | État |
 |---|---|
-| Badge statut, type et poids (`PDF · 3,1 Mo`) | ❌ absent |
-| Exigence / Dossier / Visibilité / **Période couverte** | 🟡 3 sur 4 |
-| **Versions** (liste + « Restaurer ») | ❌ absent |
-| **Activité sur cette pièce** | ❌ absent |
-| **Archiver** | ❌ absent |
-| **Remplacer (v3)** | ❌ absent |
+| Badge statut, type et poids (`PDF · 3,1 Mo`) | ✅ |
+| Exigence / Dossier / Visibilité | ✅ |
+| **Période couverte** | ❌ aucune colonne en base |
+| **Versions** (liste + « Restaurer ») | ✅ |
+| **Activité sur cette pièce** | ✅ depuis `audit_log` |
+| **Remplacer (vN)** | ✅ via `add_document_version` |
+| **Archiver** | ❌ aucune RPC — `delete_document` supprime, n'archive pas |
 | Ouvrir la visionneuse | ✅ |
 
-Retirés sciemment pour ne pas afficher de fausses données, mais jamais remis.
-`add_document_version` et `restore_document_version` existent pourtant en base.
+Deux manques restent, et tous deux tiennent à la base, pas à l'écran :
+« Période couverte » n'a aucune colonne, et archiver une pièce n'existe pas —
+`delete_document` supprime pour de bon. Les afficher demanderait une migration.
+
+La maquette montre aussi un commentaire par version (« Ajout des annexes
+fiscales ») : `document_versions` n'a pas de champ pour cela.
 
 ### 15 · Data room remplie
 
@@ -101,8 +106,12 @@ Deux règles pour que cela ne se reproduise pas :
 
 ## Ordre de reprise proposé
 
-1. **Rendre atteignables 16, 17, 13** — ce sont des étapes du parcours de
-   dépôt, qui existe désormais vraiment.
-2. **Compléter l'écran 18** — versions et activité, dont les RPC existent.
-3. **Écran 62** — il porte une décision produit en attente.
-4. Le reste, par ordre d'usage réel.
+1. ~~**Écran 16**~~ — fait le 31 juillet : s'ouvre dès deux pièces, pourcentage
+   mesuré, « Tout annuler » opérant.
+2. ~~**Écran 18**~~ — fait le 31 juillet : versions, restauration, remplacement
+   et journal.
+3. **Écrans 17 et 13** — restent injoignables. Le 17 suppose des suggestions
+   pièce ↔ exigence qui n'existent pas encore ; le 13, un analyseur de liste
+   reçue.
+4. **Écran 62** — il porte une décision produit en attente.
+5. Le reste, par ordre d'usage réel.

@@ -549,6 +549,10 @@
 .v2-upload-line-percent{flex:0 0 auto;color:var(--orange-text);font-size:12px;font-weight:600}
 .v2-upload-card-body>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;color:var(--text-3);font-size:12px}
 .v2-upload-card-body>footer .v2-btn-quiet{flex:0 0 auto}
+/* « Remplacer (v3) » est un label déguisé en bouton : il ouvre le sélecteur
+   de fichier sans que le panneau ait à gérer un second input. */
+label.v2-btn{cursor:pointer}
+label.v2-btn[data-busy=true]{opacity:.6;pointer-events:none}
 
 /* Écrans 09 et 10 — états de la vue d'ensemble */
 .v2-deadline{display:flex;margin:10px 0 0;align-items:center;gap:7px;color:var(--text-3);font-size:12.5px}
