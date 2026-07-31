@@ -303,7 +303,13 @@
 .v2-investor-identity{display:flex;align-items:center;gap:9px}.v2-investor-identity>span{display:grid;width:29px;height:29px;flex:0 0 auto;place-items:center;border-radius:50%;background:var(--line-soft);color:var(--text-2);font-size:9.5px;font-weight:650}.v2-investor-identity>div{display:flex;min-width:0;flex-direction:column}.v2-investor-identity strong{overflow:hidden;font-size:11.5px;text-overflow:ellipsis;white-space:nowrap}.v2-investor-identity small{overflow:hidden;color:var(--text-3);font-size:10px;text-overflow:ellipsis;white-space:nowrap}
 .v2-investor-badges{display:flex;margin-top:10px;flex-wrap:wrap;gap:4px}.v2-investor-badges .v2-status{min-height:18px;padding:2px 5px;font-size:9.5px}.v2-investor-card>small{display:flex;margin-top:9px;align-items:center;gap:4px;color:var(--text-3);font-size:10px}.v2-investor-card>small .v2-icon{width:12px;height:12px}
 .v2-rule-note{display:flex;margin:12px 0 0;align-items:flex-start;gap:7px;border-radius:6px;background:var(--band);padding:10px 12px;color:var(--text-3);font-size:11.5px}.v2-rule-note .v2-icon{width:14px;height:14px;margin-top:1px;flex:0 0 auto}
-.v2-pipeline-table-wrap,.v2-commitment-table-wrap,.v2-update-table-wrap{margin:0 -28px;overflow:auto}.v2-pipeline-table,.v2-commitment-table,.v2-update-table{width:100%;min-width:1080px;border-collapse:collapse}.v2-pipeline-table th,.v2-commitment-table th,.v2-update-table th{border-bottom:1px solid var(--line);padding:9px 10px;color:var(--text-3);font-size:10.5px;font-weight:550;text-align:left;white-space:nowrap}.v2-pipeline-table th:first-child,.v2-pipeline-table td:first-child,.v2-commitment-table th:first-child,.v2-commitment-table td:first-child,.v2-update-table th:first-child,.v2-update-table td:first-child{padding-left:28px}
+.v2-pipeline-table-wrap,.v2-commitment-table-wrap,.v2-update-table-wrap{margin:0 -28px;overflow:auto}/* Le pipeline porte onze colonnes et défile assumé. Les engagements et les
+   mises à jour en ont huit : à 1080 px ils débordaient de 96 px d'un conteneur
+   qui en fait 984, et une barre de défilement apparaissait là où les maquettes
+   44 et 46 montrent un tableau entier. Leur plancher descend donc sous la
+   largeur réelle du contenu, et ne sert plus qu'aux écrans étroits. */
+.v2-pipeline-table,.v2-commitment-table,.v2-update-table{width:100%;min-width:1080px;border-collapse:collapse}
+.v2-commitment-table,.v2-update-table{min-width:860px}.v2-pipeline-table th,.v2-commitment-table th,.v2-update-table th{border-bottom:1px solid var(--line);padding:9px 10px;color:var(--text-3);font-size:10.5px;font-weight:550;text-align:left;white-space:nowrap}.v2-pipeline-table th:first-child,.v2-pipeline-table td:first-child,.v2-commitment-table th:first-child,.v2-commitment-table td:first-child,.v2-update-table th:first-child,.v2-update-table td:first-child{padding-left:28px}
 .v2-pipeline-table td,.v2-commitment-table td,.v2-update-table td{border-bottom:1px solid var(--line-soft);padding:10px;color:var(--text-2);font-size:11.5px;vertical-align:middle}.v2-pipeline-table tr:hover td,.v2-commitment-table tr:hover td,.v2-update-table tr:hover td{background:var(--band)}
 .v2-pipeline-table .v2-investor-identity{min-width:170px}.v2-pipeline-table .v2-status{font-size:10px}.v2-pipeline-table-wrap>footer{display:flex;align-items:center;gap:12px;padding:12px 28px;color:var(--text-3);font-size:11.5px}.v2-pipeline-table-wrap>footer strong{margin-left:auto;color:var(--text);font-size:12px}.v2-pipeline-table-wrap>footer small{color:var(--text-4)}
 
@@ -346,6 +352,9 @@
 .v2-indicator-copy input:last-child{margin-top:3px;color:var(--text-3);font:400 11px var(--font-v2),sans-serif}
 
 .v2-version-tag{margin-left:6px;color:var(--text-3);font-size:11px}
+
+.v2-update-table th:last-child{width:44px}
+.v2-update-table td:last-child{text-align:right}
 
 /* L'inscription du facteur TOTP — écran 34. */
 .v2-mfa-setup p{margin:6px 0 14px;color:var(--text-2);font-size:12.5px;line-height:1.55}
@@ -390,7 +399,14 @@
 .v2-roles-note svg{flex:none;width:14px;height:14px;margin-top:2px}
 
 .v2-commitment-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}.v2-commitment-stats section{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:9px;padding:17px 18px}.v2-commitment-stats span{color:var(--text-3);font-size:11.5px}.v2-commitment-stats strong{margin-top:6px;font:600 21px var(--font-v2-head),sans-serif}.v2-commitment-stats small{color:var(--text-3);font-size:11.5px}
-.v2-commitment-table-wrap{margin-bottom:18px;border-top:1px solid var(--line)}.v2-commitment-table td:first-child{display:flex;flex-direction:column}.v2-commitment-table td:first-child strong{color:var(--text);font-size:12px}.v2-commitment-table td:first-child small{color:var(--text-3);font-size:10.5px}/* L'action était habillée pour un `button`, mais l'écran pose un lien — le
+.v2-commitment-table-wrap{margin-bottom:18px;border-top:1px solid var(--line)}.v2-commitment-table td:first-child{display:flex;flex-direction:column}
+/* Les tailles de la maquette 44, un cran au-dessus de celles du pipeline : ce
+   tableau porte des montants qu'on lit un par un, pas onze colonnes qu'on
+   balaie. */
+.v2-commitment-table td{font-size:12.5px}
+.v2-commitment-table td:first-child strong{color:var(--text);font-size:13.5px}
+.v2-commitment-table td:first-child small{color:var(--text-4);font-size:11.5px}
+.v2-commitment-table th:last-child{width:90px}/* L'action était habillée pour un `button`, mais l'écran pose un lien — le
    panneau vit dans l'URL, ce qui rend le retour arrière du navigateur juste.
    Résultat : « Modifier » s'affichait en texte nu là où la maquette 44 montre
    un bouton. */
@@ -400,7 +416,7 @@
    À gauche et en gris, deux ordres de grandeur ne se comparent pas d'un coup
    d'œil — c'est pourtant tout ce qu'on demande à ce tableau. */
 .v2-commitment-table th:nth-child(3),.v2-commitment-table td:nth-child(3){text-align:right}
-.v2-commitment-table td:nth-child(3){color:var(--text);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.v2-commitment-table td:nth-child(3){color:var(--text);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
 .v2-history-card{overflow:hidden}.v2-history-card .v2-activity-row{min-height:52px}.v2-history-card>p{margin:0;border-top:1px solid var(--line-soft);background:var(--band);padding:11px 16px;color:var(--text-3);font-size:11.5px}
 .v2-close-summary{display:grid;grid-template-columns:1fr 1fr;margin:0 28px 20px;border:1px solid var(--line);border-radius:8px}.v2-close-summary>div{display:flex;min-height:88px;flex-direction:column;border-bottom:1px solid var(--line-soft);padding:14px}.v2-close-summary>div:nth-child(odd){border-right:1px solid var(--line-soft)}.v2-close-summary>div:nth-child(n+3){border-bottom:0}.v2-close-summary span{color:var(--text-3);font-size:11px}.v2-close-summary strong{font-size:13px;font-weight:550}.v2-close-summary small{color:var(--text-4);font-size:10.5px}.v2-close-card>.v2-field,.v2-close-card>.v2-level-choice,.v2-close-card>.v2-panel-callout{margin:0 28px 20px}.v2-danger-button{border-color:#b42318!important;background:#b42318!important}
 
@@ -415,7 +431,7 @@
 .v2-custom-indicator{display:flex;align-items:center;gap:10px;border:1px dashed #d0d5dd;border-radius:8px;background:#fff;padding:12px 14px;color:var(--text-2);text-align:left}.v2-custom-indicator>span{display:flex;flex-direction:column}.v2-custom-indicator strong{font-size:12px}.v2-custom-indicator small{color:var(--text-3);font-size:10.5px}.v2-indicator-disclaimer{display:flex;margin:0;gap:8px;border-radius:6px;background:var(--band);padding:11px;color:var(--text-3);font-size:11px}.v2-indicator-disclaimer .v2-icon{width:14px;height:14px;flex:0 0 auto}
 .v2-attachment-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:7px;padding:11px 13px}.v2-attachment-row>div{display:flex;flex:1;flex-direction:column}.v2-attachment-row strong{font-size:12px}.v2-attachment-row small{color:var(--text-3);font-size:10.5px}.v2-attachment-row button{display:inline-flex;height:27px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;color:var(--text-2);font-size:10.5px;cursor:pointer}.v2-attachment-row button:hover{background:var(--band)}
 .v2-review-update-card{width:900px}.v2-recipient-preview{overflow:hidden;border:1px solid var(--line);border-radius:9px}.v2-recipient-preview>header{display:flex;align-items:center;justify-content:space-between;background:var(--ink);padding:14px 18px;color:#fff}.v2-recipient-preview>header>div{display:flex;flex-direction:column}.v2-recipient-preview>header span{font-size:10.5px}.v2-recipient-preview>header strong{font-size:13px}.v2-recipient-preview>section{padding:16px 18px;border-top:1px solid var(--line-soft)}.v2-recipient-preview>section>p{margin:5px 0 0;color:var(--text-2);font-size:12.5px}
-.v2-preview-section-title{display:flex;align-items:center;justify-content:space-between}.v2-preview-section-title strong{font-size:11px}.v2-preview-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(max(120px,calc(100% / 6)),1fr));overflow:hidden;margin-top:9px;border:1px solid var(--line);border-radius:7px;background:#fff}.v2-preview-metrics>div{display:flex;min-height:94px;flex-direction:column;box-shadow:inset -1px -1px 0 var(--line-soft);padding:10px}.v2-preview-metrics span{min-height:30px;color:var(--text-3);font-size:9.5px}.v2-preview-metrics strong{font-size:12px}.v2-preview-metrics small{color:var(--green);font-size:10px}.v2-preview-metrics em{margin-top:auto;color:var(--text-4);font-size:8.5px;font-style:normal}.v2-preview-request{background:var(--orange-soft);color:var(--text-2);font-size:11.5px}
+.v2-preview-section-title{display:flex;align-items:center;justify-content:space-between}.v2-preview-section-title strong{font-size:11px}.v2-preview-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(max(120px,calc(100% / 5)),1fr));overflow:hidden;margin-top:9px;border:1px solid var(--line);border-radius:7px;background:#fff}.v2-preview-metrics>div{display:flex;min-height:94px;flex-direction:column;box-shadow:inset -1px -1px 0 var(--line-soft);padding:10px}.v2-preview-metrics span{min-height:30px;color:var(--text-3);font-size:9.5px}.v2-preview-metrics strong{font-size:12px}.v2-preview-metrics small{color:var(--green);font-size:10px}.v2-preview-metrics em{margin-top:auto;color:var(--text-4);font-size:8.5px;font-style:normal}.v2-preview-request{background:var(--orange-soft);color:var(--text-2);font-size:11.5px}
 /* Hors de l'aperçu destinataire — sur la mise à jour publiée — la demande n'a
    pas de section parente pour lui donner ses marges : elle formait un bandeau
    collé à la note de gel, et les deux se lisaient comme un seul bloc.
@@ -437,8 +453,8 @@
    441 px de vide à droite dans un cadre qui, lui, allait jusqu'au bout. La
    grille suit désormais le nombre réel de lignes.
 
-   `max(120px, 100%/6)` plafonne à six colonnes : la borne basse doit rester
-   SOUS le sixième de la largeur, sinon c'est elle qui décide et on retombe à
+   `max(120px, 100%/5)` plafonne à cinq colonnes : la borne basse doit rester
+   SOUS le cinquième de la largeur, sinon c'est elle qui décide et on retombe à
    cinq. Elle ne sert qu'aux écrans étroits, où elle force le retour à la ligne
    avant que les colonnes ne deviennent illisibles.
 
@@ -447,7 +463,7 @@
    trompaient dès que la grille passait à la ligne. Un fond coloré avec `gap`
    aurait marché aussi, mais la fin d'une rangée incomplète serait apparue en
    gris — huit indicateurs sur cinq colonnes laissent deux cases vides. */
-.v2-published-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(max(120px,calc(100% / 6)),1fr));overflow:hidden;margin:18px 0;border:1px solid var(--line);border-radius:8px;background:#fff}
+.v2-published-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(max(120px,calc(100% / 5)),1fr));overflow:hidden;margin:18px 0;border:1px solid var(--line);border-radius:8px;background:#fff}
 .v2-published-metrics>div{display:flex;min-height:76px;justify-content:center;flex-direction:column;box-shadow:inset -1px -1px 0 var(--line-soft);padding:10px}.v2-published-metrics span{color:var(--text-3);font-size:9.5px}.v2-published-metrics strong{font-size:14px}.v2-frozen-note{display:flex;align-items:center;gap:7px;border-radius:6px;background:var(--band);padding:10px!important;font-size:11.5px!important}.v2-frozen-note .v2-icon{width:14px;height:14px}
 .v2-published-update>section{margin-top:20px}.v2-published-update>section>h2{margin-bottom:10px;font-size:14px}.v2-update-recipient{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:7px;padding:11px 12px}.v2-update-recipient>span{display:grid;width:32px;height:32px;place-items:center;border-radius:50%;background:var(--line-soft);font-size:10px;font-weight:650}.v2-update-recipient>div{display:flex;flex:1;flex-direction:column}.v2-update-recipient>div strong{font-size:12px}.v2-update-recipient>div small{color:var(--text-3);font-size:10.5px}.v2-update-recipient>strong{font-size:11px;font-weight:500}.v2-update-recipient button{display:inline-flex;height:27px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;color:#b42318;font-size:10.5px;cursor:pointer}.v2-update-recipient button:hover{background:#fef3f2}
 

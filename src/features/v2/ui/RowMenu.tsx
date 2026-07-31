@@ -14,6 +14,8 @@ interface Position {
 interface MenuItem {
   label: string;
   href?: string;
+  /** Une entrée qui AGIT plutôt que de mener quelque part. */
+  onSelect?: () => void;
   destructive?: boolean;
 }
 
@@ -105,7 +107,16 @@ function Menu({ label, items }: { label: string; items: MenuItem[] }) {
                     {item.label}
                   </Link>
                 ) : (
-                  <button data-destructive={item.destructive} key={item.label} role="menuitem" type="button">
+                  <button
+                    data-destructive={item.destructive}
+                    key={item.label}
+                    onClick={() => {
+                      setOpen(false);
+                      item.onSelect?.();
+                    }}
+                    role="menuitem"
+                    type="button"
+                  >
                     {item.label}
                   </button>
                 ),
@@ -116,6 +127,22 @@ function Menu({ label, items }: { label: string; items: MenuItem[] }) {
         : null}
     </>
   );
+}
+
+/**
+ * Un menu « ⋯ » dont l'appelant fournit les entrées.
+ *
+ * Les deux menus ci-dessous portent des libellés d'exemple ; celui-ci sert
+ * quand les actions sont réelles et propres à un écran.
+ */
+export function ActionsMenu({
+  items,
+  label,
+}: {
+  items: MenuItem[];
+  label: string;
+}) {
+  return <Menu items={items} label={label} />;
 }
 
 /**

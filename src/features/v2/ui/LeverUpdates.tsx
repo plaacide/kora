@@ -17,6 +17,8 @@ import {
   FINANCEURS,
   INSTRUMENTS,
   disponibles,
+  financeurCourt,
+  instrumentCourt,
   libelleFinanceur,
   libelleInstrument,
   libelleVerification,
@@ -33,6 +35,7 @@ import type { MiseAJour, MiseAJourResume } from "@/features/v2/server/updates";
 
 import { EmptyMedallion } from "./EmptyArt";
 import { Icon } from "./Icon";
+import { ActionsMenu } from "./RowMenu";
 
 function href(view: string, extra: Record<string, string> = {}): string {
   const params = new URLSearchParams({ view, ...extra });
@@ -98,12 +101,9 @@ function UpdatesList({
   operationId: string;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = useState<string | null>(null);
 
   async function supprimer(id: string) {
-    setBusy(id);
     await deleteV2Update({ operationId, id });
-    setBusy(null);
     router.refresh();
   }
 
@@ -155,8 +155,10 @@ function UpdatesList({
                   <small className="v2-version-tag">{" "}V{maj.version}</small>
                 )}
               </td>
-              <td>{libelleFinanceur(maj.financeur)}</td>
-              <td>{libelleInstrument(maj.instrument)}</td>
+              <td>{financeurCourt(maj.financeur)}</td>
+              <td>
+                <span className="v2-tag">{instrumentCourt(maj.instrument)}</span>
+              </td>
               <td>
                 {maj.destinataires.length > 0
                   ? maj.destinataires.join(" · ")
@@ -177,15 +179,31 @@ function UpdatesList({
                   : "—"}
               </td>
               <td>
-                {maj.statut === "brouillon" && (
-                  <button
-                    disabled={busy === maj.id}
-                    onClick={() => supprimer(maj.id)}
-                    type="button"
-                  >
-                    {busy === maj.id ? "…" : "Supprimer"}
-                  </button>
-                )}
+                {/* La maquette 46 pose un menu « ⋯ », pas un bouton en toutes
+                    lettres : « Supprimer » écrit sur chaque ligne fait de la
+                    suppression l'action la plus visible du tableau. */}
+                <ActionsMenu
+                  items={[
+                    { label: "Ouvrir", href: href("updates", { maj: maj.id }) },
+                    ...(maj.statut === "brouillon"
+                      ? [
+                          {
+                            label: "Reprendre le brouillon",
+                            href: href("updates", {
+                              maj: maj.id,
+                              step: "audience",
+                            }),
+                          },
+                          {
+                            label: "Supprimer",
+                            destructive: true,
+                            onSelect: () => supprimer(maj.id),
+                          },
+                        ]
+                      : []),
+                  ]}
+                  label={maj.periode}
+                />
               </td>
             </tr>
           ))}

@@ -25,54 +25,72 @@ export type Financeur = "vc" | "banque" | "dfi";
 export const INSTRUMENTS: readonly {
   cle: Instrument;
   label: string;
+  court: string;
   aide: string;
   phrase: string;
 }[] = [
   {
     cle: "capital",
     label: "Capital",
+    court: "Capital",
     aide: "Prise de participation",
     phrase: "capital",
   },
   {
     cle: "dette",
     label: "Dette",
+    court: "Dette",
     aide: "Prêt ou ligne de crédit",
     phrase: "dette",
   },
   {
     cle: "dfi",
     label: "Financement DFI ou à impact",
+    court: "DFI",
     aide: "Capital, dette ou mixte",
     phrase: "financement DFI ou à impact",
   },
 ] as const;
 
+/** L'étiquette d'instrument du tableau — « Capital », « Dette », « DFI ». */
+export function instrumentCourt(cle: string): string {
+  return INSTRUMENTS.find((i) => i.cle === cle)?.court ?? cle;
+}
+
 export const FINANCEURS: readonly {
   cle: Financeur;
   label: string;
+  court: string;
   aide: string;
   phrase: string;
 }[] = [
   {
     cle: "vc",
     label: "VC ou fonds d’investissement",
+    court: "VC et fonds equity",
     aide: "Croissance et sortie",
     phrase: "un VC ou un fonds d’investissement",
   },
   {
     cle: "banque",
     label: "Banque ou prêteur",
+    court: "Banque",
     aide: "Capacité de remboursement",
     phrase: "une banque ou un prêteur",
   },
   {
     cle: "dfi",
     label: "DFI ou investisseur à impact",
+    court: "DFI et impact",
     aide: "Impact, ESG et gouvernance",
     phrase: "une DFI ou un investisseur à impact",
   },
 ] as const;
+
+/** Le libellé de tableau — une colonne n'a pas la place d'une phrase. */
+export function financeurCourt(cle: string): string {
+  return FINANCEURS.find((f) => f.cle === cle)?.court ?? cle;
+}
 
 export function libelleInstrument(cle: string): string {
   return INSTRUMENTS.find((i) => i.cle === cle)?.label ?? cle;
