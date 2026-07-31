@@ -105,7 +105,8 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ```
 🔴 Invitations et demandes        —                     ATTEND : invitations + access_requests
 🟢 Activité globale               organizationJournal() → même écran, autre portée
-🔴 Recherche                      —                     ATTEND : documents + folders + deals
+🟢 Recherche                      searchDocuments()     → documents par nom, filtrées
+                                                        par opération, chemin complet
 🔴 Équipe                         —                     ATTEND : memberships (vocabulaire à trancher)
 🔴 Sécurité                       —                     ATTEND : MFA, audit_log
 🔴 Abonnement                     —                     ATTEND : décisions produit
@@ -227,6 +228,7 @@ autorisés — mais staging reste la première étape.
 2. ~~Vue d'ensemble~~ — faite le 1er août. Reste son pipeline investisseurs,
    qui attend l'écran Investisseurs.
 3. ~~Activité~~ — faite le 1er août, par opération et pour l'organisation.
-4. **Recherche** — documents, dossiers, opérations.
+4. ~~Recherche~~ — faite le 1er août. Elle porte sur les pièces ; chercher une
+   exigence ou un dossier reste à décider.
 5. **Investisseurs**, puis **Lever** — le plus gros volume de maquettes.
 6. **Équipe**, **Sécurité**, **Abonnement** — décisions produit d'abord.
