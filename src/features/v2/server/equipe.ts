@@ -115,3 +115,55 @@ export async function myRole(
   const role = (data as { role: string } | null)?.role;
   return role && estInterne(role) ? (role as RoleInterne) : null;
 }
+
+/** Une invitation envoyée et pas encore acceptée — écran 33. */
+export interface InvitationEquipe {
+  id: string;
+  email: string;
+  role: RoleInterne;
+  envoyeeLe: string;
+  expireLe: string | null;
+  /** `true` quand l'échéance est passée : le lien ne marche plus. */
+  expiree: boolean;
+}
+
+/**
+ * Les invitations en attente.
+ *
+ * Elles vivent au-dessus du tableau et non dedans : une personne invitée n'est
+ * pas un collaborateur. Lui donner une ligne dans l'équipe ferait compter un
+ * membre qui n'a rien accepté, et laisserait croire qu'il a déjà accès.
+ */
+export async function pendingInvitations(
+  organizationId: string,
+): Promise<InvitationEquipe[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("org_invitations")
+    .select("id, email, role, created_at, expires_at")
+    .eq("org_id", organizationId)
+    .is("accepted_at", null)
+    .is("revoked_at", null)
+    .order("created_at", { ascending: false });
+
+  if (error) console.error("[v2 équipe] invitations :", error);
+
+  const maintenant = Date.now();
+
+  return ((data ?? []) as Array<{
+    id: string;
+    email: string;
+    role: string;
+    created_at: string;
+    expires_at: string | null;
+  }>).map((row) => ({
+    id: row.id,
+    email: row.email,
+    role: row.role as RoleInterne,
+    envoyeeLe: row.created_at,
+    expireLe: row.expires_at,
+    expiree:
+      row.expires_at !== null && new Date(row.expires_at).getTime() <= maintenant,
+  }));
+}

@@ -1,5 +1,9 @@
 import { v2Routes } from "@/features/v2/navigation/routes";
-import { myRole, teamMembers } from "@/features/v2/server/equipe";
+import {
+  myRole,
+  pendingInvitations,
+  teamMembers,
+} from "@/features/v2/server/equipe";
 import { requireV2Workspace } from "@/features/v2/server/session";
 import { Standalone } from "@/features/v2/ui/Shell";
 import { TeamTable } from "@/features/v2/ui/Team";
@@ -14,9 +18,10 @@ import { TeamTable } from "@/features/v2/ui/Team";
 export default async function TeamPage() {
   const { organization } = await requireV2Workspace();
 
-  const [membres, monRole] = await Promise.all([
+  const [membres, monRole, invitations] = await Promise.all([
     teamMembers(organization.id),
     myRole(organization.id),
+    pendingInvitations(organization.id),
   ]);
 
   return (
@@ -30,7 +35,12 @@ export default async function TeamPage() {
           opération.
         </p>
 
-        <TeamTable membres={membres} monRole={monRole} />
+        <TeamTable
+          invitations={invitations}
+          membres={membres}
+          monRole={monRole}
+          organizationId={organization.id}
+        />
       </div>
     </Standalone>
   );

@@ -247,3 +247,57 @@ export function showcaseInviteEmail(input: {
 
   return { subject, html };
 }
+
+/**
+ * Rejoindre l'équipe d'une organisation — écran 33.
+ *
+ * Distincte de `invitationEmail`, qui ouvre une data room à un tiers. Ici on
+ * n'ouvre pas un dossier : on fait entrer quelqu'un dans l'entreprise. Le rôle
+ * proposé est donc dit dans le corps du message, pas seulement dans l'écran
+ * d'acceptation — une personne doit savoir ce qu'elle accepte avant de cliquer.
+ */
+export function teamInvitationEmail(input: {
+  orgName: string;
+  roleLabel: string;
+  link: string;
+  locale: "fr" | "en";
+}): { subject: string; html: string } {
+  const fr = input.locale === "fr";
+
+  const subject = fr
+    ? `${input.orgName} vous invite à rejoindre son équipe sur Sanza`
+    : `${input.orgName} invites you to join their team on Sanza`;
+
+  const intro = fr
+    ? `Vous êtes invité à rejoindre l'équipe de <strong>${escape(input.orgName)}</strong> sur Sanza, en tant que <strong>${escape(input.roleLabel)}</strong>.`
+    : `You have been invited to join the <strong>${escape(input.orgName)}</strong> team on Sanza, as <strong>${escape(input.roleLabel)}</strong>.`;
+
+  const cta = fr ? "Rejoindre l'équipe" : "Join the team";
+
+  const notice = fr
+    ? "Ce lien vous est personnellement destiné : il ne fonctionne qu'avec cette adresse email, et il expire dans quinze jours. Vous rejoignez une équipe interne — pas un accès invité limité à un dossier."
+    : "This link is personal to you: it only works with this email address, and expires in fifteen days. You are joining an internal team — not a guest access limited to one folder.";
+
+  const html = `<!doctype html>
+<html lang="${input.locale}">
+<body style="margin:0;padding:0;background:#f7f5f0;font-family:'Instrument Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f5f0;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #e8e5dc;border-radius:12px;padding:32px;">
+        <tr><td>
+          <div style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;border-radius:8px;background:#171a2c;color:#ffffff;font-weight:700;font-size:16px;letter-spacing:-0.015em;">a</div>
+          <h1 style="margin:20px 0 12px;font-size:20px;font-weight:600;color:#171a2c;letter-spacing:-0.02em;">${escape(subject)}</h1>
+          <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#4a4e63;">${intro}</p>
+          <a href="${input.link}" style="display:inline-block;background:#e85c2b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
+          <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#8b8fa3;">${escape(notice)}</p>
+          <hr style="border:none;border-top:1px solid #e8e5dc;margin:24px 0 16px;">
+          <p style="margin:0;font-size:11px;color:#8b8fa3;">Sanza — ${fr ? "data room sécurisée" : "secure data room"} · ${fr ? "Chiffré" : "Encrypted"} · SOC 2</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, html };
+}
