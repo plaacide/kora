@@ -79,7 +79,10 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 À traiter en priorité    → même ordre que la prochaine action
    ├─ 🟢 Dernières pièces         → documents par date de dépôt
    ├─ 🟢 Activité récente         → audit_log, format du journal
-   └─ 🔴 Pipeline investisseurs   —                     ATTEND : raise_investors
+   └─ 🔴 Pipeline investisseurs   —                     La base est prête depuis
+                                    le 1er août : `raise_investors` et
+                                    les interactions existent. Le bloc de
+                                    la maquette 10 reste à écrire.
 
 🟢 Préparation                    listRequirementsFull(), requirementDetail(),
                                   requirementHistory(), attachableDocuments(),
@@ -159,7 +162,7 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
       ├─ 🟢 Accès                 l'invitation qui correspond à l'adresse
       ├─ 🟢 Engagements           l'engagement déclaré, sa preuve
       └─ 🟢 Notes internes        jamais visibles par l'investisseur
-🔴 Activité (journal)             —                     ATTEND : audit_log par opération
+🟢 Activité (journal)             operationJournal()    → audit_log de l'opération
 🟢 Visionneuse                    → /api/viewer, filigrane incrusté, audit par page
 ```
 
