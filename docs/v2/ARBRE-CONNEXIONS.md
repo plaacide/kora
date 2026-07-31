@@ -104,7 +104,7 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 
 ```
 🔴 Invitations et demandes        —                     ATTEND : invitations + access_requests
-🔴 Activité globale               —                     ATTEND : audit_log par organisation
+🟢 Activité globale               organizationJournal() → même écran, autre portée
 🔴 Recherche                      —                     ATTEND : documents + folders + deals
 🔴 Équipe                         —                     ATTEND : memberships (vocabulaire à trancher)
 🔴 Sécurité                       —                     ATTEND : MFA, audit_log
@@ -117,7 +117,7 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 🟢 Préparation  1/16        preparationProgress() — requis seul, comme l'écran
 🟢 Bandeau      « Partagée — 1 accès actif »  countActiveAccesses()
 🔴 Partage et accès         la maquette 24 montre un badge, pas encore branché
-🔴 Investisseurs, Lever, Activité   pas de badge
+🔴 Investisseurs, Lever     pas de badge
 ```
 
 ---
@@ -175,6 +175,13 @@ de large à Lagos ou Nairobi.
 `not_applicable` compris. « À actualiser » se DÉDUIT de `freshness_days`.
 « En vérification » écarté tant qu'aucun geste ne le produit.
 
+**Le journal ne masque jamais ce qu'il ne sait pas nommer** (1er août). Une
+action sans traduction française s'affiche telle quelle. Un journal d'audit qui
+cache ce qu'il ne comprend pas ne prouve plus rien. Même raison pour l'onglet
+« Questions » de la maquette 30, qui n'existe pas ici : aucune fonctionnalité
+de questions, donc aucune action à filtrer, donc un onglet toujours vide qui
+ferait douter des autres.
+
 **Les compteurs portent sur le REQUIS** (1er août). Les maquettes 09 et 11
 affichent « 18 prêtes · 4 à fournir · 2 à actualiser » à côté de « 18 sur 24
 exigences requises » : 18 + 4 + 2 = 24. Le recommandé est compté à part
@@ -219,8 +226,7 @@ autorisés — mais staging reste la première étape.
 1. ~~Dépôt, visionneuse, partage et accès, préparation~~ — faits.
 2. ~~Vue d'ensemble~~ — faite le 1er août. Reste son pipeline investisseurs,
    qui attend l'écran Investisseurs.
-3. **Activité** (par opération, puis globale) — même source, et c'est la
-   surface de preuve.
+3. ~~Activité~~ — faite le 1er août, par opération et pour l'organisation.
 4. **Recherche** — documents, dossiers, opérations.
 5. **Investisseurs**, puis **Lever** — le plus gros volume de maquettes.
 6. **Équipe**, **Sécurité**, **Abonnement** — décisions produit d'abord.

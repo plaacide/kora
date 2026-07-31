@@ -410,8 +410,21 @@
 @media(max-width:600px){.v2-roles-grid{grid-template-columns:1fr}.v2-promo-card{flex-direction:column}}
 
 /* Écran 30 — Journal d'activité */
-.v2-journal{display:flex;max-width:1000px;flex-direction:column;gap:20px}
-.v2-journal .v2-nav-label{padding:0 0 8px}
+.v2-journal-page{display:flex;max-width:1000px;flex-direction:column}
+.v2-journal{display:flex;max-width:1000px;flex-direction:column;gap:22px}
+.v2-journal>section>h2{position:sticky;top:0;z-index:1;background:#fff;padding:6px 0;color:var(--text-3);font:600 12px var(--font-v2-head),sans-serif}
+.v2-journal>section>ul{display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#fff;list-style:none}
+.v2-journal>section>ul>li{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line-soft);padding:12px 16px}
+.v2-journal>section>ul>li:last-child{border-bottom:0}
+.v2-journal>section>ul>li:hover{background:var(--band)}
+.v2-journal li>p{min-width:0;flex:1;margin:0;color:var(--text-2);font-size:13.5px;line-height:1.5}
+.v2-journal li b{color:var(--text);font-weight:500}
+.v2-journal li em{margin-left:4px;color:var(--text-4);font-size:12px;font-style:normal}
+.v2-journal li strong{color:var(--text);font-weight:500}
+.v2-journal li>time{flex:0 0 auto;color:var(--text-4);font-size:12px;font-variant-numeric:tabular-nums}
+.v2-journal>footer{display:flex;align-items:flex-start;gap:9px;border-radius:8px;background:var(--band);padding:12px 14px;color:var(--text-3);font-size:12.5px;line-height:1.5}
+.v2-journal>footer .v2-icon{flex:0 0 auto;margin-top:1px;color:var(--green)}
+.v2-filterbar input[type=search]{border:1px solid var(--line);border-radius:999px;background:#fff;padding:6px 13px;width:220px;font-size:12.5px}
 .v2-journal-row{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line-soft);padding:12px 18px}
 .v2-journal-row:last-child{border-bottom:0}
 .v2-journal-avatar{display:inline-grid;width:32px;height:32px;flex:0 0 auto;place-items:center;border-radius:50%;background:var(--line-soft);color:var(--text-2);font:600 11px var(--font-v2-sans),sans-serif}

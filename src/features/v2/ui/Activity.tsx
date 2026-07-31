@@ -1,135 +1,159 @@
+"use client";
+
+import { useState } from "react";
+
+import { initials } from "@/features/v2/domain/activity";
+import {
+  FAMILLES,
+  familleDe,
+  grouperParJour,
+  heure,
+  verbeDe,
+  type EntreeJournal,
+  type FamilleJournal,
+} from "@/features/v2/domain/journal";
+import { EmptyMedallion } from "./EmptyArt";
+import { Icon } from "./Icon";
+
 /**
- * Écran 30 — Journal d'activité de l'opération.
- * Repris de `sanza_handoff/maquettes/screens/30-journal-activite.html`.
+ * Écran 30 — le journal d'activité, d'une opération ou de l'organisation.
+ *
+ * C'est la surface de PREUVE : ce qu'on montre quand un investisseur conteste
+ * avoir reçu une pièce. Le filtrage et la recherche portent donc sur ce qui
+ * est déjà chargé, sans aller-retour serveur — un journal qui se recharge en
+ * changeant d'onglet peut montrer deux réalités à deux secondes d'intervalle.
  */
+export function ActivityScreen({
+  entrees,
+  portee,
+}: {
+  entrees: readonly EntreeJournal[];
+  /** Ce que couvre ce journal : « cette opération », « votre organisation ». */
+  portee: string;
+}) {
+  const [famille, setFamille] = useState<FamilleJournal>("tout");
+  const [recherche, setRecherche] = useState("");
 
-const FILTERS = [
-  "Tout",
-  "Consultations",
-  "Téléchargements",
-  "NDA et accès",
-  "Dépôts et versions",
-  "Questions",
-];
+  const terme = recherche.trim().toLowerCase();
 
-interface ActivityEntry {
-  initials: string;
-  who: string;
-  from: string;
-  verb: string;
-  target: string;
-  place: string;
-  time: string;
-}
+  const visibles = entrees.filter((entree) => {
+    if (famille !== "tout" && familleDe(entree.action) !== famille) return false;
+    if (!terme) return true;
+    return (
+      entree.actor.toLowerCase().includes(terme) ||
+      entree.cible.toLowerCase().includes(terme) ||
+      verbeDe(entree.action).toLowerCase().includes(terme)
+    );
+  });
 
-const DAYS: Array<{ label: string; entries: ActivityEntry[] }> = [
-  {
-    label: "Aujourd’hui — 28 juillet 2026",
-    entries: [
-      {
-        initials: "AD",
-        who: "Amina Diallo",
-        from: "· Sahel Growth Fund",
-        verb: "a consulté",
-        target: "États financiers 2025.pdf",
-        place: "Dakar",
-        time: "14:12",
-      },
-      {
-        initials: "AD",
-        who: "Amina Diallo",
-        from: "· Sahel Growth Fund",
-        verb: "a consulté",
-        target: "Table de capitalisation.xlsx",
-        place: "Dakar",
-        time: "13:58",
-      },
-      {
-        initials: "IS",
-        who: "Ibrahima Sy",
-        from: "· Équipe — Finance",
-        verb: "a déposé",
-        target: "Relevés bancaires 2025.pdf (v1)",
-        place: "interne",
-        time: "11:20",
-      },
-      {
-        initials: "CM",
-        who: "Clara Morel",
-        from: "· Impact Capital Africa",
-        verb: "a demandé l’accès au",
-        target: "dossier financier",
-        place: "via dealroom",
-        time: "09:15",
-      },
-    ],
-  },
-  {
-    label: "Hier — 27 juillet 2026",
-    entries: [
-      {
-        initials: "KM",
-        who: "Kwame Mensah",
-        from: "· Horizon Ventures",
-        verb: "a signé",
-        target: "l’accord de confidentialité",
-        place: "Accra",
-        time: "16:40",
-      },
-      {
-        initials: "KM",
-        who: "Kwame Mensah",
-        from: "· Horizon Ventures",
-        verb: "a consulté",
-        target: "Pitch deck v4.pdf",
-        place: "Accra",
-        time: "16:52",
-      },
-      {
-        initials: "AD",
-        who: "Amara Diallo",
-        from: "· Équipe — Propriétaire",
-        verb: "a créé un accès pour",
-        target: "Moussa Ndao (Banque Atlantique)",
-        place: "interne",
-        time: "10:05",
-      },
-    ],
-  },
-];
+  const journees = grouperParJour(visibles, new Date());
 
-export function ActivityScreen() {
+  function exporter() {
+    // L'export porte l'horodatage COMPLET, pas l'heure abrégée de l'écran :
+    // c'est cette précision qui fait sa valeur de preuve.
+    const lignes = [
+      ["Date", "Personne", "Rôle", "Action", "Objet"],
+      ...visibles.map((entree) => [
+        new Date(entree.at).toISOString(),
+        entree.actor,
+        entree.role,
+        verbeDe(entree.action),
+        entree.cible,
+      ]),
+    ];
+
+    const csv = lignes
+      .map((ligne) =>
+        ligne.map((cellule) => `"${cellule.replaceAll('"', '""')}"`).join(","),
+      )
+      .join("\n");
+
+    // Le BOM garde les accents lisibles dans Excel, qui devine l'encodage.
+    const url = URL.createObjectURL(
+      new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8" }),
+    );
+    const lien = document.createElement("a");
+    lien.href = url;
+    lien.download = `journal-${new Date().toISOString().slice(0, 10)}.csv`;
+    lien.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
-    <>
+    <div className="v2-journal-page">
       <div className="v2-filterbar">
-        {FILTERS.map((filter) => (
-          <button data-active={filter === "Tout"} key={filter} type="button">
-            {filter}
+        {FAMILLES.map(([valeur, label]) => (
+          <button
+            data-active={famille === valeur}
+            key={valeur}
+            onClick={() => setFamille(valeur)}
+            type="button"
+          >
+            {label}
           </button>
         ))}
+        <i />
+        <input
+          aria-label="Rechercher dans le journal"
+          onChange={(event) => setRecherche(event.target.value)}
+          placeholder="Rechercher dans le journal…"
+          type="search"
+          value={recherche}
+        />
+        <button
+          className="v2-btn"
+          data-variant="secondary"
+          disabled={visibles.length === 0}
+          onClick={exporter}
+          type="button"
+        >
+          Exporter
+        </button>
       </div>
 
-      <div className="v2-journal">
-        {DAYS.map((day) => (
-          <section key={day.label}>
-            <div className="v2-nav-label">{day.label}</div>
-            <div className="v2-folder-card">
-              {day.entries.map((entry) => (
-                <div className="v2-journal-row" key={`${entry.time}-${entry.target}`}>
-                  <span className="v2-journal-avatar">{entry.initials}</span>
-                  <p>
-                    <b>{entry.who}</b> <span className="v2-muted-3">{entry.from}</span>{" "}
-                    <span className="v2-muted-2">{entry.verb}</span>{" "}
-                    <span className="v2-journal-target">{entry.target}</span>
-                  </p>
-                  <span className="v2-journal-place">{entry.place}</span>
-                  <span className="v2-journal-time">{entry.time}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
-    </>
+      {entrees.length === 0 ? (
+        <section className="v2-drop-empty">
+          <EmptyMedallion icon="clock" />
+          <h2>Le journal est vide</h2>
+          <p>
+            Rien n’a encore été fait sur {portee}. Chaque dépôt, chaque
+            consultation et chaque accès s’y inscrira, avec sa date et son
+            auteur.
+          </p>
+        </section>
+      ) : journees.length === 0 ? (
+        <p className="v2-panel-note">Rien ne correspond à cette recherche.</p>
+      ) : (
+        <div className="v2-journal">
+          {journees.map((journee) => (
+            <section key={journee.titre}>
+              <h2>{journee.titre}</h2>
+              <ul>
+                {journee.entrees.map((entree) => (
+                  <li key={entree.id}>
+                    <span className="v2-person-avatar">
+                      {initials(entree.actor)}
+                    </span>
+                    <p>
+                      <b>{entree.actor}</b>
+                      <em>· {entree.role}</em> {verbeDe(entree.action)}
+                      {entree.cible && <strong> {entree.cible}</strong>}
+                    </p>
+                    <time>{heure(entree.at)}</time>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+          <footer>
+            <Icon name="shield-check" />
+            {entrees.length} entrée{entrees.length > 1 ? "s" : ""} conservée
+            {entrees.length > 1 ? "s" : ""} pour {portee}. Le journal est
+            chaîné : une ligne ne peut être ni modifiée ni retirée sans rompre
+            la chaîne.
+          </footer>
+        </div>
+      )}
+    </div>
   );
 }

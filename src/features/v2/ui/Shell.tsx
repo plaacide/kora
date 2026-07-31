@@ -199,7 +199,7 @@ export function OperationShell({
     ["activity", "Activité"],
   ];
 
-  const cta =
+  const cta: { label: string; href: string; secondary?: boolean } | null =
     currentSection === "overview"
       ? { label: "Commencer la préparation", href: `${root}/preparation` }
       : currentSection === "documents"
@@ -211,16 +211,17 @@ export function OperationShell({
           : currentSection === "lever"
             ? null // Lever affiche ses propres actions dans sa page.
           : currentSection === "activity"
-            ? { label: "Exporter", href: `${path}?export=1`, secondary: true }
+            ? // Le journal porte sa propre recherche et son propre export :
+              // ils agissent sur ce qui est filtré à l'écran, ce qu'un lien
+              // d'en-tête ne saurait pas faire.
+              null
           : currentSection === "investors"
             ? { label: "Ajouter un investisseur", href: `${path}?panel=add` }
           : null;
 
   // Chaque écran cherche dans ce qu'il montre, pas dans les documents.
   const searchLabel =
-    currentSection === "activity"
-      ? "Rechercher dans le journal…"
-      : currentSection === "investors"
+    currentSection === "investors"
         ? "Rechercher un investisseur…"
         : currentSection === "lever"
           ? "Rechercher…"
@@ -323,7 +324,7 @@ export function OperationShell({
                 : "Privée"}
             </span>
           )}
-          {currentSection !== "lever" && (
+          {currentSection !== "lever" && currentSection !== "activity" && (
             <div className="v2-search"><Icon name="search" />{searchLabel}</div>
           )}
           {cta && (
