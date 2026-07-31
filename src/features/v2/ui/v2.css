@@ -410,6 +410,12 @@
 @media(max-width:600px){.v2-roles-grid{grid-template-columns:1fr}.v2-promo-card{flex-direction:column}}
 
 /* Écran 30 — Journal d'activité */
+.v2-danger-zone{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border:1px solid #fecdca;border-radius:9px;background:#fffbfa;padding:13px 14px}
+.v2-danger-zone strong{display:block;color:#b42318;font-size:13px;font-weight:500}
+.v2-danger-zone small{display:block;margin-top:3px;color:var(--text-3);font-size:12px;line-height:1.5}
+.v2-danger-zone button{border:0;background:none;padding:0;color:#b42318;font-size:12.5px;font-weight:500;white-space:nowrap;cursor:pointer}
+.v2-danger-zone>div:last-child{display:flex;gap:10px}
+.v2-danger-zone>div:last-child button:last-child{color:var(--text-3);font-weight:400}
 .v2-pipeline-page{display:flex;flex-direction:column}
 .v2-filterbar>a{height:32px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12px;font-weight:600;text-decoration:none}
 .v2-filterbar>a[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text)}
@@ -881,6 +887,12 @@ label.v2-btn[data-busy=true]{opacity:.6;pointer-events:none}
 .v2-dialog-choices .v2-icon{color:var(--orange-text)}
 
 /* Écrans 66 (recherche) et 68 (abonnement) */
+.v2-danger-zone{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border:1px solid #fecdca;border-radius:9px;background:#fffbfa;padding:13px 14px}
+.v2-danger-zone strong{display:block;color:#b42318;font-size:13px;font-weight:500}
+.v2-danger-zone small{display:block;margin-top:3px;color:var(--text-3);font-size:12px;line-height:1.5}
+.v2-danger-zone button{border:0;background:none;padding:0;color:#b42318;font-size:12.5px;font-weight:500;white-space:nowrap;cursor:pointer}
+.v2-danger-zone>div:last-child{display:flex;gap:10px}
+.v2-danger-zone>div:last-child button:last-child{color:var(--text-3);font-weight:400}
 .v2-pipeline-page{display:flex;flex-direction:column}
 .v2-filterbar>a{height:32px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12px;font-weight:600;text-decoration:none}
 .v2-filterbar>a[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text)}

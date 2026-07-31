@@ -136,12 +136,6 @@ export async function createV2Raise(input: {
  * jour. Un seul appel, donc pas de fenêtre où l'écran croirait avoir créé ce
  * qu'il vient de modifier.
  *
- * ⚠️ Aucune suppression n'est possible : `raise_investors` porte un
- * `revoke delete from authenticated` et aucune RPC ne supprime. Poser un
- * bouton « retirer » qui écrirait en direct serait refusé SANS erreur — la
- * ligne resterait, l'écran dirait le contraire. Écarter un investisseur se
- * fait donc par le statut `refuse`, ce qui vaut mieux : on garde la trace
- * d'une relation qui n'a pas abouti.
  */
 export async function saveV2Investor(input: {
   operationId: string;
@@ -150,7 +144,16 @@ export async function saveV2Investor(input: {
   organisation?: string | null;
   email?: string | null;
   ticket?: number | null;
-  statut?: string | null;
+  etape?: string | null;
+  engagement?: string | null;
+  categorie?: string | null;
+  fonction?: string | null;
+  pays?: string | null;
+  source?: string | null;
+  responsable?: string | null;
+  prochaineAction?: string | null;
+  dateRelance?: string | null;
+  notes?: string | null;
 }): Promise<Resultat> {
   const nom = input.nom.trim();
   if (nom.length < 2) return { ok: false, error: "Indiquez un nom." };
@@ -164,11 +167,54 @@ export async function saveV2Investor(input: {
     p_organisation: input.organisation?.trim() || null,
     p_email: input.email?.trim().toLowerCase() || null,
     p_ticket: input.ticket ?? null,
-    p_statut: input.statut ?? null,
+    p_etape: input.etape ?? null,
+    p_engagement: input.engagement ?? null,
+    // Les textes libres partent tels quels, vide compris : sans cela, effacer
+    // une note serait impossible — la valeur vide se ferait remplacer par
+    // l'ancienne à chaque enregistrement.
+    p_categorie: input.categorie?.trim() || null,
+    p_fonction: input.fonction?.trim() || null,
+    p_pays: input.pays?.trim() || null,
+    p_source: input.source?.trim() || null,
+    p_responsable: input.responsable?.trim() || null,
+    p_prochaine_action: input.prochaineAction?.trim() || null,
+    p_date_relance: input.dateRelance || null,
+    p_notes: input.notes?.trim() || null,
   });
 
   if (error) {
     console.error("[v2 lever] save_raise_investor échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true };
+}
+
+/**
+ * Retirer une relation du pipeline.
+ *
+ * À ne pas confondre avec l'étape `refuse` : celle-ci garde la trace d'une
+ * relation qui n'a pas abouti — un investisseur approché qui a dit non fait
+ * partie de l'histoire du tour. La suppression est pour les erreurs de
+ * saisie : un doublon, un nom mal orthographié recréé à côté.
+ *
+ * `delete_raise_investor` vérifie le droit d'écrire et journalise. Une
+ * suppression directe serait refusée sans erreur — `raise_investors` porte un
+ * `revoke delete from authenticated`.
+ */
+export async function deleteV2Investor(input: {
+  operationId: string;
+  id: string;
+}): Promise<Resultat> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("delete_raise_investor", {
+    p_id: input.id,
+  });
+
+  if (error) {
+    console.error("[v2 lever] delete_raise_investor échoué :", error);
     return { ok: false, error: error.message };
   }
 

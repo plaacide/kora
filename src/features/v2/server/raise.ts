@@ -107,7 +107,9 @@ export async function pipelineInvestors(
   const [{ data }, { data: invitations }] = await Promise.all([
     supabase
       .from("raise_investors")
-      .select("id, nom, organisation, email, ticket, statut, position")
+      .select(
+        "id, nom, organisation, email, ticket, etape, engagement, categorie, fonction, pays, source, responsable, prochaine_action, date_relance, notes, position",
+      )
       .eq("deal_id", operationId)
       .order("position"),
     supabase
@@ -153,14 +155,32 @@ export async function pipelineInvestors(
     organisation: string | null;
     email: string | null;
     ticket: number | null;
-    statut: string;
+    etape: string;
+    engagement: string;
+    categorie: string | null;
+    fonction: string | null;
+    pays: string | null;
+    source: string | null;
+    responsable: string | null;
+    prochaine_action: string | null;
+    date_relance: string | null;
+    notes: string | null;
   }>).map((row) => ({
     id: row.id,
     nom: row.nom,
     organisation: row.organisation,
     email: row.email,
     ticket: row.ticket,
-    statut: row.statut,
+    etape: row.etape,
+    engagement: row.engagement,
+    categorie: row.categorie,
+    fonction: row.fonction,
+    pays: row.pays,
+    source: row.source,
+    responsable: row.responsable,
+    prochaineAction: row.prochaine_action,
+    dateRelance: row.date_relance,
+    notes: row.notes,
     acces: row.email ? (acces.get(row.email.toLowerCase()) ?? null) : null,
   }));
 }

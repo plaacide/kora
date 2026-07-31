@@ -1,41 +1,60 @@
 /**
  * Le pipeline investisseur — écrans 38 à 40, en logique pure.
  *
- * DIVERGENCE À CONNAÎTRE. `raise_investors.statut` mélange trois axes :
- * une ÉTAPE de relation (`invite`, `diligence`), un ENGAGEMENT
- * (`soft_commit`, `engage`) et une ISSUE (`refuse`). Les maquettes 38 et 39
- * les séparent : sept colonnes d'étape, plus une colonne « Engagement »
- * distincte.
+ * DEUX AXES, décidés avec le fondateur le 2 août 2026. `statut` mélangeait une
+ * ÉTAPE de relation, un ENGAGEMENT et une ISSUE dans une seule colonne : un
+ * investisseur en diligence qui avait soft-committé ne pouvait afficher qu'une
+ * des deux choses, alors que c'est la phrase même qu'on prononce — « Sahel est
+ * en diligence et a soft-committé 300 M ».
  *
- * On travaille sur les six valeurs réelles plutôt que d'en peindre sept, et
- * l'écart est écrit dans la boussole. Les scinder demanderait de décider ce
- * qu'un investisseur « en diligence qui a soft-committé » doit afficher — une
- * question produit, pas technique.
+ * Le handoff appelle cette distinction « non négociable ». Elle est en base.
  */
 
 export const ETAPES = [
-  ["invite", "À contacter"],
-  ["nda", "NDA signé"],
-  ["soft_commit", "Soft-commit"],
+  ["a_cibler", "À cibler"],
+  ["contacte", "Contacté"],
+  ["premier_echange", "Premier échange"],
+  ["interesse", "Intéressé"],
   ["diligence", "Diligence"],
+  ["comite", "Comité ou offre"],
   ["engage", "Engagé"],
-  ["refuse", "Écarté"],
 ] as const;
 
 export type EtapePipeline = (typeof ETAPES)[number][0];
 
-const NOMS = new Map<string, string>(ETAPES);
+const NOMS_ETAPE = new Map<string, string>(ETAPES);
 
-export function etapeLabel(statut: string): string {
-  return NOMS.get(statut) ?? statut;
+export function etapeLabel(etape: string): string {
+  return NOMS_ETAPE.get(etape) ?? etape;
 }
 
-/** La couleur d'une étape. « Écarté » n'est pas un échec, c'est une réponse. */
-export function etapeTon(statut: string): string {
-  if (statut === "engage") return "green";
-  if (statut === "soft_commit") return "orange";
-  if (statut === "diligence" || statut === "nda") return "blue";
-  if (statut === "refuse") return "neutral";
+export const ENGAGEMENTS = [
+  ["aucun", "Aucun"],
+  ["interet", "Intérêt indicatif"],
+  ["soft_commit", "Soft-commit"],
+  ["confirme", "Confirmé"],
+  ["retire", "Retiré"],
+] as const;
+
+export type EngagementPipeline = (typeof ENGAGEMENTS)[number][0];
+
+const NOMS_ENGAGEMENT = new Map<string, string>(ENGAGEMENTS);
+
+export function engagementLabel(engagement: string): string {
+  return NOMS_ENGAGEMENT.get(engagement) ?? engagement;
+}
+
+/**
+ * La couleur d'un engagement.
+ *
+ * « Retiré » n'est pas peint en rouge : un investisseur qui dit non fait
+ * partie d'un tour normal, et le voir en alerte à chaque ouverture de l'écran
+ * ferait lire un échec là où il y a une réponse.
+ */
+export function engagementTon(engagement: string): string {
+  if (engagement === "confirme") return "green";
+  if (engagement === "soft_commit") return "orange";
+  if (engagement === "interet") return "blue";
   return "neutral";
 }
 
@@ -45,7 +64,16 @@ export interface InvestisseurPipeline {
   organisation: string | null;
   email: string | null;
   ticket: number | null;
-  statut: string;
+  etape: string;
+  engagement: string;
+  categorie: string | null;
+  fonction: string | null;
+  pays: string | null;
+  source: string | null;
+  responsable: string | null;
+  prochaineAction: string | null;
+  dateRelance: string | null;
+  notes: string | null;
   /**
    * État de l'accès documentaire, DÉDUIT des invitations par l'adresse.
    * `null` quand l'investisseur n'a pas d'adresse, ou aucune invitation.
@@ -54,7 +82,7 @@ export interface InvestisseurPipeline {
 }
 
 export interface ColonnePipeline {
-  statut: string;
+  etape: string;
   nom: string;
   investisseurs: InvestisseurPipeline[];
   /** Somme des tickets — indicative, jamais un engagement. */
@@ -62,18 +90,22 @@ export interface ColonnePipeline {
 }
 
 /**
- * Répartit le pipeline en colonnes, dans l'ordre du parcours.
+ * Répartit le pipeline en colonnes d'étape, dans l'ordre du parcours.
  *
  * Une colonne vide reste affichée : c'est elle qui montre l'étape où il n'y a
  * personne, et donc où il faut aller.
+ *
+ * Les retirés restent dans leur colonne, avec leur badge : « en diligence,
+ * retiré » se lit, alors que les sortir du tableau effacerait où la relation
+ * s'était rendue — ce qu'on veut justement se rappeler au tour suivant.
  */
 export function colonnes(
   investisseurs: readonly InvestisseurPipeline[],
 ): ColonnePipeline[] {
-  return ETAPES.map(([statut, nom]) => {
-    const dedans = investisseurs.filter((item) => item.statut === statut);
+  return ETAPES.map(([etape, nom]) => {
+    const dedans = investisseurs.filter((item) => item.etape === etape);
     return {
-      statut,
+      etape,
       nom,
       investisseurs: dedans,
       ticket: dedans.reduce((somme, item) => somme + (item.ticket ?? 0), 0),
@@ -82,15 +114,50 @@ export function colonnes(
 }
 
 /**
- * Les tickets cumulés du pipeline.
+ * Les tickets cumulés du pipeline, hors retirés.
  *
  * À ne JAMAIS confondre avec `raises.montant_engage` : la migration qui a créé
  * cette table le dit explicitement. Un ticket est une intention notée à la
  * main, le montant sécurisé est une déclaration du fondateur. Les sommer
- * gonflerait la levée d'espoirs.
+ * gonflerait la levée d'espoirs — et compter les retirés la gonflerait de
+ * refus.
  */
 export function ticketsCumules(
   investisseurs: readonly InvestisseurPipeline[],
 ): number {
-  return investisseurs.reduce((somme, item) => somme + (item.ticket ?? 0), 0);
+  return investisseurs
+    .filter((item) => item.engagement !== "retire")
+    .reduce((somme, item) => somme + (item.ticket ?? 0), 0);
+}
+
+/** Les relances dues, la plus urgente d'abord. */
+export function relancesDues(
+  investisseurs: readonly InvestisseurPipeline[],
+  maintenant: Date,
+): InvestisseurPipeline[] {
+  return investisseurs
+    .filter(
+      (item) =>
+        item.engagement !== "retire" &&
+        item.dateRelance != null &&
+        new Date(item.dateRelance).getTime() <= maintenant.getTime(),
+    )
+    .sort((a, b) => (a.dateRelance ?? "").localeCompare(b.dateRelance ?? ""));
+}
+
+/** Les catégories d'investisseur — le même vocabulaire que l'audience d'une levée. */
+export const CATEGORIES = [
+  ["vc", "VC ou fonds"],
+  ["dfi", "DFI ou fonds à impact"],
+  ["banque", "Banque ou prêteur"],
+  ["family_office", "Family office"],
+  ["corporate", "Corporate"],
+  ["autre", "Autre"],
+] as const;
+
+const NOMS_CATEGORIE = new Map<string, string>(CATEGORIES);
+
+export function categorieLabel(categorie: string | null): string {
+  if (!categorie) return "—";
+  return NOMS_CATEGORIE.get(categorie) ?? categorie;
 }

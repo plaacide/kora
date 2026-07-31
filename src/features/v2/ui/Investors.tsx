@@ -4,13 +4,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { saveV2Investor } from "@/app/v2/(workspace)/operations/[operationId]/lever/actions";
+import {
+  deleteV2Investor,
+  saveV2Investor,
+} from "@/app/v2/(workspace)/operations/[operationId]/lever/actions";
 import { initials } from "@/features/v2/domain/activity";
 import {
+  CATEGORIES,
+  ENGAGEMENTS,
   ETAPES,
+  categorieLabel,
   colonnes,
+  engagementLabel,
+  engagementTon,
   etapeLabel,
-  etapeTon,
   ticketsCumules,
   type InvestisseurPipeline,
 } from "@/features/v2/domain/pipeline";
@@ -120,7 +127,7 @@ function PipelineColonnes({
   return (
     <div className="v2-pipeline-columns">
       {colonnes(investisseurs).map((colonne) => (
-        <section key={colonne.statut}>
+        <section key={colonne.etape}>
           <header>
             <strong>{colonne.nom}</strong>
             <span>{colonne.investisseurs.length}</span>
@@ -136,11 +143,32 @@ function PipelineColonnes({
                 </span>
                 <div>
                   <strong>{item.organisation ?? item.nom}</strong>
-                  <small>{item.nom}</small>
+                  <small>
+                    {item.nom}
+                    {item.categorie ? ` · ${categorieLabel(item.categorie)}` : ""}
+                  </small>
+                  {/* Deux axes, deux badges : l'étape est la colonne,
+                      l'engagement se lit ici. */}
+                  {item.engagement !== "aucun" && (
+                    <span
+                      className="v2-status"
+                      data-tone={engagementTon(item.engagement)}
+                    >
+                      {engagementLabel(item.engagement)}
+                    </span>
+                  )}
                   {item.acces && (
                     <span className="v2-status" data-tone={tonAcces(item.acces)}>
                       {item.acces}
                     </span>
+                  )}
+                  {item.prochaineAction && (
+                    <em>
+                      {item.prochaineAction}
+                      {item.dateRelance
+                        ? ` — ${new Date(item.dateRelance).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}`
+                        : ""}
+                    </em>
                   )}
                   {item.ticket != null && (
                     <em>
@@ -171,7 +199,9 @@ function PipelineTableau({
           <tr>
             <th>Organisation · contact</th>
             <th>Étape de relation</th>
+            <th>Engagement</th>
             <th>Accès documentaire</th>
+            <th>Prochaine action</th>
             <th>Ticket ({devise})</th>
             <th />
           </tr>
@@ -185,12 +215,20 @@ function PipelineTableau({
                 </span>
                 <div>
                   <strong>{item.organisation ?? item.nom}</strong>
-                  <small>{item.nom}</small>
+                  <small>
+                    {item.nom}
+                    {item.fonction ? ` · ${item.fonction}` : ""}
+                    {item.categorie ? ` · ${categorieLabel(item.categorie)}` : ""}
+                  </small>
                 </div>
               </td>
+              <td>{etapeLabel(item.etape)}</td>
               <td>
-                <span className="v2-status" data-tone={etapeTon(item.statut)}>
-                  {etapeLabel(item.statut)}
+                <span
+                  className="v2-status"
+                  data-tone={engagementTon(item.engagement)}
+                >
+                  {engagementLabel(item.engagement)}
                 </span>
               </td>
               {/* Trois dimensions distinctes : l'accès ne fait pas avancer
@@ -202,6 +240,14 @@ function PipelineTableau({
                   </span>
                 ) : (
                   "Aucun accès"
+                )}
+              </td>
+              <td>
+                {item.prochaineAction ?? "—"}
+                {item.dateRelance && (
+                  <small>
+                    {new Date(item.dateRelance).toLocaleDateString("fr-FR")}
+                  </small>
                 )}
               </td>
               <td>
@@ -239,7 +285,42 @@ function InvestorPanel({
   const [ticket, setTicket] = useState(
     investisseur?.ticket ? String(investisseur.ticket) : "",
   );
-  const [statut, setStatut] = useState(investisseur?.statut ?? "invite");
+  const [etape, setEtape] = useState(investisseur?.etape ?? "a_cibler");
+  const [engagement, setEngagement] = useState(
+    investisseur?.engagement ?? "aucun",
+  );
+  const [categorie, setCategorie] = useState(investisseur?.categorie ?? "");
+  const [fonction, setFonction] = useState(investisseur?.fonction ?? "");
+  const [pays, setPays] = useState(investisseur?.pays ?? "");
+  const [source, setSource] = useState(investisseur?.source ?? "");
+  const [responsable, setResponsable] = useState(investisseur?.responsable ?? "");
+  const [prochaineAction, setProchaineAction] = useState(
+    investisseur?.prochaineAction ?? "",
+  );
+  const [dateRelance, setDateRelance] = useState(investisseur?.dateRelance ?? "");
+  const [notes, setNotes] = useState(investisseur?.notes ?? "");
+  const [armeSuppression, setArmeSuppression] = useState(false);
+
+  async function supprimer() {
+    if (!investisseur) return;
+
+    setBusy(true);
+    setErreur(null);
+
+    const res = await deleteV2Investor({
+      operationId,
+      id: investisseur.id,
+    });
+
+    setBusy(false);
+    if (!res.ok) {
+      setErreur(res.error ?? "La relation n’a pas pu être retirée.");
+      return;
+    }
+
+    router.push("?");
+    router.refresh();
+  }
 
   async function enregistrer() {
     setBusy(true);
@@ -252,7 +333,16 @@ function InvestorPanel({
       organisation,
       email,
       ticket: enNombre(ticket),
-      statut,
+      etape,
+      engagement,
+      categorie,
+      fonction,
+      pays,
+      source,
+      responsable,
+      prochaineAction,
+      dateRelance,
+      notes,
     });
 
     setBusy(false);
@@ -347,11 +437,57 @@ function InvestorPanel({
           </label>
 
           <label className="v2-field">
+            <span>Catégorie</span>
+            <span className="v2-control">
+              <select
+                onChange={(event) => setCategorie(event.target.value)}
+                value={categorie}
+              >
+                <option value="">Non renseignée</option>
+                {CATEGORIES.map(([valeur, label]) => (
+                  <option key={valeur} value={valeur}>{label}</option>
+                ))}
+              </select>
+            </span>
+          </label>
+
+          <label className="v2-field">
+            <span>
+              Fonction <small>— facultatif</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setFonction(event.target.value)}
+                placeholder="Partner"
+                value={fonction}
+              />
+            </span>
+          </label>
+
+          <label className="v2-field">
+            <span>
+              Pays ou zone <small>— facultatif</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setPays(event.target.value)}
+                placeholder="Ghana · Afrique de l’Ouest"
+                value={pays}
+              />
+            </span>
+          </label>
+
+          <hr />
+
+          {/* DEUX AXES, jamais fusionnés : où en est la conversation, et ce
+              qui est promis. Un investisseur peut être en diligence ET avoir
+              soft-committé — c'est la phrase qu'on prononce vraiment. */}
+          <label className="v2-field">
             <span>Étape de relation</span>
             <span className="v2-control">
               <select
-                onChange={(event) => setStatut(event.target.value)}
-                value={statut}
+                onChange={(event) => setEtape(event.target.value)}
+                value={etape}
               >
                 {ETAPES.map(([valeur, label]) => (
                   <option key={valeur} value={valeur}>{label}</option>
@@ -360,12 +496,121 @@ function InvestorPanel({
             </span>
           </label>
 
-          <p className="v2-panel-note">
-            Catégorie, pays, source de la relation, responsable interne, notes
-            et prochaine action ne sont pas encore enregistrables : aucune
-            colonne ne les porte. Une relation ne se supprime pas non plus —
-            écartez-la par l’étape, ce qui garde la trace d’un tour.
-          </p>
+          <label className="v2-field">
+            <span>
+              Engagement <small>— déclaré, jamais déduit</small>
+            </span>
+            <span className="v2-control">
+              <select
+                onChange={(event) => setEngagement(event.target.value)}
+                value={engagement}
+              >
+                {ENGAGEMENTS.map(([valeur, label]) => (
+                  <option key={valeur} value={valeur}>{label}</option>
+                ))}
+              </select>
+            </span>
+          </label>
+
+          <hr />
+
+          <label className="v2-field">
+            <span>
+              Prochaine action <small>— facultatif</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setProchaineAction(event.target.value)}
+                placeholder="Envoyer la table de capitalisation"
+                value={prochaineAction}
+              />
+            </span>
+          </label>
+
+          <label className="v2-field">
+            <span>
+              Date de relance <small>— facultatif</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setDateRelance(event.target.value)}
+                type="date"
+                value={dateRelance}
+              />
+            </span>
+          </label>
+
+          <label className="v2-field">
+            <span>
+              Responsable interne <small>— facultatif</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setResponsable(event.target.value)}
+                placeholder="Amara Diallo"
+                value={responsable}
+              />
+            </span>
+          </label>
+
+          <label className="v2-field">
+            <span>
+              Source de la relation <small>— facultatif</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setSource(event.target.value)}
+                placeholder="Introduction — Dakar Accelerator"
+                value={source}
+              />
+            </span>
+          </label>
+
+          <label className="v2-field">
+            <span>
+              Notes internes <small>— jamais visibles par l’investisseur</small>
+            </span>
+            <span className="v2-control">
+              <textarea
+                onChange={(event) => setNotes(event.target.value)}
+                placeholder="Rencontré au sommet Africa Energy Forum. Thèse énergie distribuée."
+                rows={3}
+                value={notes}
+              />
+            </span>
+          </label>
+
+          {investisseur && (
+            <section className="v2-danger-zone">
+              <div>
+                <strong>Retirer du pipeline</strong>
+                <small>
+                  À ne pas confondre avec l’étape « Écarté », qui garde la trace
+                  d’une relation qui n’a pas abouti — un investisseur qui a dit
+                  non fait partie de l’histoire du tour. Retirez seulement une
+                  erreur de saisie.
+                </small>
+              </div>
+              {armeSuppression ? (
+                <div>
+                  <button disabled={busy} onClick={supprimer} type="button">
+                    {busy ? "Suppression…" : "Confirmer"}
+                  </button>
+                  <button
+                    disabled={busy}
+                    onClick={() => setArmeSuppression(false)}
+                    type="button"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => setArmeSuppression(true)} type="button">
+                  Retirer
+                </button>
+              )}
+            </section>
+          )}
         </div>
 
         <footer className="v2-sidepanel-footer">
