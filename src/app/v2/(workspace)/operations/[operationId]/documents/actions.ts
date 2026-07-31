@@ -158,3 +158,44 @@ export async function confirmV2Associations(input: {
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
   return { ok: true, confirmed };
 }
+
+/**
+ * Masquer une pièce aux invités, ou la remontrer.
+ *
+ * Le masquage vaut pour TOUS les invités, présents et à venir : c'est une
+ * propriété de la pièce, pas de l'invitation. Un masquage par invité serait un
+ * état qu'aucun écran ne montre en entier — donc un état qu'on oublie, et une
+ * pièce qu'on croit cachée alors qu'elle ne l'est que pour l'un d'eux.
+ */
+export async function setV2DocumentHidden(input: {
+  operationId: string;
+  documentId: string;
+  hidden: boolean;
+}): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("set_document_hidden", {
+    p_doc: input.documentId,
+    p_hidden: input.hidden,
+  });
+
+  if (error) {
+    console.error("[v2 documents] set_document_hidden failed", error);
+
+    // Sans la migration, la fonction n'existe pas. Le dire vaut mieux qu'un
+    // interrupteur qui revient en place sans explication.
+    const absente =
+      error.message.includes("PGRST202") ||
+      error.message.includes("Could not find the function");
+
+    return {
+      ok: false,
+      error: absente
+        ? "Le masquage n’est pas encore actif sur cette base : la migration « pieces_masquees » doit être appliquée."
+        : error.message,
+    };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}

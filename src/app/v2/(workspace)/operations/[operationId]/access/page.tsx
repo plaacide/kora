@@ -94,8 +94,13 @@ export default async function AccessPage({
       // Sans dossier choisi, on ouvre le premier : un aperçu vide n'apprend
       // rien à qui veut vérifier ce que l'invité voit.
       const folderId = query.dossier || folders[0]?.id || null;
+      // Le fondateur est interne : la RLS ne lui cache rien. L'aperçu doit
+      // donc retirer lui-même les pièces masquées, sinon il montre justement
+      // ce que l'invité ne verra pas — l'inverse de ce que l'écran promet.
       const documents = folderId
-        ? await listDocuments(operationId, folderId)
+        ? (await listDocuments(operationId, folderId)).filter(
+            (document) => !document.hidden,
+          )
         : [];
 
       return (

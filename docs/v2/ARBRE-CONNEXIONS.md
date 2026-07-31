@@ -69,6 +69,7 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Tableau (écran 24)       → invitations + ndas + permissions + audit_log
    ├─ 🟢 Aperçu invité (écran 25) → dossiers et pièces réellement ouverts
    ├─ 🟢 Périmètre choisi         invitation_folders + create_invitation(p_folders)
+   ├─ 🟢 Pièces masquées          documents.hidden_from_guests + set_document_hidden()
    └─ 🔴 Révocation               —                     ATTEND : RPC revoke_invitation
 🔴 Lever                          —                     ATTEND : raises, save_raise (écrans déjà faits)
 🔴 Investisseurs                  —                     ATTEND : raise_investors
@@ -125,26 +126,32 @@ data room, y compris ce qui sera créé plus tard » — c'est l'ancien
 comportement, conservé pour la V1 et les invitations déjà envoyées. Une
 **sélection** fige au contraire la liste.
 
-Ce qui reste hors de portée : masquer une PIÈCE dans un dossier ouvert.
-`permissions.folder_id` est `not null`, le droit se pose sur le dossier. La
-maquette 21 montre une exception par pièce ; elle demande un autre modèle.
+**Tranchée — une pièce se masque, sans changer de dossier** (1er août 2026).
+Le droit se pose sur le dossier ; ouvrir « Financier » ouvrait ses douze
+pièces. `documents.hidden_from_guests` (migration `20260801090000`) permet d'en
+retirer une sans la déplacer.
+
+Le masquage est une propriété de la PIÈCE, pas de l'invitation : il se décide
+dans la data room, devant le fichier, et vaut pour tous les invités présents et
+à venir. Un masquage par invité serait un état qu'aucun écran ne montre en
+entier. L'assistant de partage le LIT et annonce les exceptions au moment de
+choisir les dossiers.
+
+La RLS cache jusqu'au NOM : un invité ne sait pas que la pièce existe.
 
 **En attente** — les choix produit, tous sur la fidélité des maquettes :
 
-1. **Pas de visibilité par pièce** — le droit se pose sur le DOSSIER
-   (`permissions.folder_id`). Les maquettes montrent « Masquée aux invités »
-   par document. Dériver du dossier (ce qui est fait), ou migrer ?
-2. **La préparation : trois états contre six, et pas de niveau.**
+1. **La préparation : trois états contre six, et pas de niveau.**
    `checklist_status` vaut `todo | in_progress | done`. Les maquettes montrent
    « À actualiser », « Non applicable », « En vérification », plus trois
    niveaux (Requis / Recommandé / Optionnel) et une juridiction. Rien de tout
    cela n'existe en base. Trois catégories aussi, là où les maquettes en
    montrent huit — et `ohada | financier | dfi` tient plus du financeur que du
    domaine.
-3. **Révoquer un accès demande une migration.** Aucune RPC ne révoque, et
+2. **Révoquer un accès demande une migration.** Aucune RPC ne révoque, et
    `invitations` n'a pas de politique UPDATE : le bouton semblerait marcher
    sans rien fermer.
-4. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
+3. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
    `failed`). Les maquettes en montrent sept — « À actualiser », « Archivée »
    n'existent pas en base.
 

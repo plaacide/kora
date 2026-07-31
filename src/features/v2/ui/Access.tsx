@@ -38,13 +38,31 @@ function depuis(value: string, maintenant: Date): string {
   return `le ${shortDate(value)}`;
 }
 
-const wizardSteps = ["Destinataire", "Contenu", "Sécurité", "Vérification"];
-const stepOrder: Record<string, number> = {
-  recipient: 1,
-  content: 2,
-  security: 3,
-  review: 4,
-};
+/**
+ * Les quatre étapes, nommées UNE fois.
+ *
+ * Elles vivaient dans deux tableaux séparés — les liens disaient `verify`, la
+ * table de correspondance connaissait `review`. La dernière étape retombait
+ * donc sur « étape inconnue », et le fondateur qui cliquait « Continuer →
+ * Vérification » se retrouvait renvoyé au premier écran. Rien ne cassait :
+ * l'étape inconnue valait 1, en silence.
+ *
+ * Le type ci-dessous ferme la porte : un nom d'étape qui n'existe pas ne
+ * compile plus.
+ */
+const ETAPES = [
+  ["recipient", "Destinataire"],
+  ["content", "Contenu"],
+  ["security", "Sécurité"],
+  ["review", "Vérification"],
+] as const;
+
+type Etape = (typeof ETAPES)[number][0];
+
+const wizardSteps = ETAPES.map(([, label]) => label);
+const stepOrder = Object.fromEntries(
+  ETAPES.map(([nom], index) => [nom, index + 1]),
+) as Record<string, number>;
 
 function AccessStepper({ current }: { current: number }) {
   return (
@@ -176,7 +194,7 @@ export function AccessWizard({
 
 /** Les valeurs déjà saisies voyagent d'une étape à l'autre par l'URL. */
 function lien(
-  etape: string,
+  etape: Etape,
   draft: { email: string; level: string; nda: string; expires: string; dossiers: string },
   patch: Partial<{ email: string; level: string; nda: string; expires: string; dossiers: string }> = {},
 ): string {
@@ -248,8 +266,15 @@ function ContentStep({
   const retenus = tous ? folders.map((folder) => folder.id) : choisis;
   const ouverts = folders.filter((folder) => retenus.includes(folder.id));
   const pieces = ouverts.reduce((somme, folder) => somme + folder.documentCount, 0);
-  const masquees =
+
+  // Deux façons pour une pièce de ne pas être vue, à ne pas confondre : elle
+  // est dans un dossier non coché, ou elle est masquée dans un dossier ouvert.
+  // La seconde se décide dans la data room et se rappelle ici.
+  const nonOuvertes =
     folders.reduce((somme, folder) => somme + folder.documentCount, 0) - pieces;
+  const exceptions = ouverts.flatMap((folder) =>
+    folder.hidden.map((nom) => ({ nom, dossier: folder.name })),
+  );
 
   function basculer(id: string) {
     setChoisis((liste) =>
@@ -299,11 +324,29 @@ function ContentStep({
         ))}
       </div>
 
+      {exceptions.length > 0 && (
+        <p className="v2-share-warning">
+          <Icon name="eye" />
+          <span>
+            <b>
+              {exceptions.length} exception{exceptions.length > 1 ? "s" : ""} :
+            </b>{" "}
+            {exceptions
+              .map((piece) => `« ${piece.nom} » restera masquée dans ${piece.dossier}`)
+              .join(" ; ")}
+            . Le masquage se règle sur la pièce, dans la data room.
+          </span>
+        </p>
+      )}
+
       <p className="v2-scope-summary">
         Résumé : <b>{ouverts.length} dossier{ouverts.length > 1 ? "s" : ""}</b> ·{" "}
         <b>{pieces} pièce{pieces > 1 ? "s" : ""} visible{pieces > 1 ? "s" : ""}</b>
-        {masquees > 0 && (
-          <> · {masquees} pièce{masquees > 1 ? "s" : ""} masquée{masquees > 1 ? "s" : ""}</>
+        {nonOuvertes > 0 && (
+          <> · {nonOuvertes} dans des dossiers non ouverts</>
+        )}
+        {exceptions.length > 0 && (
+          <> · {exceptions.length} masquée{exceptions.length > 1 ? "s" : ""}</>
         )}
       </p>
 
@@ -312,8 +355,9 @@ function ContentStep({
           ? "Tous les dossiers de la data room s’ouvriront, y compris ceux créés après l’envoi."
           : "Seuls les dossiers cochés s’ouvriront. Un dossier créé plus tard restera fermé tant que vous ne l’aurez pas ajouté."}{" "}
         Les pièces laissées à la racine de la data room restent invisibles dans
-        tous les cas. Masquer une pièce à l’intérieur d’un dossier ouvert n’est
-        pas possible : le droit se pose sur le dossier.
+        tous les cas. Pour retirer une pièce précise d’un dossier ouvert,
+        masquez-la depuis la data room : elle disparaît de tous les accès sans
+        changer de dossier.
       </p>
     </WizardCard>
   );
@@ -333,7 +377,7 @@ function SecurityStep({
       title="Règles de sécurité de cet accès"
       description="Les valeurs par défaut sont les plus prudentes."
       backHref={lien("content", draft)}
-      nextHref={lien("verify", draft, {
+      nextHref={lien("review", draft, {
         level,
         nda: nda ? "1" : "0",
         expires,

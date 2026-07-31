@@ -1,6 +1,11 @@
 import "server-only";
 
-import { perimetre, type NoeudDossier, type Perimetre } from "@/features/v2/domain/access";
+import {
+  fermetureDescendante,
+  perimetre,
+  type NoeudDossier,
+  type Perimetre,
+} from "@/features/v2/domain/access";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -38,6 +43,8 @@ export interface ShareFolder {
   id: string;
   name: string;
   documentCount: number;
+  /** Pièces masquées de ce dossier : elles resteront invisibles à l'invité. */
+  hidden: string[];
 }
 
 /**
@@ -273,16 +280,48 @@ export async function shareableFolders(
       .select("id, name, parent_id, position")
       .eq("deal_id", operationId)
       .order("position"),
-    supabase.from("documents").select("folder_id").eq("deal_id", operationId),
+    supabase
+      .from("documents")
+      .select("name, folder_id, hidden_from_guests")
+      .eq("deal_id", operationId),
   ]);
+
+  // Tant que la migration `pieces_masquees` n'est pas appliquée, la colonne
+  // n'existe pas : la requête échoue et `documents` est nul. On relit sans
+  // elle plutôt que d'annoncer une data room vide au moment de la partager.
+  const lignesDocuments =
+    documents ??
+    (
+      await supabase
+        .from("documents")
+        .select("name, folder_id")
+        .eq("deal_id", operationId)
+    ).data ??
+    [];
 
   const arbre: NoeudDossier[] = (
     (folders ?? []) as Array<{ id: string; parent_id: string | null }>
   ).map((folder) => ({ id: folder.id, parentId: folder.parent_id }));
 
+  // Une pièce masquée ne compte pas dans ce que l'invité verra : l'annoncer
+  // ferait promettre douze pièces là où onze s'ouvriront.
   const parDossier = new Map<string, number>();
-  for (const row of (documents ?? []) as Array<{ folder_id: string | null }>) {
+  const masqueesParDossier = new Map<string, string[]>();
+
+  for (const row of lignesDocuments as Array<{
+    name: string;
+    folder_id: string | null;
+    hidden_from_guests?: boolean | null;
+  }>) {
     if (!row.folder_id) continue;
+
+    if (row.hidden_from_guests) {
+      const liste = masqueesParDossier.get(row.folder_id);
+      if (liste) liste.push(row.name);
+      else masqueesParDossier.set(row.folder_id, [row.name]);
+      continue;
+    }
+
     parDossier.set(row.folder_id, (parDossier.get(row.folder_id) ?? 0) + 1);
   }
 
@@ -292,9 +331,16 @@ export async function shareableFolders(
     (folders ?? []) as Array<{ id: string; name: string; parent_id: string | null }>
   )
     .filter((folder) => !folder.parent_id)
-    .map((folder) => ({
-      id: folder.id,
-      name: folder.name,
-      documentCount: perimetre(arbre, parDossier, [folder.id]).documents,
-    }));
+    .map((folder) => {
+      const atteints = fermetureDescendante(arbre, [folder.id]);
+      const masquees: string[] = [];
+      for (const id of atteints) masquees.push(...(masqueesParDossier.get(id) ?? []));
+
+      return {
+        id: folder.id,
+        name: folder.name,
+        documentCount: perimetre(arbre, parDossier, [folder.id]).documents,
+        hidden: masquees,
+      };
+    });
 }

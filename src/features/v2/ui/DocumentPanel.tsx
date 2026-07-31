@@ -7,6 +7,7 @@ import { useState } from "react";
 import {
   addV2Version,
   restoreV2Version,
+  setV2DocumentHidden,
 } from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
 import {
   documentEventLabel,
@@ -71,6 +72,24 @@ export function DocumentPanel({
     setBusy(null);
     if (!res.ok) {
       setErreur(res.error ?? `La version ${versionNo} n’a pas pu être restaurée.`);
+      return;
+    }
+    router.refresh();
+  }
+
+  async function basculerMasquage() {
+    setErreur(null);
+    setBusy("hidden");
+
+    const res = await setV2DocumentHidden({
+      operationId,
+      documentId: detail.id,
+      hidden: !detail.hidden,
+    });
+
+    setBusy(null);
+    if (!res.ok) {
+      setErreur(res.error ?? "La visibilité n’a pas pu être changée.");
       return;
     }
     router.refresh();
@@ -149,13 +168,42 @@ export function DocumentPanel({
             </div>
             <div>
               <small>Visibilité</small>
-              <strong>{folderVisibilityLabel(detail.guestCount)}</strong>
+              <strong>
+                {detail.hidden
+                  ? "Masquée aux invités"
+                  : folderVisibilityLabel(detail.guestCount)}
+              </strong>
             </div>
             <div>
               <small>Version active</small>
               <strong>{active ? `v${active.versionNo}` : "—"}</strong>
             </div>
           </div>
+
+          <hr />
+
+          {/* Le masquage se décide ICI, devant la pièce — pas enfoui dans un
+              assistant de partage qu'on ne rouvre jamais. */}
+          <section className="v2-hide-toggle">
+            <div>
+              <strong>Masquer aux invités</strong>
+              <small>
+                {detail.hidden
+                  ? "Cette pièce n’apparaît nulle part pour un invité, pas même son nom, quel que soit le droit posé sur son dossier."
+                  : "La pièce suit le droit de son dossier. La masquer la retire de tous les accès, présents et à venir, sans la déplacer."}
+              </small>
+            </div>
+            <button
+              aria-pressed={detail.hidden}
+              className="v2-switch"
+              data-active={detail.hidden}
+              disabled={busy !== null}
+              onClick={basculerMasquage}
+              type="button"
+            >
+              <span />
+            </button>
+          </section>
 
           <hr />
 

@@ -14,6 +14,25 @@ import { suggestForBatch } from "../domain/suggestions";
  * notes de `../domain/documents`.
  */
 
+/**
+ * `true` quand PostgREST répond « cette colonne n'existe pas » (42703).
+ *
+ * Le masquage arrive par une migration ; tant qu'elle n'est pas appliquée,
+ * `hidden_from_guests` n'existe pas et la requête échoue — ce qui ferait
+ * tomber toute la data room, pas seulement la colonne manquante.
+ *
+ * On relit alors sans la colonne, et la pièce est rendue non masquée. Ce n'est
+ * pas un pis-aller trompeur : sur une base sans la colonne, aucune pièce
+ * n'est effectivement masquée. C'est l'état réel de cette base-là.
+ */
+function colonneMasquageAbsente(error: {
+  code?: string;
+  message?: string;
+} | null): boolean {
+  if (!error) return false;
+  return error.code === "42703" || (error.message ?? "").includes("hidden_from_guests");
+}
+
 export interface FolderRow {
   id: string;
   name: string;
@@ -27,6 +46,8 @@ export interface DocumentRow {
   indexPath: string;
   name: string;
   requirement: string | null;
+  /** Masquée aux invités — la table le signale, la maquette 15 aussi. */
+  hidden: boolean;
   guestCount: number;
   versionNo: number | null;
   updatedAt: string | null;
@@ -171,6 +192,7 @@ interface DocumentRecord {
   name: string;
   index_path: string;
   status: string;
+  hidden_from_guests: boolean | null;
   folder_id: string;
   created_by: string | null;
   document_versions: {
@@ -255,6 +277,8 @@ export interface DocumentDetail {
   id: string;
   name: string;
   status: string;
+  /** Masquée aux invités — le droit du dossier ne s'applique plus à elle. */
+  hidden: boolean;
   folderName: string | null;
   requirement: string | null;
   guestCount: number;
@@ -287,14 +311,18 @@ export async function documentDetail(
 ): Promise<DocumentDetail | null> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("documents")
-    .select(
-      "id, name, status, folder_id, current_version_id, folders(name)",
-    )
-    .eq("id", documentId)
-    .eq("deal_id", operationId)
-    .maybeSingle();
+  const requete = (masquage: boolean) =>
+    supabase
+      .from("documents")
+      .select(
+        `id, name, status, ${masquage ? "hidden_from_guests, " : ""}folder_id, current_version_id, folders(name)`,
+      )
+      .eq("id", documentId)
+      .eq("deal_id", operationId)
+      .maybeSingle();
+
+  let { data, error } = await requete(true);
+  if (colonneMasquageAbsente(error)) ({ data, error } = await requete(false));
 
   if (error || !data) return null;
 
@@ -302,6 +330,7 @@ export async function documentDetail(
     id: string;
     name: string;
     status: string;
+    hidden_from_guests: boolean | null;
     folder_id: string | null;
     current_version_id: string | null;
     folders: { name: string } | Array<{ name: string }> | null;
@@ -347,6 +376,7 @@ export async function documentDetail(
     id: row.id,
     name: row.name,
     status: row.status,
+    hidden: row.hidden_from_guests ?? false,
     folderName: first(row.folders)?.name ?? null,
     requirement: requirements.get(documentId) ?? null,
     guestCount: row.folder_id ? guests.get(row.folder_id) ?? 0 : 0,
@@ -482,14 +512,19 @@ export async function listDocuments(
 
   // `documents_current_version_fk` désigne la version ACTIVE, pas la dernière
   // déposée : après une restauration, les deux diffèrent.
-  const { data, error } = await supabase
-    .from("documents")
-    .select(
-      "id, name, index_path, status, folder_id, created_by, document_versions!documents_current_version_fk(version_no, created_at, uploaded_by)",
-    )
-    .eq("deal_id", operationId)
-    .eq("folder_id", folderId)
-    .order("position");
+  const colonnes = (masquage: boolean) =>
+    `id, name, index_path, status, ${masquage ? "hidden_from_guests, " : ""}folder_id, created_by, document_versions!documents_current_version_fk(version_no, created_at, uploaded_by)`;
+
+  const requete = (masquage: boolean) =>
+    supabase
+      .from("documents")
+      .select(colonnes(masquage))
+      .eq("deal_id", operationId)
+      .eq("folder_id", folderId)
+      .order("position");
+
+  let { data, error } = await requete(true);
+  if (colonneMasquageAbsente(error)) ({ data, error } = await requete(false));
 
   if (error) throw error;
 
@@ -518,7 +553,11 @@ export async function listDocuments(
       indexPath: row.index_path,
       name: row.name,
       requirement: requirements.get(row.id) ?? null,
-      guestCount,
+      hidden: row.hidden_from_guests ?? false,
+      // Une pièce masquée n'est visible d'aucun invité, quel que soit le
+      // droit posé sur son dossier : afficher le compte du dossier ferait
+      // croire l'inverse.
+      guestCount: row.hidden_from_guests ? 0 : guestCount,
       versionNo: version?.version_no ?? null,
       updatedAt: version?.created_at ?? null,
       owner: authorId ? authors.get(authorId) ?? null : null,

@@ -187,7 +187,15 @@ export default async function DocumentsPage({
                         </Link>
                       </td>
                       <td>{row.requirement ?? "—"}</td>
-                      <td>{folderVisibilityLabel(row.guestCount)}</td>
+                      <td>
+                        {row.hidden ? (
+                          <span className="v2-status" data-tone="neutral">
+                            Masquée aux invités
+                          </span>
+                        ) : (
+                          folderVisibilityLabel(row.guestCount)
+                        )}
+                      </td>
                       <td>{row.versionNo ? `v${row.versionNo}` : "—"}</td>
                       <td>{frenchDate(row.updatedAt)}</td>
                       <td>{row.owner ?? "—"}</td>
