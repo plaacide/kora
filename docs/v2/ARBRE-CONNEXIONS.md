@@ -175,7 +175,15 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    └─ ⚪ Périmètre par opération  n'existe pas, et ne sera pas fait : arbitrage
                                     du fondateur le 2 août. Un interne voit
                                     toutes les opérations ; la colonne le dit.
-🔴 Sécurité                       —                     ATTEND : MFA, audit_log
+🟢 Sécurité (34)                  securityState(), securityJournal()
+   ├─ 🟢 TOTP                     enroll / challenge / verify / unenroll
+   │                                côté navigateur : Supabase exige la session
+   ├─ 🟢 Journal de sécurité      log_security_event() — actions fermées,
+   │                                organisation déduite de l'appelant
+   ├─ 🟢 Fermer les autres        signOut scope « others »
+   ├─ ⚪ Liste des appareils      Supabase ne l'expose pas. L'écran le dit.
+   └─ ⚪ Codes de récupération    non faits : les générer serait facile, les
+                                    faire fonctionner ne l'est pas
 🔴 Abonnement                     —                     ATTEND : décisions produit
 ```
 
@@ -305,8 +313,8 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 ## Migrations
 
 Toutes appliquées sur staging (`jourzsgjnutktsrgxkoo`), y compris
-`lecteur_interne`, `engagements`, `mises_a_jour`, `gerer_l_equipe` et
-`inviter_un_collaborateur`. Aucune n'est en attente.
+`lecteur_interne`, `engagements`, `mises_a_jour`, `gerer_l_equipe`,
+`inviter_un_collaborateur` et `journal_de_securite`. Aucune n'est en attente.
 
 Aucune n'a été portée en production. Le fondateur a levé la contrainte de
 compatibilité V1 : produit en pré-lancement, les changements de modèle sont
@@ -326,5 +334,7 @@ autorisés — mais staging reste la première étape.
    opération est écarté : le fondateur l'a tranché, ce n'est pas un manque.
 8. **Interactions du pipeline** (41-42) — la table n'existe pas.
 9. **Cohortes** (31-32) — `cohort_links` n'existe pas.
-10. **Sécurité**, **Abonnement** — décisions produit d'abord. `/v2/abonnement`
-   n'est atteignable depuis aucun rail : à trancher avant de le brancher.
+10. ~~Sécurité~~ — faite le 2 août. Restent les codes de récupération, qui
+   demandent une mécanique de secours propre.
+11. **Abonnement** — `/v2/abonnement` affiche une fixture et n'est atteignable
+   depuis aucun rail : à trancher avant de le brancher.
