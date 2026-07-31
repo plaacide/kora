@@ -3,9 +3,10 @@
 La boussole du branchement : ce qui lit vraiment la base, ce qui affiche encore
 des données écrites en dur, et ce qui manque côté serveur pour finir.
 
-**Dernière vérification : 31 juillet 2026 (soir)**, branche `v2/rebuild`, par
-inventaire du code (`grep` des fichiers V2 touchant Supabase, puis lecture
-écran par écran). Ce document se périme : le relire avant de s'y fier.
+**Dernière vérification : 1er août 2026**, branche `v2/rebuild`. Établie en
+re-dérivant depuis le code — quels écrans importent `features/v2/server/*` — et
+en interrogeant la base de staging pour l'état réel des migrations. Ce document
+se périme : le relire avant de s'y fier.
 
 ## Comment lire
 
@@ -51,28 +52,43 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ## À l'intérieur d'une opération
 
 ```
-🔴 Vue d'ensemble                 —                     ATTEND : lecture deals + readiness
-🟡 Préparation (exigences)        listRequirementsFull(), requirementDetail(), requirementHistory()
-   ├─ 🟢 Plan (écran 11)          → checklist_items + preuves + dossier attendu
-   ├─ 🟢 Détail (écran 12)        → preuves, journal, statut, retrait de preuve
+🔴 Vue d'ensemble                 —                     ATTEND : rien. Tout ce
+                                                        qu'elle affiche est déjà
+                                                        lu ailleurs.
+
+🟢 Préparation                    listRequirementsFull(), requirementDetail(),
+                                  requirementHistory(), attachableDocuments(),
+                                  preparationProgress()
+   ├─ 🟢 Plan (écran 11)          → 8 domaines, niveaux, financeurs multiples
+   ├─ 🟢 Filtres                  → Toutes / À traiter / Requises / À actualiser
+   │                                / Prêtes, + par financeur
+   ├─ 🟢 Détail (écran 12)        → preuves, état par pièce, journal, statut
+   ├─ 🟢 Rattacher une pièce      attach_checklist_document(p_confirmed: true)
+   ├─ 🟢 Confirmer / écarter      + dismiss_checklist_suggestion()
+   ├─ 🟢 Non applicable           set_checklist_status()
    ├─ 🟢 Ajouter une exigence     add_checklist_item()
    ├─ 🟢 Poser le référentiel     apply_checklist_template()
-   └─ 🔴 Import d'une liste (13)  —                     ATTEND : extraction + colonne de provenance
+   └─ 🔴 Import d'une liste (13)  —                     ATTEND : extraction d'un
+                                                        PDF + colonne de provenance
+
 🟢 Data room                      listFolders(), listDocuments(), resolveFolderPath()
    ├─ 🟢 Arborescence             → folders (+ compte de pièces, accès invités)
-   ├─ 🟢 Table des pièces         → documents + document_versions + checklist_item_documents
-   ├─ 🟢 Détail, versions, journal → document_versions + audit_log ; restaurer et remplacer
-   ├─ 🟢 Dépôt (écran 16)         → Storage direct + register_document, % réel, annulation
-   └─ 🟢 Associations (écran 17)  → suggestions depuis le modèle + attach_checklist_document
-🟢 Partage et accès               listAccesses(), shareableFolders(), countActiveAccesses()
-   ├─ 🟢 Assistant (écrans 20-23) → createInvitation() V1 : RPC + lien + e-mail
+   ├─ 🟢 Table des pièces         → documents + versions + exigences
+   ├─ 🟢 Détail, versions, journal → restaurer, remplacer, masquer
+   ├─ 🟢 Dépôt (écran 16)         → Storage direct + register_document, % réel
+   └─ 🟢 Associations (écran 17)  → suggestions écrites non confirmées
+
+🟢 Partage et accès               listAccesses(), shareableFolders(),
+                                  countActiveAccesses(), invitationScope()
+   ├─ 🟢 Assistant (écrans 20-23) → createInvitation() : RPC + lien + e-mail
+   ├─ 🟢 Périmètre choisi         invitation_folders
+   ├─ 🟢 Pièces masquées          documents.hidden_from_guests
    ├─ 🟢 Tableau (écran 24)       → invitations + ndas + permissions + audit_log
-   ├─ 🟢 Aperçu invité (écran 25) → dossiers et pièces réellement ouverts
-   ├─ 🟢 Périmètre choisi         invitation_folders + create_invitation(p_folders)
-   ├─ 🟢 Pièces masquées          documents.hidden_from_guests + set_document_hidden()
-   └─ 🔴 Révocation               —                     ATTEND : RPC revoke_invitation
-🔴 Lever                          —                     ATTEND : raises, save_raise (écrans déjà faits)
-🔴 Investisseurs                  —                     ATTEND : raise_investors
+   ├─ 🟢 Aperçu invité (écran 25) → ce que l'invité verra vraiment
+   └─ 🟢 Révocation               revoke_invitation()
+
+🔴 Lever                          —                     ATTEND : raises, save_raise
+🔴 Investisseurs                  —                     ATTEND : raise_investors (table vide)
 🔴 Activité (journal)             —                     ATTEND : audit_log par opération
 🟢 Visionneuse                    → /api/viewer, filigrane incrusté, audit par page
 ```
@@ -80,12 +96,21 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ## Le reste du produit
 
 ```
-🔴 Invitations et demandes        —                     ATTEND : invitations
+🔴 Invitations et demandes        —                     ATTEND : invitations + access_requests
 🔴 Activité globale               —                     ATTEND : audit_log par organisation
 🔴 Recherche                      —                     ATTEND : documents + folders + deals
-🔴 Équipe                         —                     ATTEND : memberships, profiles
+🔴 Équipe                         —                     ATTEND : memberships (vocabulaire à trancher)
 🔴 Sécurité                       —                     ATTEND : MFA, audit_log
-🔴 Abonnement                     —                     ATTEND : org_active, plans
+🔴 Abonnement                     —                     ATTEND : décisions produit
+```
+
+## Ce que le rail affiche
+
+```
+🟢 Préparation  1/22        preparationProgress() — même règle que l'écran
+🟢 Bandeau      « Partagée — 1 accès actif »  countActiveAccesses()
+🔴 Partage et accès         la maquette 24 montre un badge, pas encore branché
+🔴 Investisseurs, Lever, Activité   pas de badge
 ```
 
 ---
@@ -101,89 +126,90 @@ relecture.
 contrôles, lecture ET écriture, entre deux entreprises étrangères. À rejouer
 après toute migration : une politique se casse en modifiant une AUTRE table.
 
-**Règles pures.** `domain/operation.ts`, `domain/activity.ts`,
-`domain/documents.ts` — testables sans base ni mock. 46 tests. Toute logique
-qui ne fait pas d'entrée-sortie a vocation à y descendre.
+**Règles pures.** `domain/` — `operation`, `activity`, `documents`, `access`,
+`preparation`, `suggestions`, `journal`. 128 tests, sans base ni mock. Toute
+logique qui ne fait pas d'entrée-sortie a vocation à y descendre.
 
-## Décisions
+## Décisions tranchées
 
-**Tranchée — le dépôt à la racine** (30 juillet 2026). `documents.folder_id`
-est devenu nullable (`20260731210000_documents_racine.sql`) : on dépose
-d'abord, on range ensuite, ou jamais.
+**Le dépôt à la racine** (31 juillet). `documents.folder_id` est nullable : on
+dépose d'abord, on range ensuite. Conséquence : une pièce à la racine ne se
+partage pas — un accès se pose sur un dossier, sans dossier il n'y a nulle part
+où accorder ni retirer un droit. La racine est réservée à l'équipe.
 
-Conséquence à connaître : **une pièce à la racine ne se partage pas.** Un accès
-se pose sur un dossier ; sans dossier, il n'y a nulle part où accorder — ni
-retirer — un droit. La racine est donc réservée à l'équipe interne, et le geste
-qui partage une pièce est celui qui la range.
+**L'invitation porte son périmètre** (31 juillet). `invitation_folders` :
+l'assistant fait choisir les dossiers, l'acceptation n'ouvre que ceux-là. Deux
+états à ne pas confondre : **aucun périmètre** vaut « toute la data room, y
+compris ce qui sera créé plus tard » ; une **sélection** fige la liste.
 
-**Tranchée — l'invitation porte son périmètre** (31 juillet 2026).
-`accept_invitation` accordait TOUS les dossiers racine. La migration
-`20260731230000_invitation_perimetre` ajoute `invitation_folders` : l'assistant
-fait choisir les dossiers, et l'acceptation n'ouvre que ceux-là.
+**Une pièce se masque sans changer de dossier** (1er août).
+`documents.hidden_from_guests` — propriété de la PIÈCE, pas de l'invitation :
+elle se décide dans la data room et vaut pour tous les invités. La RLS cache
+jusqu'au NOM.
 
-Deux états à ne pas confondre : **aucun périmètre enregistré** vaut « toute la
-data room, y compris ce qui sera créé plus tard » — c'est l'ancien
-comportement, conservé pour la V1 et les invitations déjà envoyées. Une
-**sélection** fige au contraire la liste.
+**La lecture d'un invité suit ses droits** (1er août). Vérifié sur un compte
+invité réel : avec deux dossiers sur six, il lisait les six dossiers, les
+vingt-quatre noms de pièces et leurs clés de stockage. `can_see_deal` ouvrait
+toute l'opération dès qu'un droit existait quelque part. Corrigé, checklist
+comprise.
 
-**Tranchée — une pièce se masque, sans changer de dossier** (1er août 2026).
-Le droit se pose sur le dossier ; ouvrir « Financier » ouvrait ses douze
-pièces. `documents.hidden_from_guests` (migration `20260801090000`) permet d'en
-retirer une sans la déplacer.
+**La révocation** (1er août). `revoke_invitation()` passe le statut, supprime
+les permissions et journalise. Vérifié : plus rien de visible, jeton rejoué
+refusé. L'appartenance `guest` est conservée — elle vaut pour les autres
+opérations.
 
-Le masquage est une propriété de la PIÈCE, pas de l'invitation : il se décide
-dans la data room, devant le fichier, et vaut pour tous les invités présents et
-à venir. Un masquage par invité serait un état qu'aucun écran ne montre en
-entier. L'assistant de partage le LIT et annonce les exceptions au moment de
-choisir les dossiers.
+**Une échéance dure jusqu'à la fin du jour dit** (1er août). Le champ date
+produisait minuit : l'accès mourait la veille au soir. `fin_de_journee()`
+normalise à 23:59:59 — en UTC, exact pour Dakar et Abidjan, une à trois heures
+de large à Lagos ou Nairobi.
 
-La RLS cache jusqu'au NOM : un invité ne sait pas que la pièce existe.
+**Les exigences ont deux axes** (1er août). `domain` range (8 valeurs),
+`sources` étiquette (plusieurs), `level` hiérarchise. Quatre états stockés,
+`not_applicable` compris. « À actualiser » se DÉDUIT de `freshness_days`.
+« En vérification » écarté tant qu'aucun geste ne le produit.
 
-**Tranchée — les exigences ont deux axes** (1er août 2026).
-`category` valait `ohada | financier | dfi` : des financeurs déguisés en
-domaines, et uniques, donc une exigence réclamée par une banque ET un bailleur
-devait choisir. Séparé en `domain` (8 valeurs, celles des maquettes) et
-`sources` (plusieurs par exigence), plus `level` qui manquait entièrement.
+**Une suggestion n'est pas une preuve** (1er août). Elle est écrite dès le
+dépôt, non confirmée : elle survit à un onglet refermé et ne compte pas dans le
+score. `sync_checklist_status` ne regarde que les liens confirmés.
 
-Sur les six états des maquettes, quatre sont stockés — `not_applicable`
-rejoint les trois existants, il a son geste. « À actualiser » se DÉDUIT de
-`freshness_days` et de la date de la preuve : « Extrait RCCM de moins de
-3 mois » portait déjà la règle dans son intitulé. « En vérification » est
-écarté tant qu'aucun geste ne le produit.
+## Ce qui reste en attente
 
-**Tranchée — la révocation** (1er août 2026). `revoke_invitation` passe le
-statut, supprime les permissions sur l'opération et journalise. Vérifié sur un
-compte invité réel : plus rien de visible, jeton rejoué refusé.
+1. **Écran 13 — import d'une liste reçue.** Rien n'extrait d'exigences d'un
+   PDF, et `checklist_items` n'a pas où retenir « demandé par telle banque ».
+2. **La juridiction.** La maquette 11 pose un filtre « Par juridiction » et la
+   12 affiche « OHADA — Sénégal ». Rien ne la porte. Probablement une propriété
+   de l'OPÉRATION, pas de chaque exigence.
+3. **« Modèle disponible »** (maquette 12) : aucune bibliothèque de gabarits.
+4. **« Demander à l'équipe »** (maquette 12) : pas de messagerie interne.
+5. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
+   `failed`). Les maquettes en montrent sept.
+6. **Le vocabulaire des rôles d'équipe.** Les maquettes en montrent quatre
+   (owner, administrator, contributor, internal_viewer), la base en a quatre
+   autres (owner, admin, member, guest).
+7. **Le fuseau horaire d'une organisation**, pour que les échéances tombent à
+   minuit local.
 
-**Tranchée — la lecture d'un invité suit ses droits** (1er août 2026).
-Vérification faite sur un vrai compte invité, après acceptation d'une
-invitation portant sur deux dossiers sur six : il lisait les six dossiers, les
-vingt-quatre noms de pièces et leurs clés de stockage. Ses DROITS étaient
-justes (`none` partout ailleurs, contenu inaccessible), mais le nom suffit à
-trahir. `can_see_deal` ouvrait la lecture de toute l'opération dès qu'un droit
-existait quelque part — défendable quand le partage était tout ou rien, plus
-depuis que l'assistant fait décocher des dossiers.
+## Migrations
 
-`20260801120000_cloisonnement_par_dossier` aligne la lecture sur le droit, et
-ferme la checklist aux invités : elle disait ce qui manque encore au dossier.
-⚠️ Cette migration change aussi ce qu'un invité V1 voit en production.
+Toutes appliquées sur staging (`jourzsgjnutktsrgxkoo`) au 1er août, **sauf** :
 
-**En attente** — les choix produit, tous sur la fidélité des maquettes :
+| Migration | État |
+|---|---|
+| `20260801230000_journal_nom_de_piece` | en attente — le journal dit « une pièce » au lieu du nom |
 
-1. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
-   `failed`). Les maquettes en montrent sept — « À actualiser », « Archivée »
-   n'existent pas en base.
+Aucune n'a été portée en production. Le fondateur a levé la contrainte de
+compatibilité V1 : produit en pré-lancement, les changements de modèle sont
+autorisés — mais staging reste la première étape.
 
 ## L'ordre qui reste
 
-Le chemin le plus court vers un produit utilisable de bout en bout :
-
-1. ~~Dépôt de fichiers~~ — fait le 31 juillet.
-2. ~~Visionneuse~~ — fait le 31 juillet.
-3. ~~Partage et accès~~ — fait le 31 juillet. Reste la révocation, qui demande
-   une migration.
-4. ~~Préparation~~ — fait le 31 juillet. Reste l'écran 13 (import d'une liste
-   reçue), qui demande une extraction et une colonne de provenance.
-5. **Vue d'ensemble** — dépend des deux précédents (prochaine action,
-   progression, activité récente). C'est la suite immédiate.
-6. **Le reste** — recherche, équipe, activité globale, abonnement.
+1. ~~Dépôt, visionneuse, partage et accès, préparation~~ — faits.
+2. **Vue d'ensemble** — c'est la première chose qu'on voit en ouvrant une
+   opération, et le dernier endroit où le produit affiche des chiffres
+   inventés. Rien ne la bloque : les quatre données dont elle a besoin sont
+   déjà branchées ailleurs.
+3. **Activité** (par opération, puis globale) — même source, et c'est la
+   surface de preuve.
+4. **Recherche** — documents, dossiers, opérations.
+5. **Investisseurs**, puis **Lever** — le plus gros volume de maquettes.
+6. **Équipe**, **Sécurité**, **Abonnement** — décisions produit d'abord.
