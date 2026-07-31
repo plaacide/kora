@@ -145,6 +145,26 @@ export function relancesDues(
     .sort((a, b) => (a.dateRelance ?? "").localeCompare(b.dateRelance ?? ""));
 }
 
+/**
+ * Les fonctions rencontrées chez un investisseur.
+ *
+ * Liste plutôt que texte libre, pour la même raison que les pays : « Partner »,
+ * « Associé », « associé », « Partner @ XYZ » finissent tous en base, et plus
+ * rien ne se regroupe. « Autre » existe pour ne pas bloquer quelqu'un dont le
+ * titre n'y est pas — un champ fermé sans échappatoire se contourne en
+ * mettant n'importe quoi dans le champ d'à côté.
+ */
+export const FONCTIONS = [
+  "Associé / Partner",
+  "Directeur d’investissement",
+  "Chargé d’investissement",
+  "Analyste",
+  "Responsable pays",
+  "Dirigeant / Fondateur",
+  "Conseil / Avocat",
+  "Autre",
+] as const;
+
 /** Les catégories d'investisseur — le même vocabulaire que l'audience d'une levée. */
 export const CATEGORIES = [
   ["vc", "VC ou fonds"],

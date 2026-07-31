@@ -106,7 +106,8 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 🟢 Investisseurs                  pipelineInvestors()   → raise_investors + accès
    ├─ 🟢 Colonnes (38)            → six étapes, tickets cumulés par colonne
    ├─ 🟢 Tableau (39)             → étape, accès, ticket : trois colonnes distinctes
-   ├─ 🟢 Ajouter / modifier (40)  save_raise_investor()
+   ├─ 🟢 Ajouter / modifier (40)  save_raise_investor() — 8 champs, listes fermées
+   ├─ 🟢 Retirer                  delete_raise_investor()
    ├─ 🟢 Accès documentaire       DÉDUIT des invitations, par l'adresse
    └─ 🔴 Interactions (41-42)     —                     ATTEND : table absente
 🔴 Activité (journal)             —                     ATTEND : audit_log par opération
@@ -202,6 +203,17 @@ exigences requises » : 18 + 4 + 2 = 24. Le recommandé est compté à part
 (« 9/13 »). Mélanger les deux ferait paraître un dossier plus en retard qu'il
 n'est.
 
+**Le pipeline a deux axes** (2 août). `statut` mélangeait une ÉTAPE, un
+ENGAGEMENT et une ISSUE : un investisseur en diligence ayant soft-committé ne
+pouvait afficher qu'une des deux. Sept étapes, cinq engagements. `nda`
+disparaît — il décrivait un ACCÈS, qui se lit dans les invitations ; `refuse`
+devient un engagement retiré sans effacer l'étape atteinte.
+
+**Pays et fonction sont des listes** (2 août). Saisis à la main, ils
+produisaient « Cote d'ivoire », « RCI » et « Côte d'Ivoire » dans la même base.
+La ZONE ne se saisit pas : elle se déduit du pays, sans quoi « Ghana · Afrique
+de l'Est » finirait par exister sans que personne puisse trancher.
+
 **Une suggestion n'est pas une preuve** (1er août). Elle est écrite dès le
 dépôt, non confirmée : elle survit à un onglet refermé et ne compte pas dans le
 score. `sync_checklist_status` ne regarde que les liens confirmés.
@@ -225,17 +237,10 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 8. **Les conditions d'une levée.** La maquette 36 demande ticket minimum et
    maximum, recherche d'un lead et part de capital envisagée. Aucune colonne ne
    les porte.
-9. **Le vocabulaire du pipeline.** `raise_investors.statut` mélange une ÉTAPE
-   de relation (`invite`, `diligence`), un ENGAGEMENT (`soft_commit`,
-   `engage`) et une ISSUE (`refuse`). Les maquettes 38 et 39 les séparent en
-   sept étapes plus une colonne d'engagement. Les scinder demande de décider
-   ce qu'affiche un investisseur « en diligence qui a soft-committé ».
-10. **Les champs d'une fiche investisseur.** La maquette 40 demande catégorie,
-   fonction, pays, source de la relation, responsable interne, prochaine
-   action, date de relance et notes. Aucune colonne ne les porte.
-11. **Supprimer une relation** est impossible : `revoke delete` et aucune RPC.
-   On écarte par l'étape, ce qui garde la trace — mais c'est un choix subi.
-12. **La ventilation du montant sécurisé.** La maquette 37 sépare « engagements
+9. **La liste des pays de l'onboarding** en propose cinq, écrits en dur, alors
+   que `domain/geographie` en tient cinquante-huit rangés par zone. Les deux
+   devraient être la même liste.
+10. **La ventilation du montant sécurisé.** La maquette 37 sépare « engagements
    confirmés » et « soft-commits » ; `montant_engage` est un seul montant
    déclaré.
 

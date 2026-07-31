@@ -410,6 +410,7 @@
 @media(max-width:600px){.v2-roles-grid{grid-template-columns:1fr}.v2-promo-card{flex-direction:column}}
 
 /* Écran 30 — Journal d'activité */
+.v2-field-hint{display:block;margin:-8px 0 2px;color:var(--text-4);font-size:12px}
 .v2-danger-zone{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border:1px solid #fecdca;border-radius:9px;background:#fffbfa;padding:13px 14px}
 .v2-danger-zone strong{display:block;color:#b42318;font-size:13px;font-weight:500}
 .v2-danger-zone small{display:block;margin-top:3px;color:var(--text-3);font-size:12px;line-height:1.5}
@@ -887,6 +888,7 @@ label.v2-btn[data-busy=true]{opacity:.6;pointer-events:none}
 .v2-dialog-choices .v2-icon{color:var(--orange-text)}
 
 /* Écrans 66 (recherche) et 68 (abonnement) */
+.v2-field-hint{display:block;margin:-8px 0 2px;color:var(--text-4);font-size:12px}
 .v2-danger-zone{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border:1px solid #fecdca;border-radius:9px;background:#fffbfa;padding:13px 14px}
 .v2-danger-zone strong{display:block;color:#b42318;font-size:13px;font-weight:500}
 .v2-danger-zone small{display:block;margin-top:3px;color:var(--text-3);font-size:12px;line-height:1.5}

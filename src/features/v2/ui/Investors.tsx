@@ -9,8 +9,10 @@ import {
   saveV2Investor,
 } from "@/app/v2/(workspace)/operations/[operationId]/lever/actions";
 import { initials } from "@/features/v2/domain/activity";
+import { paysAvecZone, paysParZone } from "@/features/v2/domain/geographie";
 import {
   CATEGORIES,
+  FONCTIONS,
   ENGAGEMENTS,
   ETAPES,
   categorieLabel,
@@ -219,6 +221,7 @@ function PipelineTableau({
                     {item.nom}
                     {item.fonction ? ` · ${item.fonction}` : ""}
                     {item.categorie ? ` · ${categorieLabel(item.categorie)}` : ""}
+                    {item.pays ? ` · ${paysAvecZone(item.pays)}` : ""}
                   </small>
                 </div>
               </td>
@@ -456,26 +459,42 @@ function InvestorPanel({
               Fonction <small>— facultatif</small>
             </span>
             <span className="v2-control">
-              <input
+              <select
                 onChange={(event) => setFonction(event.target.value)}
-                placeholder="Partner"
                 value={fonction}
-              />
+              >
+                <option value="">Non renseignée</option>
+                {FONCTIONS.map((valeur) => (
+                  <option key={valeur} value={valeur}>{valeur}</option>
+                ))}
+              </select>
             </span>
           </label>
 
+          {/* La ZONE ne se saisit pas : elle se déduit du pays. Demander les
+              deux laisserait un jour « Ghana · Afrique de l'Est » en base, et
+              personne pour dire lequel a raison. */}
           <label className="v2-field">
             <span>
-              Pays ou zone <small>— facultatif</small>
+              Pays <small>— la zone en découle</small>
             </span>
             <span className="v2-control">
-              <input
+              <select
                 onChange={(event) => setPays(event.target.value)}
-                placeholder="Ghana · Afrique de l’Ouest"
                 value={pays}
-              />
+              >
+                <option value="">Non renseigné</option>
+                {paysParZone().map((groupe) => (
+                  <optgroup key={groupe.zone} label={groupe.zone}>
+                    {groupe.pays.map((nom) => (
+                      <option key={nom} value={nom}>{nom}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
             </span>
           </label>
+          {pays && <small className="v2-field-hint">{paysAvecZone(pays)}</small>}
 
           <hr />
 
