@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { createInvitation } from "@/app/actions/invitations";
 import type { Level } from "@/lib/permissions";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Création d'un accès — dernière étape de l'assistant de partage.
@@ -54,15 +55,31 @@ export async function createV2Access(input: {
 }
 
 /**
- * PAS de révocation ici, et ce n'est pas un oubli.
+ * Refermer un accès.
  *
- * Aucune RPC ne révoque une invitation, et `invitations` n'a pas de politique
- * UPDATE : une écriture directe serait refusée en silence — zéro ligne
- * touchée, aucune erreur — et le bouton semblerait fonctionner. Livrer cela
- * serait pire que de ne rien livrer : le fondateur croirait un accès fermé
- * alors qu'il resterait ouvert.
+ * Passe par `revoke_invitation` et non par une écriture directe : `invitations`
+ * n'a pas de politique UPDATE, une écriture directe serait refusée en silence
+ * — zéro ligne touchée, aucune erreur — et le bouton semblerait fonctionner.
  *
- * La révocation demande donc une migration : une fonction `revoke_invitation`
- * qui passe le statut, retire les `permissions` associées et écrit au
- * journal. C'est un geste de sécurité, il doit être tracé.
+ * La RPC fait les trois gestes ensemble : statut, suppression des permissions
+ * sur cette opération, journal. Elle rend le nombre de dossiers refermés, qui
+ * est ce que le fondateur veut lire pour être sûr.
  */
+export async function revokeV2Access(input: {
+  operationId: string;
+  invitationId: string;
+}): Promise<{ ok: boolean; error?: string; removed?: number }> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("revoke_invitation", {
+    p_invitation: input.invitationId,
+  });
+
+  if (error) {
+    console.error("[v2 access] revoke_invitation échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true, removed: typeof data === "number" ? data : 0 };
+}

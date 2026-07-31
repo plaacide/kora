@@ -120,6 +120,7 @@ export default async function AccessPage({
       <AccessTable
         accesses={accesses}
         lien={query.lien ?? null}
+        operationId={operationId}
         sent={query.sent === "1" ? "1" : query.sent === "manuel" ? "manuel" : null}
       />
       {query.request === "1" && <RequestPanel />}

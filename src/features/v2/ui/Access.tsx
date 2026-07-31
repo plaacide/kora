@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { createV2Access } from "@/app/v2/(workspace)/operations/[operationId]/access/actions";
+import {
+  createV2Access,
+  revokeV2Access,
+} from "@/app/v2/(workspace)/operations/[operationId]/access/actions";
 import {
   correspondAuFiltre,
   etatAcces,
@@ -543,10 +546,12 @@ function ReviewStep({
  */
 export function AccessTable({
   accesses,
+  operationId,
   sent,
   lien,
 }: {
   accesses: readonly AccessRow[];
+  operationId: string;
   sent: "1" | "manuel" | null;
   /** Lien nominatif à transmettre à la main quand l'e-mail n'est pas parti. */
   lien: string | null;
@@ -652,9 +657,8 @@ export function AccessTable({
             </thead>
             <tbody>
               {visibles.map((row) => {
-                const etat = etatLabel(
-                  etatAcces(row.status, row.expiresAt, maintenant),
-                );
+                const brut = etatAcces(row.status, row.expiresAt, maintenant);
+                const etat = etatLabel(brut);
 
                 return (
                   <tr key={row.id}>
@@ -694,8 +698,17 @@ export function AccessTable({
                         : "—"}
                     </td>
                     <td>{row.expiresAt ? shortDate(row.expiresAt) : "Sans échéance"}</td>
-                    <td>
+                    <td className="v2-access-actions">
                       <Link href={`?apercu=${row.id}`}>Détail</Link>
+                      {/* Un accès déjà clos n'a plus rien à fermer : proposer
+                          « Révoquer » ferait douter de ce qui est en cours. */}
+                      {brut !== "revoked" && brut !== "expired" && (
+                        <RevokeButton
+                          email={row.name ?? row.email}
+                          invitationId={row.id}
+                          operationId={operationId}
+                        />
+                      )}
                     </td>
                   </tr>
                 );
@@ -711,6 +724,76 @@ export function AccessTable({
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Révoquer, en deux temps.
+ *
+ * Pas de fenêtre de confirmation : un clic de trop se rattrape ici en cliquant
+ * ailleurs. Mais pas un seul clic non plus — refermer une data room à un
+ * investisseur qui la consulte n'est pas un geste qu'on annule.
+ */
+function RevokeButton({
+  operationId,
+  invitationId,
+  email,
+}: {
+  operationId: string;
+  invitationId: string;
+  email: string;
+}) {
+  const router = useRouter();
+  const [arme, setArme] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  async function revoquer() {
+    setBusy(true);
+    setErreur(null);
+
+    const res = await revokeV2Access({ operationId, invitationId });
+
+    setBusy(false);
+    setArme(false);
+
+    if (!res.ok) {
+      setErreur(res.error ?? "L’accès n’a pas pu être fermé.");
+      return;
+    }
+    router.refresh();
+  }
+
+  if (erreur) {
+    return (
+      <span className="v2-revoke-error" role="alert" title={erreur}>
+        Échec — réessayer
+        <button onClick={() => setErreur(null)} type="button">×</button>
+      </span>
+    );
+  }
+
+  if (!arme) {
+    return (
+      <button
+        aria-label={`Révoquer l’accès de ${email}`}
+        onClick={() => setArme(true)}
+        type="button"
+      >
+        Révoquer
+      </button>
+    );
+  }
+
+  return (
+    <span className="v2-revoke-confirm">
+      <button disabled={busy} onClick={revoquer} type="button">
+        {busy ? "Fermeture…" : "Confirmer"}
+      </button>
+      <button disabled={busy} onClick={() => setArme(false)} type="button">
+        Annuler
+      </button>
+    </span>
   );
 }
 

@@ -581,6 +581,11 @@
 .v2-access-filters input[type=search]{border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px 11px;width:210px;font-size:12.5px}
 .v2-access-table td small{display:block;color:var(--text-4);font-size:11.5px}
 .v2-access-table td a{color:var(--orange);font-size:12.5px}
+.v2-access-actions{white-space:nowrap}
+.v2-access-actions>button,.v2-revoke-confirm>button,.v2-revoke-error>button{margin-left:10px;border:0;background:none;padding:0;color:var(--text-3);font-size:12.5px;cursor:pointer}
+.v2-access-actions>button:hover{color:#b42318}
+.v2-revoke-confirm>button:first-child{color:#b42318;font-weight:500}
+.v2-revoke-error{margin-left:10px;color:#b42318;font-size:12.5px}
 .v2-success-banner[data-tone=amber]{border-color:#f5c6ae;background:var(--orange-soft)}
 .v2-success-banner code{border-radius:4px;background:#fff;padding:1px 5px;font-size:11.5px;word-break:break-all}
 
