@@ -106,7 +106,6 @@ export function SelectField({
         <select name={name} defaultValue={defaultValue}>
           {options.map((option) => <option key={option}>{option}</option>)}
         </select>
-        <Icon name="chevron" />
       </span>
       {helper && <small className="v2-field-helper">{helper}</small>}
     </label>

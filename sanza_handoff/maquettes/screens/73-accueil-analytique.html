@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Sanza — 73 · Accueil — tableau de bord analytique</title>
+<link rel="stylesheet" href="parcours.css">
+<style>
+.tabs{display:flex;gap:26px;border-bottom:1px solid var(--line)}
+.tabs a{padding:10px 2px 12px;font:500 13.5px var(--sans);color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer}
+.tabs a.on{color:var(--orange-text);border-bottom-color:var(--orange);font-weight:600}
+.th{display:flex;align-items:center;gap:5px;font:600 12px var(--sans);color:var(--text-3);cursor:pointer}
+.th.on{color:var(--orange-text)}
+.th svg{opacity:.6}
+</style>
+</head>
+<body>
+<div class="screen-note"><b>73 · Accueil — tableau de bord analytique</b><span>MO · Route /dashboard · vue consultations toutes opérations · période 30 jours · onglets Consultations / Accès / Documents / Invités · 1440 px</span></div>
+<div class="screen">
+<nav class="rail"><span class="mark">S</span><a class="on" title="Accueil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></a><a title="Opérations"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></a><a title="Invitations et demandes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></a><a title="Recherche"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></a><span class="spring"></span><span class="avatar">AD</span></nav>
+<main class="main">
+<div class="topbar"><span class="crumb"><b>Accueil</b></span><span class="spring"></span><span class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Rechercher partout…</span></div>
+<div class="work" style="display:flex;flex-direction:column;gap:22px;max-width:1100px">
+
+<div style="display:flex;align-items:flex-end;justify-content:space-between">
+<div><h1 style="font-size:24px;letter-spacing:-.01em">Bonjour Amara</h1>
+<p style="margin:6px 0 0;font-size:14px;color:var(--text-2)">L'activité de vos invités sur vos 3 opérations actives.</p></div>
+<span class="btn btn-sm btn-grey" style="gap:7px">30 derniers jours <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+</div>
+
+<div class="card" style="padding:20px 22px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+<span class="ctx-label" style="padding:0">Consultations par jour</span>
+<div style="display:flex;gap:14px;font-size:12.5px;color:var(--text-2)">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:3px;background:var(--orange);border-radius:2px"></span>Série A 2026</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:3px;background:#98A2B3;border-radius:2px"></span>Autres opérations</span>
+</div>
+</div>
+<svg viewBox="0 0 1020 240" style="width:100%;display:block" font-family="Inter,sans-serif">
+<g stroke="#F2F4F7" stroke-dasharray="3 4"><line x1="40" y1="20" x2="1010" y2="20"/><line x1="40" y1="66" x2="1010" y2="66"/><line x1="40" y1="112" x2="1010" y2="112"/><line x1="40" y1="158" x2="1010" y2="158"/></g>
+<line x1="40" y1="204" x2="1010" y2="204" stroke="#E4E7EC"/>
+<g fill="#98A2B3" font-size="11" text-anchor="end"><text x="30" y="24">12</text><text x="30" y="70">9</text><text x="30" y="116">6</text><text x="30" y="162">3</text><text x="30" y="208">0</text></g>
+<g fill="#98A2B3" font-size="11" text-anchor="middle"><text x="72" y="228">1 juil</text><text x="233" y="228">6 juil</text><text x="394" y="228">11 juil</text><text x="555" y="228">16 juil</text><text x="716" y="228">21 juil</text><text x="877" y="228">26 juil</text><text x="1006" y="228">30 juil</text></g>
+<polyline fill="none" stroke="#98A2B3" stroke-width="1.75" points="72,196 104,199 136,189 168,196 201,183 233,189 265,196 297,183 330,189 362,176 394,183 426,189 459,176 491,183 523,168 555,176 587,183 620,168 652,176 684,160 716,168 748,160 781,168 813,153 845,160 877,153 909,160 942,145 974,153 1006,145"/>
+<polyline fill="none" stroke="#E85C2B" stroke-width="2.25" points="72,189 104,183 136,189 168,176 201,168 233,176 265,160 297,168 330,153 362,160 394,145 426,153 459,130 491,138 523,122 555,130 587,107 620,115 652,99 684,107 716,84 748,92 781,69 813,77 845,61 877,69 909,46 942,54 974,38 1006,31"/>
+<g fill="#E85C2B"><circle cx="330" cy="153" r="3"/><circle cx="523" cy="122" r="3"/><circle cx="716" cy="84" r="3"/><circle cx="1006" cy="31" r="3.5"/></g>
+<g><rect x="896" y="8" width="104" height="34" rx="6" fill="#14161F"/><text x="948" y="22" fill="#fff" font-size="11" text-anchor="middle" font-weight="600">30 juillet</text><text x="948" y="36" fill="#D0D5DD" font-size="10.5" text-anchor="middle">11 consultations</text></g>
+</svg>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:0">
+<div class="ctx-label" style="padding:0 0 10px">Détail de l'activité</div>
+<div class="tabs">
+<a class="on">Consultations récentes</a><a>Accès</a><a>Documents</a><a>Invités</a>
+</div>
+<div class="card" style="border-top:none;border-radius:0 0 var(--r-lg) var(--r-lg);overflow:hidden;padding:0">
+<div style="display:grid;grid-template-columns:2fr 2.2fr 1.4fr 1fr;gap:12px;padding:11px 20px;border-bottom:1px solid var(--line);background:var(--band)">
+<span class="th on">Invité <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span>
+<span class="th">Document <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span>
+<span class="th">Opération <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span>
+<span class="th" style="justify-content:flex-end;text-align:right">Temps passé <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span>
+</div>
+<div id="rows"></div>
+</div>
+</div>
+
+</div></main></div>
+<script>
+const rows=[
+['AD','Amina Diallo','Sahel Growth Fund','États financiers 2025.pdf','Série A 2026','24 min','aujourd\u2019hui 14:12'],
+['AD','Amina Diallo','Sahel Growth Fund','Table de capitalisation.xlsx','Série A 2026','11 min','aujourd\u2019hui 13:48'],
+['IF','Équipe diligence','IFC','Politique ESG 2025.pdf','Diligence IFC','18 min','aujourd\u2019hui 09:05'],
+['KM','Kwame Mensah','Horizon Ventures','Business plan 2026.pdf','Série A 2026','32 min','hier 17:40'],
+['CM','Clara Morel','Impact Capital Africa','Budget prévisionnel 2026-2028.xlsx','Série A 2026','9 min','hier 15:22'],
+['BA','Analyste crédit','BOA Sénégal','Relevés bancaires 2025.pdf','Prêt Ecobank','14 min','hier 10:22'],
+['KM','Kwame Mensah','Horizon Ventures','Pacte d\u2019actionnaires.pdf','Série A 2026','21 min','28 juil 16:03']
+];
+document.getElementById('rows').innerHTML=rows.map(r=>`
+<div style="display:grid;grid-template-columns:2fr 2.2fr 1.4fr 1fr;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--line-soft);background:#fff">
+<div style="display:flex;align-items:center;gap:10px"><span style="width:30px;height:30px;border-radius:50%;background:var(--line-soft);color:var(--text-2);display:inline-flex;align-items:center;justify-content:center;font:600 10.5px var(--sans);flex-shrink:0">${r[0]}</span>
+<div><div style="font-size:13.5px;font-weight:600">${r[1]}</div><div style="font-size:12px;color:var(--text-3)">${r[2]}</div></div></div>
+<div><a href="#" style="font-size:13.5px">${r[3]}</a><div style="font-size:12px;color:var(--text-3);margin-top:1px">${r[6]}</div></div>
+<span class="tag">${r[4]}</span>
+<span style="font-size:13px;text-align:right;font-variant-numeric:tabular-nums">${r[5]}</span>
+</div>`).join('');
+</script>
+</body>
+</html>

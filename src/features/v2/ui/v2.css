@@ -90,7 +90,13 @@
    préfixée sur un `select` et garde sa flèche native. Sans lui, la flèche du
    système ET celle dessinée ici s'affichent — deux chevrons côte à côte, ce
    qu'un navigateur Chromium ne montre jamais. Ne pas le retirer au motif
-   qu'« on ne voit rien ». */
+   qu'« on ne voit rien ».
+
+   LE CHEVRON VIT ICI, ET NULLE PART AILLEURS : ne pas poser d'`<Icon
+   name="chevron" />` à côté du `select` dans le JSX. Trois écrans le
+   faisaient et affichaient donc deux chevrons. Celui-ci est peint DANS le
+   champ, donc cliquer dessus déroule la liste ; une icône voisine est un
+   frère inerte, sur lequel on clique sans que rien ne s'ouvre. */
 .v2-control select{-webkit-appearance:none;padding-right:22px;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center;cursor:pointer}
 .v2-filterbar select{-webkit-appearance:none;padding-right:26px;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475467' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;appearance:none}
 .v2-control :is(input,select):focus-visible,.v2-auth-control :is(input,select):focus-visible{outline:none}
@@ -170,6 +176,10 @@
 .v2-auth-field:has(>.v2-auth-field-error) .v2-auth-control,.v2-auth-field:has(:is(input,select)[aria-invalid=true]) .v2-auth-control{box-shadow:inset 0 0 0 1px #d92d20,0 0 0 3px #fef3f2}
 .v2-auth-control>.v2-icon{color:var(--text-4)}
 .v2-auth-control input,.v2-auth-control select{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--text);font:400 14px var(--font-v2-sans),sans-serif;appearance:none}
+/* Ici le chevron est bien une icône du JSX — ces champs n'en peignent pas.
+   `-webkit-appearance:none` reste nécessaire pour la raison dite plus haut :
+   sans lui, la flèche native de Safari s'ajoute à cette icône. */
+.v2-auth-control select{-webkit-appearance:none}
 .v2-auth-control input::placeholder{color:var(--text-4)}
 .v2-auth-control button{display:grid;width:28px;height:28px;place-items:center;border:0;border-radius:4px;background:transparent;color:var(--text-4);cursor:pointer}
 .v2-auth-control button:hover{background:var(--band);color:var(--text-2)}

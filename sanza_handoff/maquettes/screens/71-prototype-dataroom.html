@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Sanza — 71 · Prototype — data room et navigation documents</title>
+<link rel="stylesheet" href="parcours.css">
+<style>
+.stage{position:relative;overflow:hidden;flex:1;display:flex;min-width:0;flex-direction:column;background:var(--bg,#F9FAFB)}
+@keyframes rowIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes rowBack{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+.doclist .row{animation:rowIn .34s cubic-bezier(.32,.72,.24,1) both}
+.doclist.back .row{animation-name:rowBack}
+.row{display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid var(--line-soft);cursor:pointer;background:#fff}
+.row:hover{background:var(--band)}
+.row .nm{font-size:13.5px;font-weight:600}
+.row .mt{font-size:12.5px;color:var(--text-3);margin-top:2px}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-3)}
+.crumbs a{color:var(--text-3);cursor:pointer}
+.crumbs a:hover{color:var(--orange-text)}
+.crumbs b{color:var(--text)}
+.tree a{transition:background .15s}
+.tree a.cur{background:var(--orange-soft);color:var(--orange-text);font-weight:600;border-radius:var(--r-md)}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:480px;background:#fff;border-left:1px solid var(--line);box-shadow:-24px 0 48px rgba(16,24,40,.12);transition:transform .48s cubic-bezier(.32,.72,.24,1);transform:translateX(100%);z-index:60;display:flex;flex-direction:column}
+.drawer.open{transform:translateX(0)}
+.veil{position:absolute;inset:0;background:rgba(16,24,40,.28);opacity:0;pointer-events:none;transition:opacity .48s;z-index:55}
+.veil.on{opacity:1;pointer-events:auto}
+</style>
+</head>
+<body>
+<div class="screen-note"><b>71 · Prototype — data room et navigation documents</b><span>Cliquez un dossier (drill-down en cascade), le fil d'Ariane pour remonter (cascade inverse), un document (panneau d'aperçu depuis la droite) · Échap ferme</span></div>
+<div class="screen" style="height:900px">
+<nav class="rail"><span class="mark">S</span><a title="Accueil"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></a><a class="on" title="Opérations"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></a><span class="spring"></span><span class="avatar">AD</span></nav>
+<aside class="ctx">
+<div class="ctx-head">
+<a class="ctx-back" href="#">← Toutes les opérations</a>
+<div class="ctx-title"><b>Série A 2026</b></div>
+<div class="ctx-sub">Levée en capital · <span class="badge b-orange" style="height:19px"><span class="dot"></span>Partagée</span></div>
+</div>
+<div class="ctx-group">
+<div class="ctx-label">Piloter</div>
+<a href="#">Vue d'ensemble</a><a href="#">Préparation</a><a href="#">Partage et accès</a><a href="#">Ma levée</a><a href="#">Investisseurs</a><a href="#">Activité</a>
+</div>
+<div class="ctx-group" style="flex:1">
+<div class="ctx-label">Documents</div>
+<div class="tree" id="tree"></div>
+</div>
+</aside>
+<div class="stage">
+<div class="topbar">
+<div class="crumbs" id="crumbs"></div>
+<span class="spring"></span>
+<span class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Rechercher un document…</span>
+<span class="btn btn-sm btn-primary">Déposer des pièces</span>
+</div>
+<div class="work" style="max-width:960px;width:100%">
+<div class="card doclist" id="list" style="overflow:hidden;padding:0"></div>
+</div>
+<div class="veil" id="veil" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--line)"><b style="font:600 15px var(--head)" id="dTitle">Document</b><span class="x" onclick="closeDrawer()" style="cursor:pointer">✕</span></div>
+<div style="flex:1;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:18px">
+<div style="height:220px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--band);display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:13px">Aperçu filigrané du document</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+<div class="kv"><span class="k">Statut</span><span class="v" id="dStatus">Prête</span></div>
+<div class="kv"><span class="k">Version</span><span class="v" id="dVersion">v3</span></div>
+<div class="kv"><span class="k">Déposé par</span><span class="v">Ibrahima Sy</span></div>
+<div class="kv"><span class="k">Le</span><span class="v" id="dDate">12 juillet 2026</span></div>
+</div>
+<div>
+<div class="ctx-label" style="padding:0 0 8px">Activité sur cette pièce</div>
+<div style="font-size:13px;color:var(--text-2);line-height:2">Amina Diallo a consulté · aujourd'hui 14:12<br>Kwame Mensah a consulté · hier 17:40<br>v3 déposée par Ibrahima Sy · 12 juillet</div>
+</div>
+</div>
+<div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--line-soft)"><span class="btn btn-grey">Remplacer</span><span class="btn btn-primary">Ouvrir en plein écran</span></div>
+</div>
+</div>
+</div>
+<script>
+const F = {
+ 'Data room': {folders:['Société et immatriculation','Gouvernance et actionnariat','Finance et comptabilité','Fiscalité','Commercial et marché','Équipe et RH','Technologie et PI','Impact et ESG'], docs:[]},
+ 'Société et immatriculation': {folders:[], docs:[['Statuts à jour.pdf','Prête','v2','3 juillet 2026'],['RCCM.pdf','Prête','v1','28 juin 2026'],['Registre des bénéficiaires effectifs.pdf','À vérifier','v1','30 juin 2026']]},
+ 'Gouvernance et actionnariat': {folders:[], docs:[['Table de capitalisation.xlsx','Prête','v4','18 juillet 2026'],['Pacte d\u2019actionnaires.pdf','Prête','v2','9 juillet 2026']]},
+ 'Finance et comptabilité': {folders:['Relevés bancaires'], docs:[['États financiers 2025.pdf','Prête','v3','12 juillet 2026'],['Budget prévisionnel 2026-2028.xlsx','Prête','v2','15 juillet 2026'],['Balance générale 2025.xlsx','À vérifier','v1','20 juillet 2026'],['Rapport du commissaire aux comptes.pdf','Manquante','—','—']]},
+ 'Relevés bancaires': {folders:[], docs:[['Relevés bancaires 2025.pdf','Prête','v1','29 juillet 2026'],['Relevés bancaires 2024.pdf','Prête','v1','29 juillet 2026']]},
+ 'Fiscalité': {folders:[], docs:[['Quitus fiscal 2025.pdf','Manquante','—','—']]},
+ 'Commercial et marché': {folders:[], docs:[['Business plan 2026.pdf','Prête','v3','12 juillet 2026'],['Pipeline commercial.xlsx','Prête','v1','5 juillet 2026']]},
+ 'Équipe et RH': {folders:[], docs:[['Organigramme.pdf','Prête','v1','2 juillet 2026']]},
+ 'Technologie et PI': {folders:[], docs:[['Dépôts de marques OAPI.pdf','À vérifier','v1','8 juillet 2026']]},
+ 'Impact et ESG': {folders:[], docs:[['Politique ESG 2025.pdf','Prête','v2','10 juillet 2026']]}
+};
+const parent = {}; Object.keys(F).forEach(k=>F[k].folders.forEach(c=>parent[c]=k));
+const badge = s => s==='Prête'?'<span class="badge b-green"><span class="dot"></span>Prête</span>':s==='À vérifier'?'<span class="badge b-amber"><span class="dot"></span>À vérifier</span>':'<span class="badge b-neutral">Manquante</span>';
+const folderIc = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>';
+const fileIc = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M15 2v5h5"/></svg>';
+let cur = 'Data room';
+function path(k){const p=[];while(k){p.unshift(k);k=parent[k];}return p;}
+function render(back){
+ const list=document.getElementById('list'), node=F[cur];
+ list.classList.toggle('back', !!back);
+ let h='', i=0;
+ node.folders.forEach(f=>{const n=F[f];h+=`<div class="row" style="animation-delay:${i++*40}ms" onclick="go('${f}')"><span style="color:var(--text-3)">${folderIc}</span><div style="flex:1"><div class="nm">${f}</div><div class="mt">${n.folders.length?n.folders.length+' sous-dossier · ':''}${n.docs.length} pièce${n.docs.length>1?'s':''}</div></div><span style="color:var(--text-4)">›</span></div>`;});
+ node.docs.forEach(d=>{h+=`<div class="row" style="animation-delay:${i++*40}ms" onclick="openDoc('${d[0]}','${d[1]}','${d[2]}','${d[3]}')"><span style="color:var(--text-3)">${fileIc}</span><div style="flex:1"><div class="nm">${d[0]}</div><div class="mt">${d[2]!=='—'?d[2]+' · déposé le '+d[3]:'pièce requise, encore rien de déposé'}</div></div>${badge(d[1])}</div>`;});
+ list.innerHTML=h;
+ document.getElementById('crumbs').innerHTML = path(cur).map((k,idx,arr)=> idx===arr.length-1?`<b>${k}</b>`:`<a onclick="go('${k}',true)">${k}</a><span>›</span>`).join('');
+ const tree=document.getElementById('tree');
+ tree.innerHTML = `<a class="${cur==='Data room'?'cur':''}" onclick="go('Data room',true)" style="cursor:pointer">${folderIc} Data room</a>` + F['Data room'].folders.map(f=>{
+   let sub = `<a class="lvl2 ${cur===f?'cur':''}" onclick="go('${f}', ${path(cur).includes(f)?'true':'false'})" style="cursor:pointer">${folderIc} ${f}</a>`;
+   if(path(cur).includes(f)) sub += F[f].folders.map(c=>`<a class="lvl2 ${cur===c?'cur':''}" onclick="go('${c}')" style="cursor:pointer;padding-left:34px">${folderIc} ${c}</a>`).join('');
+   return sub;}).join('');
+}
+function go(k, back){const from=path(cur);cur=k;render(back===true||from.length>path(k).length);}
+function openDoc(n,s,v,d){document.getElementById('dTitle').textContent=n;document.getElementById('dStatus').textContent=s;document.getElementById('dVersion').textContent=v;document.getElementById('dDate').textContent=d;document.getElementById('drawer').classList.add('open');document.getElementById('veil').classList.add('on');}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('veil').classList.remove('on');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+render();
+</script>
+</body>
+</html>

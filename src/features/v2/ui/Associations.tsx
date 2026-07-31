@@ -168,7 +168,6 @@ export function AssociationsPanel({
                       </option>
                     ))}
                   </select>
-                  <Icon name="chevron" />
                 </span>
               </label>
             </section>

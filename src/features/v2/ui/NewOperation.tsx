@@ -240,7 +240,6 @@ function SelectField({
             </option>
           ))}
         </select>
-        <Icon name="chevron" />
       </span>
     </label>
   );
