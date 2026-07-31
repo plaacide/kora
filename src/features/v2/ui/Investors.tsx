@@ -121,46 +121,6 @@ export function InvestorsScreen({
     ? (investisseurs.find((item) => item.id === fiche) ?? null)
     : null;
 
-  if (fichee) {
-    return (
-      <>
-        <InvestorFiche
-          acces={
-            acces.find(
-              (a) =>
-                fichee.email &&
-                a.email.toLowerCase() === fichee.email.toLowerCase(),
-            ) ?? null
-          }
-          engagement={
-            engagements.find((e) => e.investorId === fichee.id) ?? null
-          }
-          interactions={interactions.filter((i) => i.investorId === fichee.id)}
-          investisseur={fichee}
-          onglet={onglet}
-          signaux={signaux}
-        />
-
-        {edite === "interaction" && cible && (
-          <InteractionPanel
-            interaction={interactionEditee ?? null}
-            investisseur={cible}
-            operationId={operationId}
-          />
-        )}
-
-        {edite && edite !== "interaction" && (
-          <InvestorPanel
-            devise={devise}
-            interactions={interactions}
-            investisseur={enCours}
-            operationId={operationId}
-          />
-        )}
-      </>
-    );
-  }
-
   return (
     <div className="v2-pipeline-page">
       <div className="v2-filterbar">
@@ -213,6 +173,25 @@ export function InvestorsScreen({
           interaction={interactionEditee ?? null}
           investisseur={cible}
           operationId={operationId}
+        />
+      )}
+
+      {fichee && !edite && (
+        <InvestorFiche
+          acces={
+            acces.find(
+              (a) =>
+                fichee.email &&
+                a.email.toLowerCase() === fichee.email.toLowerCase(),
+            ) ?? null
+          }
+          engagement={
+            engagements.find((e) => e.investorId === fichee.id) ?? null
+          }
+          interactions={interactions.filter((i) => i.investorId === fichee.id)}
+          investisseur={fichee}
+          onglet={onglet}
+          signaux={signaux}
         />
       )}
     </div>

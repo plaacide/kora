@@ -67,46 +67,49 @@ export function InvestorFiche({
   const actuel = ONGLETS.some(([cle]) => cle === onglet) ? onglet : "resume";
 
   return (
-    <div className="v2-fiche">
-      <header className="v2-fiche-head">
-        <span className="v2-fiche-avatar">
-          {initials(investisseur.organisation ?? investisseur.nom)}
-        </span>
-        <div>
-          <h1>{investisseur.organisation ?? investisseur.nom}</h1>
-          <p>
-            {[
-              investisseur.nom,
-              investisseur.fonction,
-              investisseur.categorie
-                ? categorieLabel(investisseur.categorie)
-                : null,
-              investisseur.pays,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-        </div>
-        <Link
-          className="v2-btn"
-          data-variant="secondary"
-          href={lien({ panel: investisseur.id })}
-        >
-          Modifier la relation
-        </Link>
-      </header>
-
-      <nav aria-label="Sections de la fiche" className="v2-fiche-tabs">
-        {ONGLETS.map(([cle, label]) => (
-          <Link
-            data-active={actuel === cle}
-            href={lien({ fiche: investisseur.id, onglet: cle })}
-            key={cle}
-          >
-            {label}
+    <>
+      {/* La maquette 41 pose la fiche en PANNEAU sur le pipeline grisé, pas en
+          écran plein : on consulte une relation sans quitter la liste, et on
+          revient d'un clic dans le vide. */}
+      <Link aria-label="Fermer" className="v2-scrim" href={lien({})} />
+      <aside className="v2-sidepanel v2-fiche-panel">
+        <header className="v2-fiche-head">
+          <span className="v2-fiche-avatar">
+            {initials(investisseur.organisation ?? investisseur.nom)}
+          </span>
+          <div>
+            <h2>{investisseur.organisation ?? investisseur.nom}</h2>
+            <p>
+              {[
+                investisseur.nom,
+                investisseur.fonction,
+                investisseur.categorie
+                  ? categorieLabel(investisseur.categorie)
+                  : null,
+                investisseur.pays,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          </div>
+          <Link aria-label="Fermer" href={lien({})}>
+            ×
           </Link>
-        ))}
-      </nav>
+        </header>
+
+        <nav aria-label="Sections de la fiche" className="v2-fiche-tabs">
+          {ONGLETS.map(([cle, label]) => (
+            <Link
+              data-active={actuel === cle}
+              href={lien({ fiche: investisseur.id, onglet: cle })}
+              key={cle}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="v2-sidepanel-body v2-fiche-body">
 
       {actuel === "resume" && (
         <Resume
@@ -137,7 +140,16 @@ export function InvestorFiche({
       {actuel === "questions" && <Questions />}
 
       {actuel === "notes" && <Notes investisseur={investisseur} />}
-    </div>
+        </div>
+
+        <footer className="v2-sidepanel-footer">
+          <Link href={lien({})}>Fermer</Link>
+          <Link className="v2-btn" href={lien({ panel: investisseur.id })}>
+            Modifier la relation
+          </Link>
+        </footer>
+      </aside>
+    </>
   );
 }
 
