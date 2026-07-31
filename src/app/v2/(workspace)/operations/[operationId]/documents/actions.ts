@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -41,9 +40,14 @@ export async function registerV2Document(input: {
     return { ok: false, error: error.message };
   }
 
-  // Le rail liste les dossiers avec leur compte de pièces : c'est le layout de
-  // l'opération qui le rend, pas seulement la page. D'où la revalidation à la
-  // racine de l'opération.
-  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  // PAS de `revalidatePath` ici, et c'est délibéré.
+  //
+  // Cette action est appelée une fois PAR PIÈCE. Revalider à chaque appel
+  // re-rendait la page au milieu du lot : un dossier passant de vide à rempli
+  // change de branche, le composant de dépôt était démonté, et le compte rendu
+  // disparaissait — y compris la ligne disant qu'une pièce avait échoué.
+  //
+  // C'est le client qui rafraîchit, une fois le lot entier terminé et
+  // seulement s'il est entièrement passé. Lui seul sait où finit le lot.
   return { ok: true };
 }

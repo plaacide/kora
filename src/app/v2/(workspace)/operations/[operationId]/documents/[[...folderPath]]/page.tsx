@@ -17,7 +17,6 @@ import { DocumentUpload } from "@/features/v2/ui/DocumentUpload";
 import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import { Icon } from "@/features/v2/ui/Icon";
 import { SampleRowMenu } from "@/features/v2/ui/RowMenu";
-import { UploadProgress } from "@/features/v2/ui/Upload";
 
 /** Les fixtures affichaient « 03-04-2026 » ; la base rend un horodatage ISO. */
 function frenchDate(value: string | null): string {
@@ -36,11 +35,10 @@ export default async function DocumentsPage({
     document?: string;
     upload?: string;
     associations?: string;
-    depot?: string;
   }>;
 }) {
   const { operationId, folderPath } = await params;
-  const { document, upload, associations, depot } = await searchParams;
+  const { document, upload, associations } = await searchParams;
 
   // L'organisation compose le premier segment de la clé de stockage : c'est
   // sur lui que la policy du bucket vérifie l'appartenance.
@@ -285,7 +283,6 @@ export default async function DocumentsPage({
           </aside>
         </>
       )}
-      {depot === "1" && <UploadProgress />}
       {associations === "1" && <AssociationsPanel />}
     </>
   );

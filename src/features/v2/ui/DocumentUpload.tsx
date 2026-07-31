@@ -8,6 +8,7 @@ import { registerV2Document } from "@/app/v2/(workspace)/operations/[operationId
 import { cleStockage } from "@/lib/storage-key";
 import { createClient } from "@/lib/supabase/client";
 import { Icon } from "./Icon";
+import { UploadProgress, type UploadRow } from "./Upload";
 
 /**
  * Dépôt de pièces — écran 16.
@@ -25,11 +26,14 @@ import { Icon } from "./Icon";
  * room ; c'est `documents.name` qui porte le nom d'origine, intact.
  */
 
-type Progress = {
-  name: string;
-  state: "pending" | "uploading" | "done" | "failed";
-  error?: string;
-};
+/**
+ * À partir de combien de pièces l'écran 16 s'ouvre.
+ *
+ * Pour une seule, la ligne de retour sous le bouton dit tout — déployer un
+ * tableau ferait plus de bruit que d'information. Dès la deuxième, il faut
+ * pouvoir suivre laquelle passe et laquelle a échoué.
+ */
+const SEUIL_TABLEAU = 2;
 
 export function DocumentUpload({
   operationId,
@@ -49,7 +53,7 @@ export function DocumentUpload({
 }) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
-  const [uploads, setUploads] = useState<Progress[]>([]);
+  const [uploads, setUploads] = useState<UploadRow[]>([]);
   const [busy, setBusy] = useState(false);
 
   async function send(files: FileList | File[]) {
@@ -57,9 +61,16 @@ export function DocumentUpload({
     if (list.length === 0) return;
 
     setBusy(true);
-    setUploads(list.map((file) => ({ name: file.name, state: "pending" })));
+    setUploads(
+      list.map((file) => ({
+        name: file.name,
+        size: file.size,
+        state: "pending" as const,
+      })),
+    );
 
     const supabase = createClient();
+    let echecs = false;
 
     for (const [index, file] of list.entries()) {
       setUploads((current) =>
@@ -73,6 +84,7 @@ export function DocumentUpload({
         .upload(key, file, { upsert: false, contentType: file.type });
 
       if (uploadError) {
+        echecs = true;
         setUploads((current) =>
           current.map((row, i) =>
             i === index
@@ -93,6 +105,8 @@ export function DocumentUpload({
         mime: file.type,
       });
 
+      if (!registered.ok) echecs = true;
+
       setUploads((current) =>
         current.map((row, i) =>
           i === index
@@ -105,7 +119,14 @@ export function DocumentUpload({
     }
 
     setBusy(false);
-    router.refresh();
+
+    // Rafraîchir remonte l'écran : un dossier qui passe de vide à rempli
+    // change de branche, et ce composant est démonté avec son compte rendu.
+    // Tant qu'une pièce a échoué, on ne rafraîchit donc pas — sinon la seule
+    // trace de l'échec disparaîtrait et le fondateur croirait tout déposé.
+    // Les pièces passées restent lisibles dans le tableau, marquées
+    // « Déposée » ; le prochain chargement montrera la data room à jour.
+    if (!echecs) router.refresh();
   }
 
   function onPick(event: ChangeEvent<HTMLInputElement>) {
@@ -121,7 +142,6 @@ export function DocumentUpload({
   }
 
   const failed = uploads.filter((row) => row.state === "failed");
-  const done = uploads.filter((row) => row.state === "done").length;
 
   return (
     <>
@@ -144,18 +164,17 @@ export function DocumentUpload({
         {busy ? "Dépôt en cours…" : children}
       </button>
 
-      {uploads.length > 0 && (
+      {/* Plusieurs pièces : l'écran 16, qui dit laquelle passe et laquelle a
+          échoué. Une seule : la ligne ci-dessous suffit. */}
+      {uploads.length >= SEUIL_TABLEAU && <UploadProgress uploads={uploads} />}
+
+      {uploads.length > 0 && uploads.length < SEUIL_TABLEAU && (
         <div className="v2-upload-feedback" role="status">
-          {busy && (
-            <span>
-              {done} sur {uploads.length} pièce{uploads.length > 1 ? "s" : ""} déposée
-              {done > 1 ? "s" : ""}…
-            </span>
-          )}
+          {busy && <span>Dépôt en cours…</span>}
           {!busy && failed.length === 0 && (
             <span data-tone="green">
               <Icon name="check" />
-              {done} pièce{done > 1 ? "s" : ""} déposée{done > 1 ? "s" : ""}.
+              Pièce déposée.
             </span>
           )}
           {!busy &&

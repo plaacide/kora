@@ -102,8 +102,24 @@ export async function resolveFolderPath(
   let current: FolderRecord | undefined;
 
   for (const segment of path) {
+    // Le segment arrive ENCORE ENCODÉ : Next ne décode pas les portions d'une
+    // route attrape-tout. « Conformité » parvient ici en
+    // « Conformit%C3%A9 », qui ne correspond à aucun nom en base — tous les
+    // dossiers accentués rendaient donc un 404, y compris depuis les liens
+    // que l'application fabrique elle-même.
+    //
+    // Le décodage est protégé : une séquence « % » invalide dans une URL
+    // trafiquée ferait lever `decodeURIComponent`, et une visite malformée
+    // doit rendre « introuvable », pas une erreur serveur.
+    let nom = segment;
+    try {
+      nom = decodeURIComponent(segment);
+    } catch {
+      return null;
+    }
+
     current = rows.find(
-      (row) => row.parent_id === parentId && row.name === segment,
+      (row) => row.parent_id === parentId && row.name === nom,
     );
     if (!current) return null;
     parentId = current.id;

@@ -2,59 +2,85 @@
  * Écran 16 — Dépôt multiple en cours.
  * Repris de `sanza_handoff/maquettes/screens/16-depot-en-cours.html`.
  *
- * Chaque fichier porte son propre état : déposé, en cours avec son
- * pourcentage, ou en attente. La reprise est automatique — l'écran le dit,
- * parce qu'une connexion qui tombe au milieu d'un dépôt de 9 Mo est la norme,
- * pas l'exception.
+ * Chaque fichier porte son propre état. L'écran n'apparaît qu'à partir de deux
+ * pièces : pour une seule, la ligne de retour sous le bouton suffit, et
+ * déployer un tableau pour un fichier ferait plus de bruit que d'information.
  */
 
-interface Upload {
-  file: string;
-  size: string;
-  state: string;
-  progress?: number;
+export type UploadState = "pending" | "uploading" | "done" | "failed";
+
+export interface UploadRow {
+  name: string;
+  /** Taille en octets, telle que le navigateur la donne. */
+  size: number;
+  state: UploadState;
+  error?: string;
 }
 
-const UPLOADS: Upload[] = [
-  { file: "Relevés bancaires 2025.pdf", size: "4,2 Mo", state: "Déposée" },
-  { file: "Budget 2026 approuvé.pdf", size: "1,8 Mo", state: "Déposée" },
-  { file: "Rapport d’audit 2025.pdf", size: "9,6 Mo", state: "62 %", progress: 62 },
-  { file: "Projections 2026-2029.xlsx", size: "0,9 Mo", state: "En attente" },
-];
+const LABELS: Record<UploadState, { label: string; tone?: string }> = {
+  pending: { label: "En attente" },
+  uploading: { label: "Dépôt en cours" },
+  done: { label: "Déposée", tone: "green" },
+  failed: { label: "Échec", tone: "red" },
+};
 
-const DONE = UPLOADS.filter((upload) => upload.state === "Déposée").length;
+/** « 4,2 Mo » — le séparateur décimal français, comme partout ailleurs. */
+export function fileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} o`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} Ko`;
+  return `${(bytes / (1024 * 1024)).toFixed(1).replace(".", ",")} Mo`;
+}
 
-export function UploadProgress() {
+export function UploadProgress({ uploads }: { uploads: readonly UploadRow[] }) {
+  if (uploads.length === 0) return null;
+
+  const done = uploads.filter((row) => row.state === "done").length;
+  const failed = uploads.filter((row) => row.state === "failed").length;
+  const finished = done + failed === uploads.length;
+
   return (
     <section className="v2-folder-card v2-upload-progress">
       <header className="v2-folder-head-action">
         <strong>
-          Dépôt en cours — {DONE} sur {UPLOADS.length} pièces
+          {finished
+            ? `Dépôt terminé — ${done} sur ${uploads.length} pièces`
+            : `Dépôt en cours — ${done} sur ${uploads.length} pièces`}
         </strong>
-        <button className="v2-btn-quiet" type="button">Tout annuler</button>
       </header>
 
-      {UPLOADS.map((upload) => (
-        <div className="v2-upload-row" key={upload.file}>
-          <div>
-            <b>{upload.file}</b>
-            <small>{upload.size}</small>
-          </div>
-          {upload.progress !== undefined && (
-            <div className="v2-progress v2-upload-bar">
-              <span style={{ width: `${upload.progress}%` }} />
-            </div>
-          )}
-          <span
-            className="v2-status"
-            data-tone={upload.state === "Déposée" ? "green" : undefined}
-          >
-            {upload.state}
-          </span>
-        </div>
-      ))}
+      {uploads.map((upload) => {
+        const status = LABELS[upload.state];
 
-      <footer>La reprise est automatique en cas d’interruption.</footer>
+        return (
+          <div className="v2-upload-row" key={upload.name}>
+            <div>
+              <b>{upload.name}</b>
+              <small>
+                {fileSize(upload.size)}
+                {upload.error ? ` · ${upload.error}` : ""}
+              </small>
+            </div>
+
+            {/* Barre indéterminée, jamais un pourcentage : le téléversement
+                vers le bucket ne rend pas d'avancement exploitable, et
+                afficher « 62 % » serait une invention — précisément le genre
+                de chiffre qu'un fondateur croirait. */}
+            {upload.state === "uploading" && (
+              <div className="v2-progress v2-upload-bar" data-indeterminate="true">
+                <span />
+              </div>
+            )}
+
+            <span className="v2-status" data-tone={status.tone}>
+              {status.label}
+            </span>
+          </div>
+        );
+      })}
+
+      {!finished && (
+        <footer>Ne fermez pas cette page tant que le dépôt n’est pas terminé.</footer>
+      )}
     </section>
   );
 }
