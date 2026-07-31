@@ -111,7 +111,7 @@ begin
 
   if p_folders is not null then
     insert into public.invitation_folders (invitation_id, folder_id)
-    select v_inv.id, unnest(p_folders)
+    select v_inv.id, f.id from unnest(p_folders) as f(id)
     on conflict do nothing;
   end if;
 
