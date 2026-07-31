@@ -122,7 +122,7 @@ export function Lever({
   // rien n'est ouvert. Forcer `?view=pipeline` ne doit pas montrer un tableau
   // de bord vide comme s'il était réel.
   if (!raise && current !== "configure") {
-    return <LeverEmpty operationId={operationId} />;
+    return <LeverEmpty operationId={operationId} retour={retour} />;
   }
 
   if (current === "configure") {
@@ -164,7 +164,13 @@ export function Lever({
   );
 }
 
-function LeverEmpty({ operationId }: { operationId: string }) {
+function LeverEmpty({
+  operationId,
+  retour,
+}: {
+  operationId: string;
+  retour: string;
+}) {
   return (
     <LeverFrame current="overview">
       <section className="v2-lever-empty">
@@ -176,7 +182,7 @@ function LeverEmpty({ operationId }: { operationId: string }) {
           pipeline relationnel, relances et mises à jour.
         </p>
         <div>
-          <RaiseEmpty operationId={operationId} />
+          <RaiseEmpty operationId={operationId} retour={retour} />
           <Link
             className="v2-btn"
             data-variant="secondary"

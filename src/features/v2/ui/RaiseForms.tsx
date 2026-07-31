@@ -304,16 +304,43 @@ export function RaiseConfigure({
   );
 }
 
-/** Écran 35 — aucune levée sur cette opération. */
-export function RaiseEmpty({ operationId }: { operationId: string }) {
+/**
+ * Écran 35 — aucune levée sur cette opération.
+ *
+ * Le bouton dit « Configurer », il doit donc MENER à la configuration. Une
+ * première version se contentait de créer la levée puis de rafraîchir : le
+ * paramètre `view` de l'URL restait celui d'avant, et un fondateur arrivé
+ * depuis l'onglet Pipeline se retrouvait sur le pipeline. Croyant qu'il ne
+ * s'était rien passé, il recliquait — et la base garde la trace de trois
+ * « Nouvelle levée » vides créées ainsi.
+ */
+export function RaiseEmpty({
+  operationId,
+  retour,
+}: {
+  operationId: string;
+  retour: string;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
 
   async function ouvrir() {
     setBusy(true);
+    setErreur(null);
+
     const res = await createV2Raise({ operationId });
     setBusy(false);
-    if (res.ok) router.refresh();
+
+    if (!res.ok) {
+      // Un échec silencieux fait recliquer. C'est exactement ce qui a produit
+      // les levées vides : la RPC refusait, et l'écran ne disait rien.
+      setErreur(res.error ?? "La levée n’a pas pu être ouverte.");
+      return;
+    }
+
+    router.push(`${retour}?view=configure`);
+    router.refresh();
   }
 
   return (
@@ -321,6 +348,11 @@ export function RaiseEmpty({ operationId }: { operationId: string }) {
       <button className="v2-btn" disabled={busy} onClick={ouvrir} type="button">
         {busy ? "Ouverture…" : "Configurer ma levée"}
       </button>
+      {erreur && (
+        <p className="v2-auth-error" role="alert">
+          {erreur}
+        </p>
+      )}
     </div>
   );
 }

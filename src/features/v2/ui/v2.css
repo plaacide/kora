@@ -65,9 +65,15 @@
 .v2-control input,.v2-control select{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--text);font:400 14px var(--font-v2-sans),sans-serif;appearance:none}
 /* `appearance:none` retire le chevron natif du navigateur : sans ce
    remplacement, une liste déroulante ne se distingue plus d'un champ de
-   saisie, et on ne clique pas sur ce qu'on ne voit pas. */
-.v2-control select{padding-right:22px;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center;cursor:pointer}
-.v2-filterbar select{padding-right:26px;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475467' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;appearance:none}
+   saisie, et on ne clique pas sur ce qu'on ne voit pas.
+   
+   `-webkit-appearance` n'est PAS redondant : Safari ignore la propriété non
+   préfixée sur un `select` et garde sa flèche native. Sans lui, la flèche du
+   système ET celle dessinée ici s'affichent — deux chevrons côte à côte, ce
+   qu'un navigateur Chromium ne montre jamais. Ne pas le retirer au motif
+   qu'« on ne voit rien ». */
+.v2-control select{-webkit-appearance:none;padding-right:22px;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center;cursor:pointer}
+.v2-filterbar select{-webkit-appearance:none;padding-right:26px;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475467' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;appearance:none}
 .v2-control :is(input,select):focus-visible,.v2-auth-control :is(input,select):focus-visible{outline:none}
 .v2-control input::placeholder{color:var(--text-4)}
 .v2-control .v2-icon{color:var(--text-4)}
