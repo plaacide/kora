@@ -149,7 +149,8 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │  ├─ 🟢 Consigner (42)        save_raise_interaction() — six types fermés
    │  │                             la prochaine action REMONTE sur la relation
    │  └─ 🟢 Retirer               delete_raise_interaction()
-   └─ 🟢 Fiche de relation (41)   investorFiche : sept onglets
+   └─ 🟢 Fiche de relation (41)   panneau de 560 px, six onglets
+      (« Questions » de la maquette écarté : le produit n'en porte pas)
       ├─ 🟢 Résumé                étape, accès, engagement, dernière interaction
       ├─ 🟢 Interactions          l'historique complet
       ├─ 🟢 Activité documentaire document.page_viewed — visites DÉDUITES
@@ -157,7 +158,6 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
       │                             aucune n'est enregistrée
       ├─ 🟢 Accès                 l'invitation qui correspond à l'adresse
       ├─ 🟢 Engagements           l'engagement déclaré, sa preuve
-      ├─ ⚪ Questions             le produit n'en porte pas ; l'onglet le dit
       └─ 🟢 Notes internes        jamais visibles par l'investisseur
 🔴 Activité (journal)             —                     ATTEND : audit_log par opération
 🟢 Visionneuse                    → /api/viewer, filigrane incrusté, audit par page

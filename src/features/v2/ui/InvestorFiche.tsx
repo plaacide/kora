@@ -25,17 +25,16 @@ import type { SignauxDocumentaires } from "@/features/v2/server/fiche";
 import { Icon } from "./Icon";
 
 /**
- * Sept onglets dans 560 px.
+ * Six onglets, sur une seule rangée.
  *
- * Les intitulés longs de la maquette — « Activité documentaire », « Notes
- * internes » — imposaient une barre de défilement horizontale, qui cache la
- * moitié des onglets derrière un geste que rien n'annonce. On abrège plutôt, et
- * la barre passe à la ligne s'il le faut : un onglet qu'on ne voit pas n'existe
- * pas.
+ * « Questions » n'y est pas : le produit ne porte aucune mécanique de
+ * questions-réponses, et un onglet qui n'aurait eu qu'à s'excuser prenait la
+ * place qui obligeait les six autres à passer à la ligne. Ce qu'un investisseur
+ * demande se consigne en interaction — c'est là qu'on le retrouvera.
  *
- * « Consultations » plutôt que « Documents » : le mot est déjà celui du produit
- * pour les signaux de lecture, et « Documents » se confondrait avec la data
- * room.
+ * Les intitulés sont abrégés pour la même raison : « Consultations » plutôt
+ * qu'« Activité documentaire ». Le mot est déjà celui du produit pour les
+ * signaux de lecture, et « Documents » se confondrait avec la data room.
  */
 const ONGLETS = [
   ["resume", "Résumé"],
@@ -43,7 +42,6 @@ const ONGLETS = [
   ["documents", "Consultations"],
   ["acces", "Accès"],
   ["engagements", "Engagements"],
-  ["questions", "Questions"],
   ["notes", "Notes"],
 ] as const;
 
@@ -149,8 +147,6 @@ export function InvestorFiche({
       {actuel === "engagements" && (
         <Engagements engagement={engagement} investisseur={investisseur} />
       )}
-
-      {actuel === "questions" && <Questions />}
 
       {actuel === "notes" && <Notes investisseur={investisseur} />}
         </div>
@@ -581,27 +577,6 @@ function Engagements({
         <Icon name="shield" />
         Déclaré par votre équipe le {dateJournal(engagement.date)}
         {investisseur.responsable ? `, suivi par ${investisseur.responsable}` : ""}.
-      </p>
-    </section>
-  );
-}
-
-/**
- * L'onglet Questions.
- *
- * La maquette le pose, le produit ne le porte pas : il n'existe aucune
- * mécanique de questions dans Sanza. L'onglet le dit plutôt que d'afficher une
- * liste vide — une liste vide laisse croire que personne n'a demandé, alors
- * que personne ne PEUT demander.
- */
-function Questions() {
-  return (
-    <section className="v2-fiche-card">
-      <div className="v2-nav-label">Questions</div>
-      <p className="v2-field-helper">
-        Sanza ne porte pas encore de questions-réponses : un investisseur qui
-        veut un éclaircissement vous écrit directement. Ce qu’il vous demande a
-        sa place dans une interaction — c’est là qu’on le retrouvera.
       </p>
     </section>
   );
