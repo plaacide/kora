@@ -28,10 +28,25 @@ import {
   sourceLabel,
   type ExigenceBrute,
   type FiltreExigences,
+  type GroupePieces,
 } from "@/features/v2/domain/preparation";
+import { dateJournal } from "@/features/v2/domain/journal";
 import type { RequirementDetail } from "@/features/v2/server/preparation";
 import { EmptyMedallion } from "./EmptyArt";
 import { Icon } from "./Icon";
+
+/**
+ * Le lien vers un dossier de la data room.
+ *
+ * La route est un chemin, pas un nom : chaque segment s'encode séparément,
+ * sinon le « / » devient « %2F » et le chemin ne se découpe plus. Un lien
+ * construit sur le seul nom du dossier rendait 404 dès que ce dossier était
+ * un sous-dossier — ce qui est le cas de la plupart.
+ */
+function lienDossier(operationId: string, chemin: string): string {
+  const segments = chemin.split(" / ").map(encodeURIComponent).join("/");
+  return `/v2/operations/${operationId}/documents/${segments}`;
+}
 
 function shortDate(value: string): string {
   return new Date(value).toLocaleDateString("fr-FR", {
@@ -329,8 +344,8 @@ export function RequirementPanel({
   operationId: string;
   requirement: RequirementDetail;
   history: ReadonlyArray<{ id: number; texte: string; actor: string; at: string }>;
-  /** Pièces de la data room qu'on peut encore rattacher à cette exigence. */
-  attachable: ReadonlyArray<{ id: string; name: string; folderName: string | null }>;
+  /** Pièces rattachables, groupées par dossier comme la data room. */
+  attachable: readonly GroupePieces[];
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
@@ -461,27 +476,36 @@ export function RequirementPanel({
           <section>
             <small>Pièces associées</small>
             {requirement.proofDocuments.length === 0 ? (
-              <p className="v2-panel-note">
-                Aucune pièce n’est encore rattachée.{" "}
+              // `v2-upload-zone` — la zone de dépôt du système : cadre
+              // pointillé, icône en tête. Une phrase seule se lisait comme un
+              // constat ; le cadre en fait une invitation, et il désigne
+              // l'endroit où déposer.
+              <section className="v2-upload-zone">
+                <Icon name="file" />
+                <strong>Aucune pièce n’est encore rattachée</strong>
                 {requirement.folderId ? (
-                  <>
-                    Déposez-la dans{" "}
-                    <Link
-                      href={`/v2/operations/${operationId}/documents/${encodeURIComponent(
-                        requirement.folderName ?? "",
-                      )}`}
-                    >
-                      {requirement.folderName}
-                    </Link>{" "}
-                    : Sanza proposera l’association, vous la confirmerez.
-                  </>
+                  <span>
+                    Déposez-la dans {requirement.folderName} : Sanza proposera
+                    l’association, vous la confirmerez.
+                  </span>
                 ) : (
-                  <>
+                  <span>
                     Déposez une pièce dans la data room : Sanza proposera
                     l’association, vous la confirmerez.
-                  </>
+                  </span>
                 )}
-              </p>
+                {requirement.folderId && requirement.folderName && (
+                  <Link
+                    className="v2-btn"
+                    data-variant="secondary"
+                    href={`${lienDossier(operationId, requirement.folderName)}?upload=1`}
+                  >
+                    {/* Le dernier segment suffit au bouton : le chemin entier
+                        est déjà écrit deux lignes plus haut. */}
+                    Déposer dans {requirement.folderName.split(" / ").at(-1)}
+                  </Link>
+                )}
+              </section>
             ) : (
               <ul className="v2-proof-list">
                 {requirement.proofDocuments.map((proof) => (
@@ -551,16 +575,22 @@ export function RequirementPanel({
             ) : (
               <div>
                 <span className="v2-control">
+                  {/* `optgroup` plutôt qu'un suffixe « — Financier » sur
+                      chaque ligne : le dossier est écrit UNE fois, et la liste
+                      se parcourt comme la data room. */}
                   <select
                     onChange={(event) => setChoisie(event.target.value)}
                     value={choisie}
                   >
                     <option value="">Choisir une pièce…</option>
-                    {attachable.map((doc) => (
-                      <option key={doc.id} value={doc.id}>
-                        {doc.name}
-                        {doc.folderName ? ` — ${doc.folderName}` : ""}
-                      </option>
+                    {attachable.map((groupe) => (
+                      <optgroup key={groupe.chemin} label={groupe.chemin}>
+                        {groupe.pieces.map((piece) => (
+                          <option key={piece.id} value={piece.id}>
+                            {piece.name}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
                 </span>
@@ -589,8 +619,11 @@ export function RequirementPanel({
               <ul className="v2-history-list">
                 {history.map((entree) => (
                   <li key={entree.id}>
-                    <span>{shortDate(entree.at)}</span>
-                    {entree.actor} {entree.texte}
+                    <time>{dateJournal(entree.at)}</time>
+                    <span>·</span>
+                    <p>
+                      <b>{entree.actor}</b> {entree.texte}
+                    </p>
                   </li>
                 ))}
               </ul>

@@ -7,6 +7,7 @@ import {
   estAActualiser,
   etatAffiche,
   grouper,
+  grouperParDossier,
   statutLabel,
   type ExigenceBrute,
 } from "./preparation";
@@ -214,5 +215,73 @@ describe("estAActualiser", () => {
 
     expect(etatAffiche(vieille, maintenant).label).toBe("À actualiser");
     expect(vieille.status).toBe("done");
+  });
+});
+
+describe("grouperParDossier", () => {
+  const arbre = [
+    { id: "fin", name: "Financier", parentId: null, indexPath: "2" },
+    { id: "fin25", name: "Exercice 2025", parentId: "fin", indexPath: "2.1" },
+    { id: "corp", name: "Corporate", parentId: null, indexPath: "1" },
+  ];
+
+  it("suit l’ordre de la data room, pas l’alphabet", () => {
+    const groupes = grouperParDossier(arbre, [
+      { id: "d1", name: "a.pdf", folderId: "fin" },
+      { id: "d2", name: "b.pdf", folderId: "corp" },
+    ]);
+
+    expect(groupes.map((g) => g.chemin)).toEqual(["Corporate", "Financier"]);
+  });
+
+  it("écrit le chemin complet d’un sous-dossier", () => {
+    const groupes = grouperParDossier(arbre, [
+      { id: "d1", name: "a.pdf", folderId: "fin25" },
+    ]);
+
+    expect(groupes[0].chemin).toBe("Financier / Exercice 2025");
+  });
+
+  it("classe 2.10 après 2.2, pas avant", () => {
+    const profond = [
+      { id: "a", name: "Deux", parentId: null, indexPath: "2.2" },
+      { id: "b", name: "Dix", parentId: null, indexPath: "2.10" },
+    ];
+    const groupes = grouperParDossier(profond, [
+      { id: "d1", name: "x.pdf", folderId: "b" },
+      { id: "d2", name: "y.pdf", folderId: "a" },
+    ]);
+
+    expect(groupes.map((g) => g.chemin)).toEqual(["Deux", "Dix"]);
+  });
+
+  it("range les pièces sans dossier à la fin, signalées", () => {
+    const groupes = grouperParDossier(arbre, [
+      { id: "d1", name: "a.pdf", folderId: null },
+      { id: "d2", name: "b.pdf", folderId: "corp" },
+    ]);
+
+    expect(groupes.at(-1)?.chemin).toBe("Racine — non rangées");
+  });
+
+  it("traite un dossier inconnu comme une pièce non rangée", () => {
+    const groupes = grouperParDossier(arbre, [
+      { id: "d1", name: "a.pdf", folderId: "fantome" },
+    ]);
+
+    expect(groupes).toHaveLength(1);
+    expect(groupes[0].chemin).toBe("Racine — non rangées");
+  });
+
+  it("ne boucle pas sur une arborescence cyclique", () => {
+    const cycle = [
+      { id: "a", name: "A", parentId: "b", indexPath: "1" },
+      { id: "b", name: "B", parentId: "a", indexPath: "2" },
+    ];
+    const groupes = grouperParDossier(cycle, [
+      { id: "d1", name: "x.pdf", folderId: "a" },
+    ]);
+
+    expect(groupes).toHaveLength(1);
   });
 });

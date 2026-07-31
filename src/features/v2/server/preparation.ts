@@ -1,6 +1,13 @@
 import "server-only";
 
-import type { ExigenceBrute } from "@/features/v2/domain/preparation";
+import { nomActeur, nomCourt } from "@/features/v2/domain/journal";
+import {
+  cheminDossier,
+  grouperParDossier,
+  type DossierArbre,
+  type ExigenceBrute,
+  type GroupePieces,
+} from "@/features/v2/domain/preparation";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -155,7 +162,7 @@ export async function requirementDetail(
 
   const ligne = item as unknown as LigneExigence;
 
-  const [{ data: liens }, { data: folder }] = await Promise.all([
+  const [{ data: liens }, { data: dossiers }] = await Promise.all([
     supabase
       .from("checklist_item_documents")
       .select(
@@ -163,8 +170,15 @@ export async function requirementDetail(
       )
       .eq("item_id", requirementId)
       .order("linked_at", { ascending: false }),
+    // Tous les dossiers, pas seulement le sien : le CHEMIN complet est
+    // nécessaire. Un lien vers « RCCM & existence légale » seul rend 404
+    // quand ce dossier est un sous-dossier de « Corporate » — la route
+    // résout un chemin, pas un nom.
     ligne.folder_id
-      ? supabase.from("folders").select("name").eq("id", ligne.folder_id).maybeSingle()
+      ? supabase
+          .from("folders")
+          .select("id, name, parent_id, index_path")
+          .eq("deal_id", operationId)
       : Promise.resolve({ data: null }),
   ]);
 
@@ -199,9 +213,30 @@ export async function requirementDetail(
 
   const confirmees = proofDocuments.filter((p) => p.confirmed);
 
+  const arbre = new Map(
+    (
+      (dossiers ?? []) as Array<{
+        id: string;
+        name: string;
+        parent_id: string | null;
+        index_path: string | null;
+      }>
+    ).map((f) => [
+      f.id,
+      {
+        id: f.id,
+        name: f.name,
+        parentId: f.parent_id,
+        indexPath: f.index_path ?? "",
+      },
+    ]),
+  );
+
+  const chemin = ligne.folder_id ? cheminDossier(arbre, ligne.folder_id) : "";
+
   return {
     ...enExigence(ligne, {
-      folderName: (folder as { name: string } | null)?.name ?? null,
+      folderName: chemin || null,
       proofs: confirmees.length,
       pending: proofDocuments.length - confirmees.length,
       // Les liens arrivent triés du plus récent au plus ancien.
@@ -222,7 +257,7 @@ export async function requirementDetail(
 export async function attachableDocuments(
   operationId: string,
   requirementId: string,
-): Promise<Array<{ id: string; name: string; folderName: string | null }>> {
+): Promise<GroupePieces[]> {
   const supabase = await createClient();
 
   const [{ data: documents }, { data: liens }, { data: folders }] =
@@ -236,30 +271,39 @@ export async function attachableDocuments(
         .from("checklist_item_documents")
         .select("document_id")
         .eq("item_id", requirementId),
-      supabase.from("folders").select("id, name").eq("deal_id", operationId),
+      supabase
+        .from("folders")
+        .select("id, name, parent_id, index_path")
+        .eq("deal_id", operationId),
     ]);
 
   const liees = new Set(
     ((liens ?? []) as Array<{ document_id: string }>).map((l) => l.document_id),
   );
-  const noms = new Map(
-    ((folders ?? []) as Array<{ id: string; name: string }>).map((f) => [
-      f.id,
-      f.name,
-    ]),
-  );
 
-  return ((documents ?? []) as Array<{
+  const arbre: DossierArbre[] = (
+    (folders ?? []) as Array<{
+      id: string;
+      name: string;
+      parent_id: string | null;
+      index_path: string | null;
+    }>
+  ).map((folder) => ({
+    id: folder.id,
+    name: folder.name,
+    parentId: folder.parent_id,
+    indexPath: folder.index_path ?? "",
+  }));
+
+  const pieces = ((documents ?? []) as Array<{
     id: string;
     name: string;
     folder_id: string | null;
   }>)
     .filter((doc) => !liees.has(doc.id))
-    .map((doc) => ({
-      id: doc.id,
-      name: doc.name,
-      folderName: doc.folder_id ? (noms.get(doc.folder_id) ?? null) : "Racine",
-    }));
+    .map((doc) => ({ id: doc.id, name: doc.name, folderId: doc.folder_id }));
+
+  return grouperParDossier(arbre, pieces);
 }
 
 /**
@@ -293,6 +337,31 @@ export async function requirementHistory(
     .order("created_at", { ascending: false })
     .limit(50);
 
+  const emails = [
+    ...new Set(
+      ((data ?? []) as Array<{ actor_email: string | null }>)
+        .map((row) => row.actor_email?.toLowerCase())
+        .filter((email): email is string => Boolean(email)),
+    ),
+  ];
+
+  // Le journal ne garde que l'adresse. On y adjoint le nom : « Amara Diallo a
+  // rattaché » se lit, « amara.diallo@nimba.sn a rattaché » se déchiffre.
+  const noms = new Map<string, string>();
+  if (emails.length > 0) {
+    const { data: profils } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .in("email", emails);
+
+    for (const p of (profils ?? []) as Array<{
+      email: string | null;
+      full_name: string | null;
+    }>) {
+      if (p.email && p.full_name) noms.set(p.email.toLowerCase(), p.full_name);
+    }
+  }
+
   return ((data ?? []) as Array<{
     id: number;
     action: string;
@@ -300,21 +369,28 @@ export async function requirementHistory(
     created_at: string;
     metadata: Record<string, unknown> | null;
   }>).map((row) => {
-    const piece = (row.metadata?.document_name as string) ?? "une pièce";
+    const piece = nomCourt(
+      (row.metadata?.document_name as string) ?? "une pièce",
+    );
 
     const texte =
       row.action === "checklist.document_linked"
         ? `a rattaché « ${piece} »`
         : row.action === "checklist.document_unlinked"
           ? `a retiré « ${piece} »`
-          : row.action === "checklist.status_changed"
+          : row.action === "checklist.suggestion_dismissed"
+          ? `a écarté « ${piece} »`
+      : row.action === "checklist.status_changed"
             ? `a marqué l’exigence « ${statutMot(row.metadata?.status)} »`
             : row.action;
 
     return {
       id: row.id,
       texte,
-      actor: row.actor_email ?? "—",
+      actor: nomActeur(
+        row.actor_email,
+        noms.get(row.actor_email?.toLowerCase() ?? ""),
+      ),
       at: row.created_at,
     };
   });

@@ -9,6 +9,7 @@ import {
   restoreV2Version,
   setV2DocumentHidden,
 } from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
+import { dateJournal, nomActeur } from "@/features/v2/domain/journal";
 import {
   documentEventLabel,
   documentStateLabel,
@@ -248,11 +249,16 @@ export function DocumentPanel({
                 invité apparaîtra ici.
               </p>
             ) : (
-              <ul className="v2-panel-activity">
+              <ul className="v2-history-list">
                 {detail.events.map((event, index) => (
                   <li key={`${event.at}-${index}`}>
-                    {event.actor} {documentEventLabel(event.action)}
-                    {event.page ? ` la page ${event.page}` : ""} — {dateHeure(event.at)}
+                    <time>{dateJournal(event.at)}</time>
+                    <span>·</span>
+                    <p>
+                      <b>{nomActeur(event.actor)}</b>{" "}
+                      {documentEventLabel(event.action)}
+                      {event.page ? ` la page ${event.page}` : ""}
+                    </p>
                   </li>
                 ))}
               </ul>

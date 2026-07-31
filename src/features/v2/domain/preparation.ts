@@ -242,3 +242,99 @@ export function actionLabel(exigence: ExigenceBrute): string {
   if (exigence.proofs > 0) return "Voir la pièce";
   return exigence.folderId ? "Déposer une pièce" : "Associer une pièce";
 }
+
+/**
+ * Les pièces à rattacher, groupées par dossier.
+ *
+ * Une liste déroulante de vingt-quatre fichiers à plat oblige à connaître le
+ * nom exact de ce qu'on cherche. Groupée par dossier, elle se parcourt comme
+ * la data room elle-même — on retrouve une pièce par l'endroit où on l'a
+ * rangée, ce qui est justement pourquoi on l'a rangée.
+ *
+ * Le chemin complet sert d'intitulé (« Financier / Exercice 2025 ») : deux
+ * sous-dossiers homonymes sous des parents différents ne se confondent pas,
+ * et la profondeur se lit sans indentation.
+ */
+export interface DossierArbre {
+  id: string;
+  name: string;
+  parentId: string | null;
+  indexPath: string;
+}
+
+export interface PieceRattachable {
+  id: string;
+  name: string;
+  folderId: string | null;
+}
+
+export interface GroupePieces {
+  /** Chemin lisible du dossier, ou « Racine » pour les pièces non rangées. */
+  chemin: string;
+  pieces: PieceRattachable[];
+}
+
+/** « Financier / Exercice 2025 » — remonté depuis le dossier vers la racine. */
+export function cheminDossier(
+  dossiers: ReadonlyMap<string, DossierArbre>,
+  id: string,
+): string {
+  const noms: string[] = [];
+  let courant = dossiers.get(id);
+  let garde = 0;
+
+  // Un cycle en base — impossible en théorie — ne doit pas figer l'écran.
+  while (courant && garde < 20) {
+    noms.unshift(courant.name);
+    courant = courant.parentId ? dossiers.get(courant.parentId) : undefined;
+    garde += 1;
+  }
+
+  return noms.join(" / ");
+}
+
+export function grouperParDossier(
+  dossiers: readonly DossierArbre[],
+  pieces: readonly PieceRattachable[],
+): GroupePieces[] {
+  const parId = new Map(dossiers.map((dossier) => [dossier.id, dossier]));
+
+  const groupes = new Map<string, PieceRattachable[]>();
+  const racine: PieceRattachable[] = [];
+
+  for (const piece of pieces) {
+    if (!piece.folderId || !parId.has(piece.folderId)) {
+      racine.push(piece);
+      continue;
+    }
+    const liste = groupes.get(piece.folderId);
+    if (liste) liste.push(piece);
+    else groupes.set(piece.folderId, [piece]);
+  }
+
+  // L'ordre de la data room, pas l'alphabet : `index_path` porte déjà la
+  // numérotation que le fondateur voit dans son arborescence.
+  const ordonnes = [...groupes.entries()].sort(([a], [b]) =>
+    (parId.get(a)?.indexPath ?? "").localeCompare(
+      parId.get(b)?.indexPath ?? "",
+      undefined,
+      { numeric: true },
+    ),
+  );
+
+  const resultat: GroupePieces[] = ordonnes.map(([id, liste]) => ({
+    chemin: cheminDossier(parId, id),
+    pieces: [...liste].sort((a, b) => a.name.localeCompare(b.name)),
+  }));
+
+  // La racine en dernier : ces pièces ne se partagent pas, elles sont
+  // l'exception plutôt que le rangement normal.
+  if (racine.length > 0) {
+    resultat.push({
+      chemin: "Racine — non rangées",
+      pieces: [...racine].sort((a, b) => a.name.localeCompare(b.name)),
+    });
+  }
+
+  return resultat;
+}
