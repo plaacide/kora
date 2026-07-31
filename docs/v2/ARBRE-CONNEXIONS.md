@@ -139,6 +139,19 @@ choisir les dossiers.
 
 La RLS cache jusqu'au NOM : un invité ne sait pas que la pièce existe.
 
+**Tranchée — la lecture d'un invité suit ses droits** (1er août 2026).
+Vérification faite sur un vrai compte invité, après acceptation d'une
+invitation portant sur deux dossiers sur six : il lisait les six dossiers, les
+vingt-quatre noms de pièces et leurs clés de stockage. Ses DROITS étaient
+justes (`none` partout ailleurs, contenu inaccessible), mais le nom suffit à
+trahir. `can_see_deal` ouvrait la lecture de toute l'opération dès qu'un droit
+existait quelque part — défendable quand le partage était tout ou rien, plus
+depuis que l'assistant fait décocher des dossiers.
+
+`20260801120000_cloisonnement_par_dossier` aligne la lecture sur le droit, et
+ferme la checklist aux invités : elle disait ce qui manque encore au dossier.
+⚠️ Cette migration change aussi ce qu'un invité V1 voit en production.
+
 **En attente** — les choix produit, tous sur la fidélité des maquettes :
 
 1. **La préparation : trois états contre six, et pas de niveau.**
