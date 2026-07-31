@@ -34,6 +34,8 @@ export type LeverQuery = {
   /** L'interaction ouverte, et la relation à laquelle elle se rattache. */
   interaction?: string;
   investisseur?: string;
+  /** `fiche` quand le panneau d'interaction a été ouvert depuis la fiche. */
+  origine?: string;
   /** La fiche de relation ouverte — écran 41 — et son onglet. */
   fiche?: string;
   onglet?: string;
@@ -151,6 +153,7 @@ export function Lever({
           interactionOuverte={query.interaction ?? null}
           interactions={interactions}
           onglet={query.onglet ?? "resume"}
+          origine={query.origine === "fiche" ? "fiche" : "panel"}
           signaux={signaux}
           investisseurCible={query.investisseur ?? null}
           investisseurs={investisseurs}

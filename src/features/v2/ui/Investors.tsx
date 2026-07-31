@@ -71,6 +71,7 @@ export function InvestorsScreen({
   investisseurCible,
   fiche,
   onglet,
+  origine,
   acces,
   engagements,
   signaux,
@@ -91,6 +92,8 @@ export function InvestorsScreen({
   /** La fiche ouverte — écran 41 — et l'onglet consulté. */
   fiche: string | null;
   onglet: string;
+  /** D'où le panneau d'interaction a été ouvert, pour y revenir. */
+  origine: "fiche" | "panel";
   /** Ce qui alimente les onglets Accès, Engagements et Activité. */
   acces: readonly AccessRow[];
   engagements: readonly Engagement[];
@@ -173,6 +176,7 @@ export function InvestorsScreen({
           interaction={interactionEditee ?? null}
           investisseur={cible}
           operationId={operationId}
+          origine={origine}
         />
       )}
 

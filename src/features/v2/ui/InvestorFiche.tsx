@@ -273,7 +273,11 @@ function Resume({
       <div className="v2-fiche-actions">
         <Link
           className="v2-btn"
-          href={lien({ panel: "interaction", investisseur: investisseur.id })}
+          href={lien({
+            panel: "interaction",
+            investisseur: investisseur.id,
+            origine: "fiche",
+          })}
         >
           <Icon name="plus" />
           Ajouter une interaction
@@ -358,7 +362,11 @@ function ListeInteractions({
         </span>
         <Link
           className="v2-btn-mini"
-          href={lien({ panel: "interaction", investisseur: investisseur.id })}
+          href={lien({
+            panel: "interaction",
+            investisseur: investisseur.id,
+            origine: "fiche",
+          })}
         >
           <Icon name="plus" />
           Consigner
@@ -398,6 +406,7 @@ function ListeInteractions({
                   panel: "interaction",
                   investisseur: investisseur.id,
                   interaction: i.id,
+                  origine: "fiche",
                 })}
               >
                 Modifier

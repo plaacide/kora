@@ -51,7 +51,11 @@ export function InteractionsSection({
         </span>
         <Link
           className="v2-btn-mini"
-          href={lien({ panel: "interaction", investisseur: investisseur.id })}
+          href={lien({
+            panel: "interaction",
+            investisseur: investisseur.id,
+            origine: "panel",
+          })}
         >
           <Icon name="plus" />
           Consigner
@@ -92,6 +96,7 @@ export function InteractionsSection({
                   panel: "interaction",
                   investisseur: investisseur.id,
                   interaction: i.id,
+                  origine: "panel",
                 })}
               >
                 Modifier
@@ -115,14 +120,27 @@ export function InteractionPanel({
   interaction,
   investisseur,
   operationId,
+  origine,
 }: {
   /** `null` pour une nouvelle interaction. */
   interaction: Interaction | null;
   investisseur: InvestisseurPipeline;
   operationId: string;
+  /**
+   * D'où l'on vient — la fiche ou le formulaire de la relation.
+   *
+   * Sans elle, enregistrer une interaction ouverte depuis la fiche renvoyait
+   * au FORMULAIRE de modification : on se retrouvait devant des champs qu'on
+   * n'avait pas demandés, et l'interaction qu'on venait d'écrire n'était nulle
+   * part en vue.
+   */
+  origine: "fiche" | "panel";
 }) {
   const router = useRouter();
-  const retour = lien({ panel: investisseur.id });
+  const retour =
+    origine === "fiche"
+      ? lien({ fiche: investisseur.id, onglet: "interactions" })
+      : lien({ panel: investisseur.id });
 
   const [type, setType] = useState<TypeInteraction>(
     interaction?.type ?? "appel",
