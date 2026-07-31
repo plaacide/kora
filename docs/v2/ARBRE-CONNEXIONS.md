@@ -31,8 +31,8 @@ Rail opération   Vue d'ensemble · Préparation · Partage et accès · Lever �
 Onglets Lever    Vue de la levée · Pipeline · Engagements · Mises à jour
 ```
 
-⚠️ **`/v2/abonnement` n'est proposé nulle part.** La maquette 68 existe, le
-rail n'y mène pas — probablement un menu de compte, à décider.
+`/v2/abonnement` a été ajouté au rail global le 3 août. Il y était inatteignable
+— un écran qu'aucun chemin ne dessert n'existe pas pour celui qui l'utilise.
 
 ---
 
@@ -206,16 +206,28 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Usage                    compté sur les données, jamais incrémenté
    ├─ 🟢 Opérations comptées      une archive ne compte pas
    ├─ 🟢 Droits du plan           43 fonctionnalités, entitlements par plan
-   ├─ 🟢 Changer de plan          set_workspace_plan() — §14 montée immédiate,
-   │                                §15 descente ANNONCÉE, jamais appliquée
-   │                                avant la fin de la période payée
-   ├─ 🟢 Résilier                 cancel_workspace_subscription()
+   ├─ 🟡 Changer de plan          set_workspace_plan() marche — §14 montée
+   │                                immédiate, §15 descente ANNONCÉE, jamais
+   │                                appliquée avant la fin de la période payée.
+   │                                MAIS AUCUN BOUTON NE L'APPELLE : l'écran
+   │                                est en lecture seule, `requestV2Plan` et
+   │                                `activateV2Plan` ne sont appelées nulle part.
+   ├─ 🟡 Résilier                 cancel_workspace_subscription() marche ;
+   │                                `cancelV2Subscription` n'est appelée nulle
+   │                                part non plus.
    ├─ 🟡 Prestataire de paiement  BillingProvider posé ; seul le mode MANUEL
    │                                est implémenté (virement, facture,
    │                                activation). Genius Pay attend leur doc.
-   └─ 🔴 Faire respecter la limite §15 : empêcher la CRÉATION au-delà, sans
-                                    jamais supprimer. Écrit en base, pas
-                                    encore appliqué aux écrans.
+   └─ 🟢 Faire respecter la limite trois triggers, faits le 3 août : créer une
+                                    opération, ajouter un collaborateur,
+                                    inviter un externe. En base et non dans
+                                    les écrans, parce qu'un contrôle qui ne
+                                    vit que dans l'application se contourne
+                                    en appelant la RPC. Les refus sont mis en
+                                    mots par `billing/limites.ts`.
+                                    JAMAIS TESTÉ DANS UN NAVIGATEUR : vérifié
+                                    sous identité authentifiée en SQL, pas sur
+                                    l'écran, faute d'un compte accessible.
 ```
 
 ## Ce que le rail affiche
@@ -369,6 +381,11 @@ autorisés — mais staging reste la première étape.
 9. **Cohortes** (31-32) — `cohort_links` n'existe pas.
 10. ~~Sécurité~~ — faite le 2 août. Restent les codes de récupération, qui
    demandent une mécanique de secours propre.
-11. ~~Abonnement~~ — socle, service d'entitlements et écran faits le 3 août.
-   Restent deux choses : faire RESPECTER les limites (§15) et brancher
-   Genius Pay derrière `BillingProvider`.
+11. **Abonnement** — socle, entitlements, écran et limites faits le 3 août.
+   Restent deux choses, et la première ne dépend de personne :
+   - **l'écran ne fait rien.** Il montre le plan, l'usage et les droits, mais
+     ne porte aucun bouton : on ne peut ni changer de plan ni résilier depuis
+     l'interface, alors que les trois actions serveur existent et marchent.
+   - Genius Pay derrière `BillingProvider`, qui attend leur documentation.
+     Question ouverte : proposent-ils l'abonnement récurrent, ou seulement le
+     paiement unitaire ? La réponse change le parcours.
