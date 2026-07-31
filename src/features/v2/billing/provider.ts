@@ -102,12 +102,24 @@ export interface BillingProvider {
     montant: number;
     devise: string;
     email: string;
+    /**
+     * Le mobile money identifie un payeur par son NUMÉRO, pas par son e-mail.
+     * Optionnel parce qu'un virement et une carte s'en passent : les
+     * prestataires qui n'en ont pas besoin l'ignorent, et le contrat du §18
+     * ne se plie pas à celui qui l'exige.
+     */
+    telephone?: string | null;
   }): Promise<SessionPaiement>;
 
   creerAbonnement(input: {
     workspaceId: string;
     planCode: string;
     intervalle: "month" | "year";
+    montant?: number;
+    devise?: string;
+    telephone?: string | null;
+    /** §17 : l'essai de 14 jours du plan Raise. */
+    joursDEssai?: number;
   }): Promise<ResultatAbonnement>;
 
   modifierAbonnement(input: {

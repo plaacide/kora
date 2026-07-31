@@ -215,9 +215,21 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟡 Résilier                 cancel_workspace_subscription() marche ;
    │                                `cancelV2Subscription` n'est appelée nulle
    │                                part non plus.
-   ├─ 🟡 Prestataire de paiement  BillingProvider posé ; seul le mode MANUEL
-   │                                est implémenté (virement, facture,
-   │                                activation). Genius Pay attend leur doc.
+   ├─ 🟢 Prestataire de paiement  deux implémentations : MANUEL (virement,
+   │                                facture) et GENIUS PAY — mobile money,
+   │                                cartes, et le RÉCURRENT. Choisi par
+   │                                SANZA_BILLING_PROVIDER. Voir GENIUSPAY.md.
+   ├─ 🟢 Recevoir un paiement     /api/v2/billing/webhook → apply_billing_event()
+   │                                signature HMAC vérifiée, fenêtre 5 min,
+   │                                bac à sable cloisonné du réel, idempotence
+   │                                garantie par l'unicité en base. Éprouvé :
+   │                                anon et client refusés, rejeu neutralisé.
+   ├─ 🔴 Téléphone du payeur      leur API d'abonnement l'EXIGE ; Sanza ne le
+   │                                collecte nulle part. Sans lui, seul le
+   │                                paiement ponctuel fonctionne.
+   ├─ 🔴 Renouvellement réel      non confirmé par leur documentation. Ne rien
+   │                                promettre sur un écran avant d'avoir la
+   │                                réponse par écrit.
    └─ 🟢 Faire respecter la limite trois triggers, faits le 3 août : créer une
                                     opération, ajouter un collaborateur,
                                     inviter un externe. En base et non dans
@@ -386,6 +398,7 @@ autorisés — mais staging reste la première étape.
    - **l'écran ne fait rien.** Il montre le plan, l'usage et les droits, mais
      ne porte aucun bouton : on ne peut ni changer de plan ni résilier depuis
      l'interface, alors que les trois actions serveur existent et marchent.
-   - Genius Pay derrière `BillingProvider`, qui attend leur documentation.
-     Question ouverte : proposent-ils l'abonnement récurrent, ou seulement le
-     paiement unitaire ? La réponse change le parcours.
+   - ~~Genius Pay~~ — branché le 3 août. **Oui, ils font du récurrent** :
+     cycles, essai gratuit, résiliation en fin de cycle. Restent le téléphone
+     du payeur, que nous ne collectons pas, et la nature réelle du
+     renouvellement, qu'ils ne documentent pas.

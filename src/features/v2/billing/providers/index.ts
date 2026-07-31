@@ -1,4 +1,5 @@
 import type { BillingProvider } from "../provider";
+import { GeniusPayProvider } from "./geniuspay";
 import { ManualProvider } from "./manual";
 
 /**
@@ -14,6 +15,7 @@ import { ManualProvider } from "./manual";
  */
 const PRESTATAIRES: Record<string, () => BillingProvider> = {
   manual: () => new ManualProvider(),
+  geniuspay: () => new GeniusPayProvider(),
 };
 
 export function billingProvider(): BillingProvider {
@@ -33,4 +35,4 @@ export function billingProvider(): BillingProvider {
   return fabrique();
 }
 
-export { ManualProvider };
+export { GeniusPayProvider, ManualProvider };

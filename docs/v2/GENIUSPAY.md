@@ -1,0 +1,89 @@
+# Brancher Genius Pay
+
+Documentation du prestataire : <https://pay.genius.ci/doc>
+
+## Ce qui est en place
+
+| Pièce | Où |
+|---|---|
+| Le prestataire | `src/features/v2/billing/providers/geniuspay.ts` |
+| Signature des notifications | testée, 15 cas, `geniuspay.test.ts` |
+| La route qui reçoit | `src/app/api/v2/billing/webhook/route.ts` |
+| L'application en base | `apply_billing_event()`, migration `20260803220000` |
+
+Aucun écran ne nomme Genius Pay. Le §18 est tenu : on change de prestataire en
+changeant une variable d'environnement.
+
+## Les variables à poser
+
+Dans `.env.local` en local, dans Coolify pour le déploiement. **Elles ne doivent
+jamais entrer dans le dépôt, ni dans une conversation.**
+
+```
+SANZA_BILLING_PROVIDER=geniuspay
+GENIUSPAY_API_KEY=pk_sandbox_…
+GENIUSPAY_API_SECRET=sk_sandbox_…
+GENIUSPAY_WEBHOOK_SECRET=whsec_sandbox_…
+```
+
+Sans `SANZA_BILLING_PROVIDER`, c'est le mode manuel qui s'applique — virement et
+facture. C'est volontaire : le produit doit fonctionner sans dépendre de
+personne.
+
+**Le mode réel se déduit du préfixe de la clé**, pas d'une variable séparée :
+`_sandbox_` ou `_live_`. Deux sources pour un même fait finissent par se
+contredire, et ce jour-là on encaisse pour de vrai en croyant tester.
+
+## L'adresse à déclarer chez eux
+
+```
+https://<votre-domaine>/api/v2/billing/webhook
+```
+
+Événements utiles : `payment.success`, `payment.failed`, `payment.expired`,
+`subscription.payment_succeeded`, `subscription.payment_failed`,
+`subscription.past_due`, `subscription.cancelled`.
+
+## Ce qui protège l'argent
+
+1. **La signature.** `HMAC-SHA256(timestamp + "." + corps)`, comparée en temps
+   constant, sur le corps brut. Une notification non signée n'ouvre rien.
+2. **La fenêtre de cinq minutes**, dans les deux sens. Une notification
+   authentique capturée hier ne rouvre pas un plan aujourd'hui.
+3. **Le cloisonnement bac à sable / réel.** Un événement `sandbox` reçu par une
+   installation `live` est rejeté. Sans ce contrôle, un compte d'essai chez eux
+   suffirait à s'offrir le plan le plus cher.
+4. **L'idempotence en base.** L'unicité `(provider, external_event_id)` de
+   `billing_events` est le juge — pas un `if` dans l'application, que deux
+   notifications simultanées franchiraient toutes les deux.
+5. **`apply_billing_event` est fermée** à `anon` et à `authenticated`. Vérifié :
+   les deux reçoivent « permission denied ».
+6. **L'organisation et le plan viennent de NOS métadonnées**, jamais du corps
+   librement composé par l'appelant.
+
+## Ce qui reste ouvert
+
+- **Le renouvellement est-il un vrai prélèvement ?** Leur documentation ne le
+  dit pas, et mentionne « réessayer une facture », ce qui évoque une relance.
+  En mobile money, Wave et Orange demandent souvent une confirmation à chaque
+  débit. **Tant que ce n'est pas confirmé par écrit, ne pas promettre un
+  renouvellement automatique sur un écran.**
+- **Le téléphone.** `POST /subscriptions` exige `customer.phone`. Sanza ne
+  collecte de numéro nulle part — ni dans `profiles`, ni dans `organizations`.
+  Sans lui, seul le paiement ponctuel fonctionne. Le paiement ponctuel, lui, se
+  contente de l'e-mail.
+- **L'identifiant d'événement.** Ils n'en envoient pas. On reconstitue
+  `type:référence`, ce qui rend un rejeu inoffensif. À revoir s'ils en publient
+  un vrai.
+- **L'écran ne porte toujours aucun bouton.** Toute cette plomberie n'est
+  atteignable par personne tant que `Subscription.tsx` reste en lecture seule.
+
+## Leur serveur MCP
+
+Configuré sur le projet, mais **il ne se charge qu'au démarrage d'une session** —
+il faudra relancer Claude Code pour en disposer. Il vit sur `geniuspay.ci`,
+tandis que l'API marchande vit sur `pay.genius.ci` : deux domaines, une erreur
+d'hôte donne un 403 qui ressemble à une clé refusée.
+
+Leur outil `inspect_recent_errors` prend la clé secrète **en paramètre** : ne
+jamais lui donner une clé `_live_`.
