@@ -8,16 +8,11 @@ import type { Level } from "@/lib/permissions";
 /**
  * Création d'un accès — dernière étape de l'assistant de partage.
  *
- * ⚠️ PORTÉE : `accept_invitation` accorde les droits sur TOUS les dossiers
- * racine de l'opération, au niveau porté par l'invitation. La base n'a
- * aujourd'hui aucun endroit où retenir « cette invitation n'ouvre que ces
- * dossiers-là » — il faudrait une table de liaison et modifier
- * `accept_invitation`, donc toucher la V1 en production.
- *
- * L'assistant le dit donc en clair plutôt que de faire choisir des dossiers
- * qui seraient ignorés à l'acceptation. Restreindre reste possible APRÈS,
- * depuis le tableau des accès, une fois l'invité inscrit : `set_permission`
- * travaille sur un utilisateur existant.
+ * PORTÉE : depuis la migration `20260731230000_invitation_perimetre`,
+ * l'invitation porte les dossiers qu'elle ouvre (`invitation_folders`) et
+ * `accept_invitation` n'accorde que ceux-là. Sans périmètre enregistré, le
+ * comportement d'origine s'applique — tous les dossiers racine — ce qui garde
+ * la V1 et les invitations déjà envoyées intactes.
  */
 export async function createV2Access(input: {
   operationId: string;
@@ -26,6 +21,8 @@ export async function createV2Access(input: {
   ndaRequired: boolean;
   /** Échéance ISO. `null` laisse la base poser ses quatre-vingt-dix jours. */
   expiresAt: string | null;
+  /** Dossiers choisis. `null` = toute la data room, présente et à venir. */
+  folderIds: string[] | null;
 }): Promise<{ ok: boolean; error?: string; link?: string; emailFailed?: boolean }> {
   const email = input.email.trim().toLowerCase();
   if (!email) return { ok: false, error: "Indiquez l’adresse du destinataire." };
@@ -39,11 +36,26 @@ export async function createV2Access(input: {
     ndaRequired: input.ndaRequired,
     level: input.level as Level,
     expiresAt: input.expiresAt,
+    folderIds: input.folderIds,
   });
 
   if (!result.ok) {
     console.error("[v2 access] create_invitation échoué :", result.error);
-    return { ok: false, error: result.error };
+
+    // PGRST202 : PostgREST ne trouve pas la fonction à six arguments, donc la
+    // migration du périmètre n'est pas appliquée sur cette base. On le dit au
+    // lieu de renvoyer l'invitation sans son périmètre : le fondateur croirait
+    // avoir restreint l'accès alors que tout serait ouvert.
+    const signature =
+      result.error?.includes("PGRST202") ||
+      result.error?.includes("Could not find the function");
+
+    return {
+      ok: false,
+      error: signature
+        ? "Le choix des dossiers n’est pas encore actif sur cette base : la migration « invitation_perimetre » doit être appliquée."
+        : result.error,
+    };
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");

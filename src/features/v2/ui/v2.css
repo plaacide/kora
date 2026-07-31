@@ -596,9 +596,18 @@
 @media (max-width:900px){.v2-preview-body{grid-template-columns:1fr}}
 
 /* Écrans 20-23 — assistant de partage */
-.v2-share-folders{display:flex;flex-direction:column;gap:2px}
-.v2-share-folders>div{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:10px 0}
-.v2-share-folders>div:last-child{border-bottom:0}
+.v2-scope-modes{display:flex;gap:8px;margin-bottom:12px}
+.v2-scope-modes button{border:1px solid var(--line);border-radius:999px;background:#fff;padding:7px 15px;color:var(--text-2);font-size:12.5px;cursor:pointer}
+.v2-scope-modes button[data-active=true]{border-color:var(--orange);background:var(--orange-soft);color:var(--orange);font-weight:500}
+.v2-scope-summary{border-radius:8px;background:var(--surface-2);padding:9px 12px;color:var(--text-3);font-size:12.5px;text-align:center}
+.v2-scope-summary b{color:var(--text-1);font-weight:500}
+.v2-share-folders{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:9px;padding:4px 12px}
+.v2-share-folders>div,.v2-share-folders>label{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:10px 0}
+.v2-share-folders>div:last-child,.v2-share-folders>label:last-child{border-bottom:0}
+.v2-share-folders>label{cursor:pointer}
+.v2-share-folders>label[data-off=true] strong{color:var(--text-3)}
+.v2-share-folders input[type=checkbox]{width:16px;height:16px;flex:0 0 auto;accent-color:var(--orange)}
+.v2-share-folders input:disabled{cursor:not-allowed}
 .v2-share-folders .v2-icon{flex:0 0 auto;color:var(--text-3)}
 .v2-share-folders strong{flex:1;font-size:13.5px;font-weight:500}
 .v2-share-folders span{color:var(--text-4);font-size:12px}

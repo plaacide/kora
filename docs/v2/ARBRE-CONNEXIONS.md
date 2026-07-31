@@ -68,6 +68,7 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Assistant (écrans 20-23) → createInvitation() V1 : RPC + lien + e-mail
    ├─ 🟢 Tableau (écran 24)       → invitations + ndas + permissions + audit_log
    ├─ 🟢 Aperçu invité (écran 25) → dossiers et pièces réellement ouverts
+   ├─ 🟢 Périmètre choisi         invitation_folders + create_invitation(p_folders)
    └─ 🔴 Révocation               —                     ATTEND : RPC revoke_invitation
 🔴 Lever                          —                     ATTEND : raises, save_raise (écrans déjà faits)
 🔴 Investisseurs                  —                     ATTEND : raise_investors
@@ -114,11 +115,19 @@ se pose sur un dossier ; sans dossier, il n'y a nulle part où accorder — ni
 retirer — un droit. La racine est donc réservée à l'équipe interne, et le geste
 qui partage une pièce est celui qui la range.
 
-**Tranchée — l'accès ne se restreint pas à l'invitation** (31 juillet 2026).
-`accept_invitation` accorde TOUS les dossiers racine au niveau de
-l'invitation ; rien ne retient « cette invitation n'ouvre que ces
-dossiers-là ». L'assistant DIT donc ce qui s'ouvrira au lieu d'offrir un choix
-qui serait ignoré. Restreindre reste possible après, via `set_permission`.
+**Tranchée — l'invitation porte son périmètre** (31 juillet 2026).
+`accept_invitation` accordait TOUS les dossiers racine. La migration
+`20260731230000_invitation_perimetre` ajoute `invitation_folders` : l'assistant
+fait choisir les dossiers, et l'acceptation n'ouvre que ceux-là.
+
+Deux états à ne pas confondre : **aucun périmètre enregistré** vaut « toute la
+data room, y compris ce qui sera créé plus tard » — c'est l'ancien
+comportement, conservé pour la V1 et les invitations déjà envoyées. Une
+**sélection** fige au contraire la liste.
+
+Ce qui reste hors de portée : masquer une PIÈCE dans un dossier ouvert.
+`permissions.folder_id` est `not null`, le droit se pose sur le dossier. La
+maquette 21 montre une exception par pièce ; elle demande un autre modèle.
 
 **En attente** — les choix produit, tous sur la fidélité des maquettes :
 

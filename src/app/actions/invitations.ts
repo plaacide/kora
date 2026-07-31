@@ -27,15 +27,26 @@ export async function createInvitation(input: {
   ndaRequired: boolean;
   level: Level;
   expiresAt?: string | null;
+  /**
+   * Dossiers ouverts par cette invitation. `null` ou absent = tous les
+   * dossiers racine, y compris ceux créés après l'envoi — c'est le
+   * comportement d'origine, et celui que la V1 continue d'utiliser.
+   */
+  folderIds?: string[] | null;
 }): Promise<InviteResult> {
   const supabase = await createClient();
 
+  // `p_folders` n'est envoyé QUE s'il y a un périmètre. PostgREST résout la
+  // fonction sur les arguments reçus : envoyer `p_folders: null` là où la base
+  // n'a que l'ancienne signature à cinq arguments ferait échouer TOUS les
+  // envois, V1 comprise. Sans le paramètre, l'appel reste celui d'avant.
   const { data, error } = await supabase.rpc("create_invitation", {
     p_deal: input.dealId,
     p_email: input.email,
     p_nda_required: input.ndaRequired,
     p_level: input.level,
     p_expires: input.expiresAt || null,
+    ...(input.folderIds?.length ? { p_folders: input.folderIds } : {}),
   });
 
   if (error) return { ok: false, error: error.message };

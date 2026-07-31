@@ -1,4 +1,8 @@
-import { listAccesses, shareableFolders } from "@/features/v2/server/access";
+import {
+  invitationScope,
+  listAccesses,
+  shareableFolders,
+} from "@/features/v2/server/access";
 import { listDocuments } from "@/features/v2/server/documents";
 import { listOperations } from "@/features/v2/server/operations";
 import { requireV2Workspace } from "@/features/v2/server/session";
@@ -32,6 +36,7 @@ export default async function AccessPage({
     level?: string;
     nda?: string;
     expires?: string;
+    dossiers?: string;
   }>;
 }) {
   const [{ operationId }, query] = await Promise.all([params, searchParams]);
@@ -58,6 +63,7 @@ export default async function AccessPage({
           level: query.level ?? "watermark",
           nda: query.nda ?? "1",
           expires: query.expires ?? "",
+          dossiers: query.dossiers ?? "",
         }}
         folders={folders}
         operationId={operationId}
@@ -73,10 +79,17 @@ export default async function AccessPage({
     const acces = accesses.find((row) => row.id === query.apercu);
 
     if (acces) {
-      const [folders, name] = await Promise.all([
+      const [tous, name, choisis] = await Promise.all([
         shareableFolders(operationId),
         nomOperation(),
+        invitationScope(acces.id),
       ]);
+
+      // L'aperçu ne montre QUE ce que cette invitation ouvre. Lui faire lister
+      // toute la data room en dirait plus à l'écran que l'invité n'en verra.
+      const folders = choisis
+        ? tous.filter((folder) => choisis.includes(folder.id))
+        : tous;
 
       // Sans dossier choisi, on ouvre le premier : un aperçu vide n'apprend
       // rien à qui veut vérifier ce que l'invité voit.

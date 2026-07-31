@@ -151,7 +151,7 @@ export function AccessWizard({
   operationId: string;
   operationName: string;
   folders: readonly ShareFolder[];
-  draft: { email: string; level: string; nda: string; expires: string };
+  draft: { email: string; level: string; nda: string; expires: string; dossiers: string };
 }) {
   const current = stepOrder[step] ?? 1;
 
@@ -177,8 +177,8 @@ export function AccessWizard({
 /** Les valeurs déjà saisies voyagent d'une étape à l'autre par l'URL. */
 function lien(
   etape: string,
-  draft: { email: string; level: string; nda: string; expires: string },
-  patch: Partial<{ email: string; level: string; nda: string; expires: string }> = {},
+  draft: { email: string; level: string; nda: string; expires: string; dossiers: string },
+  patch: Partial<{ email: string; level: string; nda: string; expires: string; dossiers: string }> = {},
 ): string {
   const valeurs = { ...draft, ...patch };
   const params = new URLSearchParams({ share: etape });
@@ -191,7 +191,7 @@ function lien(
 function RecipientStep({
   draft,
 }: {
-  draft: { email: string; level: string; nda: string; expires: string };
+  draft: { email: string; level: string; nda: string; expires: string; dossiers: string };
 }) {
   const [email, setEmail] = useState(draft.email);
 
@@ -223,40 +223,97 @@ function RecipientStep({
   );
 }
 
+/**
+ * Écran 21 — le choix du périmètre.
+ *
+ * Deux modes, et la différence n'est pas cosmétique : « Tous les dossiers
+ * autorisés » n'enregistre AUCUN périmètre, ce qui vaut « tout ce qui existe »
+ * — y compris les dossiers créés après l'envoi. Une sélection fige au
+ * contraire la liste : un dossier ajouté demain ne s'ouvrira pas tout seul.
+ */
 function ContentStep({
   draft,
   folders,
 }: {
-  draft: { email: string; level: string; nda: string; expires: string };
+  draft: { email: string; level: string; nda: string; expires: string; dossiers: string };
   folders: readonly ShareFolder[];
 }) {
-  const total = folders.reduce((somme, f) => somme + f.documentCount, 0);
+  // `dossiers` vide = mode « tous ». C'est exactement ce que la base entend
+  // par un périmètre absent : les deux représentations n'ont pas à diverger.
+  const [tous, setTous] = useState(!draft.dossiers);
+  const [choisis, setChoisis] = useState<string[]>(() =>
+    draft.dossiers ? draft.dossiers.split(",").filter(Boolean) : [],
+  );
+
+  const retenus = tous ? folders.map((folder) => folder.id) : choisis;
+  const ouverts = folders.filter((folder) => retenus.includes(folder.id));
+  const pieces = ouverts.reduce((somme, folder) => somme + folder.documentCount, 0);
+  const masquees =
+    folders.reduce((somme, folder) => somme + folder.documentCount, 0) - pieces;
+
+  function basculer(id: string) {
+    setChoisis((liste) =>
+      liste.includes(id) ? liste.filter((autre) => autre !== id) : [...liste, id],
+    );
+  }
 
   return (
     <WizardCard
       title={`Que verra ${draft.email || "cet invité"} ?`}
-      description="Un accès s’accorde sur des dossiers — jamais sur une pièce isolée."
+      description="Sélectionnez les dossiers. Un dossier ouvert l’est avec tous ses sous-dossiers."
       backHref={lien("recipient", draft)}
-      nextHref={lien("security", draft)}
+      nextHref={lien("security", draft, {
+        dossiers: tous ? "" : choisis.join(","),
+      })}
       nextLabel="Continuer → Sécurité"
+      nextDisabled={!tous && choisis.length === 0}
     >
+      <div className="v2-scope-modes">
+        <button
+          data-active={!tous}
+          onClick={() => setTous(false)}
+          type="button"
+        >
+          Sélection de dossiers
+        </button>
+        <button data-active={tous} onClick={() => setTous(true)} type="button">
+          Tous les dossiers autorisés
+        </button>
+      </div>
+
       <div className="v2-share-folders">
         {folders.map((folder) => (
-          <div key={folder.id}>
+          <label data-off={!retenus.includes(folder.id)} key={folder.id}>
+            <input
+              checked={retenus.includes(folder.id)}
+              disabled={tous}
+              onChange={() => basculer(folder.id)}
+              type="checkbox"
+            />
             <Icon name="folder" />
             <strong>{folder.name}</strong>
             <span>
               {folder.documentCount} pièce{folder.documentCount > 1 ? "s" : ""}
             </span>
-          </div>
+          </label>
         ))}
       </div>
 
+      <p className="v2-scope-summary">
+        Résumé : <b>{ouverts.length} dossier{ouverts.length > 1 ? "s" : ""}</b> ·{" "}
+        <b>{pieces} pièce{pieces > 1 ? "s" : ""} visible{pieces > 1 ? "s" : ""}</b>
+        {masquees > 0 && (
+          <> · {masquees} pièce{masquees > 1 ? "s" : ""} masquée{masquees > 1 ? "s" : ""}</>
+        )}
+      </p>
+
       <p className="v2-panel-note">
-        Ces {folders.length} dossiers seront ouverts avec tous leurs
-        sous-dossiers, soit {total} pièce{total > 1 ? "s" : ""} au total. Les
-        pièces laissées à la racine de la data room restent invisibles. Vous
-        pourrez restreindre dossier par dossier une fois l’invitation acceptée.
+        {tous
+          ? "Tous les dossiers de la data room s’ouvriront, y compris ceux créés après l’envoi."
+          : "Seuls les dossiers cochés s’ouvriront. Un dossier créé plus tard restera fermé tant que vous ne l’aurez pas ajouté."}{" "}
+        Les pièces laissées à la racine de la data room restent invisibles dans
+        tous les cas. Masquer une pièce à l’intérieur d’un dossier ouvert n’est
+        pas possible : le droit se pose sur le dossier.
       </p>
     </WizardCard>
   );
@@ -265,7 +322,7 @@ function ContentStep({
 function SecurityStep({
   draft,
 }: {
-  draft: { email: string; level: string; nda: string; expires: string };
+  draft: { email: string; level: string; nda: string; expires: string; dossiers: string };
 }) {
   const [level, setLevel] = useState(draft.level || "watermark");
   const [nda, setNda] = useState(draft.nda !== "0");
@@ -337,7 +394,7 @@ function ReviewStep({
   folders,
   operationId,
 }: {
-  draft: { email: string; level: string; nda: string; expires: string };
+  draft: { email: string; level: string; nda: string; expires: string; dossiers: string };
   folders: readonly ShareFolder[];
   operationId: string;
 }) {
@@ -347,6 +404,13 @@ function ReviewStep({
 
   const nda = draft.nda !== "0";
   const niveau = NIVEAUX.find(([valeur]) => valeur === draft.level) ?? NIVEAUX[0];
+
+  const choisis = draft.dossiers ? draft.dossiers.split(",").filter(Boolean) : [];
+  const ouverts =
+    choisis.length > 0
+      ? folders.filter((folder) => choisis.includes(folder.id))
+      : folders;
+  const pieces = ouverts.reduce((somme, folder) => somme + folder.documentCount, 0);
 
   async function envoyer() {
     setErreur(null);
@@ -358,6 +422,10 @@ function ReviewStep({
       level: draft.level || "watermark",
       ndaRequired: nda,
       expiresAt: draft.expires ? new Date(draft.expires).toISOString() : null,
+      // `null` porte « tous les dossiers », y compris ceux à venir. Envoyer la
+      // liste complète à la place figerait le périmètre sans que le fondateur
+      // l'ait demandé.
+      folderIds: choisis.length > 0 ? choisis : null,
     });
 
     setBusy(false);
@@ -407,8 +475,10 @@ function ReviewStep({
         <div>
           <small>Périmètre</small>
           <strong>
-            {folders.length} dossier{folders.length > 1 ? "s" : ""}
+            {ouverts.length} dossier{ouverts.length > 1 ? "s" : ""} ·{" "}
+            {pieces} pièce{pieces > 1 ? "s" : ""}
           </strong>
+          {choisis.length === 0 && <small>toute la data room</small>}
         </div>
       </div>
 

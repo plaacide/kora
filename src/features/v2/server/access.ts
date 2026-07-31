@@ -43,10 +43,10 @@ export interface ShareFolder {
 /**
  * Les accès accordés, du plus récent au plus ancien (écran 24).
  *
- * Le périmètre n'est pas lu sur l'invitation — elle ne le porte pas. Il se
- * reconstitue depuis les `permissions` réellement écrites, et pour une
- * invitation pas encore acceptée, depuis ce que `accept_invitation` posera :
- * les dossiers racine.
+ * Le périmètre se lit à deux endroits selon l'état : une invitation acceptée
+ * a des `permissions` écrites, c'est la vérité. Une invitation en attente n'en
+ * a aucune — on montre alors ce que l'acceptation POSERA : les dossiers
+ * choisis à l'envoi, ou tous les dossiers racine si aucun ne l'a été.
  */
 export async function listAccesses(operationId: string): Promise<AccessRow[]> {
   const supabase = await createClient();
@@ -76,7 +76,12 @@ export async function listAccesses(operationId: string): Promise<AccessRow[]> {
 
   const emails = [...new Set(lignes.map((row) => row.email.toLowerCase()))];
 
-  const [{ data: ndas }, { data: profiles }, { data: activite }] = await Promise.all([
+  const [
+    { data: ndas },
+    { data: profiles },
+    { data: activite },
+    { data: perimetres },
+  ] = await Promise.all([
     supabase
       .from("ndas")
       .select("invitation_id, signed_at")
@@ -89,7 +94,25 @@ export async function listAccesses(operationId: string): Promise<AccessRow[]> {
       .in("actor_email", emails)
       .order("created_at", { ascending: false })
       .limit(400),
+    // Le périmètre choisi à l'envoi. Tant que la migration
+    // `invitation_perimetre` n'est pas appliquée, la requête échoue et `data`
+    // reste nul : on retombe alors sur « tous les dossiers racine », qui est
+    // très exactement ce que la base fait dans ce cas.
+    supabase
+      .from("invitation_folders")
+      .select("invitation_id, folder_id")
+      .in("invitation_id", lignes.map((row) => row.id)),
   ]);
+
+  const choisisParInvitation = new Map<string, string[]>();
+  for (const row of (perimetres ?? []) as Array<{
+    invitation_id: string;
+    folder_id: string;
+  }>) {
+    const liste = choisisParInvitation.get(row.invitation_id);
+    if (liste) liste.push(row.folder_id);
+    else choisisParInvitation.set(row.invitation_id, [row.folder_id]);
+  }
 
   const arbre: NoeudDossier[] = (
     (folders ?? []) as Array<{ id: string; parent_id: string | null }>
@@ -178,11 +201,36 @@ export async function listAccesses(operationId: string): Promise<AccessRow[]> {
       ndaSignedAt: signatures.get(row.id) ?? null,
       expiresAt: row.expires_at,
       createdAt: row.created_at,
-      scope: perimetre(arbre, parDossier, prevision ? racines : (droits ?? [])),
+      scope: perimetre(
+        arbre,
+        parDossier,
+        prevision ? (choisisParInvitation.get(row.id) ?? racines) : (droits ?? []),
+      ),
       scopePending: prevision,
       lastActivityAt: derniereTrace.get(cle) ?? null,
     };
   });
+}
+
+/**
+ * Les dossiers qu'une invitation ouvre, ou `null` si elle les ouvre tous.
+ *
+ * `null` et « la liste de tous les dossiers » ne se valent pas : le premier
+ * suit la data room quand elle grandit, le second l'a figée.
+ */
+export async function invitationScope(
+  invitationId: string,
+): Promise<string[] | null> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("invitation_folders")
+    .select("folder_id")
+    .eq("invitation_id", invitationId);
+
+  const ids = ((data ?? []) as Array<{ folder_id: string }>).map((row) => row.folder_id);
+
+  return ids.length > 0 ? ids : null;
 }
 
 /**
