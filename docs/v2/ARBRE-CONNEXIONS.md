@@ -241,11 +241,8 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 
 ## Migrations
 
-Toutes appliquées sur staging (`jourzsgjnutktsrgxkoo`) au 1er août, **sauf** :
-
-| Migration | État |
-|---|---|
-| `20260801230000_journal_nom_de_piece` | en attente — le journal dit « une pièce » au lieu du nom |
+Toutes appliquées sur staging (`jourzsgjnutktsrgxkoo`), y compris
+`journal_nom_de_piece` et `nom_de_levee`. Aucune n'est en attente.
 
 Aucune n'a été portée en production. Le fondateur a levé la contrainte de
 compatibilité V1 : produit en pré-lancement, les changements de modèle sont
