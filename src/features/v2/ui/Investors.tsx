@@ -25,8 +25,12 @@ import {
   type Interaction,
   type InvestisseurPipeline,
 } from "@/features/v2/domain/pipeline";
+import type { Engagement } from "@/features/v2/domain/engagements";
+import type { AccessRow } from "@/features/v2/server/access";
+import type { SignauxDocumentaires } from "@/features/v2/server/fiche";
 import { EmptyMedallion } from "./EmptyArt";
 import { InteractionPanel, InteractionsSection } from "./Interactions";
+import { InvestorFiche } from "./InvestorFiche";
 import { Icon } from "./Icon";
 
 /**
@@ -65,6 +69,11 @@ export function InvestorsScreen({
   edite,
   interactionOuverte,
   investisseurCible,
+  fiche,
+  onglet,
+  acces,
+  engagements,
+  signaux,
 }: {
   operationId: string;
   investisseurs: readonly InvestisseurPipeline[];
@@ -79,6 +88,13 @@ export function InvestorsScreen({
   interactionOuverte: string | null;
   /** La relation à laquelle l'interaction se rattache. */
   investisseurCible: string | null;
+  /** La fiche ouverte — écran 41 — et l'onglet consulté. */
+  fiche: string | null;
+  onglet: string;
+  /** Ce qui alimente les onglets Accès, Engagements et Activité. */
+  acces: readonly AccessRow[];
+  engagements: readonly Engagement[];
+  signaux: SignauxDocumentaires;
 }) {
   // Le pipeline vit sous l'onglet `?view=pipeline` de Lever : chaque lien doit
   // le reconduire, sans quoi le premier clic sort de l'écran.
@@ -100,6 +116,50 @@ export function InvestorsScreen({
   const interactionEditee = interactions.find(
     (i) => i.id === interactionOuverte,
   );
+
+  const fichee = fiche
+    ? (investisseurs.find((item) => item.id === fiche) ?? null)
+    : null;
+
+  if (fichee) {
+    return (
+      <>
+        <InvestorFiche
+          acces={
+            acces.find(
+              (a) =>
+                fichee.email &&
+                a.email.toLowerCase() === fichee.email.toLowerCase(),
+            ) ?? null
+          }
+          engagement={
+            engagements.find((e) => e.investorId === fichee.id) ?? null
+          }
+          interactions={interactions.filter((i) => i.investorId === fichee.id)}
+          investisseur={fichee}
+          onglet={onglet}
+          signaux={signaux}
+        />
+
+        {edite === "interaction" && cible && (
+          <InteractionPanel
+            interaction={interactionEditee ?? null}
+            investisseur={cible}
+            operationId={operationId}
+          />
+        )}
+
+        {edite && edite !== "interaction" && (
+          <InvestorPanel
+            devise={devise}
+            interactions={interactions}
+            investisseur={enCours}
+            operationId={operationId}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <div className="v2-pipeline-page">
@@ -179,7 +239,7 @@ function PipelineColonnes({
             <p>Aucune relation</p>
           ) : (
             colonne.investisseurs.map((item) => (
-              <Link href={`?view=pipeline&panel=${item.id}`} key={item.id}>
+              <Link href={`?view=pipeline&fiche=${item.id}`} key={item.id}>
                 <span className="v2-person-avatar">
                   {initials(item.organisation ?? item.nom)}
                 </span>
@@ -297,7 +357,7 @@ function PipelineTableau({
                 {item.ticket != null ? item.ticket.toLocaleString("fr-FR") : "—"}
               </td>
               <td>
-                <Link href={`?view=pipeline&panel=${item.id}`}>Modifier</Link>
+                <Link href={`?view=pipeline&fiche=${item.id}`}>Ouvrir</Link>
               </td>
             </tr>
           ))}

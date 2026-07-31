@@ -7,6 +7,8 @@ import {
   pipelineInteractions,
   pipelineInvestors,
 } from "@/features/v2/server/raise";
+import { listAccesses } from "@/features/v2/server/access";
+import { documentarySignals } from "@/features/v2/server/fiche";
 import { update, updates } from "@/features/v2/server/updates";
 import { Lever, type LeverQuery } from "@/features/v2/ui/Lever";
 
@@ -27,15 +29,23 @@ export default async function LeverPage({
 }) {
   const [{ operationId }, query] = await Promise.all([params, searchParams]);
 
-  const [raise, investisseurs, interactions, engagements, historique, majListe] =
-    await Promise.all([
-      activeRaise(operationId),
-      pipelineInvestors(operationId),
-      pipelineInteractions(operationId),
-      commitments(operationId),
-      commitmentHistory(operationId),
-      updates(operationId),
-    ]);
+  const [
+    raise,
+    investisseurs,
+    interactions,
+    engagements,
+    historique,
+    majListe,
+    acces,
+  ] = await Promise.all([
+    activeRaise(operationId),
+    pipelineInvestors(operationId),
+    pipelineInteractions(operationId),
+    commitments(operationId),
+    commitmentHistory(operationId),
+    updates(operationId),
+    listAccesses(operationId),
+  ]);
 
   // Le détail d'une mise à jour ne se charge que si l'URL en désigne une :
   // indicateurs et consultations n'ont rien à faire dans la liste.
@@ -43,8 +53,17 @@ export default async function LeverPage({
     ? await update(operationId, query.maj)
     : null;
 
+  // Les signaux de lecture ne se calculent que pour la fiche ouverte : deux
+  // mille lignes de journal par relation, pour un pipeline qu'on parcourt,
+  // seraient payées pour rien.
+  const fichee = query.fiche
+    ? investisseurs.find((i) => i.id === query.fiche)
+    : undefined;
+  const signaux = await documentarySignals(operationId, fichee?.email ?? null);
+
   return (
     <Lever
+      acces={acces}
       engagements={engagements}
       historique={historique}
       interactions={interactions}
@@ -54,6 +73,7 @@ export default async function LeverPage({
       operationId={operationId}
       query={query}
       raise={raise}
+      signaux={signaux}
     />
   );
 }

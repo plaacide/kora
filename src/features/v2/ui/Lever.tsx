@@ -9,6 +9,8 @@ import type {
   Interaction,
   InvestisseurPipeline,
 } from "@/features/v2/domain/pipeline";
+import type { AccessRow } from "@/features/v2/server/access";
+import type { SignauxDocumentaires } from "@/features/v2/server/fiche";
 import type { Raise } from "@/features/v2/server/raise";
 import type { MiseAJour, MiseAJourResume } from "@/features/v2/server/updates";
 import { CommitmentsScreen } from "./Commitments";
@@ -32,6 +34,9 @@ export type LeverQuery = {
   /** L'interaction ouverte, et la relation à laquelle elle se rattache. */
   interaction?: string;
   investisseur?: string;
+  /** La fiche de relation ouverte — écran 41 — et son onglet. */
+  fiche?: string;
+  onglet?: string;
 };
 
 
@@ -84,9 +89,11 @@ function LeverFrame({
 }
 
 export function Lever({
+  acces,
   engagements,
   historique,
   interactions,
+  signaux,
   investisseurs,
   majCourante,
   majListe,
@@ -99,6 +106,10 @@ export function Lever({
   historique: readonly Requalification[];
   /** Ce qui a été consigné sur les relations — écrans 41 et 42. */
   interactions: readonly Interaction[];
+  /** Les accès ouverts, pour l'onglet Accès de la fiche. */
+  acces: readonly AccessRow[];
+  /** Les signaux de lecture de la relation dont la fiche est ouverte. */
+  signaux: SignauxDocumentaires;
   /** Le pipeline RÉEL. L'onglet affichait jusqu'ici quatre fixtures. */
   investisseurs: readonly InvestisseurPipeline[];
   /** La mise à jour ouverte, si l'URL en désigne une. */
@@ -134,8 +145,13 @@ export function Lever({
         <InvestorsScreen
           devise={raise?.currency ?? "XOF"}
           edite={query.panel ?? null}
+          acces={acces}
+          engagements={engagements}
+          fiche={query.fiche ?? null}
           interactionOuverte={query.interaction ?? null}
           interactions={interactions}
+          onglet={query.onglet ?? "resume"}
+          signaux={signaux}
           investisseurCible={query.investisseur ?? null}
           investisseurs={investisseurs}
           operationId={operationId}

@@ -365,6 +365,44 @@
 .v2-update-table th:last-child{width:44px}
 .v2-update-table td:last-child{text-align:right}
 
+/* La fiche d'une relation — écran 41. Un dossier, pas un formulaire : on la
+   lit, on n'y saisit rien. Modifier passe par le panneau. */
+.v2-fiche{display:flex;flex-direction:column;gap:14px}
+.v2-fiche-head{display:flex;align-items:center;gap:14px}
+.v2-fiche-head h1{font:600 21px var(--font-v2-head),sans-serif;letter-spacing:-.02em}
+.v2-fiche-head p{margin:2px 0 0;color:var(--text-3);font-size:12.5px}
+.v2-fiche-head>div{flex:1}
+.v2-fiche-avatar{display:grid;width:46px;height:46px;flex:none;place-items:center;border-radius:12px;background:var(--orange-soft);color:var(--orange-text);font:650 15px var(--font-v2-head),sans-serif}
+.v2-fiche-tabs{display:flex;gap:22px;overflow:auto;border-bottom:1px solid var(--line)}
+.v2-fiche-tabs a{padding:10px 2px;margin-bottom:-1px;border-bottom:2px solid transparent;color:var(--text-3);font:500 13px var(--font-v2-sans),sans-serif;white-space:nowrap}
+.v2-fiche-tabs a[data-active=true]{border-bottom-color:var(--orange);color:var(--text);font-weight:600}
+.v2-fiche-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:18px 20px}
+.v2-fiche-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.v2-fiche-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 22px}
+.v2-fiche-kv>div{display:flex;flex-direction:column;gap:3px}
+.v2-fiche-kv span{color:var(--text-3);font-size:11.5px}
+.v2-fiche-kv strong{font-size:13.5px;font-weight:550}
+.v2-fiche-signals{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));overflow:hidden;margin:10px 0;border:1px solid var(--line);border-radius:8px;background:#fff}
+.v2-fiche-signals>div{display:flex;min-height:70px;justify-content:center;flex-direction:column;gap:4px;box-shadow:inset -1px 0 0 var(--line-soft);padding:12px}
+.v2-fiche-signals span{color:var(--text-3);font-size:11px}
+.v2-fiche-signals strong{font:600 20px var(--font-v2-head),sans-serif}
+.v2-fiche-notes{margin:8px 0 0;color:var(--text-2);font-size:13px;line-height:1.6}
+.v2-fiche-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.v2-fiche-docs{display:flex;flex-direction:column;gap:0;margin:0;padding:0;list-style:none}
+.v2-fiche-docs li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line-soft)}
+.v2-fiche-docs li:first-child{border-top:0}
+.v2-fiche-docs svg{width:16px;height:16px;flex:none;color:var(--text-3)}
+.v2-fiche-docs strong{display:block;font-size:12.5px;font-weight:550}
+.v2-fiche-docs small{color:var(--text-3);font-size:11px}
+.v2-interactions-full{display:flex;flex-direction:column;gap:0;margin:0;padding:0;list-style:none}
+.v2-interactions-full li{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid var(--line-soft)}
+.v2-interactions-full li:first-child{border-top:0}
+.v2-interactions-full li>div{display:flex;min-width:0;flex:1;flex-direction:column;gap:2px}
+.v2-interactions-full strong{font-size:13px;font-weight:550}
+.v2-interactions-full small{color:var(--text-3);font-size:11.5px}
+.v2-interactions-full p{margin:4px 0 0;color:var(--text-2);font-size:12.5px;line-height:1.55}
+.v2-interactions-full li>a{flex:none;color:var(--orange-text);font-size:11.5px}
+
 /* Les interactions d'une relation — écrans 41 et 42. Une liste dans la fiche
    plutôt qu'un écran à part : on la consulte au moment où l'on regarde la
    relation, pas en s'en éloignant. */

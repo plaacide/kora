@@ -110,7 +110,13 @@ function sousEcranCourant(
       if (params.get("maj")) return "Mises à jour › Détail";
       return "Mises à jour";
     }
-    if (vue === "pipeline") return "Pipeline";
+    // La fiche d'une relation porte son nom, comme « Investisseurs › Sahel
+    // Growth Fund » dans les maquettes 28 et 29. Le nom n'est pas dans l'URL :
+    // le bandeau annonce donc l'étage sans le nommer, et la fiche elle-même
+    // porte le titre.
+    if (vue === "pipeline") {
+      return params.get("fiche") ? "Pipeline › Relation" : "Pipeline";
+    }
     if (vue === "commitments") return "Engagements";
     return null;
   }
