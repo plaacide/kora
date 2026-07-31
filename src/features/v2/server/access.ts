@@ -66,7 +66,10 @@ export async function listAccesses(operationId: string): Promise<AccessRow[]> {
         .eq("deal_id", operationId)
         .order("created_at", { ascending: false }),
       supabase.from("folders").select("id, parent_id").eq("deal_id", operationId),
-      supabase.from("documents").select("folder_id").eq("deal_id", operationId),
+      supabase
+        .from("documents")
+        .select("folder_id, hidden_from_guests")
+        .eq("deal_id", operationId),
     ]);
 
   if (error || !invitations?.length) return [];
@@ -127,9 +130,14 @@ export async function listAccesses(operationId: string): Promise<AccessRow[]> {
 
   const racines = arbre.filter((folder) => !folder.parentId).map((folder) => folder.id);
 
+  // Une pièce masquée ne compte pas dans ce qu'un accès ouvre : le tableau
+  // annonçait dix pièces là où l'invité n'en voyait que neuf.
   const parDossier = new Map<string, number>();
-  for (const row of (documents ?? []) as Array<{ folder_id: string | null }>) {
-    if (!row.folder_id) continue;
+  for (const row of (documents ?? []) as Array<{
+    folder_id: string | null;
+    hidden_from_guests: boolean | null;
+  }>) {
+    if (!row.folder_id || row.hidden_from_guests) continue;
     parDossier.set(row.folder_id, (parDossier.get(row.folder_id) ?? 0) + 1);
   }
 
