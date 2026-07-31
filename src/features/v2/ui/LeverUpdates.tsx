@@ -148,7 +148,12 @@ function UpdatesList({
                 <Link href={href("updates", { maj: maj.id })}>
                   <strong>{maj.periode}</strong>
                 </Link>
-                {maj.version > 1 && <small>V{maj.version}</small>}
+                {/* L'espace est un vrai caractère, pas une marge : une marge
+                    sépare à l'œil mais laisse « T2 2026V2 » à la copie et à la
+                    lecture d'écran. */}
+                {maj.version > 1 && (
+                  <small className="v2-version-tag">{" "}V{maj.version}</small>
+                )}
               </td>
               <td>{libelleFinanceur(maj.financeur)}</td>
               <td>{libelleInstrument(maj.instrument)}</td>

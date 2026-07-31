@@ -61,6 +61,21 @@
 .v2-field>span:first-child,.v2-chip-field legend{font:500 14px var(--font-v2-head),sans-serif;color:var(--text)}
 .v2-field>span>small{color:var(--text-4);font-weight:400}
 .v2-control{display:flex;height:52px;align-items:center;gap:12px;border-radius:6px;background:#fff;padding:0 16px;box-shadow:inset 0 0 0 1px #d0d5dd}
+/* Un `textarea` n'a pas la hauteur d'un champ d'une ligne. Le conteneur était
+   figé à 52 px avec `overflow:visible` : trois lignes en occupaient 63 et
+   débordaient PAR-DESSUS le libellé, au-dessus comme en dessous. Cinq champs
+   du produit étaient dans ce cas. */
+.v2-control:has(textarea){height:auto;align-items:stretch;padding:11px 16px}
+/* Les formulaires de levée et les panneaux latéraux resserrent le champ à
+   42 px : cette règle est plus spécifique et reprenait le dessus, laissant le
+   textarea déborder là où le bug avait justement été vu. */
+.v2-configure-section .v2-control:has(textarea),
+.v2-lever-panel .v2-control:has(textarea){height:auto;padding:11px 12px}
+/* `min-height` explicite plutôt que `rows` : dans un conteneur flex étiré,
+   la hauteur intrinsèque du textarea n'est pas respectée — trois lignes
+   demandées en donnaient deux. */
+.v2-control textarea{min-width:0;min-height:63px;flex:1;resize:vertical;border:0;outline:0;background:transparent;color:var(--text);font:400 14px var(--font-v2-sans),sans-serif;line-height:1.5}
+.v2-control textarea::placeholder{color:var(--text-4)}
 .v2-control:focus-within{box-shadow:inset 0 0 0 1px var(--orange),0 0 0 3px var(--orange-soft)}
 .v2-control input,.v2-control select{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--text);font:400 14px var(--font-v2-sans),sans-serif;appearance:none}
 /* `appearance:none` retire le chevron natif du navigateur : sans ce
@@ -186,7 +201,7 @@
 .v2-filterbar{display:flex;margin:-26px -28px 20px;align-items:center;gap:8px;border-bottom:1px solid var(--line-soft);padding:14px 28px}.v2-filterbar button{display:inline-flex;height:32px;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font:600 12px var(--font-v2-sans),sans-serif;cursor:pointer}.v2-filterbar button:hover{background:var(--band)}.v2-filterbar button>.v2-icon{width:13px;height:13px;color:var(--text-4)}.v2-filterbar button[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text)}.v2-filterbar i{width:1px;height:20px;margin:0 4px;background:var(--line)}.v2-filterbar>span{margin-left:auto;color:var(--text-2);font-size:13px}
 .v2-preparation-list{display:flex;max-width:1080px;flex-direction:column;gap:20px}.v2-requirement-group{overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#fff}.v2-requirement-group>header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:var(--band);padding:12px 18px}.v2-requirement-group>header strong{font:600 13px var(--font-v2-head),sans-serif}.v2-requirement-group>header span{color:var(--text-3);font-size:12px}
 .v2-requirement-row{display:flex;align-items:flex-start;gap:14px;border-bottom:1px solid var(--line-soft);padding:14px 18px}.v2-requirement-row:last-child{border:0}.v2-requirement-row>.v2-icon{margin-top:3px;color:var(--text-3)}.v2-requirement-copy{min-width:0;flex:1}.v2-requirement-copy>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.v2-requirement-copy>div>strong{font-size:14px}.v2-requirement-copy p{max-width:640px;margin:3px 0 0;color:var(--text-3);font-size:12.5px}.v2-requirement-copy>small{display:block;margin-top:3px;color:var(--text-4);font-size:12px}.v2-tag[data-level=required]{border-color:var(--orange-border,#f5c6ae);background:var(--orange-soft);color:var(--orange-text)}
-.v2-status{display:inline-flex;min-height:22px;align-items:center;border-radius:999px;background:var(--line-soft);padding:3px 8px;color:var(--text-2);font-size:11.5px;font-weight:500;white-space:nowrap}.v2-status[data-tone=green]{background:var(--green-bg);color:var(--green)}.v2-status[data-tone=amber]{background:#fffAeb;color:#b54708}.v2-status[data-tone=blue]{background:#eaf1f8;color:#185fa5}.v2-requirement-row>.v2-status{margin-top:2px}.v2-requirement-row>.v2-btn{margin-top:-4px}
+.v2-status{display:inline-flex;min-height:22px;align-items:center;gap:5px;border-radius:999px;background:var(--line-soft);padding:3px 8px;color:var(--text-2);font-size:11.5px;font-weight:500;white-space:nowrap}.v2-status[data-tone=green]{background:var(--green-bg);color:var(--green)}.v2-status[data-tone=amber]{background:#fffAeb;color:#b54708}.v2-status[data-tone=blue]{background:#eaf1f8;color:#185fa5}.v2-requirement-row>.v2-status{margin-top:2px}.v2-requirement-row>.v2-btn{margin-top:-4px}
 .v2-documents-page{display:flex;max-width:1080px;flex-direction:column;gap:16px}.v2-drop-empty{display:flex;max-width:1080px;align-items:center;flex-direction:column;border:1.5px dashed #d0d5dd;border-radius:10px;background:#fff;padding:44px;text-align:center}.v2-drop-empty h2{margin-top:10px;font-size:17px}
 /* L'écran des accès sort des marges pour que sa table aille bord à bord
    (maquette 24, `work{padding:0}`). Son état vide, lui, est une carte : sans
@@ -312,7 +327,6 @@
 .v2-money-split span:first-child{color:var(--text);font-weight:550}
 .v2-money-split svg{width:13px;height:13px;color:var(--green,#0f7b4f)}
 .v2-money-split a{margin-left:auto;color:var(--orange-text);font-size:11.5px}
-.v2-commitment-note{margin:-8px 0 16px}
 
 /* Les destinataires — écran 47. Des cases à cocher et non une liste déroulante :
    une mise à jour part rarement à une seule personne, et le multiple d'un
@@ -330,6 +344,8 @@
    colonnes, donc mêmes repères. */
 .v2-indicator-copy input{width:100%;border:0;border-bottom:1px solid var(--line);padding:2px 0;font:550 12.5px var(--font-v2-head),sans-serif}
 .v2-indicator-copy input:last-child{margin-top:3px;color:var(--text-3);font:400 11px var(--font-v2),sans-serif}
+
+.v2-version-tag{margin-left:6px;color:var(--text-3);font-size:11px}
 
 /* L'inscription du facteur TOTP — écran 34. */
 .v2-mfa-setup p{margin:6px 0 14px;color:var(--text-2);font-size:12.5px;line-height:1.55}
@@ -374,7 +390,17 @@
 .v2-roles-note svg{flex:none;width:14px;height:14px;margin-top:2px}
 
 .v2-commitment-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}.v2-commitment-stats section{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:9px;padding:17px 18px}.v2-commitment-stats span{color:var(--text-3);font-size:11.5px}.v2-commitment-stats strong{margin-top:6px;font:600 21px var(--font-v2-head),sans-serif}.v2-commitment-stats small{color:var(--text-3);font-size:11.5px}
-.v2-commitment-table-wrap{margin-bottom:18px;border-top:1px solid var(--line)}.v2-commitment-table td:first-child{display:flex;flex-direction:column}.v2-commitment-table td:first-child strong{color:var(--text);font-size:12px}.v2-commitment-table td:first-child small{color:var(--text-3);font-size:10.5px}.v2-commitment-table td:last-child button{display:inline-flex;height:27px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;color:var(--text-2);font-size:10.5px;cursor:pointer}.v2-commitment-table td:last-child button:hover{background:var(--band)}
+.v2-commitment-table-wrap{margin-bottom:18px;border-top:1px solid var(--line)}.v2-commitment-table td:first-child{display:flex;flex-direction:column}.v2-commitment-table td:first-child strong{color:var(--text);font-size:12px}.v2-commitment-table td:first-child small{color:var(--text-3);font-size:10.5px}/* L'action était habillée pour un `button`, mais l'écran pose un lien — le
+   panneau vit dans l'URL, ce qui rend le retour arrière du navigateur juste.
+   Résultat : « Modifier » s'affichait en texte nu là où la maquette 44 montre
+   un bouton. */
+.v2-commitment-table td:last-child :is(button,a){display:inline-flex;height:27px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;color:var(--text-2);font-size:10.5px;text-decoration:none;cursor:pointer}
+.v2-commitment-table td:last-child :is(button,a):hover{background:var(--band)}
+/* Le montant se lit en colonne : aligné à droite et appuyé, comme la maquette.
+   À gauche et en gris, deux ordres de grandeur ne se comparent pas d'un coup
+   d'œil — c'est pourtant tout ce qu'on demande à ce tableau. */
+.v2-commitment-table th:nth-child(3),.v2-commitment-table td:nth-child(3){text-align:right}
+.v2-commitment-table td:nth-child(3){color:var(--text);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
 .v2-history-card{overflow:hidden}.v2-history-card .v2-activity-row{min-height:52px}.v2-history-card>p{margin:0;border-top:1px solid var(--line-soft);background:var(--band);padding:11px 16px;color:var(--text-3);font-size:11.5px}
 .v2-close-summary{display:grid;grid-template-columns:1fr 1fr;margin:0 28px 20px;border:1px solid var(--line);border-radius:8px}.v2-close-summary>div{display:flex;min-height:88px;flex-direction:column;border-bottom:1px solid var(--line-soft);padding:14px}.v2-close-summary>div:nth-child(odd){border-right:1px solid var(--line-soft)}.v2-close-summary>div:nth-child(n+3){border-bottom:0}.v2-close-summary span{color:var(--text-3);font-size:11px}.v2-close-summary strong{font-size:13px;font-weight:550}.v2-close-summary small{color:var(--text-4);font-size:10.5px}.v2-close-card>.v2-field,.v2-close-card>.v2-level-choice,.v2-close-card>.v2-panel-callout{margin:0 28px 20px}.v2-danger-button{border-color:#b42318!important;background:#b42318!important}
 
@@ -390,6 +416,11 @@
 .v2-attachment-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:7px;padding:11px 13px}.v2-attachment-row>div{display:flex;flex:1;flex-direction:column}.v2-attachment-row strong{font-size:12px}.v2-attachment-row small{color:var(--text-3);font-size:10.5px}.v2-attachment-row button{display:inline-flex;height:27px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;color:var(--text-2);font-size:10.5px;cursor:pointer}.v2-attachment-row button:hover{background:var(--band)}
 .v2-review-update-card{width:900px}.v2-recipient-preview{overflow:hidden;border:1px solid var(--line);border-radius:9px}.v2-recipient-preview>header{display:flex;align-items:center;justify-content:space-between;background:var(--ink);padding:14px 18px;color:#fff}.v2-recipient-preview>header>div{display:flex;flex-direction:column}.v2-recipient-preview>header span{font-size:10.5px}.v2-recipient-preview>header strong{font-size:13px}.v2-recipient-preview>section{padding:16px 18px;border-top:1px solid var(--line-soft)}.v2-recipient-preview>section>p{margin:5px 0 0;color:var(--text-2);font-size:12.5px}
 .v2-preview-section-title{display:flex;align-items:center;justify-content:space-between}.v2-preview-section-title strong{font-size:11px}.v2-preview-metrics{display:grid;grid-template-columns:repeat(4,1fr);margin-top:9px;border:1px solid var(--line);border-radius:7px}.v2-preview-metrics>div{display:flex;min-height:94px;flex-direction:column;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);padding:10px}.v2-preview-metrics>div:nth-child(4n){border-right:0}.v2-preview-metrics>div:nth-child(n+5){border-bottom:0}.v2-preview-metrics span{min-height:30px;color:var(--text-3);font-size:9.5px}.v2-preview-metrics strong{font-size:12px}.v2-preview-metrics small{color:var(--green);font-size:10px}.v2-preview-metrics em{margin-top:auto;color:var(--text-4);font-size:8.5px;font-style:normal}.v2-preview-request{background:var(--orange-soft);color:var(--text-2);font-size:11.5px}
+/* Hors de l'aperçu destinataire — sur la mise à jour publiée — la demande n'a
+   pas de section parente pour lui donner ses marges : elle formait un bandeau
+   collé à la note de gel, et les deux se lisaient comme un seul bloc.
+   `.v2-recipient-preview>section` reste plus spécifique, l'aperçu ne bouge pas. */
+.v2-preview-request{margin:0 0 14px;border-radius:7px;padding:11px 14px;line-height:1.55}
 .v2-publication-grid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:8px}.v2-publication-grid>div{display:flex;min-height:67px;flex-direction:column;border-bottom:1px solid var(--line-soft);padding:11px 13px}.v2-publication-grid>div:nth-child(odd){border-right:1px solid var(--line-soft)}.v2-publication-grid>div:nth-child(n+3){border-bottom:0}.v2-publication-grid span{color:var(--text-3);font-size:10.5px}.v2-publication-grid strong{font-size:11.5px}.v2-publication-grid small{color:var(--text-4);font-size:10px}
 .v2-published-update{max-width:980px;padding:22px}.v2-published-update>header{display:flex;align-items:flex-start;justify-content:space-between}.v2-published-update>header h1{margin-top:4px;font-size:23px}.v2-published-update>header>div:last-child{display:flex;align-items:flex-end;flex-direction:column;gap:4px}.v2-published-update>header small{color:var(--text-3);font-size:10.5px}.v2-published-update>p{max-width:760px;color:var(--text-2);font-size:13px}
 .v2-published-metrics{display:grid;grid-template-columns:repeat(6,1fr);margin:18px 0;border:1px solid var(--line);border-radius:8px}.v2-published-metrics>div{display:flex;min-height:76px;justify-content:center;flex-direction:column;border-right:1px solid var(--line-soft);padding:10px}.v2-published-metrics>div:last-child{border:0}.v2-published-metrics span{color:var(--text-3);font-size:9.5px}.v2-published-metrics strong{font-size:14px}.v2-frozen-note{display:flex;align-items:center;gap:7px;border-radius:6px;background:var(--band);padding:10px!important;font-size:11.5px!important}.v2-frozen-note .v2-icon{width:14px;height:14px}
@@ -602,7 +633,6 @@
 .v2-pipeline .v2-cell-3{color:var(--text-3);font-size:12.5px}
 .v2-pipeline .v2-num{text-align:right}
 .v2-pipeline .v2-declared{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
-.v2-pipeline .v2-status{gap:6px}
 .v2-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
 .v2-pipeline-wrap>footer{border-top:1px solid var(--line-soft);padding:12px 28px;color:var(--text-3);font-size:12.5px}
 @media(max-width:1100px){.v2-pipeline{min-width:1040px}}

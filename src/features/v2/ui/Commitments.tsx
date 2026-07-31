@@ -129,17 +129,6 @@ export function CommitmentsScreen({
             </section>
           </div>
 
-          {v.interet.investisseurs > 0 && (
-            <p className="v2-field-helper v2-commitment-note">
-              {v.interet.investisseurs}{" "}
-              {v.interet.investisseurs > 1
-                ? "intérêts indicatifs représentent"
-                : "intérêt indicatif représente"}{" "}
-              {somme(v.interet.montant)} {devise} — non comptés dans le montant
-              sécurisé.
-            </p>
-          )}
-
           <div className="v2-commitment-table-wrap">
             <table className="v2-commitment-table">
               <thead>
@@ -165,6 +154,7 @@ export function CommitmentsScreen({
                       </td>
                       <td>
                         <span className="v2-status" data-tone={n.tone}>
+                          <i className="v2-dot" />
                           {n.court}
                         </span>
                       </td>
