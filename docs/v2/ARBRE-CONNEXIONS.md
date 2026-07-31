@@ -3,7 +3,7 @@
 La boussole du branchement : ce qui lit vraiment la base, ce qui affiche encore
 des données écrites en dur, et ce qui manque côté serveur pour finir.
 
-**Dernière vérification : 1er août 2026**, branche `v2/rebuild`. Établie en
+**Dernière vérification : 2 août 2026**, branche `v2/rebuild`. Établie en
 re-dérivant depuis le code — quels écrans importent `features/v2/server/*` — et
 en interrogeant la base de staging pour l'état réel des migrations. Ce document
 se périme : le relire avant de s'y fier.
@@ -15,6 +15,24 @@ se périme : le relire avant de s'y fier.
 | 🟢 | Branché — l'écran lit ou écrit la vraie base |
 | 🟡 | Partiel — une partie lit la base, le reste est en dur |
 | 🔴 | Fixture — aucune donnée réelle, tout est écrit dans le fichier |
+
+**Un écran branché mais inatteignable ne compte pas.** Trois fois de suite,
+un écran a été bâti sur une URL que rien ne proposait — écrans 16/17/13 le
+31 juillet, `/investors` et `/activite` le 2 août — pendant que le chemin
+réellement parcouru servait des fixtures. Vérifier depuis le RAIL, pas depuis
+l'URL qu'on vient d'inventer.
+
+## Ce qui mène où
+
+```
+Rail global      Accueil · Opérations · Invitations · Recherche
+                 Équipe · Sécurité · Aide
+Rail opération   Vue d'ensemble · Préparation · Partage et accès · Lever · Activité
+Onglets Lever    Vue de la levée · Pipeline · Engagements · Mises à jour
+```
+
+⚠️ **`/v2/abonnement` n'est proposé nulle part.** La maquette 68 existe, le
+rail n'y mène pas — probablement un menu de compte, à décider.
 
 ---
 
@@ -103,8 +121,10 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Pipeline (38-40)         → voir Investisseurs ci-dessous
    ├─ 🔴 Engagements (43-44)      —                     ATTEND : ventilation
    └─ 🔴 Mises à jour (46-50)     —                     ATTEND : table absente
-🟢 Investisseurs                  pipelineInvestors()   → raise_investors + accès
-   ├─ 🟢 Colonnes (38)            → six étapes, tickets cumulés par colonne
+(Investisseurs)                   → l'onglet Pipeline de Lever, ci-dessus.
+                                    La route `/operations/:id/investors`
+                                    redirige : elle n'était dans aucun rail.
+   ├─ 🟢 Colonnes (38)            → sept étapes, tickets cumulés par colonne
    ├─ 🟢 Tableau (39)             → étape, accès, ticket : trois colonnes distinctes
    ├─ 🟢 Ajouter / modifier (40)  save_raise_investor() — 8 champs, listes fermées
    ├─ 🟢 Retirer                  delete_raise_investor()
@@ -119,6 +139,8 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ```
 🔴 Invitations et demandes        —                     ATTEND : invitations + access_requests
 🟢 Activité globale               organizationJournal() → même écran, autre portée
+                                  (rejoint depuis l'accueil : le rail n'a pas
+                                   d'entrée, la maquette n'en prévoit pas)
 🟢 Recherche                      searchDocuments()     → documents par nom, filtrées
                                                         par opération, chemin complet
 🔴 Équipe                         —                     ATTEND : memberships (vocabulaire à trancher)

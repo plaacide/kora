@@ -344,7 +344,13 @@ export function HomeScreen({
         <Chart series={views} />
 
         <section className="v2-home-activity">
-          <span className="v2-section-label">Détail de l’activité</span>
+          <header className="v2-card-header">
+            <span className="v2-section-label">Détail de l’activité</span>
+            {/* Le journal complet n'a pas d'entrée dans le rail — la maquette
+                n'en prévoit pas — et personne ne pouvait donc l'atteindre. Il
+                se rejoint d'ici, où l'on regarde déjà l'activité. */}
+            <Link href="/v2/activite">Journal complet →</Link>
+          </header>
           <div className="v2-home-tabs">
             {ACTIVITY_TABS.map(([key, label]) => (
               <Link data-active={key === tab} href={`?onglet=${key}`} key={key}>
