@@ -128,3 +128,50 @@ export async function createV2Raise(input: {
   revalider(input.operationId);
   return { ok: true };
 }
+
+/**
+ * Ajouter ou modifier un investisseur du pipeline.
+ *
+ * `save_raise_investor` fait les deux : sans `id` elle crée, avec elle met à
+ * jour. Un seul appel, donc pas de fenêtre où l'écran croirait avoir créé ce
+ * qu'il vient de modifier.
+ *
+ * ⚠️ Aucune suppression n'est possible : `raise_investors` porte un
+ * `revoke delete from authenticated` et aucune RPC ne supprime. Poser un
+ * bouton « retirer » qui écrirait en direct serait refusé SANS erreur — la
+ * ligne resterait, l'écran dirait le contraire. Écarter un investisseur se
+ * fait donc par le statut `refuse`, ce qui vaut mieux : on garde la trace
+ * d'une relation qui n'a pas abouti.
+ */
+export async function saveV2Investor(input: {
+  operationId: string;
+  id?: string | null;
+  nom: string;
+  organisation?: string | null;
+  email?: string | null;
+  ticket?: number | null;
+  statut?: string | null;
+}): Promise<Resultat> {
+  const nom = input.nom.trim();
+  if (nom.length < 2) return { ok: false, error: "Indiquez un nom." };
+
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("save_raise_investor", {
+    p_deal: input.operationId,
+    p_id: input.id ?? null,
+    p_nom: nom,
+    p_organisation: input.organisation?.trim() || null,
+    p_email: input.email?.trim().toLowerCase() || null,
+    p_ticket: input.ticket ?? null,
+    p_statut: input.statut ?? null,
+  });
+
+  if (error) {
+    console.error("[v2 lever] save_raise_investor échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true };
+}

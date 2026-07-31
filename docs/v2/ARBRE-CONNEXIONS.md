@@ -100,10 +100,15 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │                                instrument, valorisation, échéance, audience
    ├─ 🟢 Vue de la levée (37)     → montants réels, progression calculée
    ├─ 🟢 Clôturer (45)            close_raise()
-   ├─ 🔴 Pipeline (38-40)         —                     ATTEND : raise_investors
+   ├─ 🟢 Pipeline (38-40)         → voir Investisseurs ci-dessous
    ├─ 🔴 Engagements (43-44)      —                     ATTEND : ventilation
    └─ 🔴 Mises à jour (46-50)     —                     ATTEND : table absente
-🔴 Investisseurs                  —                     ATTEND : raise_investors (table vide)
+🟢 Investisseurs                  pipelineInvestors()   → raise_investors + accès
+   ├─ 🟢 Colonnes (38)            → six étapes, tickets cumulés par colonne
+   ├─ 🟢 Tableau (39)             → étape, accès, ticket : trois colonnes distinctes
+   ├─ 🟢 Ajouter / modifier (40)  save_raise_investor()
+   ├─ 🟢 Accès documentaire       DÉDUIT des invitations, par l'adresse
+   └─ 🔴 Interactions (41-42)     —                     ATTEND : table absente
 🔴 Activité (journal)             —                     ATTEND : audit_log par opération
 🟢 Visionneuse                    → /api/viewer, filigrane incrusté, audit par page
 ```
@@ -220,7 +225,17 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 8. **Les conditions d'une levée.** La maquette 36 demande ticket minimum et
    maximum, recherche d'un lead et part de capital envisagée. Aucune colonne ne
    les porte.
-9. **La ventilation du montant sécurisé.** La maquette 37 sépare « engagements
+9. **Le vocabulaire du pipeline.** `raise_investors.statut` mélange une ÉTAPE
+   de relation (`invite`, `diligence`), un ENGAGEMENT (`soft_commit`,
+   `engage`) et une ISSUE (`refuse`). Les maquettes 38 et 39 les séparent en
+   sept étapes plus une colonne d'engagement. Les scinder demande de décider
+   ce qu'affiche un investisseur « en diligence qui a soft-committé ».
+10. **Les champs d'une fiche investisseur.** La maquette 40 demande catégorie,
+   fonction, pays, source de la relation, responsable interne, prochaine
+   action, date de relance et notes. Aucune colonne ne les porte.
+11. **Supprimer une relation** est impossible : `revoke delete` et aucune RPC.
+   On écarte par l'étape, ce qui garde la trace — mais c'est un choix subi.
+12. **La ventilation du montant sécurisé.** La maquette 37 sépare « engagements
    confirmés » et « soft-commits » ; `montant_engage` est un seul montant
    déclaré.
 
@@ -246,5 +261,5 @@ autorisés — mais staging reste la première étape.
    exigence ou un dossier reste à décider.
 5. **Lever** — le cœur est fait (35, 36, 37, 45). Restent le pipeline, les
    engagements et les mises à jour aux investisseurs.
-6. **Investisseurs** — `raise_investors` et `save_raise_investor` sont prêtes.
+6. ~~Investisseurs~~ — fait le 1er août. Restent les interactions (41-42).
 7. **Équipe**, **Sécurité**, **Abonnement** — décisions produit d'abord.

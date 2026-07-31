@@ -410,6 +410,22 @@
 @media(max-width:600px){.v2-roles-grid{grid-template-columns:1fr}.v2-promo-card{flex-direction:column}}
 
 /* Écran 30 — Journal d'activité */
+.v2-pipeline-page{display:flex;flex-direction:column}
+.v2-filterbar>a{height:32px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12px;font-weight:600;text-decoration:none}
+.v2-filterbar>a[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text)}
+.v2-filterbar>a.v2-btn{border-radius:8px}
+.v2-pipeline-columns{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+.v2-pipeline-columns>section{display:flex;width:236px;flex:0 0 236px;flex-direction:column;gap:8px;border-radius:10px;background:var(--band);padding:12px}
+.v2-pipeline-columns>section>header{display:flex;align-items:center;justify-content:space-between}
+.v2-pipeline-columns>section>header strong{font:600 12px var(--font-v2-head),sans-serif}
+.v2-pipeline-columns>section>header span{border-radius:999px;background:#fff;padding:1px 8px;color:var(--text-3);font-size:11.5px}
+.v2-pipeline-columns>section>p{margin:0;border:1.5px dashed var(--line);border-radius:8px;padding:14px;color:var(--text-4);font-size:12px;text-align:center}
+.v2-pipeline-columns a{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px;text-decoration:none}
+.v2-pipeline-columns a:hover{border-color:var(--orange-border,#f5c6ae)}
+.v2-pipeline-columns a>div{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.v2-pipeline-columns strong{overflow:hidden;color:var(--text);font-size:13px;font-weight:500;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.v2-pipeline-columns small{color:var(--text-4);font-size:11.5px}
+.v2-pipeline-columns em{color:var(--text-3);font-size:11.5px;font-style:normal}
 .v2-chip-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .v2-chip-row button{height:32px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12.5px;cursor:pointer}
 .v2-chip-row button[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text);font-weight:500}
@@ -865,6 +881,22 @@ label.v2-btn[data-busy=true]{opacity:.6;pointer-events:none}
 .v2-dialog-choices .v2-icon{color:var(--orange-text)}
 
 /* Écrans 66 (recherche) et 68 (abonnement) */
+.v2-pipeline-page{display:flex;flex-direction:column}
+.v2-filterbar>a{height:32px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12px;font-weight:600;text-decoration:none}
+.v2-filterbar>a[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text)}
+.v2-filterbar>a.v2-btn{border-radius:8px}
+.v2-pipeline-columns{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+.v2-pipeline-columns>section{display:flex;width:236px;flex:0 0 236px;flex-direction:column;gap:8px;border-radius:10px;background:var(--band);padding:12px}
+.v2-pipeline-columns>section>header{display:flex;align-items:center;justify-content:space-between}
+.v2-pipeline-columns>section>header strong{font:600 12px var(--font-v2-head),sans-serif}
+.v2-pipeline-columns>section>header span{border-radius:999px;background:#fff;padding:1px 8px;color:var(--text-3);font-size:11.5px}
+.v2-pipeline-columns>section>p{margin:0;border:1.5px dashed var(--line);border-radius:8px;padding:14px;color:var(--text-4);font-size:12px;text-align:center}
+.v2-pipeline-columns a{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px;text-decoration:none}
+.v2-pipeline-columns a:hover{border-color:var(--orange-border,#f5c6ae)}
+.v2-pipeline-columns a>div{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.v2-pipeline-columns strong{overflow:hidden;color:var(--text);font-size:13px;font-weight:500;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.v2-pipeline-columns small{color:var(--text-4);font-size:11.5px}
+.v2-pipeline-columns em{color:var(--text-3);font-size:11.5px;font-style:normal}
 .v2-chip-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .v2-chip-row button{height:32px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12.5px;cursor:pointer}
 .v2-chip-row button[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text);font-weight:500}

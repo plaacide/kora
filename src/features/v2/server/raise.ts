@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { InvestisseurPipeline } from "@/features/v2/domain/pipeline";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -85,15 +86,6 @@ export async function closedRaises(operationId: string): Promise<Raise[]> {
   return ((data ?? []) as Array<Record<string, unknown>>).map(enRaise);
 }
 
-export interface PipelineInvestor {
-  id: string;
-  nom: string;
-  organisation: string | null;
-  email: string | null;
-  ticket: number | null;
-  statut: string;
-}
-
 /**
  * Le pipeline investisseur — écrans 38 à 40.
  *
@@ -101,17 +93,59 @@ export interface PipelineInvestor {
  * montant sécurisé : la migration qui l'a créée le dit explicitement, ce sont
  * deux choses distinctes. Un ticket est une intention, `montant_engage` est
  * une déclaration du fondateur.
+ *
+ * L'état d'accès est DÉDUIT des invitations, par l'adresse. C'est le seul lien
+ * réel entre le pipeline et la data room : un investisseur qu'on suit ici et
+ * qu'on a invité là-bas est la même personne, et l'écran doit le montrer sans
+ * qu'on ait à le ressaisir.
  */
 export async function pipelineInvestors(
   operationId: string,
-): Promise<PipelineInvestor[]> {
+): Promise<InvestisseurPipeline[]> {
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from("raise_investors")
-    .select("id, nom, organisation, email, ticket, statut, position")
-    .eq("deal_id", operationId)
-    .order("position");
+  const [{ data }, { data: invitations }] = await Promise.all([
+    supabase
+      .from("raise_investors")
+      .select("id, nom, organisation, email, ticket, statut, position")
+      .eq("deal_id", operationId)
+      .order("position"),
+    supabase
+      .from("invitations")
+      .select("email, status, expires_at")
+      .eq("deal_id", operationId),
+  ]);
+
+  const maintenant = Date.now();
+  const acces = new Map<string, string>();
+
+  for (const inv of (invitations ?? []) as Array<{
+    email: string;
+    status: string;
+    expires_at: string | null;
+  }>) {
+    const expiree =
+      inv.expires_at != null && new Date(inv.expires_at).getTime() <= maintenant;
+
+    const etat =
+      inv.status === "revoked"
+        ? "Révoqué"
+        : expiree
+          ? "Expiré"
+          : inv.status === "accepted"
+            ? "Accès actif"
+            : inv.status === "nda_pending"
+              ? "NDA en attente"
+              : "Invitation envoyée";
+
+    // Plusieurs invitations pour une même adresse : la plus ouverte gagne.
+    // Afficher « Révoqué » sur quelqu'un qui a un accès actif par ailleurs
+    // ferait croire la porte fermée.
+    const rang = ["Révoqué", "Expiré", "Invitation envoyée", "NDA en attente", "Accès actif"];
+    const cle = inv.email.toLowerCase();
+    const connu = acces.get(cle);
+    if (!connu || rang.indexOf(etat) > rang.indexOf(connu)) acces.set(cle, etat);
+  }
 
   return ((data ?? []) as Array<{
     id: string;
@@ -127,5 +161,6 @@ export async function pipelineInvestors(
     email: row.email,
     ticket: row.ticket,
     statut: row.statut,
+    acces: row.email ? (acces.get(row.email.toLowerCase()) ?? null) : null,
   }));
 }
