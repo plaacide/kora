@@ -192,6 +192,72 @@ describe("suggestForFile — explicabilité", () => {
   });
 });
 
+/**
+ * Ce que devient l'appariement quand d'autres modèles arriveront.
+ *
+ * L'algorithme ne connaît aucun vocabulaire figé : il mesure la rareté des
+ * mots DANS le référentiel qu'on lui passe. Un même fichier peut donc être
+ * apparié différemment selon le modèle appliqué à l'opération — et c'est le
+ * comportement voulu, pas un défaut.
+ */
+describe("un autre modèle, un autre référentiel", () => {
+  const MODELE_AGRICOLE = [
+    {
+      id: "a1",
+      label: "Certificat phytosanitaire",
+      description: "Délivré par la protection des végétaux avant export.",
+    },
+    {
+      id: "a2",
+      label: "Contrat de campagne avec les producteurs",
+      description: "Volumes, prix plancher et calendrier de collecte.",
+    },
+    {
+      id: "a3",
+      label: "Registre des parcelles et surfaces",
+      description: "Géolocalisation, superficie et statut foncier.",
+    },
+    {
+      id: "a4",
+      label: "Statuts de la coopérative",
+      description: "Version en vigueur, enregistrée.",
+    },
+  ];
+
+  it("apparie contre le modèle fourni, sans rien connaître d'avance", () => {
+    const trouve = suggestForFile(
+      "Certificat phytosanitaire 2026.pdf",
+      MODELE_AGRICOLE,
+    )[0];
+    expect(trouve.label).toBe("Certificat phytosanitaire");
+  });
+
+  it("ne propose rien d'un modèle pour une pièce de l'autre", () => {
+    // « RCCM » n'existe pas dans le modèle agricole : aucune exigence ne peut
+    // le réclamer, et l'algorithme ne doit pas s'en inventer une.
+    expect(suggestForFile("Extrait RCCM.pdf", MODELE_AGRICOLE)).toEqual([]);
+  });
+
+  it("mesure la rareté dans le modèle courant, pas dans l'absolu", () => {
+    // « Statuts » désigne une exigence dans les deux modèles, mais la
+    // concurrence n'est pas la même : le score est calculé à chaque fois
+    // contre le référentiel qu'on lui donne, jamais contre une liste figée.
+    const dansOhada = suggestForFile("Statuts.pdf", EXIGENCES)[0];
+    const dansAgricole = suggestForFile("Statuts.pdf", MODELE_AGRICOLE)[0];
+
+    expect(dansOhada.label).toBe("Statuts à jour et enregistrés");
+    expect(dansAgricole.label).toBe("Statuts de la coopérative");
+  });
+
+  it("fonctionne sur un modèle court, où tout mot paraît rare", () => {
+    const court = [{ id: "c1", label: "Bail commercial" }];
+    expect(suggestForFile("Bail commercial 2026.pdf", court)[0].label).toBe(
+      "Bail commercial",
+    );
+    expect(suggestForFile("Facture téléphone.pdf", court)).toEqual([]);
+  });
+});
+
 describe("suggestForBatch", () => {
   it("n'attribue pas deux fois la même exigence", () => {
     // Deux pièces qui se disputent une exigence produiraient un écran où
