@@ -2,7 +2,11 @@ import {
   commitmentHistory,
   commitments,
 } from "@/features/v2/server/commitments";
-import { activeRaise, pipelineInvestors } from "@/features/v2/server/raise";
+import {
+  activeRaise,
+  pipelineInteractions,
+  pipelineInvestors,
+} from "@/features/v2/server/raise";
 import { update, updates } from "@/features/v2/server/updates";
 import { Lever, type LeverQuery } from "@/features/v2/ui/Lever";
 
@@ -23,10 +27,11 @@ export default async function LeverPage({
 }) {
   const [{ operationId }, query] = await Promise.all([params, searchParams]);
 
-  const [raise, investisseurs, engagements, historique, majListe] =
+  const [raise, investisseurs, interactions, engagements, historique, majListe] =
     await Promise.all([
       activeRaise(operationId),
       pipelineInvestors(operationId),
+      pipelineInteractions(operationId),
       commitments(operationId),
       commitmentHistory(operationId),
       updates(operationId),
@@ -42,6 +47,7 @@ export default async function LeverPage({
     <Lever
       engagements={engagements}
       historique={historique}
+      interactions={interactions}
       investisseurs={investisseurs}
       majCourante={majCourante}
       majListe={majListe}

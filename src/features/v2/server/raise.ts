@@ -1,6 +1,10 @@
 import "server-only";
 
-import type { InvestisseurPipeline } from "@/features/v2/domain/pipeline";
+import type {
+  Interaction,
+  InvestisseurPipeline,
+  TypeInteraction,
+} from "@/features/v2/domain/pipeline";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -182,5 +186,53 @@ export async function pipelineInvestors(
     dateRelance: row.date_relance,
     notes: row.notes,
     acces: row.email ? (acces.get(row.email.toLowerCase()) ?? null) : null,
+  }));
+}
+
+/**
+ * Les interactions consignées sur une opération — écrans 41 et 42.
+ *
+ * Toutes en une lecture plutôt qu'une par investisseur : le panneau s'ouvre
+ * sur une fiche déjà chargée, et une seconde requête au clic ferait attendre
+ * là où il n'y a rien à attendre. Le volume le permet — un pipeline se compte
+ * en dizaines de relations, pas en milliers.
+ */
+export async function pipelineInteractions(
+  operationId: string,
+): Promise<Interaction[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("raise_interactions")
+    .select(
+      "id, investor_id, type, date_interaction, responsable, participants, resume, resultat, prochaine_action, date_relance",
+    )
+    .eq("deal_id", operationId)
+    .order("date_interaction", { ascending: false });
+
+  if (error) console.error("[v2 lever] interactions :", error);
+
+  return ((data ?? []) as Array<{
+    id: string;
+    investor_id: string;
+    type: TypeInteraction;
+    date_interaction: string;
+    responsable: string | null;
+    participants: string | null;
+    resume: string | null;
+    resultat: string | null;
+    prochaine_action: string | null;
+    date_relance: string | null;
+  }>).map((row) => ({
+    id: row.id,
+    investorId: row.investor_id,
+    type: row.type,
+    date: row.date_interaction,
+    responsable: row.responsable,
+    participants: row.participants,
+    resume: row.resume,
+    resultat: row.resultat,
+    prochaineAction: row.prochaine_action,
+    dateRelance: row.date_relance,
   }));
 }

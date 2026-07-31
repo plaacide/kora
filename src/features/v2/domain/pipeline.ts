@@ -181,3 +181,69 @@ export function categorieLabel(categorie: string | null): string {
   if (!categorie) return "—";
   return NOMS_CATEGORIE.get(categorie) ?? categorie;
 }
+
+/**
+ * Les interactions consignées — écrans 41 et 42.
+ *
+ * SANZA N'ENVOIE NI NE DÉTECTE D'E-MAIL. Une interaction est écrite par
+ * l'équipe, et la maquette 42 le dit à l'écran. La nuance décide de l'usage :
+ * un fondateur qui croirait sa boîte lue cesserait de consigner, et le
+ * pipeline se viderait sans que personne s'en aperçoive.
+ */
+export type TypeInteraction =
+  | "email"
+  | "appel"
+  | "reunion"
+  | "evenement"
+  | "note"
+  | "autre";
+
+export const TYPES_INTERACTION: readonly {
+  cle: TypeInteraction;
+  label: string;
+}[] = [
+  { cle: "email", label: "E-mail" },
+  { cle: "appel", label: "Appel" },
+  { cle: "reunion", label: "Réunion" },
+  { cle: "evenement", label: "Événement" },
+  { cle: "note", label: "Note" },
+  { cle: "autre", label: "Autre" },
+] as const;
+
+export function libelleInteraction(cle: string): string {
+  return TYPES_INTERACTION.find((t) => t.cle === cle)?.label ?? "Note";
+}
+
+export interface Interaction {
+  id: string;
+  investorId: string;
+  type: TypeInteraction;
+  date: string;
+  responsable: string | null;
+  participants: string | null;
+  resume: string | null;
+  resultat: string | null;
+  prochaineAction: string | null;
+  dateRelance: string | null;
+}
+
+/**
+ * La dernière interaction, celle qu'affiche la fiche.
+ *
+ * Par DATE et non par ordre de saisie : on consigne souvent un appel de la
+ * veille après une note du matin, et « dernière interaction » doit dire ce qui
+ * s'est passé en dernier, pas ce qui a été tapé en dernier.
+ */
+export function derniereInteraction(
+  interactions: readonly Interaction[],
+): Interaction | null {
+  if (interactions.length === 0) return null;
+  return [...interactions].sort((a, b) => b.date.localeCompare(a.date))[0];
+}
+
+/** Les interactions, de la plus récente à la plus ancienne. */
+export function parDateDecroissante(
+  interactions: readonly Interaction[],
+): Interaction[] {
+  return [...interactions].sort((a, b) => b.date.localeCompare(a.date));
+}

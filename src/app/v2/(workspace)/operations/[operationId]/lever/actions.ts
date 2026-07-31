@@ -405,3 +405,73 @@ export async function deleteV2Update(input: {
   revalider(input.operationId);
   return { ok: true };
 }
+
+/**
+ * Consigner une interaction — écran 42.
+ *
+ * Sanza n'envoie ni ne détecte d'e-mail : cette action ÉCRIT ce que l'équipe a
+ * vécu, elle ne l'observe pas. La RPC remonte au passage la prochaine action
+ * sur l'investisseur, pour ne pas saisir deux fois la même décision.
+ */
+export async function saveV2Interaction(input: {
+  operationId: string;
+  investorId: string;
+  id?: string | null;
+  type: "email" | "appel" | "reunion" | "evenement" | "note" | "autre";
+  date?: string | null;
+  responsable?: string | null;
+  participants?: string | null;
+  resume?: string | null;
+  resultat?: string | null;
+  prochaineAction?: string | null;
+  dateRelance?: string | null;
+}): Promise<Resultat> {
+  if (!input.investorId) {
+    return { ok: false, error: "Choisissez un investisseur." };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("save_raise_interaction", {
+    p_investor: input.investorId,
+    p_id: input.id ?? null,
+    p_type: input.type,
+    p_date: input.date || null,
+    // Les textes partent vides compris : sans cela, effacer un participant
+    // serait impossible — la valeur vide se ferait remplacer par l'ancienne.
+    p_responsable: input.responsable?.trim() || null,
+    p_participants: input.participants?.trim() || null,
+    p_resume: input.resume?.trim() || null,
+    p_resultat: input.resultat?.trim() || null,
+    p_prochaine_action: input.prochaineAction?.trim() || null,
+    p_date_relance: input.dateRelance || null,
+  });
+
+  if (error) {
+    console.error("[v2 lever] save_raise_interaction échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true };
+}
+
+/** Retirer une interaction consignée par erreur. */
+export async function deleteV2Interaction(input: {
+  operationId: string;
+  id: string;
+}): Promise<Resultat> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("delete_raise_interaction", {
+    p_id: input.id,
+  });
+
+  if (error) {
+    console.error("[v2 lever] delete_raise_interaction échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true };
+}

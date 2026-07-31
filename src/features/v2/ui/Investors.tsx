@@ -22,9 +22,11 @@ import {
   engagementTon,
   etapeLabel,
   ticketsCumules,
+  type Interaction,
   type InvestisseurPipeline,
 } from "@/features/v2/domain/pipeline";
 import { EmptyMedallion } from "./EmptyArt";
+import { InteractionPanel, InteractionsSection } from "./Interactions";
 import { Icon } from "./Icon";
 
 /**
@@ -57,17 +59,26 @@ function tonAcces(acces: string | null): string {
 export function InvestorsScreen({
   operationId,
   investisseurs,
+  interactions,
   devise,
   vue,
   edite,
+  interactionOuverte,
+  investisseurCible,
 }: {
   operationId: string;
   investisseurs: readonly InvestisseurPipeline[];
+  /** Ce qui a été consigné — écrans 41 et 42. */
+  interactions: readonly Interaction[];
   devise: string;
   /** `colonnes` ou `tableau` — les deux lectures de la maquette. */
   vue: string;
   /** Identifiant de l'investisseur en cours d'édition, `add` pour un nouveau. */
   edite: string | null;
+  /** `interaction` quand le panneau de l'écran 42 est ouvert. */
+  interactionOuverte: string | null;
+  /** La relation à laquelle l'interaction se rattache. */
+  investisseurCible: string | null;
 }) {
   // Le pipeline vit sous l'onglet `?view=pipeline` de Lever : chaque lien doit
   // le reconduire, sans quoi le premier clic sort de l'écran.
@@ -80,6 +91,15 @@ export function InvestorsScreen({
   const enCours = edite
     ? (investisseurs.find((item) => item.id === edite) ?? null)
     : null;
+
+  // L'écran 42 se rattache toujours à une relation : sans elle, il n'y a rien
+  // à consigner et le panneau ne s'ouvre pas.
+  const cible = investisseurCible
+    ? (investisseurs.find((item) => item.id === investisseurCible) ?? null)
+    : null;
+  const interactionEditee = interactions.find(
+    (i) => i.id === interactionOuverte,
+  );
 
   return (
     <div className="v2-pipeline-page">
@@ -119,10 +139,19 @@ export function InvestorsScreen({
         <PipelineTableau devise={devise} investisseurs={investisseurs} />
       )}
 
-      {edite && (
+      {edite && edite !== "interaction" && (
         <InvestorPanel
           devise={devise}
+          interactions={interactions}
           investisseur={enCours}
+          operationId={operationId}
+        />
+      )}
+
+      {edite === "interaction" && cible && (
+        <InteractionPanel
+          interaction={interactionEditee ?? null}
+          investisseur={cible}
           operationId={operationId}
         />
       )}
@@ -284,10 +313,12 @@ function PipelineTableau({
 
 function InvestorPanel({
   operationId,
+  interactions,
   investisseur,
   devise,
 }: {
   operationId: string;
+  interactions: readonly Interaction[];
   investisseur: InvestisseurPipeline | null;
   devise: string;
 }) {
@@ -644,6 +675,16 @@ function InvestorPanel({
           </label>
 
           </div>
+
+          {investisseur && (
+            <>
+              <hr />
+              <InteractionsSection
+                interactions={interactions}
+                investisseur={investisseur}
+              />
+            </>
+          )}
 
           <label className="v2-field">
             <span>
