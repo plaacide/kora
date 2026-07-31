@@ -172,8 +172,9 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Rejoindre                accept_org_invitation()
    │                                /v2/rejoindre-equipe, HORS du poste de
    │                                pilotage : l'invité n'est pas encore membre
-   └─ 🔴 Périmètre par opération  n'existe pas : un interne voit toutes les
-                                    opérations. La colonne le dit.
+   └─ ⚪ Périmètre par opération  n'existe pas, et ne sera pas fait : arbitrage
+                                    du fondateur le 2 août. Un interne voit
+                                    toutes les opérations ; la colonne le dit.
 🔴 Sécurité                       —                     ATTEND : MFA, audit_log
 🔴 Abonnement                     —                     ATTEND : décisions produit
 ```
@@ -321,8 +322,8 @@ autorisés — mais staging reste la première étape.
    exigence ou un dossier reste à décider.
 5. ~~Lever~~ — fait. Vue, pipeline, engagements et mises à jour sont branchés.
 6. ~~Investisseurs~~ — fait le 1er août. Restent les interactions (41-42).
-7. ~~Équipe~~ — faite le 2 août, invitation comprise. Reste le périmètre par
-   opération, qui n'existe pas en base.
+7. ~~Équipe~~ — faite le 2 août, invitation comprise. Le périmètre par
+   opération est écarté : le fondateur l'a tranché, ce n'est pas un manque.
 8. **Interactions du pipeline** (41-42) — la table n'existe pas.
 9. **Cohortes** (31-32) — `cohort_links` n'existe pas.
 10. **Sécurité**, **Abonnement** — décisions produit d'abord. `/v2/abonnement`
