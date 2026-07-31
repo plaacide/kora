@@ -139,6 +139,22 @@ choisir les dossiers.
 
 La RLS cache jusqu'au NOM : un invité ne sait pas que la pièce existe.
 
+**Tranchée — les exigences ont deux axes** (1er août 2026).
+`category` valait `ohada | financier | dfi` : des financeurs déguisés en
+domaines, et uniques, donc une exigence réclamée par une banque ET un bailleur
+devait choisir. Séparé en `domain` (8 valeurs, celles des maquettes) et
+`sources` (plusieurs par exigence), plus `level` qui manquait entièrement.
+
+Sur les six états des maquettes, quatre sont stockés — `not_applicable`
+rejoint les trois existants, il a son geste. « À actualiser » se DÉDUIT de
+`freshness_days` et de la date de la preuve : « Extrait RCCM de moins de
+3 mois » portait déjà la règle dans son intitulé. « En vérification » est
+écarté tant qu'aucun geste ne le produit.
+
+**Tranchée — la révocation** (1er août 2026). `revoke_invitation` passe le
+statut, supprime les permissions sur l'opération et journalise. Vérifié sur un
+compte invité réel : plus rien de visible, jeton rejoué refusé.
+
 **Tranchée — la lecture d'un invité suit ses droits** (1er août 2026).
 Vérification faite sur un vrai compte invité, après acceptation d'une
 invitation portant sur deux dossiers sur six : il lisait les six dossiers, les
@@ -154,17 +170,7 @@ ferme la checklist aux invités : elle disait ce qui manque encore au dossier.
 
 **En attente** — les choix produit, tous sur la fidélité des maquettes :
 
-1. **La préparation : trois états contre six, et pas de niveau.**
-   `checklist_status` vaut `todo | in_progress | done`. Les maquettes montrent
-   « À actualiser », « Non applicable », « En vérification », plus trois
-   niveaux (Requis / Recommandé / Optionnel) et une juridiction. Rien de tout
-   cela n'existe en base. Trois catégories aussi, là où les maquettes en
-   montrent huit — et `ohada | financier | dfi` tient plus du financeur que du
-   domaine.
-2. **Révoquer un accès demande une migration.** Aucune RPC ne révoque, et
-   `invitations` n'a pas de politique UPDATE : le bouton semblerait marcher
-   sans rien fermer.
-3. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
+1. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
    `failed`). Les maquettes en montrent sept — « À actualiser », « Archivée »
    n'existent pas en base.
 

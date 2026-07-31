@@ -11,11 +11,14 @@ import {
   setRequirementStatusAction,
 } from "@/app/v2/(workspace)/operations/[operationId]/preparation/actions";
 import {
+  DOMAINES,
   actionLabel,
   compter,
   correspondAuFiltre,
   domaineLabel,
+  etatAffiche,
   grouper,
+  niveauLabel,
   sourceLabel,
   statutLabel,
   type ExigenceBrute,
@@ -54,6 +57,10 @@ export function PreparationPlan({
   const router = useRouter();
   const [filtre, setFiltre] = useState<FiltreExigences>("toutes");
   const [busy, setBusy] = useState(false);
+
+  // Une seule référence de temps : deux appels à `new Date()` dans la même
+  // liste pourraient classer deux exigences différemment.
+  const maintenant = new Date();
 
   const comptes = compter(requirements);
   const groupes = grouper(
@@ -118,16 +125,16 @@ export function PreparationPlan({
         )}
 
         {groupes.map((groupe) => (
-          <section className="v2-requirement-group" key={groupe.category}>
+          <section className="v2-requirement-group" key={groupe.domain}>
             <header>
               <strong>{groupe.name}</strong>
               <span>
-                {groupe.ready} sur {groupe.items.length} prête
+                {groupe.ready} sur {groupe.due} prête
                 {groupe.ready > 1 ? "s" : ""}
               </span>
             </header>
             {groupe.items.map((item) => {
-              const statut = statutLabel(item.status);
+              const statut = etatAffiche(item, maintenant);
 
               return (
                 <article className="v2-requirement-row" key={item.id}>
@@ -135,10 +142,19 @@ export function PreparationPlan({
                   <div className="v2-requirement-copy">
                     <div>
                       <strong>{item.label}</strong>
-                      <span className="v2-tag">{sourceLabel(item.category)}</span>
-                      {item.folderName && (
-                        <span className="v2-tag">{item.folderName}</span>
-                      )}
+                      <span
+                        className="v2-tag"
+                        data-level={item.level === "required" ? "required" : undefined}
+                      >
+                        {niveauLabel(item.level)}
+                      </span>
+                      {/* Qui réclame la pièce — plusieurs financeurs possibles,
+                          ce que l'ancienne catégorie unique interdisait. */}
+                      {item.sources.map((source) => (
+                        <span className="v2-tag" key={source}>
+                          {sourceLabel(source)}
+                        </span>
+                      ))}
                     </div>
                     <p>{item.description}</p>
                     {/* Une exigence peut porter une preuve sans être « prête » :
@@ -174,15 +190,16 @@ export function PreparationPlan({
   );
 }
 
-const CATEGORIES: Array<[string, string]> = [
-  ["ohada", domaineLabel("ohada")],
-  ["financier", domaineLabel("financier")],
-  ["dfi", domaineLabel("dfi")],
+const NIVEAUX: Array<[string, string]> = [
+  ["required", "Requis"],
+  ["recommended", "Recommandé"],
+  ["optional", "Optionnel"],
 ];
 
 function AddRequirement({ operationId }: { operationId: string }) {
   const router = useRouter();
-  const [category, setCategory] = useState("ohada");
+  const [domain, setDomain] = useState(DOMAINES[0][0] as string);
+  const [level, setLevel] = useState("required");
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
@@ -193,7 +210,8 @@ function AddRequirement({ operationId }: { operationId: string }) {
     setErreur(null);
     const res = await addRequirementAction({
       operationId,
-      category,
+      domain,
+      level,
       label,
       description,
     });
@@ -228,10 +246,24 @@ function AddRequirement({ operationId }: { operationId: string }) {
             <span>Domaine</span>
             <span className="v2-control">
               <select
-                onChange={(event) => setCategory(event.target.value)}
-                value={category}
+                onChange={(event) => setDomain(event.target.value)}
+                value={domain}
               >
-                {CATEGORIES.map(([valeur, nom]) => (
+                {DOMAINES.map(([valeur, nom]) => (
+                  <option key={valeur} value={valeur}>{nom}</option>
+                ))}
+              </select>
+            </span>
+          </label>
+
+          <label className="v2-field">
+            <span>Niveau</span>
+            <span className="v2-control">
+              <select
+                onChange={(event) => setLevel(event.target.value)}
+                value={level}
+              >
+                {NIVEAUX.map(([valeur, nom]) => (
                   <option key={valeur} value={valeur}>{nom}</option>
                 ))}
               </select>
@@ -334,12 +366,36 @@ export function RequirementPanel({
           <div className="v2-detail-grid">
             <div>
               <small>Domaine</small>
-              <strong>{domaineLabel(requirement.category)}</strong>
+              <strong>{domaineLabel(requirement.domain)}</strong>
+            </div>
+            <div>
+              <small>Niveau</small>
+              <strong>{niveauLabel(requirement.level)}</strong>
+            </div>
+            <div>
+              <small>Demandé par</small>
+              <strong>
+                {requirement.sources.length
+                  ? requirement.sources.map(sourceLabel).join(", ")
+                  : "—"}
+              </strong>
             </div>
             <div>
               <small>Dossier attendu</small>
               <strong>{requirement.folderName ?? "Aucun"}</strong>
             </div>
+            {requirement.expectedPeriod && (
+              <div>
+                <small>Période attendue</small>
+                <strong>{requirement.expectedPeriod}</strong>
+              </div>
+            )}
+            {requirement.acceptedFormats && (
+              <div>
+                <small>Format accepté</small>
+                <strong>{requirement.acceptedFormats}</strong>
+              </div>
+            )}
           </div>
 
           {requirement.description && (
@@ -423,7 +479,23 @@ export function RequirementPanel({
         </div>
 
         <footer className="v2-sidepanel-footer">
-          {requirement.status !== "in_progress" && (
+          {/* « Non applicable » est le seul des six états de la maquette qui
+              soit une DÉCISION : il lui faut donc son geste. */}
+          <button
+            disabled={busy !== null}
+            onClick={() =>
+              changerStatut(
+                requirement.status === "not_applicable" ? "todo" : "not_applicable",
+              )
+            }
+            type="button"
+          >
+            {requirement.status === "not_applicable"
+              ? "Rendre applicable"
+              : "Marquer non applicable"}
+          </button>
+          {requirement.status !== "in_progress" &&
+            requirement.status !== "not_applicable" && (
             <button
               disabled={busy !== null}
               onClick={() => changerStatut("in_progress")}

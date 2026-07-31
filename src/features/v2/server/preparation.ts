@@ -12,6 +12,45 @@ import { createClient } from "@/lib/supabase/server";
  * fondateur a déposé trois exercices.
  */
 
+/** La forme brute rendue par PostgREST, avant traduction. */
+interface LigneExigence {
+  id: string;
+  domain: string;
+  level: string;
+  sources: string[] | null;
+  label: string;
+  description: string;
+  status: string;
+  position: number;
+  folder_id: string | null;
+  freshness_days: number | null;
+  expected_period: string | null;
+  accepted_formats: string | null;
+}
+
+/** Un seul endroit traduit la ligne : deux lectures qui divergent, ce sont
+ *  deux écrans qui affichent la même exigence différemment. */
+function enExigence(
+  ligne: LigneExigence,
+  extra: { folderName: string | null; proofs: number; lastProofAt: string | null },
+): ExigenceBrute {
+  return {
+    id: ligne.id,
+    domain: ligne.domain,
+    level: ligne.level,
+    sources: ligne.sources ?? [],
+    label: ligne.label,
+    description: ligne.description,
+    status: ligne.status,
+    position: ligne.position,
+    folderId: ligne.folder_id,
+    freshnessDays: ligne.freshness_days,
+    expectedPeriod: ligne.expected_period,
+    acceptedFormats: ligne.accepted_formats,
+    ...extra,
+  };
+}
+
 export interface ProofRow {
   id: string;
   name: string;
@@ -31,36 +70,39 @@ export async function listRequirementsFull(
   const [{ data: items }, { data: folders }] = await Promise.all([
     supabase
       .from("checklist_items")
-      .select("id, category, label, description, status, position, folder_id")
+      .select(
+        "id, domain, level, sources, label, description, status, position, folder_id, freshness_days, expected_period, accepted_formats",
+      )
       .eq("deal_id", operationId)
-      .order("category")
+      .order("domain")
       .order("position"),
     supabase.from("folders").select("id, name").eq("deal_id", operationId),
   ]);
 
-  const lignes = (items ?? []) as Array<{
-    id: string;
-    category: string;
-    label: string;
-    description: string;
-    status: string;
-    position: number;
-    folder_id: string | null;
-  }>;
+  const lignes = (items ?? []) as Array<LigneExigence>;
 
   if (lignes.length === 0) return [];
 
+  // `linked_at` porte la date du rattachement, pas celle du fichier. C'est la
+  // bonne mesure ici : ce qu'on veut savoir, c'est depuis quand cette preuve
+  // tient lieu de réponse à l'exigence.
   const { data: preuves } = await supabase
     .from("checklist_item_documents")
-    .select("item_id")
+    .select("item_id, linked_at")
     .in(
       "item_id",
       lignes.map((item) => item.id),
     );
 
   const comptes = new Map<string, number>();
-  for (const row of (preuves ?? []) as Array<{ item_id: string }>) {
+  const derniere = new Map<string, string>();
+  for (const row of (preuves ?? []) as Array<{
+    item_id: string;
+    linked_at: string;
+  }>) {
     comptes.set(row.item_id, (comptes.get(row.item_id) ?? 0) + 1);
+    const connue = derniere.get(row.item_id);
+    if (!connue || row.linked_at > connue) derniere.set(row.item_id, row.linked_at);
   }
 
   const noms = new Map(
@@ -70,16 +112,10 @@ export async function listRequirementsFull(
     ]),
   );
 
-  return lignes.map((item) => ({
-    id: item.id,
-    category: item.category,
-    label: item.label,
-    description: item.description,
-    status: item.status,
-    position: item.position,
-    folderId: item.folder_id,
+  return lignes.map((item) => enExigence(item, {
     folderName: item.folder_id ? (noms.get(item.folder_id) ?? null) : null,
     proofs: comptes.get(item.id) ?? 0,
+    lastProofAt: derniere.get(item.id) ?? null,
   }));
 }
 
@@ -92,22 +128,16 @@ export async function requirementDetail(
 
   const { data: item } = await supabase
     .from("checklist_items")
-    .select("id, category, label, description, status, position, folder_id")
+    .select(
+      "id, domain, level, sources, label, description, status, position, folder_id, freshness_days, expected_period, accepted_formats",
+    )
     .eq("deal_id", operationId)
     .eq("id", requirementId)
     .maybeSingle();
 
   if (!item) return null;
 
-  const ligne = item as {
-    id: string;
-    category: string;
-    label: string;
-    description: string;
-    status: string;
-    position: number;
-    folder_id: string | null;
-  };
+  const ligne = item as unknown as LigneExigence;
 
   const [{ data: liens }, { data: folder }] = await Promise.all([
     supabase
@@ -150,15 +180,12 @@ export async function requirementDetail(
   });
 
   return {
-    id: ligne.id,
-    category: ligne.category,
-    label: ligne.label,
-    description: ligne.description,
-    status: ligne.status,
-    position: ligne.position,
-    folderId: ligne.folder_id,
-    folderName: (folder as { name: string } | null)?.name ?? null,
-    proofs: proofDocuments.length,
+    ...enExigence(ligne, {
+      folderName: (folder as { name: string } | null)?.name ?? null,
+      proofs: proofDocuments.length,
+      // Les liens arrivent triés du plus récent au plus ancien.
+      lastProofAt: proofDocuments[0]?.linkedAt ?? null,
+    }),
     proofDocuments,
   };
 }
@@ -175,6 +202,7 @@ function statutMot(valeur: unknown): string {
   if (valeur === "done") return "prête";
   if (valeur === "in_progress") return "en cours";
   if (valeur === "todo") return "à préparer";
+  if (valeur === "not_applicable") return "non applicable";
   return String(valeur ?? "?");
 }
 

@@ -36,13 +36,15 @@ export async function applyTemplateAction(operationId: string): Promise<Resultat
 /**
  * Ajouter une exigence à la main.
  *
- * La catégorie est imposée par l'énumération `checklist_category` : trois
- * valeurs, pas huit domaines. L'appelant ne peut donc pas inventer un domaine
- * que la base refuserait au moment de l'insertion.
+ * Domaine et niveau sont des énumérations en base : un domaine inventé serait
+ * refusé à l'insertion, pas rangé n'importe où. Les sources restent vides —
+ * une exigence ajoutée à la main n'est réclamée par personne d'autre que le
+ * fondateur, et c'est une information en soi.
  */
 export async function addRequirementAction(input: {
   operationId: string;
-  category: string;
+  domain: string;
+  level: string;
   label: string;
   description: string;
 }): Promise<Resultat> {
@@ -53,9 +55,11 @@ export async function addRequirementAction(input: {
 
   const { error } = await supabase.rpc("add_checklist_item", {
     p_deal: input.operationId,
-    p_category: input.category,
+    p_domain: input.domain,
     p_label: label,
     p_description: input.description.trim(),
+    p_level: input.level,
+    p_sources: [],
   });
 
   if (error) {
@@ -78,7 +82,7 @@ export async function setRequirementStatusAction(input: {
   requirementId: string;
   status: string;
 }): Promise<Resultat> {
-  if (!["todo", "in_progress", "done"].includes(input.status)) {
+  if (!["todo", "in_progress", "done", "not_applicable"].includes(input.status)) {
     return { ok: false, error: "Statut inconnu." };
   }
 

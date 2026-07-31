@@ -4,6 +4,8 @@ import {
   actionLabel,
   compter,
   correspondAuFiltre,
+  estAActualiser,
+  etatAffiche,
   grouper,
   statutLabel,
   type ExigenceBrute,
@@ -11,33 +13,60 @@ import {
 
 const exigence = (patch: Partial<ExigenceBrute> = {}): ExigenceBrute => ({
   id: "e1",
-  category: "ohada",
+  domain: "company_registration",
+  level: "required",
+  sources: [],
   label: "Statuts à jour",
   description: "",
   status: "todo",
   position: 1,
   folderId: null,
   folderName: null,
+  freshnessDays: null,
+  expectedPeriod: null,
+  acceptedFormats: null,
+  lastProofAt: null,
   proofs: 0,
   ...patch,
 });
 
 describe("grouper", () => {
-  it("range les domaines dans l’ordre du référentiel, pas alphabétique", () => {
+  it("range les domaines dans l’ordre où le dossier se construit", () => {
     const groupes = grouper([
-      exigence({ id: "a", category: "dfi" }),
-      exigence({ id: "b", category: "financier" }),
-      exigence({ id: "c", category: "ohada" }),
+      exigence({ id: "a", domain: "impact_esg" }),
+      exigence({ id: "b", domain: "finance_and_accounting" }),
+      exigence({ id: "c", domain: "company_registration" }),
     ]);
 
-    expect(groupes.map((groupe) => groupe.category)).toEqual([
-      "ohada",
-      "financier",
-      "dfi",
+    expect(groupes.map((groupe) => groupe.domain)).toEqual([
+      "company_registration",
+      "finance_and_accounting",
+      "impact_esg",
     ]);
   });
 
-  it("trie les exigences d’un domaine par position", () => {
+  it("remonte le requis avant le recommandé, quelle que soit la position", () => {
+    const groupes = grouper([
+      exigence({ id: "a", level: "optional", position: 1 }),
+      exigence({ id: "b", level: "required", position: 9 }),
+      exigence({ id: "c", level: "recommended", position: 2 }),
+    ]);
+
+    expect(groupes[0].items.map((item) => item.id)).toEqual(["b", "c", "a"]);
+  });
+
+  it("ne compte pas le non-applicable comme dû", () => {
+    const groupes = grouper([
+      exigence({ id: "a", status: "done" }),
+      exigence({ id: "b", status: "not_applicable" }),
+      exigence({ id: "c", status: "todo" }),
+    ]);
+
+    expect(groupes[0].ready).toBe(1);
+    expect(groupes[0].due).toBe(2);
+  });
+
+  it("trie les exigences d’un même niveau par position", () => {
     const groupes = grouper([
       exigence({ id: "a", position: 3 }),
       exigence({ id: "b", position: 1 }),
@@ -56,15 +85,15 @@ describe("grouper", () => {
     expect(groupes[0].ready).toBe(1);
   });
 
-  it("place une catégorie inconnue à la fin plutôt que de la perdre", () => {
+  it("place un domaine inconnu à la fin plutôt que de le perdre", () => {
     const groupes = grouper([
-      exigence({ id: "a", category: "inconnue" }),
-      exigence({ id: "b", category: "ohada" }),
+      exigence({ id: "a", domain: "inconnu" }),
+      exigence({ id: "b", domain: "company_registration" }),
     ]);
 
-    expect(groupes.map((groupe) => groupe.category)).toEqual([
-      "ohada",
-      "inconnue",
+    expect(groupes.map((groupe) => groupe.domain)).toEqual([
+      "company_registration",
+      "inconnu",
     ]);
   });
 });
@@ -112,5 +141,62 @@ describe("actionLabel", () => {
 describe("statutLabel", () => {
   it("retombe sur « à préparer » devant un statut inconnu", () => {
     expect(statutLabel("bizarre").label).toBe("À préparer");
+  });
+
+  it("connaît « non applicable »", () => {
+    expect(statutLabel("not_applicable").label).toBe("Non applicable");
+  });
+});
+
+describe("estAActualiser", () => {
+  const maintenant = new Date("2026-08-01T12:00:00Z");
+  const ilYA = (jours: number) =>
+    new Date(maintenant.getTime() - jours * 86_400_000).toISOString();
+
+  it("signale une preuve plus vieille que sa durée de validité", () => {
+    expect(
+      estAActualiser(
+        { status: "done", freshnessDays: 90, lastProofAt: ilYA(120) },
+        maintenant,
+      ),
+    ).toBe(true);
+  });
+
+  it("laisse tranquille une preuve encore fraîche", () => {
+    expect(
+      estAActualiser(
+        { status: "done", freshnessDays: 90, lastProofAt: ilYA(30) },
+        maintenant,
+      ),
+    ).toBe(false);
+  });
+
+  it("ne périme jamais une exigence sans durée de validité", () => {
+    expect(
+      estAActualiser(
+        { status: "done", freshnessDays: null, lastProofAt: ilYA(3000) },
+        maintenant,
+      ),
+    ).toBe(false);
+  });
+
+  it("ne s’applique qu’à une exigence prête", () => {
+    expect(
+      estAActualiser(
+        { status: "todo", freshnessDays: 90, lastProofAt: ilYA(120) },
+        maintenant,
+      ),
+    ).toBe(false);
+  });
+
+  it("bascule l’état affiché sans toucher au statut stocké", () => {
+    const vieille = exigence({
+      status: "done",
+      freshnessDays: 90,
+      lastProofAt: ilYA(120),
+    });
+
+    expect(etatAffiche(vieille, maintenant).label).toBe("À actualiser");
+    expect(vieille.status).toBe("done");
   });
 });
