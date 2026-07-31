@@ -4,6 +4,7 @@ import { nomActeur, nomCourt } from "@/features/v2/domain/journal";
 import {
   cheminDossier,
   compter,
+  requises,
   grouperParDossier,
   type DossierArbre,
   type ExigenceBrute,
@@ -436,12 +437,13 @@ export async function preparationProgress(
 
   const { data: items } = await supabase
     .from("checklist_items")
-    .select("id, status, freshness_days")
+    .select("id, status, level, freshness_days")
     .eq("deal_id", operationId);
 
   const lignes = (items ?? []) as Array<{
     id: string;
     status: string;
+    level: string;
     freshness_days: number | null;
   }>;
 
@@ -469,13 +471,16 @@ export async function preparationProgress(
   }
 
   const compte = compter(
-    lignes.map((item) => ({
+    requises(
+      lignes.map((item) => ({
       ...VIDE,
-      id: item.id,
-      status: item.status,
-      freshnessDays: item.freshness_days,
-      lastProofAt: derniere.get(item.id) ?? null,
-    })),
+        id: item.id,
+        status: item.status,
+        level: item.level,
+        freshnessDays: item.freshness_days,
+        lastProofAt: derniere.get(item.id) ?? null,
+      })),
+    ),
     new Date(),
   );
 

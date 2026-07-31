@@ -267,6 +267,23 @@ export interface Compte {
 }
 
 /**
+ * Les exigences REQUISES — celles que les compteurs mesurent.
+ *
+ * Les maquettes 09 et 11 affichent « 18 prêtes · 4 à fournir · 2 à
+ * actualiser » à côté de « 18 sur 24 exigences requises » : 18 + 4 + 2 = 24.
+ * Les trois chiffres portent donc sur le requis seul, et les recommandées sont
+ * comptées à part (« 9/13 »).
+ *
+ * C'est juste : le recommandé n'empêche pas un closing, le mélanger au requis
+ * ferait paraître un dossier plus en retard qu'il n'est.
+ */
+export function requises(
+  exigences: readonly ExigenceBrute[],
+): ExigenceBrute[] {
+  return exigences.filter((item) => item.level === "required");
+}
+
+/**
  * Les trois chiffres de la maquette : prêtes, à fournir, à actualiser.
  *
  * Les trois catégories s'excluent, et leur somme est le nombre d'exigences
@@ -398,4 +415,117 @@ export function grouperParDossier(
   }
 
   return resultat;
+}
+
+/**
+ * La prochaine action — le cœur de la vue d'ensemble (écrans 08, 09, 10).
+ *
+ * Un fondateur qui ouvre son opération ne veut pas un tableau de bord, il veut
+ * savoir quoi faire maintenant. Cette fonction répond à cette question à
+ * partir de ce que la base sait, et rien d'autre.
+ *
+ * L'ORDRE des cas est une décision produit, pas un détail :
+ *
+ *   · une pièce PÉRIMÉE passe avant une pièce manquante. Contre-intuitif —
+ *     elle semble faite — mais c'est justement le piège : elle est comptée
+ *     prête, personne ne la regarde, et un investisseur la découvre. Et la
+ *     réparer coûte un geste là où fournir une pièce absente coûte des jours.
+ *     C'est aussi l'ordre que la maquette 09 retient.
+ *   · une exigence REQUISE avant une recommandée : c'est ce qui bloque un
+ *     closing.
+ *   · une suggestion à confirmer en dernier des gestes documentaires : elle ne
+ *     manque à personne, elle attend un clic.
+ */
+export type ProchaineAction =
+  | { type: "referentiel" }
+  | { type: "actualiser"; exigence: ExigenceBrute }
+  | { type: "deposer"; exigence: ExigenceBrute }
+  | { type: "confirmer"; exigence: ExigenceBrute }
+  | { type: "partager" }
+  | { type: "rien" };
+
+export function prochaineAction(
+  exigences: readonly ExigenceBrute[],
+  accesActifs: number,
+  maintenant: Date,
+): ProchaineAction {
+  if (exigences.length === 0) return { type: "referentiel" };
+
+  const perimee = exigences.find((item) => estAActualiser(item, maintenant));
+  if (perimee) return { type: "actualiser", exigence: perimee };
+
+  const due = (item: ExigenceBrute) =>
+    item.status !== "done" && item.status !== "not_applicable";
+
+  const requise = exigences.find((item) => due(item) && item.level === "required");
+  if (requise) return { type: "deposer", exigence: requise };
+
+  const aConfirmer = exigences.find(
+    (item) => item.pending > 0 && item.proofs === 0,
+  );
+  if (aConfirmer) return { type: "confirmer", exigence: aConfirmer };
+
+  // Tout le requis est prêt. Une data room complète que personne ne voit
+  // n'a servi à rien : le geste suivant est de la partager.
+  if (accesActifs === 0) return { type: "partager" };
+
+  const recommandee = exigences.find(
+    (item) => due(item) && item.level === "recommended",
+  );
+  if (recommandee) return { type: "deposer", exigence: recommandee };
+
+  return { type: "rien" };
+}
+
+/** Ce que la vue d'ensemble écrit dans son encadré. */
+export function texteProchaineAction(action: ProchaineAction): {
+  titre: string;
+  explication: string;
+} {
+  switch (action.type) {
+    case "referentiel":
+      return {
+        titre: "Poser votre plan de préparation",
+        explication:
+          "Le référentiel OHADA pose vingt-deux exigences réparties en huit domaines, chacune rattachée au dossier où sa pièce se dépose. Vous pourrez en ajouter et en retirer.",
+      };
+    case "actualiser":
+      return {
+        titre: `Mettre à jour « ${action.exigence.label} »`,
+        explication: `La pièce fournie a dépassé sa durée de validité${
+          action.exigence.expectedPeriod
+            ? ` (${action.exigence.expectedPeriod.toLowerCase()})`
+            : ""
+        }. Elle compte encore comme prête, et c'est ce qui la rend risquée : personne ne la regarde plus.`,
+      };
+    case "deposer":
+      return {
+        titre: `Déposer « ${action.exigence.label} »`,
+        explication: `${
+          action.exigence.level === "required" ? "Exigence requise" : "Exigence recommandée"
+        } du domaine ${domaineLabel(action.exigence.domain)}${
+          action.exigence.sources.length
+            ? `, réclamée par ${action.exigence.sources.map(sourceLabel).join(" et ")}`
+            : ""
+        }. ${action.exigence.description}`,
+      };
+    case "confirmer":
+      return {
+        titre: `Confirmer l'association de « ${action.exigence.label} »`,
+        explication:
+          "Sanza a proposé une pièce pour cette exigence. Tant qu'elle n'est pas confirmée, elle ne compte pas comme fournie — c'est vous qui validez, jamais la machine.",
+      };
+    case "partager":
+      return {
+        titre: "Partager votre data room",
+        explication:
+          "Toutes les exigences requises sont prêtes et personne n'y a encore accès. Un accès est nominatif, daté, et son activité est journalisée.",
+      };
+    default:
+      return {
+        titre: "Rien ne bloque",
+        explication:
+          "Les exigences requises sont prêtes et votre data room est partagée. Suivez l'activité de vos invités pour savoir quand relancer.",
+      };
+  }
 }

@@ -52,9 +52,16 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ## À l'intérieur d'une opération
 
 ```
-🔴 Vue d'ensemble                 —                     ATTEND : rien. Tout ce
-                                                        qu'elle affiche est déjà
-                                                        lu ailleurs.
+🟢 Vue d'ensemble                 operationOverview()
+   ├─ 🟢 En-tête                  → deals + raises (montant, devise, échéance)
+   ├─ 🟢 Prochaine action         prochaineAction() — périmé, puis requis, puis
+   │                                à confirmer, puis partager
+   ├─ 🟢 Progression              → requis seul, recommandées comptées à part
+   ├─ 🟢 Votre espace             → dossiers, pièces, accès actifs
+   ├─ 🟢 À traiter en priorité    → même ordre que la prochaine action
+   ├─ 🟢 Dernières pièces         → documents par date de dépôt
+   ├─ 🟢 Activité récente         → audit_log, format du journal
+   └─ 🔴 Pipeline investisseurs   —                     ATTEND : raise_investors
 
 🟢 Préparation                    listRequirementsFull(), requirementDetail(),
                                   requirementHistory(), attachableDocuments(),
@@ -107,7 +114,7 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ## Ce que le rail affiche
 
 ```
-🟢 Préparation  1/22        preparationProgress() — même règle que l'écran
+🟢 Préparation  1/16        preparationProgress() — requis seul, comme l'écran
 🟢 Bandeau      « Partagée — 1 accès actif »  countActiveAccesses()
 🔴 Partage et accès         la maquette 24 montre un badge, pas encore branché
 🔴 Investisseurs, Lever, Activité   pas de badge
@@ -168,6 +175,12 @@ de large à Lagos ou Nairobi.
 `not_applicable` compris. « À actualiser » se DÉDUIT de `freshness_days`.
 « En vérification » écarté tant qu'aucun geste ne le produit.
 
+**Les compteurs portent sur le REQUIS** (1er août). Les maquettes 09 et 11
+affichent « 18 prêtes · 4 à fournir · 2 à actualiser » à côté de « 18 sur 24
+exigences requises » : 18 + 4 + 2 = 24. Le recommandé est compté à part
+(« 9/13 »). Mélanger les deux ferait paraître un dossier plus en retard qu'il
+n'est.
+
 **Une suggestion n'est pas une preuve** (1er août). Elle est écrite dès le
 dépôt, non confirmée : elle survit à un onglet refermé et ne compte pas dans le
 score. `sync_checklist_status` ne regarde que les liens confirmés.
@@ -204,10 +217,8 @@ autorisés — mais staging reste la première étape.
 ## L'ordre qui reste
 
 1. ~~Dépôt, visionneuse, partage et accès, préparation~~ — faits.
-2. **Vue d'ensemble** — c'est la première chose qu'on voit en ouvrant une
-   opération, et le dernier endroit où le produit affiche des chiffres
-   inventés. Rien ne la bloque : les quatre données dont elle a besoin sont
-   déjà branchées ailleurs.
+2. ~~Vue d'ensemble~~ — faite le 1er août. Reste son pipeline investisseurs,
+   qui attend l'écran Investisseurs.
 3. **Activité** (par opération, puis globale) — même source, et c'est la
    surface de preuve.
 4. **Recherche** — documents, dossiers, opérations.

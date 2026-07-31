@@ -9,6 +9,8 @@ import {
   etatAffiche,
   grouper,
   grouperParDossier,
+  prochaineAction,
+  requises,
   statutLabel,
   type ExigenceBrute,
 } from "./preparation";
@@ -352,5 +354,90 @@ describe("grouperParDossier", () => {
     ]);
 
     expect(groupes).toHaveLength(1);
+  });
+});
+
+describe("prochaineAction", () => {
+  const maintenant = new Date("2026-08-01T12:00:00Z");
+  const ilYA = (jours: number) =>
+    new Date(maintenant.getTime() - jours * 86_400_000).toISOString();
+
+  it("commence par poser le référentiel quand il n’y a rien", () => {
+    expect(prochaineAction([], 0, maintenant)).toEqual({ type: "referentiel" });
+  });
+
+  it("fait passer une pièce périmée AVANT une exigence requise manquante", () => {
+    const action = prochaineAction(
+      [
+        exigence({ id: "manquante", level: "required", status: "todo" }),
+        exigence({
+          id: "perimee",
+          level: "required",
+          status: "done",
+          freshnessDays: 90,
+          lastProofAt: ilYA(120),
+        }),
+      ],
+      0,
+      maintenant,
+    );
+
+    expect(action.type).toBe("actualiser");
+    expect(action.type === "actualiser" && action.exigence.id).toBe("perimee");
+  });
+
+  it("préfère le requis au recommandé", () => {
+    const action = prochaineAction(
+      [
+        exigence({ id: "reco", level: "recommended", status: "todo" }),
+        exigence({ id: "req", level: "required", status: "todo" }),
+      ],
+      0,
+      maintenant,
+    );
+
+    expect(action.type === "deposer" && action.exigence.id).toBe("req");
+  });
+
+  it("propose de partager quand tout le requis est prêt et que personne n’a accès", () => {
+    const action = prochaineAction(
+      [exigence({ level: "required", status: "done" })],
+      0,
+      maintenant,
+    );
+
+    expect(action).toEqual({ type: "partager" });
+  });
+
+  it("ne propose plus de partager dès qu’un accès existe", () => {
+    const action = prochaineAction(
+      [exigence({ level: "required", status: "done" })],
+      1,
+      maintenant,
+    );
+
+    expect(action).toEqual({ type: "rien" });
+  });
+
+  it("ne réclame pas une exigence marquée non applicable", () => {
+    const action = prochaineAction(
+      [exigence({ level: "required", status: "not_applicable" })],
+      1,
+      maintenant,
+    );
+
+    expect(action.type).not.toBe("deposer");
+  });
+});
+
+describe("requises", () => {
+  it("écarte le recommandé et l’optionnel des compteurs", () => {
+    const liste = requises([
+      exigence({ id: "a", level: "required" }),
+      exigence({ id: "b", level: "recommended" }),
+      exigence({ id: "c", level: "optional" }),
+    ]);
+
+    expect(liste.map((item) => item.id)).toEqual(["a"]);
   });
 });

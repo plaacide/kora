@@ -27,6 +27,7 @@ import {
   etatPiece,
   grouper,
   niveauLabel,
+  requises,
   sourceLabel,
   type ExigenceBrute,
   type FiltreExigences,
@@ -78,7 +79,9 @@ export function PreparationPlan({
   // liste pourraient classer deux exigences différemment.
   const maintenant = new Date();
 
-  const comptes = compter(requirements, maintenant);
+  // Les trois chiffres portent sur le REQUIS, comme la maquette : leur somme
+  // est le nombre d’exigences qui bloquent un closing.
+  const comptes = compter(requises(requirements), maintenant);
   const groupes = grouper(
     requirements.filter(
       (item) =>
