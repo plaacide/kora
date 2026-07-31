@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import type { MoyenDePaiement } from "@/features/v2/billing/moyens";
+import { moyen, normaliserTelephone, refusDeSaisie } from "@/features/v2/billing/moyens";
 import { billingProvider } from "@/features/v2/billing/providers";
 import { createClient } from "@/lib/supabase/server";
 
@@ -44,37 +46,78 @@ export async function requestV2Plan(input: {
   organizationId: string;
   planCode: string;
   intervalle: "month" | "year";
+  moyen: MoyenDePaiement;
+  telephone?: string;
 }): Promise<Resultat & { reference?: string; url?: string; instruction?: string }> {
+  // Le contrôle de saisie est REFAIT ici. Celui de l'écran sert au confort de
+  // qui remplit le formulaire ; celui-ci sert à la sûreté, parce qu'une action
+  // serveur s'appelle aussi sans passer par l'écran.
+  const refus = refusDeSaisie({
+    moyen: input.moyen,
+    telephone: input.telephone ?? "",
+  });
+  if (refus) return { ok: false, error: refus };
+
+  const choisi = moyen(input.moyen);
+  if (!choisi) return { ok: false, error: "Moyen de paiement inconnu." };
+
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: prix } = await supabase
+  const { data: prix, error: erreurPrix } = await supabase
     .from("plan_prices")
     .select("unit_amount, currency, plans!inner(code)")
     .eq("plans.code", input.planCode)
     .eq("billing_interval", input.intervalle)
     .maybeSingle();
 
+  if (erreurPrix) {
+    console.error("[v2 abonnement] tarif illisible :", erreurPrix);
+    return { ok: false, error: "Le tarif de ce plan n’a pas pu être lu." };
+  }
+
   const tarif = prix as { unit_amount: number | null; currency: string } | null;
 
-  const session = await billingProvider().ouvrirPaiement({
-    workspaceId: input.organizationId,
-    planCode: input.planCode,
-    intervalle: input.intervalle,
-    montant: tarif?.unit_amount ?? 0,
-    devise: tarif?.currency ?? "XOF",
-    email: user?.email ?? "",
-  });
+  if (!tarif?.unit_amount) {
+    // Ouvrir un paiement à zéro rendrait une référence que personne ne pourrait
+    // honorer — et Genius Pay refuse sous 200 XOF de toute façon.
+    return {
+      ok: false,
+      error: "Ce plan n’a pas de tarif public. Écrivez-nous pour l’activer.",
+    };
+  }
 
-  return {
-    ok: true,
-    reference: session.reference,
-    url: session.url ?? undefined,
-    instruction: session.instruction,
-  };
+  try {
+    const session = await billingProvider().ouvrirPaiement({
+      workspaceId: input.organizationId,
+      planCode: input.planCode,
+      intervalle: input.intervalle,
+      montant: tarif.unit_amount,
+      devise: tarif.currency ?? "XOF",
+      email: user?.email ?? "",
+      telephone: input.telephone ? normaliserTelephone(input.telephone) : null,
+      moyen: choisi.paymentMethod,
+    });
+
+    return {
+      ok: true,
+      reference: session.reference,
+      url: session.url ?? undefined,
+      instruction: session.instruction,
+    };
+  } catch (erreur) {
+    // Le message du prestataire peut contenir sa réponse brute : on le trace,
+    // on ne le montre pas.
+    console.error("[v2 abonnement] ouverture de paiement échouée :", erreur);
+    return {
+      ok: false,
+      error:
+        "Le paiement n’a pas pu être ouvert. Réessayez dans un instant, ou écrivez-nous.",
+    };
+  }
 }
 
 /**

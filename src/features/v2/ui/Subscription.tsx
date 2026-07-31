@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 import {
-  economieAnnuelle,
   joursRestants,
   libelleStatut,
   prixAffiche,
   quantite,
 } from "@/features/v2/billing/format";
+import type { MoyenDePaiement } from "@/features/v2/billing/moyens";
 import type {
   Abonnement,
   Consommation,
@@ -15,6 +15,7 @@ import type {
 } from "@/features/v2/billing/types";
 import { dateJournal } from "@/features/v2/domain/journal";
 
+import { ChangerDePlan } from "./ChangerDePlan";
 import { Icon } from "./Icon";
 
 /** Ce qui compte dans la limite, et ce qui n'y compte pas — maquette 68. */
@@ -42,6 +43,7 @@ export function SubscriptionScreen({
   catalogue,
   consommation,
   droits,
+  onPayer,
   operations,
   plan,
 }: {
@@ -50,6 +52,13 @@ export function SubscriptionScreen({
   catalogue: readonly Plan[];
   consommation: readonly Consommation[];
   droits: readonly Droit[];
+  /** L'action serveur qui ouvre le paiement. */
+  onPayer: (choix: {
+    planCode: string;
+    intervalle: "month" | "year";
+    moyen: MoyenDePaiement;
+    telephone: string;
+  }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
   operations: readonly OperationComptee[];
   plan: Plan;
 }) {
@@ -209,46 +218,7 @@ export function SubscriptionScreen({
       </section>
 
       {memeSegment.length > 0 && (
-        <section className="v2-plan-card">
-          <div className="v2-nav-label">Changer de plan</div>
-          <div className="v2-plan-others">
-            {memeSegment.map((autre) => {
-              const p = prixAffiche(autre, "month");
-              const economie = economieAnnuelle(autre);
-              return (
-                <div key={autre.code}>
-                  <div>
-                    <strong>
-                      {autre.nom}
-                      {autre.badge && (
-                        <span className="v2-tag">{autre.badge}</span>
-                      )}
-                    </strong>
-                    <small>{autre.description}</small>
-                    {economie !== null && (
-                      <small className="v2-plan-economie">
-                        {economie} % d’économie à l’année
-                      </small>
-                    )}
-                  </div>
-                  <div className="v2-plan-others-prix">
-                    <strong>{p.principal}</strong>
-                    {p.detail && <small>{p.detail}</small>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {/* Le changement de plan passe par un paiement, et aucun prestataire
-              n'est encore branché. Un bouton qui ne mène nulle part serait pire
-              qu'une phrase qui le dit. */}
-          <p className="v2-roles-note">
-            <Icon name="shield" />
-            Le changement de plan en ligne n’est pas encore ouvert. Écrivez-nous
-            et nous l’activons sur votre espace — sans interruption ni perte de
-            données. Passer à un plan inférieur ne supprime aucune donnée.
-          </p>
-        </section>
+        <ChangerDePlan autres={memeSegment} onPayer={onPayer} />
       )}
 
       <section className="v2-plan-card">

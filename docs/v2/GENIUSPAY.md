@@ -61,22 +61,39 @@ https://<votre-domaine>/api/v2/billing/webhook
 6. **L'organisation et le plan viennent de NOS métadonnées**, jamais du corps
    librement composé par l'appelant.
 
+## Carte ou mobile money — ce que leur API permet vraiment
+
+| | Téléphone | Carte | Reconduction |
+|---|---|---|---|
+| `POST /payments` | facultatif | **oui** (`payment_method: "card"`) | non |
+| `POST /subscriptions` | **obligatoire** | **aucune option** | oui |
+
+Leur API d'abonnement est **mobile money uniquement**. La carte existe, mais
+paiement par paiement.
+
+Cette asymétrie vit dans `billing/moyens.ts`, testée : le numéro n'est réclamé
+que par le moyen qui l'exige, et aucun écran ne promet une reconduction à qui
+paie par carte.
+
+**Le numéro est demandé AU MOMENT DE PAYER**, jamais à l'inscription ni dans le
+profil — décision du fondateur, et la bonne : quelqu'un qui paie par carte n'a
+aucune raison de laisser son numéro, et le réclamer d'avance serait collecter
+une donnée personnelle dont on ne se servira jamais. Il n'est pas conservé.
+
 ## Ce qui reste ouvert
 
 - **Le renouvellement est-il un vrai prélèvement ?** Leur documentation ne le
   dit pas, et mentionne « réessayer une facture », ce qui évoque une relance.
   En mobile money, Wave et Orange demandent souvent une confirmation à chaque
-  débit. **Tant que ce n'est pas confirmé par écrit, ne pas promettre un
-  renouvellement automatique sur un écran.**
-- **Le téléphone.** `POST /subscriptions` exige `customer.phone`. Sanza ne
-  collecte de numéro nulle part — ni dans `profiles`, ni dans `organizations`.
-  Sans lui, seul le paiement ponctuel fonctionne. Le paiement ponctuel, lui, se
-  contente de l'e-mail.
+  débit. **Aucune phrase de l'application ne dit « automatique »** — un test le
+  vérifie sur chaque message d'échéance. À réécrire quand ils répondront, et
+  pas avant.
 - **L'identifiant d'événement.** Ils n'en envoient pas. On reconstitue
   `type:référence`, ce qui rend un rejeu inoffensif. À revoir s'ils en publient
   un vrai.
-- **L'écran ne porte toujours aucun bouton.** Toute cette plomberie n'est
-  atteignable par personne tant que `Subscription.tsx` reste en lecture seule.
+- **Rien n'a été essayé contre leur API réelle**, faute de clés — ni dans un
+  navigateur, faute de session. Le premier paiement en bac à sable sera le
+  premier vrai test.
 
 ## Leur serveur MCP
 

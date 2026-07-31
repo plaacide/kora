@@ -214,6 +214,7 @@ export class GeniusPayProvider implements BillingProvider {
     devise: string;
     email: string;
     telephone?: string | null;
+    moyen?: string | null;
   }): Promise<SessionPaiement> {
     if (input.montant < MONTANT_MINIMUM_XOF) {
       throw new Error(
@@ -234,9 +235,11 @@ export class GeniusPayProvider implements BillingProvider {
           email: input.email,
           ...(input.telephone ? { phone: input.telephone } : {}),
         },
-        // `payment_method` volontairement OMIS : Genius Pay affiche alors sa
-        // page de choix. Imposer Wave à quelqu'un qui a Orange Money est le
+        // `payment_method` n'est envoyé QUE si le payeur a tranché. Omis, il
+        // déclenche la page de choix de Genius Pay — ce qu'on veut pour le
+        // mobile money, où imposer Wave à quelqu'un qui a Orange Money est le
         // meilleur moyen de perdre un paiement déjà décidé.
+        ...(input.moyen ? { payment_method: input.moyen } : {}),
         metadata: {
           workspace_id: input.workspaceId,
           plan_code: input.planCode,

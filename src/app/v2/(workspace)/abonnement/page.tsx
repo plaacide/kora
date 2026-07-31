@@ -13,6 +13,8 @@ import {
   type OperationComptee,
 } from "@/features/v2/ui/Subscription";
 
+import { requestV2Plan } from "./actions";
+
 /**
  * Écran 68 — l'abonnement de l'organisation.
  *
@@ -52,6 +54,13 @@ export default async function AbonnementPage() {
         catalogue={catalogue}
         consommation={consommation}
         droits={droits}
+        onPayer={async (choix) => {
+          "use server";
+          // L'identifiant d'organisation vient du SERVEUR, jamais du navigateur :
+          // le passer par le client permettrait de payer pour l'espace d'un autre.
+          const { organization: espace } = await requireV2Workspace();
+          return requestV2Plan({ organizationId: espace.id, ...choix });
+        }}
         operations={comptees}
         plan={plan}
       />

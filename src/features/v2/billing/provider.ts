@@ -109,6 +109,11 @@ export interface BillingProvider {
      * ne se plie pas à celui qui l'exige.
      */
     telephone?: string | null;
+    /**
+     * Ce que le payeur a choisi, dans le vocabulaire du prestataire.
+     * `null` ou absent laisse celui-ci proposer sa propre page de choix.
+     */
+    moyen?: string | null;
   }): Promise<SessionPaiement>;
 
   creerAbonnement(input: {

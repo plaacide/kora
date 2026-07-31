@@ -206,15 +206,17 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Usage                    compté sur les données, jamais incrémenté
    ├─ 🟢 Opérations comptées      une archive ne compte pas
    ├─ 🟢 Droits du plan           43 fonctionnalités, entitlements par plan
-   ├─ 🟡 Changer de plan          set_workspace_plan() marche — §14 montée
-   │                                immédiate, §15 descente ANNONCÉE, jamais
-   │                                appliquée avant la fin de la période payée.
-   │                                MAIS AUCUN BOUTON NE L'APPELLE : l'écran
-   │                                est en lecture seule, `requestV2Plan` et
-   │                                `activateV2Plan` ne sont appelées nulle part.
+   ├─ 🟢 Changer de plan          set_workspace_plan() — §14 montée immédiate,
+   │                                §15 descente ANNONCÉE. L'écran porte enfin
+   │                                le bouton : choix du plan, de l'intervalle
+   │                                et du moyen, puis paiement.
+   ├─ 🟢 Moyen de paiement        mobile money ou carte. Le numéro n'est
+   │                                demandé QU'AU MOMENT DE PAYER, et
+   │                                uniquement par le moyen qui l'exige — la
+   │                                carte n'en réclame aucun. Non conservé.
    ├─ 🟡 Résilier                 cancel_workspace_subscription() marche ;
-   │                                `cancelV2Subscription` n'est appelée nulle
-   │                                part non plus.
+   │                                `cancelV2Subscription` n'est toujours
+   │                                appelée nulle part — aucun bouton.
    ├─ 🟢 Prestataire de paiement  deux implémentations : MANUEL (virement,
    │                                facture) et GENIUS PAY — mobile money,
    │                                cartes, et le RÉCURRENT. Choisi par
@@ -224,12 +226,12 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │                                bac à sable cloisonné du réel, idempotence
    │                                garantie par l'unicité en base. Éprouvé :
    │                                anon et client refusés, rejeu neutralisé.
-   ├─ 🔴 Téléphone du payeur      leur API d'abonnement l'EXIGE ; Sanza ne le
-   │                                collecte nulle part. Sans lui, seul le
-   │                                paiement ponctuel fonctionne.
-   ├─ 🔴 Renouvellement réel      non confirmé par leur documentation. Ne rien
-   │                                promettre sur un écran avant d'avoir la
-   │                                réponse par écrit.
+   ├─ 🔴 Renouvellement réel      non confirmé par leur documentation. Aucune
+   │                                phrase du produit ne dit « automatique »,
+   │                                et un test le vérifie. À réécrire quand ils
+   │                                répondront — pas avant.
+   ├─ 🔴 Essayé pour de vrai      jamais : ni contre leur API (pas de clés), ni
+   │                                dans un navigateur (pas de session).
    └─ 🟢 Faire respecter la limite trois triggers, faits le 3 août : créer une
                                     opération, ajouter un collaborateur,
                                     inviter un externe. En base et non dans
