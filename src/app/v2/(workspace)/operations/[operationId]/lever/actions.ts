@@ -19,6 +19,19 @@ function revalider(operationId: string): void {
 }
 
 /**
+ * L'identifiant rendu par une RPC qui retourne une LIGNE.
+ *
+ * PostgREST enveloppe parfois ce retour dans un tableau, parfois non, selon la
+ * façon dont la fonction est déclarée. Lire `data.id` sans regarder rendait
+ * l'identifiant `undefined` — et l'assistant, privé de son brouillon, repartait
+ * à la liste sans rien dire alors que la ligne existait bel et bien en base.
+ */
+function identifiant(data: unknown): string | undefined {
+  const ligne = Array.isArray(data) ? data[0] : data;
+  return (ligne as { id?: string } | null)?.id;
+}
+
+/**
  * Créer la levée si elle n'existe pas, sinon la mettre à jour.
  *
  * `save_raise` crée d'elle-même quand aucune levée n'est en cours : deux
@@ -215,6 +228,177 @@ export async function deleteV2Investor(input: {
 
   if (error) {
     console.error("[v2 lever] delete_raise_investor échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true };
+}
+
+/**
+ * Enregistrer ou requalifier un engagement — écran 43.
+ *
+ * Le même appel pour les deux : le fondateur ne crée pas un second engagement
+ * quand un intérêt devient un soft-commit, il requalifie le même. La RPC
+ * recalcule ensuite le montant sécurisé de la levée — c'est pour cela qu'on ne
+ * saisit plus ce montant à la main.
+ */
+export async function saveV2Commitment(input: {
+  operationId: string;
+  investorId: string;
+  niveau: "interet" | "soft_commit" | "confirme";
+  montant: number;
+  devise?: string | null;
+  date?: string | null;
+  preuve?: string | null;
+  commentaire?: string | null;
+  responsable?: string | null;
+}): Promise<Resultat> {
+  if (!input.investorId) return { ok: false, error: "Choisissez un investisseur." };
+  if (!Number.isFinite(input.montant) || input.montant < 0) {
+    return { ok: false, error: "Indiquez un montant." };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("save_raise_commitment", {
+    p_investor: input.investorId,
+    p_niveau: input.niveau,
+    p_montant: Math.round(input.montant),
+    p_devise: input.devise?.trim() || null,
+    p_date: input.date || null,
+    p_preuve: input.preuve?.trim() || null,
+    p_commentaire: input.commentaire?.trim() || null,
+    p_responsable: input.responsable?.trim() || null,
+  });
+
+  if (error) {
+    console.error("[v2 lever] save_raise_commitment échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true };
+}
+
+/** Retirer un engagement. Le montant sécurisé retombe aussitôt. */
+export async function deleteV2Commitment(input: {
+  operationId: string;
+  id: string;
+}): Promise<Resultat> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("delete_raise_commitment", {
+    p_id: input.id,
+  });
+
+  if (error) {
+    console.error("[v2 lever] delete_raise_commitment échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true };
+}
+
+/**
+ * Enregistrer un brouillon de mise à jour — étapes 1 à 3 de l'assistant.
+ *
+ * Appelé à chaque passage d'étape : fermer l'onglet à l'étape 3 ne doit pas
+ * perdre les deux premières. Retourne l'identifiant, car la première étape
+ * crée le brouillon et les suivantes ont besoin de savoir lequel.
+ */
+export async function saveV2Update(input: {
+  operationId: string;
+  id?: string | null;
+  instrument?: string | null;
+  financeur?: string | null;
+  periode?: string | null;
+  resume?: string | null;
+  demande?: string | null;
+  indicateurs?: unknown[] | null;
+  documentId?: string | null;
+  destinataires?: string[] | null;
+}): Promise<Resultat & { id?: string }> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("save_raise_update", {
+    p_deal: input.operationId,
+    p_id: input.id ?? null,
+    p_instrument: input.instrument ?? null,
+    p_financeur: input.financeur ?? null,
+    p_periode: input.periode?.trim() || null,
+    p_resume: input.resume ?? null,
+    p_demande: input.demande ?? null,
+    p_indicateurs: input.indicateurs ?? null,
+    p_document: input.documentId ?? null,
+    p_destinataires: input.destinataires ?? null,
+  });
+
+  if (error) {
+    console.error("[v2 lever] save_raise_update échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true, id: identifiant(data) };
+}
+
+/**
+ * Publier — écran 49.
+ *
+ * La RPC refuse une mise à jour sans destinataire et fige le contenu. Rien de
+ * cela n'est vérifié ici : un contrôle posé uniquement dans le bouton se perd
+ * au premier appel qui ne passe pas par le bouton.
+ */
+export async function publishV2Update(input: {
+  operationId: string;
+  id: string;
+}): Promise<Resultat> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("publish_raise_update", { p_id: input.id });
+
+  if (error) {
+    console.error("[v2 lever] publish_raise_update échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true };
+}
+
+/** Créer une correction (V2) d'une mise à jour publiée — écran 50. */
+export async function correctV2Update(input: {
+  operationId: string;
+  id: string;
+}): Promise<Resultat & { id?: string }> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("correct_raise_update", {
+    p_id: input.id,
+  });
+
+  if (error) {
+    console.error("[v2 lever] correct_raise_update échoué :", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalider(input.operationId);
+  return { ok: true, id: identifiant(data) };
+}
+
+/** Supprimer un brouillon. Une mise à jour publiée ne se supprime pas. */
+export async function deleteV2Update(input: {
+  operationId: string;
+  id: string;
+}): Promise<Resultat> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("delete_raise_update", { p_id: input.id });
+
+  if (error) {
+    console.error("[v2 lever] delete_raise_update échoué :", error);
     return { ok: false, error: error.message };
   }
 
