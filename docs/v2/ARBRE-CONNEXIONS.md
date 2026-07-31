@@ -149,8 +149,16 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │  ├─ 🟢 Consigner (42)        save_raise_interaction() — six types fermés
    │  │                             la prochaine action REMONTE sur la relation
    │  └─ 🟢 Retirer               delete_raise_interaction()
-   └─ ⚪ Fiche à onglets (41)     l'écran complet — sept onglets — n'existe pas :
-                                    la fiche est le panneau latéral
+   └─ 🟢 Fiche de relation (41)   investorFiche : sept onglets
+      ├─ 🟢 Résumé                étape, accès, engagement, dernière interaction
+      ├─ 🟢 Interactions          l'historique complet
+      ├─ 🟢 Activité documentaire document.page_viewed — visites DÉDUITES
+      │                             (bursts à trente minutes), pas de durée :
+      │                             aucune n'est enregistrée
+      ├─ 🟢 Accès                 l'invitation qui correspond à l'adresse
+      ├─ 🟢 Engagements           l'engagement déclaré, sa preuve
+      ├─ ⚪ Questions             le produit n'en porte pas ; l'onglet le dit
+      └─ 🟢 Notes internes        jamais visibles par l'investisseur
 🔴 Activité (journal)             —                     ATTEND : audit_log par opération
 🟢 Visionneuse                    → /api/viewer, filigrane incrusté, audit par page
 ```
@@ -321,7 +329,8 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 Toutes appliquées sur staging (`jourzsgjnutktsrgxkoo`), y compris
 `lecteur_interne`, `engagements`, `mises_a_jour`, `gerer_l_equipe`,
 `inviter_un_collaborateur`, `journal_de_securite` et
-`interactions_pipeline`. Aucune n'est en attente.
+`interactions_pipeline` et `engagement_de_la_relation`. Aucune n'est en
+attente.
 
 Aucune n'a été portée en production. Le fondateur a levé la contrainte de
 compatibilité V1 : produit en pré-lancement, les changements de modèle sont
@@ -339,8 +348,7 @@ autorisés — mais staging reste la première étape.
 6. ~~Investisseurs~~ — fait le 1er août. Restent les interactions (41-42).
 7. ~~Équipe~~ — faite le 2 août, invitation comprise. Le périmètre par
    opération est écarté : le fondateur l'a tranché, ce n'est pas un manque.
-8. ~~Interactions du pipeline~~ — faites le 3 août. Reste la fiche à
-   onglets de la maquette 41, dont le panneau latéral tient lieu.
+8. ~~Interactions du pipeline~~ et ~~fiche de relation~~ — faites le 3 août.
 9. **Cohortes** (31-32) — `cohort_links` n'existe pas.
 10. ~~Sécurité~~ — faite le 2 août. Restent les codes de récupération, qui
    demandent une mécanique de secours propre.
