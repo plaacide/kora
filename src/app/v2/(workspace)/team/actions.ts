@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
+import { messageDeRefus } from "@/features/v2/billing/limites";
 import { role } from "@/features/v2/domain/equipe";
 import { originFromHeaders } from "@/lib/app-origin";
 import { teamInvitationEmail } from "@/lib/email/templates";
@@ -41,6 +42,11 @@ const MESSAGES: Record<string, string> = {
 };
 
 function traduire(message: string): string {
+  // Un refus de plan passe en premier : il porte son issue, là où les autres
+  // messages ne font que constater.
+  const limite = messageDeRefus(message);
+  if (limite) return limite;
+
   const cle = Object.keys(MESSAGES).find((m) => message.includes(m));
   return cle ? MESSAGES[cle] : message;
 }

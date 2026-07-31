@@ -8,6 +8,7 @@ import {
 } from "@/features/v2/domain/operation";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { createClient } from "@/lib/supabase/server";
+import { messageDeRefus } from "@/features/v2/billing/limites";
 
 function value(formData: FormData, name: string): string | null {
   const raw = formData.get(name);
@@ -69,7 +70,9 @@ export async function createOperation(formData: FormData) {
 
   if (error) {
     console.error("[v2 nouvelle-operation] create_data_room failed", error);
-    back(formData, "enregistrement");
+    // Un refus de plan n'est pas une panne : il se dit avec son issue, sinon
+    // le fondateur croit à un bug et recommence.
+    back(formData, messageDeRefus(error.message) ? "limite" : "enregistrement");
   }
 
   const id = (data as { id?: string } | null)?.id;

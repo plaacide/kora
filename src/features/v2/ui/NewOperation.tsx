@@ -111,6 +111,12 @@ const ERROR_MESSAGES: Record<string, string> = {
   nom: "Donnez un nom à cette opération avant de continuer.",
   structure: "Choisissez une structure disponible.",
   enregistrement: "L’opération n’a pas pu être créée. Réessayez.",
+  // Un refus de plan n'est pas une panne : « réessayez » enverrait le fondateur
+  // buter deux fois de suite sur la même limite.
+  limite:
+    "Votre plan n’autorise pas une opération de plus. Les opérations déjà " +
+    "ouvertes ne sont pas touchées — archivez-en une terminée, ce qui est " +
+    "réversible, ou changez de plan depuis Abonnement.",
   levee:
     "L’opération est créée, mais les détails de la levée n’ont pas pu être enregistrés. Reprenez-les depuis l’onglet « Lever ».",
 };

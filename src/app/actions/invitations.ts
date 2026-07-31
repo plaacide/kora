@@ -10,6 +10,7 @@ import { clientIp, rateLimit } from "@/lib/security/rate-limit";
 import { sendEmail } from "@/lib/email/send";
 import { invitationEmail } from "@/lib/email/templates";
 import type { Level } from "@/lib/permissions";
+import { messageDeRefus } from "@/features/v2/billing/limites";
 
 export interface InviteResult {
   ok: boolean;
@@ -46,7 +47,9 @@ export async function createInvitation(input: {
     p_folders: input.folderIds?.length ? input.folderIds : null,
   });
 
-  if (error) return { ok: false, error: error.message };
+  // Un refus de plan se dit avec son issue : « révoquez un accès, ou passez au
+  // plan Raise » plutôt que « limite atteinte : external_visitors ».
+  if (error) return { ok: false, error: messageDeRefus(error.message) ?? error.message };
 
   const invitation = data as { token: string; deal_id: string };
   const token = invitation.token;
