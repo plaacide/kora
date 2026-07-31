@@ -14,7 +14,7 @@ import {
 } from "@/features/v2/domain/access";
 import { accessLevelLabel, initials } from "@/features/v2/domain/activity";
 import type { AccessRow, ShareFolder } from "@/features/v2/server/access";
-import { EmptyArt } from "./EmptyArt";
+import { EmptyMedallion } from "./EmptyArt";
 import { Icon } from "./Icon";
 
 /** « 12 juil. 2026 » — même format que le reste du produit. */
@@ -586,7 +586,7 @@ export function AccessTable({
 
       {accesses.length === 0 ? (
         <section className="v2-drop-empty">
-          <EmptyArt name="files" />
+          <EmptyMedallion icon="users" />
           <h2>Personne n’a accès à cette opération</h2>
           <p>
             Votre data room reste privée tant que vous n’invitez personne. Chaque

@@ -22,7 +22,7 @@ import {
   type FiltreExigences,
 } from "@/features/v2/domain/preparation";
 import type { RequirementDetail } from "@/features/v2/server/preparation";
-import { EmptyArt } from "./EmptyArt";
+import { EmptyMedallion } from "./EmptyArt";
 import { Icon } from "./Icon";
 
 function shortDate(value: string): string {
@@ -70,7 +70,7 @@ export function PreparationPlan({
   if (requirements.length === 0) {
     return (
       <section className="v2-drop-empty">
-        <EmptyArt name="files" />
+        <EmptyMedallion icon="check" />
         <h2>Aucune exigence pour cette opération</h2>
         <p>
           Le référentiel OHADA pose vingt-deux exigences réparties en trois

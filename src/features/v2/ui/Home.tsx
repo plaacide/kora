@@ -56,7 +56,7 @@ const TAB_COLUMNS: Record<ActivityTab, string[]> = {
 function EmptyTab({ title, note }: { title: string; note: string }) {
   return (
     <div className="v2-home-activity-empty">
-      <EmptyArt name="files" />
+      <EmptyArt name="documents" size={120} />
       <strong>{title}</strong>
       <p>{note}</p>
     </div>
