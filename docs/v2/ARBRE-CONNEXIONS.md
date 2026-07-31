@@ -214,9 +214,12 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │                                demandé QU'AU MOMENT DE PAYER, et
    │                                uniquement par le moyen qui l'exige — la
    │                                carte n'en réclame aucun. Non conservé.
-   ├─ 🟡 Résilier                 cancel_workspace_subscription() marche ;
-   │                                `cancelV2Subscription` n'est toujours
-   │                                appelée nulle part — aucun bouton.
+   ├─ 🟢 Résilier                 cancel_workspace_subscription(), en fin de
+   │                                période payée et jamais immédiat. L'écran
+   │                                dit AVANT le clic : la date jusqu'à
+   │                                laquelle le service est dû, qu'aucune
+   │                                donnée n'est supprimée, et qu'on peut
+   │                                revenir en arrière.
    ├─ 🟢 Prestataire de paiement  deux implémentations : MANUEL (virement,
    │                                facture) et GENIUS PAY — mobile money,
    │                                cartes, et le RÉCURRENT. Choisi par

@@ -13,7 +13,7 @@ import {
   type OperationComptee,
 } from "@/features/v2/ui/Subscription";
 
-import { requestV2Plan } from "./actions";
+import { cancelV2Subscription, requestV2Plan } from "./actions";
 
 /**
  * Écran 68 — l'abonnement de l'organisation.
@@ -60,6 +60,12 @@ export default async function AbonnementPage() {
           // le passer par le client permettrait de payer pour l'espace d'un autre.
           const { organization: espace } = await requireV2Workspace();
           return requestV2Plan({ organizationId: espace.id, ...choix });
+        }}
+        onResilier={async (motif) => {
+          "use server";
+          const { organization: espace } = await requireV2Workspace();
+          // Jamais `immediat` : §15, ce qui est payé est servi jusqu'au terme.
+          return cancelV2Subscription({ organizationId: espace.id, motif });
         }}
         operations={comptees}
         plan={plan}

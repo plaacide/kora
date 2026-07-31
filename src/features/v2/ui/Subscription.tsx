@@ -17,6 +17,7 @@ import { dateJournal } from "@/features/v2/domain/journal";
 
 import { ChangerDePlan } from "./ChangerDePlan";
 import { Icon } from "./Icon";
+import { Resilier } from "./Resilier";
 
 /** Ce qui compte dans la limite, et ce qui n'y compte pas — maquette 68. */
 export interface OperationComptee {
@@ -44,6 +45,7 @@ export function SubscriptionScreen({
   consommation,
   droits,
   onPayer,
+  onResilier,
   operations,
   plan,
 }: {
@@ -59,6 +61,8 @@ export function SubscriptionScreen({
     moyen: MoyenDePaiement;
     telephone: string;
   }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
+  /** L'action serveur qui arrête l'abonnement, en fin de période payée. */
+  onResilier: (motif: string) => Promise<{ ok: boolean; error?: string }>;
   operations: readonly OperationComptee[];
   plan: Plan;
 }) {
@@ -219,6 +223,12 @@ export function SubscriptionScreen({
 
       {memeSegment.length > 0 && (
         <ChangerDePlan autres={memeSegment} onPayer={onPayer} />
+      )}
+
+      {/* La résiliation n'apparaît que s'il y a quelque chose à résilier : la
+          proposer sur le plan gratuit n'aurait aucun sens. */}
+      {abonnement && abonnement.statut !== "cancelled" && (
+        <Resilier abonnement={abonnement} onResilier={onResilier} />
       )}
 
       <section className="v2-plan-card">
