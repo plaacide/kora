@@ -19,7 +19,9 @@ import {
   DOMAINES,
   actionLabel,
   compter,
+  FILTRES,
   correspondAuFiltre,
+  correspondAuFinanceur,
   domaineLabel,
   etatAffiche,
   etatPiece,
@@ -56,13 +58,6 @@ function shortDate(value: string): string {
   });
 }
 
-const FILTRES: Array<[FiltreExigences, string]> = [
-  ["toutes", "Toutes"],
-  ["a-traiter", "À traiter"],
-  ["en-cours", "En cours"],
-  ["pretes", "Prêtes"],
-];
-
 /** Écran 11 — le plan de préparation, sur les exigences réelles. */
 export function PreparationPlan({
   operationId,
@@ -76,15 +71,20 @@ export function PreparationPlan({
 }) {
   const router = useRouter();
   const [filtre, setFiltre] = useState<FiltreExigences>("toutes");
+  const [financeur, setFinanceur] = useState("");
   const [busy, setBusy] = useState(false);
 
   // Une seule référence de temps : deux appels à `new Date()` dans la même
   // liste pourraient classer deux exigences différemment.
   const maintenant = new Date();
 
-  const comptes = compter(requirements);
+  const comptes = compter(requirements, maintenant);
   const groupes = grouper(
-    requirements.filter((item) => correspondAuFiltre(item.status, filtre)),
+    requirements.filter(
+      (item) =>
+        correspondAuFiltre(item, filtre, maintenant) &&
+        correspondAuFinanceur(item, financeur),
+    ),
   );
 
   async function poserLeReferentiel() {
@@ -120,6 +120,9 @@ export function PreparationPlan({
 
   return (
     <>
+      {/* Deux lignes : les filtres, puis le compte. Le bouton « Ajouter une
+          exigence » n'est plus ici — il faisait doublon avec celui de
+          l'en-tête, qui ouvre le même panneau. */}
       <div className="v2-filterbar">
         {FILTRES.map(([valeur, label]) => (
           <button
@@ -132,12 +135,26 @@ export function PreparationPlan({
           </button>
         ))}
         <i />
-        <Link href="?new=1">Ajouter une exigence</Link>
-        <span>
-          <b>{comptes.pretes}</b> prête{comptes.pretes > 1 ? "s" : ""} ·{" "}
-          <b>{comptes.aFournir}</b> à fournir · <b>{comptes.enCours}</b> en cours
-        </span>
+        <select
+          aria-label="Filtrer par financeur"
+          data-active={financeur !== ""}
+          onChange={(event) => setFinanceur(event.target.value)}
+          value={financeur}
+        >
+          <option value="">Par financeur</option>
+          {["ohada", "bank", "dfi", "capital"].map((source) => (
+            <option key={source} value={source}>
+              {sourceLabel(source)}
+            </option>
+          ))}
+        </select>
       </div>
+
+      <p className="v2-filter-counts">
+        <b>{comptes.pretes}</b> prête{comptes.pretes > 1 ? "s" : ""} ·{" "}
+        <b>{comptes.aFournir}</b> à fournir · <b>{comptes.aActualiser}</b> à
+        actualiser
+      </p>
 
       <div className="v2-preparation-list">
         {groupes.length === 0 && (

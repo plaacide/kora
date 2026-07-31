@@ -4,6 +4,7 @@ import {
   actionLabel,
   compter,
   correspondAuFiltre,
+  correspondAuFinanceur,
   estAActualiser,
   etatAffiche,
   grouper,
@@ -101,26 +102,94 @@ describe("grouper", () => {
 });
 
 describe("compter", () => {
-  it("sépare les trois états que la base connaît", () => {
+  const maintenant = new Date("2026-08-01T12:00:00Z");
+  const ilYA = (jours: number) =>
+    new Date(maintenant.getTime() - jours * 86_400_000).toISOString();
+
+  it("sépare prêtes, à fournir et à actualiser", () => {
     expect(
-      compter([
-        exigence({ id: "a", status: "done" }),
-        exigence({ id: "b", status: "in_progress" }),
-        exigence({ id: "c", status: "todo" }),
-        exigence({ id: "d", status: "todo" }),
-      ]),
-    ).toEqual({ pretes: 1, enCours: 1, aFournir: 2 });
+      compter(
+        [
+          exigence({ id: "a", status: "done" }),
+          exigence({ id: "b", status: "in_progress" }),
+          exigence({ id: "c", status: "todo" }),
+          exigence({
+            id: "d",
+            status: "done",
+            freshnessDays: 90,
+            lastProofAt: ilYA(120),
+          }),
+        ],
+        maintenant,
+      ),
+    ).toEqual({ pretes: 1, aFournir: 2, aActualiser: 1 });
+  });
+
+  it("ne compte nulle part le non-applicable", () => {
+    const c = compter(
+      [exigence({ id: "a", status: "not_applicable" })],
+      maintenant,
+    );
+    expect(c.pretes + c.aFournir + c.aActualiser).toBe(0);
   });
 });
 
 describe("correspondAuFiltre", () => {
-  it("ne mélange pas « en cours » et « à traiter »", () => {
-    expect(correspondAuFiltre("in_progress", "a-traiter")).toBe(false);
-    expect(correspondAuFiltre("in_progress", "en-cours")).toBe(true);
+  const maintenant = new Date("2026-08-01T12:00:00Z");
+  const ilYA = (jours: number) =>
+    new Date(maintenant.getTime() - jours * 86_400_000).toISOString();
+
+  const perimee = exigence({
+    status: "done",
+    freshnessDays: 90,
+    lastProofAt: ilYA(120),
+  });
+
+  it("« Requises » filtre un niveau, pas un statut", () => {
+    expect(
+      correspondAuFiltre(
+        exigence({ level: "required", status: "done" }),
+        "requises",
+        maintenant,
+      ),
+    ).toBe(true);
+    expect(
+      correspondAuFiltre(exigence({ level: "optional" }), "requises", maintenant),
+    ).toBe(false);
+  });
+
+  it("sort une pièce périmée des « Prêtes » et la remet « À traiter »", () => {
+    expect(correspondAuFiltre(perimee, "pretes", maintenant)).toBe(false);
+    expect(correspondAuFiltre(perimee, "a-traiter", maintenant)).toBe(true);
+    expect(correspondAuFiltre(perimee, "a-actualiser", maintenant)).toBe(true);
+  });
+
+  it("ne met pas le non-applicable dans « À traiter »", () => {
+    expect(
+      correspondAuFiltre(
+        exigence({ status: "not_applicable" }),
+        "a-traiter",
+        maintenant,
+      ),
+    ).toBe(false);
   });
 
   it("laisse tout passer sur « toutes »", () => {
-    expect(correspondAuFiltre("done", "toutes")).toBe(true);
+    expect(
+      correspondAuFiltre(exigence({ status: "not_applicable" }), "toutes", maintenant),
+    ).toBe(true);
+  });
+});
+
+describe("correspondAuFinanceur", () => {
+  it("ne filtre rien sans financeur choisi", () => {
+    expect(correspondAuFinanceur(exigence({ sources: [] }), "")).toBe(true);
+  });
+
+  it("retient une exigence réclamée par plusieurs financeurs", () => {
+    const item = exigence({ sources: ["bank", "dfi"] });
+    expect(correspondAuFinanceur(item, "dfi")).toBe(true);
+    expect(correspondAuFinanceur(item, "capital")).toBe(false);
   });
 });
 

@@ -182,6 +182,10 @@
    ces marges il collait aux quatre bords de la fenêtre. */
 .v2-access-page>.v2-drop-empty{margin:26px 28px}
 .v2-home-activity-empty .v2-empty-art{margin:-10px 0 -6px}
+.v2-filterbar select{height:32px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);padding:0 10px;color:var(--text-2);font-size:12px;font-weight:600;cursor:pointer}
+.v2-filterbar select[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text)}
+.v2-filter-counts{margin:0 0 16px;color:var(--text-2);font-size:13px}
+.v2-filter-counts b{color:var(--text);font-weight:600}
 .v2-hide-toggle{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .v2-hide-toggle>div{flex:1}
 .v2-hide-toggle strong{display:block;font-size:13.5px;font-weight:500}

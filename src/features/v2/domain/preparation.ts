@@ -180,17 +180,60 @@ export function grouper(exigences: readonly ExigenceBrute[]): GroupeExigences[] 
     }));
 }
 
-/** Les filtres que la base sait honorer, et ce qu'ils retiennent. */
-export type FiltreExigences = "toutes" | "a-traiter" | "en-cours" | "pretes";
+/**
+ * Les cinq filtres de la maquette 11.
+ *
+ * Ils ne portent pas tous sur la même chose, et c'est voulu : « Requises »
+ * filtre un NIVEAU, « À actualiser » un état déduit, les trois autres un
+ * statut. C'est ainsi qu'on cherche dans un dossier — « qu'est-ce qui bloque »
+ * n'est pas la même question que « où j'en suis ».
+ *
+ * Absent : « Par juridiction », que la maquette pose à côté. Rien en base ne
+ * porte de juridiction, et un filtre qui ne filtre rien est pire qu'un filtre
+ * manquant : il fait croire qu'on a cherché.
+ */
+export type FiltreExigences =
+  | "toutes"
+  | "a-traiter"
+  | "requises"
+  | "a-actualiser"
+  | "pretes";
+
+export const FILTRES: Array<[FiltreExigences, string]> = [
+  ["toutes", "Toutes"],
+  ["a-traiter", "À traiter"],
+  ["requises", "Requises"],
+  ["a-actualiser", "À actualiser"],
+  ["pretes", "Prêtes"],
+];
 
 export function correspondAuFiltre(
-  statut: string,
+  exigence: ExigenceBrute,
   filtre: FiltreExigences,
+  maintenant: Date,
 ): boolean {
+  const perimee = estAActualiser(exigence, maintenant);
+
   if (filtre === "toutes") return true;
-  if (filtre === "a-traiter") return statut === "todo";
-  if (filtre === "en-cours") return statut === "in_progress";
-  return statut === "done";
+  if (filtre === "requises") return exigence.level === "required";
+  if (filtre === "a-actualiser") return perimee;
+  // Une pièce périmée n'est plus prête : elle est justement à retraiter.
+  if (filtre === "pretes") return exigence.status === "done" && !perimee;
+
+  // « À traiter » : tout ce qui demande encore un geste. Le non-applicable
+  // n'en demande aucun, il sort.
+  return (
+    exigence.status !== "not_applicable" &&
+    (exigence.status !== "done" || perimee)
+  );
+}
+
+/** Filtre par financeur — celui qui réclame la pièce. */
+export function correspondAuFinanceur(
+  exigence: ExigenceBrute,
+  source: string,
+): boolean {
+  return source === "" || exigence.sources.includes(source);
 }
 
 /**
@@ -219,16 +262,34 @@ export function etatPiece(
 
 export interface Compte {
   pretes: number;
-  enCours: number;
   aFournir: number;
+  aActualiser: number;
 }
 
-export function compter(exigences: readonly ExigenceBrute[]): Compte {
-  return {
-    pretes: exigences.filter((item) => item.status === "done").length,
-    enCours: exigences.filter((item) => item.status === "in_progress").length,
-    aFournir: exigences.filter((item) => item.status === "todo").length,
-  };
+/**
+ * Les trois chiffres de la maquette : prêtes, à fournir, à actualiser.
+ *
+ * Les trois catégories s'excluent, et leur somme est le nombre d'exigences
+ * DUES : le non-applicable n'entre nulle part, sinon le total dépasserait ce
+ * qu'on a réellement à faire.
+ */
+export function compter(
+  exigences: readonly ExigenceBrute[],
+  maintenant: Date,
+): Compte {
+  let pretes = 0;
+  let aFournir = 0;
+  let aActualiser = 0;
+
+  for (const item of exigences) {
+    if (item.status === "not_applicable") continue;
+
+    if (estAActualiser(item, maintenant)) aActualiser += 1;
+    else if (item.status === "done") pretes += 1;
+    else aFournir += 1;
+  }
+
+  return { pretes, aFournir, aActualiser };
 }
 
 /**
