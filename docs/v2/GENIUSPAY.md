@@ -40,9 +40,19 @@ contredire, et ce jour-là on encaisse pour de vrai en croyant tester.
 https://<votre-domaine>/api/v2/billing/webhook
 ```
 
-Événements utiles : `payment.success`, `payment.failed`, `payment.expired`,
-`subscription.payment_succeeded`, `subscription.payment_failed`,
-`subscription.past_due`, `subscription.cancelled`.
+Le secret `whsec_` s'affiche à la création du webhook, **une seule fois**.
+
+Événements réellement proposés par leur tableau de bord (août 2026) :
+`payment.success`, `payment.failed`, `payment.initiated`, `payment.cancelled`,
+`payment.refunded`, `cashout.*`.
+
+⚠️ **AUCUN ÉVÉNEMENT `subscription.*` N'EST PROPOSÉ.** Leur documentation décrit
+pourtant une API d'abonnements complète. Le code sait déjà les traduire, mais
+tant qu'ils ne sont pas exposés, **la reconduction automatique n'existe pas** :
+chaque échéance est un paiement à part entière. Question posée à leur support.
+
+Leur guide demande aussi une **réponse en moins de 5 secondes**. La route s'y
+tient : elle vérifie une signature et appelle une seule fonction en base.
 
 ## Ce qui protège l'argent
 

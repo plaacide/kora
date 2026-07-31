@@ -192,16 +192,24 @@ describe("traduireEvenement", () => {
     expect(traduireEvenement("subscription.cancelled")).toBe("subscription.cancelled");
   });
 
-  it("range les échecs, expirations et impayés du même côté", () => {
+  it("range les échecs, annulations, remboursements et impayés du même côté", () => {
     for (const nom of [
       "payment.failed",
       "payment.expired",
       "payment.cancelled",
+      "payment.refunded",
       "subscription.payment_failed",
       "subscription.past_due",
     ]) {
       expect(traduireEvenement(nom)).toBe("payment.failed");
     }
+  });
+
+  it("ignore une intention de paiement", () => {
+    // `payment.initiated` annonce qu'on s'apprête à payer. Le reconnaître
+    // donnerait envie d'en faire quelque chose ; il n'y a rien à en faire, et
+    // ouvrir un plan sur une intention serait offrir le produit.
+    expect(traduireEvenement("payment.initiated")).toBe("unknown");
   });
 
   it("ne se casse pas sur un événement qu’ils ajouteraient demain", () => {

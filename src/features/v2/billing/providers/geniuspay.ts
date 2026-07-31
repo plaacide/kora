@@ -174,9 +174,13 @@ export function traduireEvenement(nom: string): EvenementRecu["type"] {
     case "payment.failed":
     case "payment.expired":
     case "payment.cancelled":
+    case "payment.refunded":
     case "subscription.payment_failed":
     case "subscription.past_due":
       return "payment.failed";
+    // `payment.initiated` reste volontairement `unknown` : il annonce une
+    // intention, pas un encaissement. Le reconnaître donnerait envie d'en
+    // faire quelque chose, et il n'y a rien à en faire.
     default:
       return "unknown";
   }

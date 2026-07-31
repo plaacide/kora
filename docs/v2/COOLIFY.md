@@ -65,9 +65,17 @@ paiements qui n'ouvrent rien.
 https://<domaine-de-cette-application>/api/v2/billing/webhook
 ```
 
-Événements : `payment.success`, `payment.failed`, `payment.expired`,
-`subscription.payment_succeeded`, `subscription.payment_failed`,
-`subscription.past_due`, `subscription.cancelled`.
+Le secret `whsec_` n'existe pas avant le webhook : il s'affiche à sa création,
+**une seule fois**.
+
+Événements réellement proposés par leur tableau de bord (août 2026) :
+`payment.success`, `payment.failed`, `payment.cancelled`, `payment.refunded`.
+Cocher aussi `payment.initiated` ne coûte rien — l'application le reçoit et
+l'ignore, une intention de paiement n'ouvrant aucun plan.
+
+⚠️ **Aucun événement `subscription.*` n'est proposé**, alors que leur
+documentation décrit une API d'abonnements. La reconduction automatique n'est
+donc pas disponible : on est en paiement par paiement. À leur demander.
 
 **Cette route n'est PAS coupée par `SANZA_V2_ENABLED`** — le drapeau ne couvre
 que les pages sous `/v2`. C'est délibéré : un paiement encaissé ne doit pas se
