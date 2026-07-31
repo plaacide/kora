@@ -94,7 +94,15 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Aperçu invité (écran 25) → ce que l'invité verra vraiment
    └─ 🟢 Révocation               revoke_invitation()
 
-🔴 Lever                          —                     ATTEND : raises, save_raise
+🟡 Lever                          activeRaise(), closedRaises()
+   ├─ 🟢 Non configurée (35)      create_raise()
+   ├─ 🟢 Configurer (36)          save_raise() — nom, stade, montant, devise,
+   │                                instrument, valorisation, échéance, audience
+   ├─ 🟢 Vue de la levée (37)     → montants réels, progression calculée
+   ├─ 🟢 Clôturer (45)            close_raise()
+   ├─ 🔴 Pipeline (38-40)         —                     ATTEND : raise_investors
+   ├─ 🔴 Engagements (43-44)      —                     ATTEND : ventilation
+   └─ 🔴 Mises à jour (46-50)     —                     ATTEND : table absente
 🔴 Investisseurs                  —                     ATTEND : raise_investors (table vide)
 🔴 Activité (journal)             —                     ATTEND : audit_log par opération
 🟢 Visionneuse                    → /api/viewer, filigrane incrusté, audit par page
@@ -209,6 +217,12 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
    autres (owner, admin, member, guest).
 7. **Le fuseau horaire d'une organisation**, pour que les échéances tombent à
    minuit local.
+8. **Les conditions d'une levée.** La maquette 36 demande ticket minimum et
+   maximum, recherche d'un lead et part de capital envisagée. Aucune colonne ne
+   les porte.
+9. **La ventilation du montant sécurisé.** La maquette 37 sépare « engagements
+   confirmés » et « soft-commits » ; `montant_engage` est un seul montant
+   déclaré.
 
 ## Migrations
 
@@ -230,5 +244,7 @@ autorisés — mais staging reste la première étape.
 3. ~~Activité~~ — faite le 1er août, par opération et pour l'organisation.
 4. ~~Recherche~~ — faite le 1er août. Elle porte sur les pièces ; chercher une
    exigence ou un dossier reste à décider.
-5. **Investisseurs**, puis **Lever** — le plus gros volume de maquettes.
-6. **Équipe**, **Sécurité**, **Abonnement** — décisions produit d'abord.
+5. **Lever** — le cœur est fait (35, 36, 37, 45). Restent le pipeline, les
+   engagements et les mises à jour aux investisseurs.
+6. **Investisseurs** — `raise_investors` et `save_raise_investor` sont prêtes.
+7. **Équipe**, **Sécurité**, **Abonnement** — décisions produit d'abord.

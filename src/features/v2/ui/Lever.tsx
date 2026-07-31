@@ -1,5 +1,8 @@
-import { EmptyArt } from "./EmptyArt";
 import Link from "next/link";
+
+import type { Raise } from "@/features/v2/server/raise";
+import { EmptyArt } from "./EmptyArt";
+import { RaiseClose, RaiseConfigure, RaiseEmpty } from "./RaiseForms";
 
 import {
   investorPipeline,
@@ -10,7 +13,6 @@ import {
   type RelationshipStage,
 } from "@/features/v2/domain/lever";
 import { v2Routes } from "@/features/v2/navigation/routes";
-import { ChipField } from "./ChipField";
 
 import { Icon } from "./Icon";
 import { LeverUpdates } from "./LeverUpdates";
@@ -106,14 +108,32 @@ function LeverFrame({
 export function Lever({
   operationId,
   query,
+  raise,
 }: {
   operationId: string;
   query: LeverQuery;
+  /** `null` quand l'opération n'a pas de levée en cours — c'est l'écran 35. */
+  raise: Raise | null;
 }) {
   const current = query.view ?? "overview";
+  const retour = v2Routes.operations.lever(operationId);
 
-  if (current === "setup") return <LeverEmpty />;
-  if (current === "configure") return <ConfigureRaise />;
+  // Sans levée, tout mène au même endroit : il n'y a rien à piloter tant que
+  // rien n'est ouvert. Forcer `?view=pipeline` ne doit pas montrer un tableau
+  // de bord vide comme s'il était réel.
+  if (!raise && current !== "configure") {
+    return <LeverEmpty operationId={operationId} />;
+  }
+
+  if (current === "configure") {
+    return (
+      <RaiseConfigure operationId={operationId} raise={raise} retour={retour} />
+    );
+  }
+
+  if (current === "close" && raise) {
+    return <RaiseClose operationId={operationId} raise={raise} retour={retour} />;
+  }
   if (current === "pipeline") {
     return (
       <Pipeline
@@ -126,7 +146,6 @@ export function Lever({
   if (current === "commitments") {
     return <Commitments panel={query.panel} />;
   }
-  if (current === "close") return <CloseRaise />;
   if (current === "updates" || current === "update" || current === "published") {
     return (
       <LeverUpdates
@@ -137,10 +156,15 @@ export function Lever({
     );
   }
 
-  return <RaiseOverview configured={query.configured === "1"} />;
+  return (
+    <RaiseOverview
+      configured={query.configured === "1"}
+      raise={raise as Raise}
+    />
+  );
 }
 
-function LeverEmpty() {
+function LeverEmpty({ operationId }: { operationId: string }) {
   return (
     <LeverFrame current="overview">
       <section className="v2-lever-empty">
@@ -152,9 +176,7 @@ function LeverEmpty() {
           pipeline relationnel, relances et mises à jour.
         </p>
         <div>
-          <Link className="v2-btn" href={queryHref("configure")}>
-            Configurer ma levée
-          </Link>
+          <RaiseEmpty operationId={operationId} />
           <Link
             className="v2-btn"
             data-variant="secondary"
@@ -171,128 +193,6 @@ function LeverEmpty() {
   );
 }
 
-function ConfigureRaise() {
-  return (
-    <div className="v2-lever-focus">
-      <div className="v2-wizard-heading">
-        <span>Lever /</span><strong>Configurer la levée</strong>
-        <Link href={queryHref("setup")}>×</Link>
-      </div>
-      <section className="v2-configure-card">
-        <header>
-          <h1>Configurer la levée</h1>
-          <p>Les informations restent modifiables tant que la levée n’est pas clôturée.</p>
-        </header>
-
-        <div className="v2-configure-section">
-          <span className="v2-configure-number">1</span>
-          <div>
-            <h2>Objectif</h2>
-            <div className="v2-wizard-grid">
-              <Field label="Nom de la levée" value="Série A 2026" />
-              <Field label="Stade" options={STAGES} value="Série A" />
-              <Field label="Montant recherché" value="500 000 000" />
-              <Field label="Devise" options={CURRENCIES} value="XOF — Franc CFA" />
-              <Field
-                label="Instrument envisagé"
-                options={INSTRUMENTS}
-                value="Prise de participation"
-                wide
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="v2-configure-section">
-          <span className="v2-configure-number">2</span>
-          <div>
-            <h2>Conditions déclarées</h2>
-            <div className="v2-wizard-grid">
-              <Field label="Ticket minimum" optional value="25 000 000" />
-              <Field label="Ticket maximum" optional value="150 000 000" />
-              <Field label="Recherche d’un lead" options={YES_NO} value="Oui" />
-              <Field label="Valorisation déclarée" optional value="" />
-              <Field label="Part de capital envisagée" optional value="20 – 25 %" wide />
-            </div>
-          </div>
-        </div>
-
-        <div className="v2-configure-section">
-          <span className="v2-configure-number">3</span>
-          <div>
-            <h2>Cibles</h2>
-            <ChipField
-              defaultSelected={["VC", "Fonds à impact", "DFI"]}
-              label="Types d’investisseurs"
-              options={INVESTOR_CATEGORIES}
-            />
-            <div className="v2-configure-gap" />
-            <ChipField
-              defaultSelected={["Afrique de l’Ouest", "Europe"]}
-              label="Zones géographiques"
-              options={REGIONS}
-            />
-            <div className="v2-configure-gap" />
-            <Field
-              label="Secteurs ou thèses pertinentes"
-              optional
-              value="Énergie distribuée · Climat"
-            />
-          </div>
-        </div>
-
-        <div className="v2-configure-section">
-          <span className="v2-configure-number">4</span>
-          <div>
-            <h2>Calendrier et utilisation</h2>
-            <div className="v2-wizard-grid">
-              <Field label="Date d’ouverture" type="date" value="2026-06-01" />
-              <Field label="Date cible de clôture" type="date" value="2026-11-30" />
-            </div>
-            <label className="v2-field v2-configure-textarea">
-              <span>Principaux usages des fonds</span>
-              <textarea defaultValue="Extension du réseau de mini-centrales (60 %), recrutement technique (25 %), fonds de roulement (15 %)" />
-            </label>
-          </div>
-        </div>
-
-        <div className="v2-configure-summary">
-          <span className="v2-section-label">Synthèse avant activation</span>
-          <p>
-            <strong>Série A 2026 — 500 000 000 XOF</strong> en prise de participation ·
-            lead recherché · tickets 25 – 150 M XOF · clôture visée le 30 novembre 2026.
-          </p>
-          <small>
-            Sanza ne calcule ni ne recommande de valorisation, de dilution ou de
-            montant — ces informations sont déclarées par vous.
-          </small>
-        </div>
-        <footer>
-          <Link href={queryHref("setup")}>Annuler</Link>
-          <div>
-            <button className="v2-btn" data-variant="secondary" type="button">
-              Enregistrer le brouillon
-            </button>
-            <Link className="v2-btn" href={queryHref("overview", { configured: "1" })}>
-              Activer la levée
-            </Link>
-          </div>
-        </footer>
-      </section>
-    </div>
-  );
-}
-
-/**
- * Un champ du formulaire de levée.
- *
- * `options` rend une vraie liste déroulante. Le chevron seul ne suffisait
- * pas : il donnait l'apparence d'une liste à un champ de saisie libre, où
- * l'on pouvait taper n'importe quoi et où cliquer n'ouvrait rien.
- *
- * `type="date"` rend le sélecteur de date natif — un mini calendrier — au
- * lieu d'une date écrite à la main, qu'il aurait fallu deviner à la lecture.
- */
 function Field({
   label,
   value,
@@ -332,15 +232,7 @@ function Field({
   );
 }
 
-const STAGES = ["Pré-amorçage", "Amorçage", "Série A", "Série B", "Série C et plus"];
 const CURRENCIES = ["XOF — Franc CFA", "EUR — Euro", "USD — Dollar US", "GHS — Cedi"];
-const INSTRUMENTS = [
-  "Prise de participation",
-  "Obligation convertible",
-  "SAFE",
-  "Dette",
-];
-const YES_NO = ["Oui", "Non"];
 const INVESTOR_CATEGORIES = [
   "VC",
   "Fonds à impact",
@@ -356,15 +248,6 @@ const PIPELINE_STAGES = [
   "Engagé",
   "Écarté",
 ];
-const REGIONS = [
-  "Afrique de l’Ouest",
-  "Afrique Centrale",
-  "Afrique de l’Est",
-  "Afrique Australe",
-  "Europe",
-  "Amérique du Nord",
-  "Moyen-Orient",
-];
 const TEAM = ["Amara Diallo", "Ibrahima Sy", "Fatou Ndiaye"];
 const INVESTORS = [
   "Horizon Ventures — Kwame Mensah",
@@ -372,7 +255,21 @@ const INVESTORS = [
   "Kora Impact Partners — Nadia Mensah",
 ];
 
-function RaiseOverview({ configured }: { configured: boolean }) {
+/** Écran 37 — la levée en cours, sur ses montants réels. */
+function RaiseOverview({
+  configured,
+  raise,
+}: {
+  configured: boolean;
+  raise: Raise;
+}) {
+  const devise = raise.currency;
+  const cible = raise.target ?? 0;
+  const securise = raise.secured ?? 0;
+  const restant = Math.max(0, cible - securise);
+  const part = cible > 0 ? Math.round((securise / cible) * 100) : 0;
+  const somme = (valeur: number) => valeur.toLocaleString("fr-FR");
+
   return (
     <LeverFrame
       current="overview"
@@ -395,8 +292,16 @@ function RaiseOverview({ configured }: { configured: boolean }) {
       )}
       <div className="v2-lever-title">
         <div>
-          <h1>Série A 2026 <span className="v2-status" data-tone="green">Active</span></h1>
-          <p><Icon name="calendar" />Clôture visée le 30 novembre 2026</p>
+          <h1>
+            {raise.name ?? "Levée en cours"}{" "}
+            <span className="v2-status" data-tone="green">Active</span>
+          </h1>
+          <p>
+            <Icon name="calendar" />
+            {raise.deadline
+              ? `Clôture visée le ${new Date(raise.deadline).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}`
+              : "Aucune date de clôture visée"}
+          </p>
         </div>
         <Link href={queryHref("close")}>Clôturer la levée</Link>
       </div>
@@ -407,19 +312,39 @@ function RaiseOverview({ configured }: { configured: boolean }) {
             <span className="v2-section-label">Progression financière</span>
             <p>Montants déclarés par votre équipe — jamais déduits de l’activité documentaire</p>
           </div>
-          <strong>40 %</strong>
+          <strong>{part} %</strong>
         </header>
         <div className="v2-money-lead">
-          <strong>200 000 000</strong>
-          <span>sécurisés sur 500 000 000 XOF</span>
+          <strong>{somme(securise)}</strong>
+          <span>
+            sécurisés sur {cible > 0 ? somme(cible) : "—"} {devise}
+          </span>
         </div>
-        <div className="v2-money-progress"><span /></div>
+        <div className="v2-money-progress">
+          <span style={{ width: `${Math.min(100, part)}%` }} />
+        </div>
         <div className="v2-money-grid">
-          <div><span>Engagements confirmés</span><strong>120 000 000</strong></div>
-          <div><span>Soft-commits déclarés</span><strong>80 000 000</strong></div>
-          <div><span>Restant à sécuriser</span><strong>300 000 000</strong></div>
+          <div>
+            <span>Restant à sécuriser</span>
+            <strong>{somme(restant)}</strong>
+          </div>
+          <div>
+            <span>Valorisation pré-money</span>
+            <strong>{raise.preMoney ? somme(raise.preMoney) : "—"}</strong>
+          </div>
+          <div>
+            <span>Investisseurs au pipeline</span>
+            <strong>—</strong>
+          </div>
         </div>
-        <small>Les intérêts indicatifs ne sont pas comptés.</small>
+        {/* Le détail « engagements confirmés / soft-commits » de la maquette
+            demande une ventilation que `montant_engage` ne porte pas : c'est un
+            seul montant déclaré. Le scinder à l'écran inventerait une
+            répartition. */}
+        <small>
+          Montant déclaré par votre équipe, jamais déduit du pipeline ni de
+          l’activité documentaire.
+        </small>
       </section>
 
       <div className="v2-lever-overview-grid">
@@ -799,30 +724,5 @@ function Commitments({ panel }: { panel?: string }) {
       </LeverFrame>
       {panel === "commitment" && <CommitmentPanel backView="commitments" />}
     </>
-  );
-}
-
-function CloseRaise() {
-  return (
-    <div className="v2-close-page">
-      <div className="v2-wizard-heading"><span>Lever /</span><strong>Clôturer la levée</strong><Link href={queryHref("overview")}>×</Link></div>
-      <section className="v2-close-card">
-        <header><h1>Clôturer la levée — Série A 2026</h1><p>Vérifiez le récapitulatif : après clôture, l’opération passe en lecture seule.</p></header>
-        <div className="v2-close-summary">
-          <div><span>Montant finalement levé</span><strong>450 000 000 XOF</strong><small>sur 500 M recherchés</small></div>
-          <div><span>Date de clôture</span><strong>30 novembre 2026</strong></div>
-          <div><span>Investisseurs participants</span><strong>Sahel Growth Fund (300 M, lead) · Horizon Ventures (150 M)</strong></div>
-          <div><span>Engagements retirés ou non réalisés</span><strong>Impact Capital Africa — soft-commit de 50 M non confirmé</strong></div>
-        </div>
-        <label className="v2-field v2-configure-textarea"><span>Note de clôture <small>— facultative</small></span><textarea defaultValue="Tour bouclé avec un lead régional. Reliquat abandonné au profit d’une clôture rapide." /></label>
-        <fieldset className="v2-level-choice">
-          <legend>Accès externes</legend>
-          <label data-active="true"><input defaultChecked name="access" type="radio" /><span><strong>Conserver les accès actuels selon leurs échéances</strong></span></label>
-          <label><input name="access" type="radio" /><span><strong>Révoquer tous les accès externes maintenant</strong></span></label>
-        </fieldset>
-        <p className="v2-panel-callout"><Icon name="lock" />Les pièces, interactions et engagements restent consultables. Vous pourrez dupliquer la structure pour une prochaine opération.</p>
-        <footer><Link href={queryHref("overview")}>Annuler</Link><button className="v2-btn v2-danger-button" type="button">Clôturer la levée</button></footer>
-      </section>
-    </div>
   );
 }
