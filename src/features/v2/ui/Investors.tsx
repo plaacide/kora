@@ -114,7 +114,11 @@ export function InvestorsScreen({
       )}
 
       {edite && (
-        <InvestorPanel investisseur={enCours} operationId={operationId} />
+        <InvestorPanel
+          devise={devise}
+          investisseur={enCours}
+          operationId={operationId}
+        />
       )}
     </div>
   );
@@ -275,9 +279,11 @@ function PipelineTableau({
 function InvestorPanel({
   operationId,
   investisseur,
+  devise,
 }: {
   operationId: string;
   investisseur: InvestisseurPipeline | null;
+  devise: string;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -365,9 +371,7 @@ function InvestorPanel({
       <aside className="v2-sidepanel">
         <header>
           <div>
-            <span className="v2-status" data-tone="neutral">
-              {investisseur ? "Modifier" : "Nouvelle relation"}
-            </span>
+            <span className="v2-panel-eyebrow">Lever · Pipeline</span>
             <h2>
               {investisseur?.organisation ??
                 investisseur?.nom ??
@@ -417,6 +421,7 @@ function InvestorPanel({
             </section>
           ) : (
             <p className="v2-panel-note">
+              <Icon name="shield" />
               Ajouté au pipeline uniquement — aucun accès documentaire n’est
               créé. Renseignez l’e-mail pour pouvoir lui ouvrir la data room.
             </p>
@@ -433,45 +438,9 @@ function InvestorPanel({
             </span>
           </label>
 
-          <label className="v2-field">
-            <span>Contact principal</span>
-            <span className="v2-control">
-              <input
-                onChange={(event) => setNom(event.target.value)}
-                placeholder="Amina Diallo"
-                value={nom}
-              />
-            </span>
-          </label>
-
-          <label className="v2-field">
-            <span>
-              E-mail <small>— relie cette relation à son accès</small>
-            </span>
-            <span className="v2-control">
-              <input
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="amina.diallo@fonds.com"
-                type="email"
-                value={email}
-              />
-            </span>
-          </label>
-
-          <label className="v2-field">
-            <span>
-              Ticket potentiel <small>— indicatif, jamais un engagement</small>
-            </span>
-            <span className="v2-control">
-              <input
-                inputMode="numeric"
-                onChange={(event) => setTicket(event.target.value)}
-                placeholder="150 000 000"
-                value={ticket}
-              />
-            </span>
-          </label>
-
+          {/* Deux colonnes, comme la maquette 40 : un panneau qui se lit d'un
+              coup d'œil plutôt qu'une colonne qu'on fait défiler. */}
+          <div className="v2-panel-grid">
           <label className="v2-field">
             <span>Catégorie</span>
             <span className="v2-control">
@@ -486,6 +455,18 @@ function InvestorPanel({
               </select>
             </span>
           </label>
+
+          <label className="v2-field">
+            <span>Contact principal</span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setNom(event.target.value)}
+                placeholder="Amina Diallo"
+                value={nom}
+              />
+            </span>
+          </label>
+          </div>
 
           <label className="v2-field">
             <span>
@@ -529,8 +510,54 @@ function InvestorPanel({
           </label>
           {pays && <small className="v2-field-hint">{paysAvecZone(pays)}</small>}
 
+          <label className="v2-field">
+            <span>
+              E-mail <small>— relie cette relation à son accès</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="amina.diallo@fonds.com"
+                type="email"
+                value={email}
+              />
+            </span>
+          </label>
+
+          <label className="v2-field">
+            <span>Ticket potentiel</span>
+            <span className="v2-control">
+              <input
+                inputMode="numeric"
+                onChange={(event) => setTicket(event.target.value)}
+                placeholder="150 000 000"
+                value={ticket}
+              />
+              {/* La devise vient de la levée : un ticket sans monnaie de
+                  compte ne veut rien dire. */}
+              <em>{devise}</em>
+            </span>
+          </label>
+          <small className="v2-field-hint">
+            Indicatif — jamais compté comme engagement.
+          </small>
+
+          <label className="v2-field">
+            <span>
+              Source de la relation <small>— facultatif</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setSource(event.target.value)}
+                placeholder="Introduction — Dakar Accelerator"
+                value={source}
+              />
+            </span>
+          </label>
+
           <hr />
 
+          <div className="v2-panel-grid">
           {/* DEUX AXES, jamais fusionnés : où en est la conversation, et ce
               qui est promis. Un investisseur peut être en diligence ET avoir
               soft-committé — c'est la phrase qu'on prononce vraiment. */}
@@ -564,8 +591,26 @@ function InvestorPanel({
             </span>
           </label>
 
+          </div>
+
           <hr />
 
+          <label className="v2-field">
+            <span>
+              Responsable interne <small>— facultatif</small>
+            </span>
+            <span className="v2-control">
+              <input
+                onChange={(event) => setResponsable(event.target.value)}
+                placeholder="Amara Diallo"
+                value={responsable}
+              />
+            </span>
+          </label>
+
+          {/* Prochaine action et sa date vont ensemble : une échéance sans
+              geste, ou un geste sans date, ne fait pas revenir personne. */}
+          <div className="v2-panel-grid">
           <label className="v2-field">
             <span>
               Prochaine action <small>— facultatif</small>
@@ -592,31 +637,7 @@ function InvestorPanel({
             </span>
           </label>
 
-          <label className="v2-field">
-            <span>
-              Responsable interne <small>— facultatif</small>
-            </span>
-            <span className="v2-control">
-              <input
-                onChange={(event) => setResponsable(event.target.value)}
-                placeholder="Amara Diallo"
-                value={responsable}
-              />
-            </span>
-          </label>
-
-          <label className="v2-field">
-            <span>
-              Source de la relation <small>— facultatif</small>
-            </span>
-            <span className="v2-control">
-              <input
-                onChange={(event) => setSource(event.target.value)}
-                placeholder="Introduction — Dakar Accelerator"
-                value={source}
-              />
-            </span>
-          </label>
+          </div>
 
           <label className="v2-field">
             <span>

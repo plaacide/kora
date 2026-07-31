@@ -415,6 +415,12 @@
 @media(max-width:600px){.v2-roles-grid{grid-template-columns:1fr}.v2-promo-card{flex-direction:column}}
 
 /* Écran 30 — Journal d'activité */
+.v2-panel-note{display:flex;align-items:flex-start;gap:9px}
+.v2-panel-note .v2-icon{flex:0 0 auto;margin-top:1px;color:var(--text-4)}
+.v2-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.v2-panel-eyebrow{display:block;color:var(--text-4);font:600 11px var(--font-v2-head),sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.v2-control em{flex:0 0 auto;color:var(--text-4);font-size:12.5px;font-style:normal}
+@media(max-width:560px){.v2-panel-grid{grid-template-columns:1fr}}
 .v2-access-bridge{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:9px;background:var(--band);padding:13px 14px}
 .v2-access-bridge strong{display:block;font-size:13px;font-weight:500}
 .v2-access-bridge small{display:block;margin-top:3px;color:var(--text-3);font-size:12px;line-height:1.5}
@@ -897,6 +903,12 @@ label.v2-btn[data-busy=true]{opacity:.6;pointer-events:none}
 .v2-dialog-choices .v2-icon{color:var(--orange-text)}
 
 /* Écrans 66 (recherche) et 68 (abonnement) */
+.v2-panel-note{display:flex;align-items:flex-start;gap:9px}
+.v2-panel-note .v2-icon{flex:0 0 auto;margin-top:1px;color:var(--text-4)}
+.v2-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.v2-panel-eyebrow{display:block;color:var(--text-4);font:600 11px var(--font-v2-head),sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.v2-control em{flex:0 0 auto;color:var(--text-4);font-size:12.5px;font-style:normal}
+@media(max-width:560px){.v2-panel-grid{grid-template-columns:1fr}}
 .v2-access-bridge{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:9px;background:var(--band);padding:13px 14px}
 .v2-access-bridge strong{display:block;font-size:13px;font-weight:500}
 .v2-access-bridge small{display:block;margin-top:3px;color:var(--text-3);font-size:12px;line-height:1.5}
