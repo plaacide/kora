@@ -422,7 +422,8 @@ function SecurityStep({
 
       <label className="v2-field">
         <span>
-          Échéance de l’accès <small>— 90 jours par défaut</small>
+          Échéance de l’accès{" "}
+          <small>— dernier jour entier, 90 jours par défaut</small>
         </span>
         <span className="v2-control">
           <input
@@ -468,6 +469,9 @@ function ReviewStep({
       email: draft.email,
       level: draft.level || "watermark",
       ndaRequired: nda,
+      // On envoie le jour, pas une heure : `fin_de_journee` en base le porte à
+      // 23:59:59. Calculer l'heure ici donnerait deux règles pour la même
+      // question, et c'est celle de la base qui gouverne l'expiration.
       expiresAt: draft.expires ? new Date(draft.expires).toISOString() : null,
       // `null` porte « tous les dossiers », y compris ceux à venir. Envoyer la
       // liste complète à la place figerait le périmètre sans que le fondateur
@@ -518,6 +522,9 @@ function ReviewStep({
               ? new Date(draft.expires).toLocaleDateString("fr-FR")
               : "90 jours"}
           </strong>
+          {/* La date seule laissait croire que l'accès meurt AU début du jour
+              dit — ce qu'il faisait vraiment avant la normalisation. */}
+          <small>jusqu’à 23:59 ce jour-là</small>
         </div>
         <div>
           <small>Périmètre</small>
