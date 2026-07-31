@@ -3,6 +3,7 @@ import "server-only";
 import { nomActeur, nomCourt } from "@/features/v2/domain/journal";
 import {
   cheminDossier,
+  compter,
   grouperParDossier,
   type DossierArbre,
   type ExigenceBrute,
@@ -62,6 +63,30 @@ function enExigence(
     ...extra,
   };
 }
+
+/**
+ * Le squelette d'une exigence, pour les lectures qui n'ont pas besoin de
+ * tout. Compter n'exige que trois champs ; les inventer un par un à chaque
+ * appel finirait par diverger du type réel.
+ */
+const VIDE: ExigenceBrute = {
+  id: "",
+  domain: "",
+  level: "required",
+  sources: [],
+  label: "",
+  description: "",
+  status: "todo",
+  position: 0,
+  folderId: null,
+  folderName: null,
+  freshnessDays: null,
+  expectedPeriod: null,
+  acceptedFormats: null,
+  lastProofAt: null,
+  proofs: 0,
+  pending: 0,
+};
 
 export interface ProofRow {
   id: string;
@@ -394,4 +419,68 @@ export async function requirementHistory(
       at: row.created_at,
     };
   });
+}
+
+/**
+ * Le compte affiché sur l'onglet Préparation du rail.
+ *
+ * Lecture volontairement étroite — elle tourne sur CHAQUE écran d'une
+ * opération — mais elle applique la MÊME règle que l'écran lui-même : sans
+ * cela, le rail annoncerait 18/24 pendant que la page compte 17 prêtes, et
+ * c'est le genre d'écart qui fait douter des deux.
+ */
+export async function preparationProgress(
+  operationId: string,
+): Promise<{ ready: number; due: number }> {
+  const supabase = await createClient();
+
+  const { data: items } = await supabase
+    .from("checklist_items")
+    .select("id, status, freshness_days")
+    .eq("deal_id", operationId);
+
+  const lignes = (items ?? []) as Array<{
+    id: string;
+    status: string;
+    freshness_days: number | null;
+  }>;
+
+  if (lignes.length === 0) return { ready: 0, due: 0 };
+
+  // La fraîcheur se mesure sur la preuve la plus récente : sans elle, une
+  // pièce périmée compterait comme prête.
+  const { data: preuves } = await supabase
+    .from("checklist_item_documents")
+    .select("item_id, linked_at, confirmed")
+    .in(
+      "item_id",
+      lignes.map((item) => item.id),
+    );
+
+  const derniere = new Map<string, string>();
+  for (const row of (preuves ?? []) as Array<{
+    item_id: string;
+    linked_at: string;
+    confirmed: boolean;
+  }>) {
+    if (!row.confirmed) continue;
+    const connue = derniere.get(row.item_id);
+    if (!connue || row.linked_at > connue) derniere.set(row.item_id, row.linked_at);
+  }
+
+  const compte = compter(
+    lignes.map((item) => ({
+      ...VIDE,
+      id: item.id,
+      status: item.status,
+      freshnessDays: item.freshness_days,
+      lastProofAt: derniere.get(item.id) ?? null,
+    })),
+    new Date(),
+  );
+
+  return {
+    ready: compte.pretes,
+    due: compte.pretes + compte.aFournir + compte.aActualiser,
+  };
 }

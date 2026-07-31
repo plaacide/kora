@@ -172,6 +172,7 @@ export function OperationShell({
   operationId,
   folders = [],
   activeAccesses = 0,
+  preparation,
 }: {
   children: ReactNode;
   operationId: string;
@@ -179,6 +180,8 @@ export function OperationShell({
   folders?: readonly string[];
   /** Accès réellement ouverts. Le bandeau annonçait « 3 » en toutes lettres. */
   activeAccesses?: number;
+  /** Exigences prêtes sur exigences dues. Le rail annonçait « 18/24 ». */
+  preparation?: { ready: number; due: number };
 }) {
   const path = usePathname();
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -277,7 +280,11 @@ export function OperationShell({
               key={slug}
             >
               {label}
-              {slug === "preparation" && <small>18/24</small>}
+              {slug === "preparation" && preparation && (
+                <small>
+                  {preparation.ready}/{preparation.due}
+                </small>
+              )}
             </Link>
           ))}
         </div>
