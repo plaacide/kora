@@ -181,19 +181,7 @@ export async function setV2DocumentHidden(input: {
 
   if (error) {
     console.error("[v2 documents] set_document_hidden failed", error);
-
-    // Sans la migration, la fonction n'existe pas. Le dire vaut mieux qu'un
-    // interrupteur qui revient en place sans explication.
-    const absente =
-      error.message.includes("PGRST202") ||
-      error.message.includes("Could not find the function");
-
-    return {
-      ok: false,
-      error: absente
-        ? "Le masquage n’est pas encore actif sur cette base : la migration « pieces_masquees » doit être appliquée."
-        : error.message,
-    };
+    return { ok: false, error: error.message };
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");

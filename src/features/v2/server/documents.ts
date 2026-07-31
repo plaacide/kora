@@ -14,25 +14,6 @@ import { suggestForBatch } from "../domain/suggestions";
  * notes de `../domain/documents`.
  */
 
-/**
- * `true` quand PostgREST répond « cette colonne n'existe pas » (42703).
- *
- * Le masquage arrive par une migration ; tant qu'elle n'est pas appliquée,
- * `hidden_from_guests` n'existe pas et la requête échoue — ce qui ferait
- * tomber toute la data room, pas seulement la colonne manquante.
- *
- * On relit alors sans la colonne, et la pièce est rendue non masquée. Ce n'est
- * pas un pis-aller trompeur : sur une base sans la colonne, aucune pièce
- * n'est effectivement masquée. C'est l'état réel de cette base-là.
- */
-function colonneMasquageAbsente(error: {
-  code?: string;
-  message?: string;
-} | null): boolean {
-  if (!error) return false;
-  return error.code === "42703" || (error.message ?? "").includes("hidden_from_guests");
-}
-
 export interface FolderRow {
   id: string;
   name: string;
@@ -311,18 +292,14 @@ export async function documentDetail(
 ): Promise<DocumentDetail | null> {
   const supabase = await createClient();
 
-  const requete = (masquage: boolean) =>
-    supabase
-      .from("documents")
-      .select(
-        `id, name, status, ${masquage ? "hidden_from_guests, " : ""}folder_id, current_version_id, folders(name)`,
-      )
-      .eq("id", documentId)
-      .eq("deal_id", operationId)
-      .maybeSingle();
-
-  let { data, error } = await requete(true);
-  if (colonneMasquageAbsente(error)) ({ data, error } = await requete(false));
+  const { data, error } = await supabase
+    .from("documents")
+    .select(
+      "id, name, status, hidden_from_guests, folder_id, current_version_id, folders(name)",
+    )
+    .eq("id", documentId)
+    .eq("deal_id", operationId)
+    .maybeSingle();
 
   if (error || !data) return null;
 
@@ -512,19 +489,14 @@ export async function listDocuments(
 
   // `documents_current_version_fk` désigne la version ACTIVE, pas la dernière
   // déposée : après une restauration, les deux diffèrent.
-  const colonnes = (masquage: boolean) =>
-    `id, name, index_path, status, ${masquage ? "hidden_from_guests, " : ""}folder_id, created_by, document_versions!documents_current_version_fk(version_no, created_at, uploaded_by)`;
-
-  const requete = (masquage: boolean) =>
-    supabase
-      .from("documents")
-      .select(colonnes(masquage))
-      .eq("deal_id", operationId)
-      .eq("folder_id", folderId)
-      .order("position");
-
-  let { data, error } = await requete(true);
-  if (colonneMasquageAbsente(error)) ({ data, error } = await requete(false));
+  const { data, error } = await supabase
+    .from("documents")
+    .select(
+      "id, name, index_path, status, hidden_from_guests, folder_id, created_by, document_versions!documents_current_version_fk(version_no, created_at, uploaded_by)",
+    )
+    .eq("deal_id", operationId)
+    .eq("folder_id", folderId)
+    .order("position");
 
   if (error) throw error;
 

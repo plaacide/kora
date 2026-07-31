@@ -41,21 +41,7 @@ export async function createV2Access(input: {
 
   if (!result.ok) {
     console.error("[v2 access] create_invitation échoué :", result.error);
-
-    // PGRST202 : PostgREST ne trouve pas la fonction à six arguments, donc la
-    // migration du périmètre n'est pas appliquée sur cette base. On le dit au
-    // lieu de renvoyer l'invitation sans son périmètre : le fondateur croirait
-    // avoir restreint l'accès alors que tout serait ouvert.
-    const signature =
-      result.error?.includes("PGRST202") ||
-      result.error?.includes("Could not find the function");
-
-    return {
-      ok: false,
-      error: signature
-        ? "Le choix des dossiers n’est pas encore actif sur cette base : la migration « invitation_perimetre » doit être appliquée."
-        : result.error,
-    };
+    return { ok: false, error: result.error };
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");

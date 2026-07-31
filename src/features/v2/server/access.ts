@@ -286,19 +286,6 @@ export async function shareableFolders(
       .eq("deal_id", operationId),
   ]);
 
-  // Tant que la migration `pieces_masquees` n'est pas appliquée, la colonne
-  // n'existe pas : la requête échoue et `documents` est nul. On relit sans
-  // elle plutôt que d'annoncer une data room vide au moment de la partager.
-  const lignesDocuments =
-    documents ??
-    (
-      await supabase
-        .from("documents")
-        .select("name, folder_id")
-        .eq("deal_id", operationId)
-    ).data ??
-    [];
-
   const arbre: NoeudDossier[] = (
     (folders ?? []) as Array<{ id: string; parent_id: string | null }>
   ).map((folder) => ({ id: folder.id, parentId: folder.parent_id }));
@@ -308,10 +295,10 @@ export async function shareableFolders(
   const parDossier = new Map<string, number>();
   const masqueesParDossier = new Map<string, string[]>();
 
-  for (const row of lignesDocuments as Array<{
+  for (const row of (documents ?? []) as Array<{
     name: string;
     folder_id: string | null;
-    hidden_from_guests?: boolean | null;
+    hidden_from_guests: boolean | null;
   }>) {
     if (!row.folder_id) continue;
 
