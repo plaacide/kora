@@ -119,8 +119,23 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Vue de la levée (37)     → montants réels, progression calculée
    ├─ 🟢 Clôturer (45)            close_raise()
    ├─ 🟢 Pipeline (38-40)         → voir Investisseurs ci-dessous
-   ├─ 🔴 Engagements (43-44)      —                     ATTEND : ventilation
-   └─ 🔴 Mises à jour (46-50)     —                     ATTEND : table absente
+   ├─ 🟢 Engagements (43-44)      commitments(), commitmentHistory()
+   │  ├─ 🟢 Enregistrer (43)      save_raise_commitment() — un par investisseur
+   │  ├─ 🟢 Ventilation (44)      confirmés / soft-commits / restant, calculés
+   │  ├─ 🟢 Historique (44)       → audit_log : l'avant ET l'après, donc
+   │  │                             « requalifié en » se reconstitue
+   │  └─ 🟢 Retirer               delete_raise_commitment()
+   └─ 🟢 Mises à jour (46-50)     updates(), update()
+      ├─ 🟢 Liste (46)            → période, audience, état, consultations
+      ├─ 🟢 Audience (47)         save_raise_update() — instrument × financeur
+      ├─ 🟢 Indicateurs (48)      → catalogue de 18 définitions, suggérées par
+      │                             famille ; valeurs saisies, jamais devinées
+      ├─ 🟢 Commentaire           → résumé du dirigeant + demande
+      ├─ 🟢 Vérification (49)     → l'aperçu destinataire, publiables seuls
+      ├─ 🟢 Publiée (50)          publish_raise_update() — figée, versionnée
+      ├─ 🟢 Correction V2         correct_raise_update() — la V1 reste lisible
+      └─ 🟡 Consultations         seen_raise_update() existe ; rien ne l'appelle
+                                    encore : l'écran destinataire n'est pas fait
 (Investisseurs)                   → l'onglet Pipeline de Lever, ci-dessus.
                                     La route `/operations/:id/investors`
                                     redirige : elle n'était dans aucun rail.
@@ -146,7 +161,10 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
                                    d'entrée, la maquette n'en prévoit pas)
 🟢 Recherche                      searchDocuments()     → documents par nom, filtrées
                                                         par opération, chemin complet
-🔴 Équipe                         —                     ATTEND : memberships (vocabulaire à trancher)
+🔴 Équipe                         —                     ATTEND : l'écran (33).
+                                  La base est prête : org_role porte désormais
+                                  `internal_viewer`, le quatrième rôle de la
+                                  maquette.
 🔴 Sécurité                       —                     ATTEND : MFA, audit_log
 🔴 Abonnement                     —                     ATTEND : décisions produit
 ```
@@ -260,9 +278,8 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 4. **« Demander à l'équipe »** (maquette 12) : pas de messagerie interne.
 5. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
    `failed`). Les maquettes en montrent sept.
-6. **Le vocabulaire des rôles d'équipe.** Les maquettes en montrent quatre
-   (owner, administrator, contributor, internal_viewer), la base en a quatre
-   autres (owner, admin, member, guest).
+6. ~~**Le vocabulaire des rôles d'équipe.**~~ Tranché le 2 août : `org_role`
+   porte désormais `internal_viewer`. Reste l'écran (33), pas la base.
 7. **Le fuseau horaire d'une organisation**, pour que les échéances tombent à
    minuit local.
 8. **Les conditions d'une levée.** La maquette 36 demande ticket minimum et
@@ -271,14 +288,14 @@ score. `sync_checklist_status` ne regarde que les liens confirmés.
 9. **La liste des pays de l'onboarding** en propose cinq, écrits en dur, alors
    que `domain/geographie` en tient cinquante-huit rangés par zone. Les deux
    devraient être la même liste.
-10. **La ventilation du montant sécurisé.** La maquette 37 sépare « engagements
-   confirmés » et « soft-commits » ; `montant_engage` est un seul montant
-   déclaré.
+10. ~~**La ventilation du montant sécurisé.**~~ Faite le 2 août :
+   `raise_commitments` porte une ligne par investisseur et `montant_engage`
+   n'est plus saisi — il est recalculé.
 
 ## Migrations
 
 Toutes appliquées sur staging (`jourzsgjnutktsrgxkoo`), y compris
-`journal_nom_de_piece` et `nom_de_levee`. Aucune n'est en attente.
+`lecteur_interne`, `engagements` et `mises_a_jour`. Aucune n'est en attente.
 
 Aucune n'a été portée en production. Le fondateur a levé la contrainte de
 compatibilité V1 : produit en pré-lancement, les changements de modèle sont
@@ -292,7 +309,10 @@ autorisés — mais staging reste la première étape.
 3. ~~Activité~~ — faite le 1er août, par opération et pour l'organisation.
 4. ~~Recherche~~ — faite le 1er août. Elle porte sur les pièces ; chercher une
    exigence ou un dossier reste à décider.
-5. **Lever** — le cœur est fait (35, 36, 37, 45). Restent le pipeline, les
-   engagements et les mises à jour aux investisseurs.
+5. ~~Lever~~ — fait. Vue, pipeline, engagements et mises à jour sont branchés.
 6. ~~Investisseurs~~ — fait le 1er août. Restent les interactions (41-42).
-7. **Équipe**, **Sécurité**, **Abonnement** — décisions produit d'abord.
+7. **Équipe** (33) — la base est prête, l'écran reste à faire.
+8. **Interactions du pipeline** (41-42) — la table n'existe pas.
+9. **Cohortes** (31-32) — `cohort_links` n'existe pas.
+10. **Sécurité**, **Abonnement** — décisions produit d'abord. `/v2/abonnement`
+   n'est atteignable depuis aucun rail : à trancher avant de le brancher.
