@@ -676,7 +676,12 @@
 .v2-pipeline-page{display:flex;flex-direction:column}
 .v2-filterbar>a{height:32px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12px;font-weight:600;text-decoration:none}
 .v2-filterbar>a[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text)}
-.v2-filterbar>a.v2-btn{border-radius:8px}
+/* Le bouton principal de la barre était INVISIBLE : `.v2-filterbar>a` repeint le
+   fond en blanc — il est plus spécifique que `.v2-btn` — pendant que `.v2-btn`
+   impose `color:#fff!important`. Blanc sur blanc, on ne pouvait plus ajouter
+   d'investisseur depuis le pipeline. La règle ne rendait ici que le rayon. */
+.v2-filterbar>a.v2-btn{border-color:var(--orange);border-radius:8px;background:var(--orange)}
+.v2-filterbar>a.v2-btn[data-variant=secondary]{border-color:var(--line);background:#fff;color:var(--text-2)!important}
 .v2-pipeline-columns{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
 .v2-pipeline-columns>section{display:flex;width:236px;flex:0 0 236px;flex-direction:column;gap:8px;border-radius:10px;background:var(--band);padding:12px}
 .v2-pipeline-columns>section>header{display:flex;align-items:center;justify-content:space-between}
