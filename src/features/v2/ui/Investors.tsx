@@ -10,6 +10,7 @@ import {
 } from "@/app/v2/(workspace)/operations/[operationId]/lever/actions";
 import { initials } from "@/features/v2/domain/activity";
 import { paysAvecZone, paysParZone } from "@/features/v2/domain/geographie";
+import { v2Routes } from "@/features/v2/navigation/routes";
 import {
   CATEGORIES,
   FONCTIONS,
@@ -383,11 +384,43 @@ function InvestorPanel({
             </p>
           )}
 
-          <p className="v2-panel-note">
-            Ajouté au pipeline uniquement — aucun accès documentaire n’est créé.
-            Pour ouvrir la data room à cette personne, passez par Partage et
-            accès.
-          </p>
+          {/* Le pipeline et la data room restent deux choses : suivre une
+              relation n'ouvre rien. Mais le geste suivant est assez fréquent
+              pour mériter un chemin — avec ce qu'on sait déjà. */}
+          {investisseur?.acces ? (
+            <section className="v2-access-bridge">
+              <div>
+                <strong>Accès documentaire</strong>
+                <small>
+                  Cette adresse a déjà un accès à l’opération :{" "}
+                  {investisseur.acces.toLowerCase()}.
+                </small>
+              </div>
+              <Link href={v2Routes.operations.access(operationId)}>
+                Voir l’accès
+              </Link>
+            </section>
+          ) : email.trim().includes("@") ? (
+            <section className="v2-access-bridge">
+              <div>
+                <strong>Aucun accès documentaire</strong>
+                <small>
+                  Ajouter au pipeline n’ouvre rien. L’assistant reprendra
+                  l’adresse saisie ici.
+                </small>
+              </div>
+              <Link
+                href={`${v2Routes.operations.access(operationId)}?share=recipient&email=${encodeURIComponent(email.trim().toLowerCase())}`}
+              >
+                Créer un accès documentaire
+              </Link>
+            </section>
+          ) : (
+            <p className="v2-panel-note">
+              Ajouté au pipeline uniquement — aucun accès documentaire n’est
+              créé. Renseignez l’e-mail pour pouvoir lui ouvrir la data room.
+            </p>
+          )}
 
           <label className="v2-field">
             <span>Organisation</span>
