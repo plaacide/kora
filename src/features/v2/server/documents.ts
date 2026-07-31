@@ -3,6 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/server";
+import { suggestForBatch } from "../domain/suggestions";
 
 /**
  * Lecture de l'arborescence documentaire d'une opération.
@@ -372,6 +373,105 @@ export async function documentDetail(
       page: event.metadata?.page ?? null,
     })),
   };
+}
+
+export interface PendingAssociation {
+  documentId: string;
+  documentName: string;
+  suggestion: {
+    requirementId: string;
+    label: string;
+    matched: string[];
+  } | null;
+}
+
+/**
+ * Les associations à confirmer après un dépôt (écran 17).
+ *
+ * Les suggestions sont calculées contre les exigences de CETTE opération, et
+ * contre rien d'autre. Les pièces déjà rattachées sont écartées : reproposer
+ * une association confirmée ferait douter de ce qui a été validé.
+ */
+export async function pendingAssociations(
+  operationId: string,
+  documentIds: readonly string[],
+): Promise<PendingAssociation[]> {
+  if (documentIds.length === 0) return [];
+
+  const supabase = await createClient();
+
+  const [{ data: docs }, { data: items }, { data: liens }] = await Promise.all([
+    supabase
+      .from("documents")
+      .select("id, name")
+      .eq("deal_id", operationId)
+      .in("id", documentIds),
+    supabase
+      .from("checklist_items")
+      .select("id, label, description")
+      .eq("deal_id", operationId),
+    supabase
+      .from("checklist_item_documents")
+      .select("document_id, item_id")
+      .in("document_id", documentIds),
+  ]);
+
+  const dejaLiees = new Set(
+    ((liens ?? []) as Array<{ document_id: string }>).map((l) => l.document_id),
+  );
+
+  const requirements = ((items ?? []) as Array<{
+    id: string;
+    label: string;
+    description: string | null;
+  }>).map((item) => ({
+    id: item.id,
+    label: item.label,
+    description: item.description ?? undefined,
+  }));
+
+  const enAttente = ((docs ?? []) as Array<{ id: string; name: string }>).filter(
+    (doc) => !dejaLiees.has(doc.id),
+  );
+
+  // L'ordre de dépôt est celui que le fondateur a sous les yeux.
+  const parId = new Map(enAttente.map((doc) => [doc.id, doc.name]));
+  const ordonnes = documentIds.filter((id) => parId.has(id));
+
+  const lot = suggestForBatch(
+    ordonnes.map((id) => parId.get(id) as string),
+    requirements,
+  );
+
+  return ordonnes.map((id, index) => ({
+    documentId: id,
+    documentName: parId.get(id) as string,
+    suggestion: lot[index]?.suggestion
+      ? {
+          requirementId: lot[index].suggestion.requirementId,
+          label: lot[index].suggestion.label,
+          matched: lot[index].suggestion.matched,
+        }
+      : null,
+  }));
+}
+
+/** Toutes les exigences de l'opération, pour le choix manuel de l'écran 17. */
+export async function listRequirements(
+  operationId: string,
+): Promise<Array<{ id: string; label: string }>> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("checklist_items")
+    .select("id, label, category, position")
+    .eq("deal_id", operationId)
+    .order("category")
+    .order("position");
+
+  return ((data ?? []) as Array<{ id: string; label: string }>).map((item) => ({
+    id: item.id,
+    label: item.label,
+  }));
 }
 
 export async function listDocuments(

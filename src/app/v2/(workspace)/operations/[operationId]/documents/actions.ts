@@ -25,10 +25,10 @@ export async function registerV2Document(input: {
   storageKey: string;
   size: number;
   mime: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<{ ok: boolean; error?: string; documentId?: string }> {
   const supabase = await createClient();
 
-  const { error } = await supabase.rpc("register_document", {
+  const { data, error } = await supabase.rpc("register_document", {
     p_deal: input.operationId,
     p_folder: input.folderId,
     p_name: input.name,
@@ -51,7 +51,11 @@ export async function registerV2Document(input: {
   //
   // C'est le client qui rafraîchit, une fois le lot entier terminé et
   // seulement s'il est entièrement passé. Lui seul sait où finit le lot.
-  return { ok: true };
+  //
+  // L'identifiant repart vers le client : c'est lui qui enchaînera sur la
+  // confirmation des associations, et il a besoin de savoir QUELLES pièces
+  // viennent d'être déposées.
+  return { ok: true, documentId: (data as { id?: string } | null)?.id };
 }
 
 /**
@@ -116,4 +120,41 @@ export async function addV2Version(input: {
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
   return { ok: true };
+}
+
+/**
+ * Confirme les associations retenues par le fondateur (écran 17).
+ *
+ * Rien n'est associé sans ce geste : les suggestions restent des propositions
+ * jusqu'ici. Les paires refusées ne sont simplement pas transmises — il n'y a
+ * pas de trace d'un refus, parce qu'une exigence non satisfaite reste une
+ * exigence non satisfaite, ce que le plan de préparation dit déjà.
+ */
+export async function confirmV2Associations(input: {
+  operationId: string;
+  pairs: Array<{ documentId: string; requirementId: string }>;
+}): Promise<{ ok: boolean; confirmed: number; error?: string }> {
+  if (input.pairs.length === 0) return { ok: true, confirmed: 0 };
+
+  const supabase = await createClient();
+  let confirmed = 0;
+
+  for (const pair of input.pairs) {
+    const { error } = await supabase.rpc("attach_checklist_document", {
+      p_item: pair.requirementId,
+      p_doc: pair.documentId,
+    });
+
+    if (error) {
+      console.error("[v2 documents] attach_checklist_document failed", error);
+      // On rend ce qui a été fait plutôt que d'annuler le reste : les
+      // associations déjà posées sont justes, et les refaire n'apporterait
+      // rien.
+      return { ok: false, confirmed, error: error.message };
+    }
+    confirmed += 1;
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true, confirmed };
 }

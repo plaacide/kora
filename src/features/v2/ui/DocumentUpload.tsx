@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import type { ChangeEvent, DragEvent, ReactNode } from "react";
 
@@ -48,6 +48,7 @@ export function DocumentUpload({
   variant?: "secondary";
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const input = useRef<HTMLInputElement>(null);
   const encours = useRef<XMLHttpRequest | null>(null);
   const annule = useRef(false);
@@ -134,6 +135,7 @@ export function DocumentUpload({
       })),
     );
 
+    const deposees: string[] = [];
     const supabase = createClient();
     const {
       data: { session },
@@ -185,6 +187,7 @@ export function DocumentUpload({
       });
 
       if (!registered.ok) echecs = true;
+      if (registered.documentId) deposees.push(registered.documentId);
 
       majLigne(index, {
         state: registered.ok ? "done" : "failed",
@@ -200,7 +203,22 @@ export function DocumentUpload({
     // qu'une pièce a échoué ou été annulée, on ne rafraîchit donc pas — sinon
     // la seule trace de l'échec disparaîtrait et le fondateur croirait tout
     // déposé.
-    if (!echecs) router.refresh();
+    if (echecs) return;
+
+    // Le dépôt s'enchaîne sur la confirmation des associations (écran 17) :
+    // c'est le moment où le fondateur a ses pièces en tête. Les identifiants
+    // passent par l'URL — ainsi l'écran survit à un rechargement, et le lien
+    // reste partageable avec un collègue.
+    if (deposees.length > 0) {
+      // Chemin absolu, et SANS `refresh()` derrière : re-rendre la route
+      // courante juste après écrase la navigation en cours, et l'écran 17 ne
+      // s'ouvrait jamais. La navigation recharge de toute façon les données
+      // du serveur.
+      router.push(`${pathname}?associations=${deposees.join(",")}`);
+      return;
+    }
+
+    router.refresh();
   }
 
   function annulerTout() {

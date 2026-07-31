@@ -549,6 +549,21 @@
 .v2-upload-line-percent{flex:0 0 auto;color:var(--orange-text);font-size:12px;font-weight:600}
 .v2-upload-card-body>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;color:var(--text-3);font-size:12px}
 .v2-upload-card-body>footer .v2-btn-quiet{flex:0 0 auto}
+/* Écran 17 — une carte par pièce déposée, sa suggestion cochée d'avance. */
+.v2-association-card{border:1px solid var(--line);border-radius:8px;background:#fff;padding:14px 16px}
+.v2-association-file{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.v2-association-file>.v2-icon{flex:0 0 auto;color:var(--text-3)}
+.v2-association-file>b{overflow:hidden;font-size:13.5px;text-overflow:ellipsis;white-space:nowrap}
+.v2-association-choice{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:10px 12px;cursor:pointer}
+.v2-association-choice[data-selected=true]{border-color:#f5c6ae;background:var(--orange-soft)}
+.v2-association-choice input{margin-top:2px;width:16px;height:16px;flex:0 0 auto;accent-color:var(--orange)}
+.v2-association-choice strong{display:block;font-size:13px;font-weight:500}
+.v2-association-choice small{display:block;margin-top:2px;color:var(--text-4);font-size:11.5px}
+.v2-association-none{margin:0;border-radius:6px;background:var(--band);padding:10px 12px;color:var(--text-3);font-size:12.5px}
+.v2-association-manuel{margin-top:10px}
+.v2-association-manuel>span:first-child{font-size:12px!important;color:var(--text-3)}
+.v2-association-manuel .v2-control{height:40px}
+
 /* « Remplacer (v3) » est un label déguisé en bouton : il ouvre le sélecteur
    de fichier sans que le panneau ait à gérer un second input. */
 label.v2-btn{cursor:pointer}

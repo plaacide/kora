@@ -10,6 +10,8 @@ import {
   documentDetail,
   listDocuments,
   listFolders,
+  listRequirements,
+  pendingAssociations,
   resolveFolderPath,
 } from "@/features/v2/server/documents";
 import { requireV2Workspace } from "@/features/v2/server/session";
@@ -134,6 +136,17 @@ export default async function DocumentsPage({
   // liste ne porte pas.
   const detail = document ? await documentDetail(operationId, document) : null;
 
+  // Écran 17 : les pièces qui viennent d'être déposées attendent d'être
+  // rattachées à une exigence. Leurs identifiants voyagent dans l'URL, donc
+  // l'écran survit à un rechargement.
+  const aAssocier = associations?.split(",").filter(Boolean) ?? [];
+  const [pending, requirements] = aAssocier.length
+    ? await Promise.all([
+        pendingAssociations(operationId, aAssocier),
+        listRequirements(operationId),
+      ])
+    : [[], []];
+
   return (
     <>
       <div className="v2-document-table-wrap">
@@ -242,7 +255,14 @@ export default async function DocumentsPage({
           )}`}
         />
       )}
-      {associations === "1" && <AssociationsPanel />}
+      {pending.length > 0 && (
+        <AssociationsPanel
+          closeHref="?"
+          operationId={operationId}
+          pending={pending}
+          requirements={requirements}
+        />
+      )}
     </>
   );
 }

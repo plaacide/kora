@@ -147,12 +147,15 @@ describe("suggestForFile — les cas que le fondateur dépose vraiment", () => {
 });
 
 describe("suggestForFile — ce qu'il ne doit PAS proposer", () => {
-  it("ne rattache pas « Politique RGPD » à une politique du référentiel", () => {
-    // Le piège du mot commun : « politique » apparaît dans deux exigences et
-    // n'en désigne aucune. Sans pondération par la rareté, ce test échoue.
-    const trouve = meilleure("Politique RGPD.pdf");
-    expect(trouve).not.toBe("Politique LBC/FT et screening");
-    expect(trouve).not.toBe("Politique environnementale et sociale");
+  it("classe une correspondance sur mot propre AVANT une correspondance sur mot commun", () => {
+    // « Politique RGPD » partage « politique » avec deux exigences sans en
+    // désigner aucune : la piste peut être proposée — le fondateur la refuse
+    // d'un clic — mais elle doit rester derrière une correspondance franche.
+    const vague = suggestForFile("Politique RGPD.pdf", EXIGENCES)[0];
+    const franche = suggestForFile("Politique LBC-FT.pdf", EXIGENCES)[0];
+
+    expect(franche.label).toBe("Politique LBC/FT et screening");
+    expect(franche.score).toBeGreaterThan(vague?.score ?? 0);
   });
 
   it("ne propose rien pour une pièce étrangère au référentiel", () => {

@@ -71,14 +71,14 @@ export function mots(texte: string): string[] {
 }
 
 /**
- * En deçà, la correspondance tient à trop peu pour être proposée.
+ * En deçà, la piste est trop mince pour valoir la peine d'être montrée.
  *
- * Réglé contre des noms de fichiers réels, dans les deux sens : assez bas pour
- * retenir « Statuts NIMBA SOLAR SAS 2026.pdf », assez haut pour écarter
- * « Politique RGPD.pdf », qui ne partage avec le référentiel qu'un mot sans
- * pouvoir distinctif.
+ * Volontairement bas. Les deux erreurs ne coûtent pas la même chose : une
+ * suggestion inutile se refuse d'un clic, tandis qu'une suggestion manquante
+ * oblige à chercher soi-même dans une liste de vingt-quatre exigences. Rien ne
+ * s'associe sans validation — autant proposer largement.
  */
-export const SEUIL = 0.3;
+export const SEUIL = 0.16;
 
 /** Au-delà, on n'aide plus : on noie. */
 const MAX_SUGGESTIONS = 3;
@@ -114,12 +114,6 @@ function raretes(requirements: readonly Requirement[]): {
   }
   return { poids, presence };
 }
-
-/**
- * Couverture minimale du libellé, quand aucun mot propre ne désigne
- * l'exigence. Voir la règle de retenue plus bas.
- */
-const COUVERTURE_MINIMALE = 0.35;
 
 /**
  * Les exigences que ce nom de fichier pourrait satisfaire, les meilleures
@@ -212,21 +206,17 @@ export function suggestForFile(
       totalDescription === 0 ? 0 : couvertDescription / totalDescription;
     const couverture = Math.max(couvLabel, couvDescription * 0.75);
 
-    // Retenue : un mot PROPRE à cette exigence, ou une part sérieuse de son
-    // libellé. Sans cette règle, « Politique RGPD.pdf » se rattachait à
-    // « Politique environnementale et sociale » — sur le seul mot
-    // « politique », qui désigne plusieurs exigences et donc aucune.
-    //
-    // « Bilan 2025.pdf » passe par la première voie : « bilan » n'apparaît
-    // que là. « Statuts NIMBA SOLAR.pdf » passe par la seconde : « statuts »
-    // n'est pas unique, mais couvre l'essentiel d'un libellé de deux mots.
+    // Un mot PROPRE à l'exigence pousse la piste devant les autres — « bilan »
+    // ne désigne que les états financiers, quand « politique » en désigne
+    // plusieurs. Le classement s'en trouve juste ; aucune piste n'est écartée
+    // pour autant, c'est au fondateur de trancher.
     const motPropre = matched.some((mot) => (presence.get(mot) ?? 0) === 1);
-    const retenue = motPropre || couverture >= COUVERTURE_MINIMALE;
+    const base = precision * Math.sqrt(couverture);
 
     return {
       requirementId: requirement.id,
       label: requirement.label,
-      score: retenue ? precision * Math.sqrt(couverture) : 0,
+      score: motPropre ? base : base * 0.7,
       matched,
     };
   });
