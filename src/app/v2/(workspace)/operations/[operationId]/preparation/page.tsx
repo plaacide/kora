@@ -1,4 +1,5 @@
 import {
+  attachableDocuments,
   listRequirementsFull,
   requirementDetail,
   requirementHistory,
@@ -28,9 +29,12 @@ export default async function PreparationPage({
     ? await requirementDetail(operationId, query.exigence)
     : null;
 
-  const history = detail
-    ? await requirementHistory(operationId, detail.id)
-    : [];
+  const [history, attachable] = detail
+    ? await Promise.all([
+        requirementHistory(operationId, detail.id),
+        attachableDocuments(operationId, detail.id),
+      ])
+    : [[], []];
 
   return (
     <>
@@ -42,6 +46,7 @@ export default async function PreparationPage({
 
       {detail && (
         <RequirementPanel
+          attachable={attachable}
           history={history}
           operationId={operationId}
           requirement={detail}

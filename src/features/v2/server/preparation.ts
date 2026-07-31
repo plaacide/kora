@@ -212,6 +212,57 @@ export async function requirementDetail(
 }
 
 /**
+ * Les pièces qu'on peut encore rattacher à cette exigence.
+ *
+ * Toute la data room, moins ce qui lui est déjà lié. On ne filtre pas sur le
+ * dossier attendu : une pièce rangée ailleurs répond quand même à l'exigence,
+ * et refuser de la proposer forcerait à la déplacer pour une raison qui n'a
+ * rien à voir avec le classement.
+ */
+export async function attachableDocuments(
+  operationId: string,
+  requirementId: string,
+): Promise<Array<{ id: string; name: string; folderName: string | null }>> {
+  const supabase = await createClient();
+
+  const [{ data: documents }, { data: liens }, { data: folders }] =
+    await Promise.all([
+      supabase
+        .from("documents")
+        .select("id, name, folder_id")
+        .eq("deal_id", operationId)
+        .order("name"),
+      supabase
+        .from("checklist_item_documents")
+        .select("document_id")
+        .eq("item_id", requirementId),
+      supabase.from("folders").select("id, name").eq("deal_id", operationId),
+    ]);
+
+  const liees = new Set(
+    ((liens ?? []) as Array<{ document_id: string }>).map((l) => l.document_id),
+  );
+  const noms = new Map(
+    ((folders ?? []) as Array<{ id: string; name: string }>).map((f) => [
+      f.id,
+      f.name,
+    ]),
+  );
+
+  return ((documents ?? []) as Array<{
+    id: string;
+    name: string;
+    folder_id: string | null;
+  }>)
+    .filter((doc) => !liees.has(doc.id))
+    .map((doc) => ({
+      id: doc.id,
+      name: doc.name,
+      folderName: doc.folder_id ? (noms.get(doc.folder_id) ?? null) : "Racine",
+    }));
+}
+
+/**
  * Le journal d'une exigence — écran 12, bloc « Historique ».
  *
  * `write_audit` range l'identifiant de l'exigence dans `target_id` pour les

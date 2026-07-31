@@ -11,6 +11,7 @@ import {
 import {
   addRequirementAction,
   applyTemplateAction,
+  attachProofAction,
   detachProofAction,
   setRequirementStatusAction,
 } from "@/app/v2/(workspace)/operations/[operationId]/preparation/actions";
@@ -21,6 +22,7 @@ import {
   correspondAuFiltre,
   domaineLabel,
   etatAffiche,
+  etatPiece,
   grouper,
   niveauLabel,
   sourceLabel,
@@ -322,16 +324,32 @@ export function RequirementPanel({
   operationId,
   requirement,
   history,
+  attachable,
 }: {
   operationId: string;
   requirement: RequirementDetail;
   history: ReadonlyArray<{ id: number; texte: string; actor: string; at: string }>;
+  /** Pièces de la data room qu'on peut encore rattacher à cette exigence. */
+  attachable: ReadonlyArray<{ id: string; name: string; folderName: string | null }>;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
+  const [choisie, setChoisie] = useState("");
   // Le panneau montre le même état que la liste : un fondateur qui ouvre une
   // ligne « Pièce à confirmer » ne doit pas y lire « À préparer ».
   const statut = etatAffiche(requirement, new Date());
+
+  async function rattacher(documentId: string) {
+    setBusy(documentId);
+    await attachProofAction({
+      operationId,
+      requirementId: requirement.id,
+      documentId,
+    });
+    setBusy(null);
+    setChoisie("");
+    router.refresh();
+  }
 
   async function changerStatut(status: string) {
     setBusy(status);
@@ -382,34 +400,36 @@ export function RequirementPanel({
       <aside className="v2-sidepanel">
         <header>
           <div>
-            <span className="v2-status" data-tone={statut.tone}>{statut.label}</span>
+            {/* La maquette met le niveau et les financeurs en étiquettes
+                au-dessus du titre : c'est ce qu'on lit en premier d'une
+                exigence, avant même son intitulé. */}
+            <div className="v2-panel-tags">
+              <span
+                className="v2-tag"
+                data-level={requirement.level === "required" ? "required" : undefined}
+              >
+                {niveauLabel(requirement.level)}
+              </span>
+              {requirement.sources.map((source) => (
+                <span className="v2-tag" key={source}>
+                  {sourceLabel(source)}
+                </span>
+              ))}
+            </div>
             <h2>{requirement.label}</h2>
           </div>
           <Link href="?" aria-label="Fermer">×</Link>
         </header>
 
         <div className="v2-sidepanel-body">
+          {requirement.description && (
+            <section>
+              <small>Pourquoi cette pièce est demandée</small>
+              <p>{requirement.description}</p>
+            </section>
+          )}
+
           <div className="v2-detail-grid">
-            <div>
-              <small>Domaine</small>
-              <strong>{domaineLabel(requirement.domain)}</strong>
-            </div>
-            <div>
-              <small>Niveau</small>
-              <strong>{niveauLabel(requirement.level)}</strong>
-            </div>
-            <div>
-              <small>Demandé par</small>
-              <strong>
-                {requirement.sources.length
-                  ? requirement.sources.map(sourceLabel).join(", ")
-                  : "—"}
-              </strong>
-            </div>
-            <div>
-              <small>Dossier attendu</small>
-              <strong>{requirement.folderName ?? "Aucun"}</strong>
-            </div>
             {requirement.expectedPeriod && (
               <div>
                 <small>Période attendue</small>
@@ -422,14 +442,19 @@ export function RequirementPanel({
                 <strong>{requirement.acceptedFormats}</strong>
               </div>
             )}
+            <div>
+              <small>Statut</small>
+              <strong>{statut.label}</strong>
+            </div>
+            <div>
+              <small>Domaine</small>
+              <strong>{domaineLabel(requirement.domain)}</strong>
+            </div>
+            <div>
+              <small>Dossier attendu</small>
+              <strong>{requirement.folderName ?? "Aucun"}</strong>
+            </div>
           </div>
-
-          {requirement.description && (
-            <section>
-              <small>Pourquoi cette pièce est demandée</small>
-              <p>{requirement.description}</p>
-            </section>
-          )}
 
           <hr />
 
@@ -471,6 +496,14 @@ export function RequirementPanel({
                           : `proposée par Sanza le ${shortDate(proof.linkedAt)}`}
                       </small>
                     </div>
+                    {/* Un état PAR PIÈCE : dans un lot de trois exercices,
+                        c'est souvent une seule qui a vieilli. */}
+                    <span
+                      className="v2-status"
+                      data-tone={etatPiece(requirement, proof).tone}
+                    >
+                      {etatPiece(requirement, proof).label}
+                    </span>
                     <Link href={`/v2/documents/${proof.id}`}>Ouvrir</Link>
                     {/* Une suggestion se confirme ou s'écarte ; une preuve
                         validée se retire. Le même bouton pour les deux
@@ -505,6 +538,42 @@ export function RequirementPanel({
                   </li>
                 ))}
               </ul>
+            )}
+          </section>
+
+          <section className="v2-attach-proof">
+            <small>Rattacher une pièce déjà déposée</small>
+            {attachable.length === 0 ? (
+              <p className="v2-panel-note">
+                Toutes les pièces de la data room sont déjà rattachées à cette
+                exigence. Déposez-en une nouvelle depuis la data room.
+              </p>
+            ) : (
+              <div>
+                <span className="v2-control">
+                  <select
+                    onChange={(event) => setChoisie(event.target.value)}
+                    value={choisie}
+                  >
+                    <option value="">Choisir une pièce…</option>
+                    {attachable.map((doc) => (
+                      <option key={doc.id} value={doc.id}>
+                        {doc.name}
+                        {doc.folderName ? ` — ${doc.folderName}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </span>
+                <button
+                  className="v2-btn"
+                  data-variant="secondary"
+                  disabled={!choisie || busy !== null}
+                  onClick={() => rattacher(choisie)}
+                  type="button"
+                >
+                  Rattacher
+                </button>
+              </div>
             )}
           </section>
 

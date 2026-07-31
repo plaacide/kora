@@ -99,6 +99,31 @@ export async function setRequirementStatusAction(input: {
   return { ok: true };
 }
 
+/**
+ * Rattacher une pièce déjà déposée, confirmée d'emblée.
+ *
+ * C'est un choix du fondateur, pas une proposition de la machine : le lien
+ * naît donc confirmé, et l'exigence devient prête si elle ne l'était pas.
+ */
+export async function attachProofAction(input: {
+  operationId: string;
+  requirementId: string;
+  documentId: string;
+}): Promise<Resultat> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("attach_checklist_document", {
+    p_item: input.requirementId,
+    p_doc: input.documentId,
+    p_confirmed: true,
+  });
+
+  if (error) return { ok: false, error: error.message };
+
+  revalider(input.operationId);
+  return { ok: true };
+}
+
 /** Retirer une preuve. Le statut se réaligne tout seul côté base. */
 export async function detachProofAction(input: {
   operationId: string;

@@ -193,6 +193,30 @@ export function correspondAuFiltre(
   return statut === "done";
 }
 
+/**
+ * L'état d'UNE pièce rattachée.
+ *
+ * Une exigence peut porter trois exercices dont un seul a vieilli : afficher
+ * le seul état de l'exigence obligerait à ouvrir chaque fichier pour trouver
+ * lequel refaire.
+ */
+export function etatPiece(
+  exigence: Pick<ExigenceBrute, "freshnessDays">,
+  piece: { confirmed: boolean; linkedAt: string },
+  maintenant: Date = new Date(),
+): { label: string; tone: string } {
+  if (!piece.confirmed) return { label: "À confirmer", tone: "blue" };
+
+  if (exigence.freshnessDays) {
+    const age = maintenant.getTime() - new Date(piece.linkedAt).getTime();
+    if (age > exigence.freshnessDays * 86_400_000) {
+      return { label: "À actualiser", tone: "amber" };
+    }
+  }
+
+  return { label: "Prête", tone: "green" };
+}
+
 export interface Compte {
   pretes: number;
   enCours: number;
