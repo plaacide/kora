@@ -156,6 +156,10 @@ export function WorkspaceShell({
   const bottom: Array<{ href: string; label: string; icon: IconName; mobile?: boolean }> = [
     { href: "/v2/team", label: "Équipe", icon: "users" },
     { href: "/v2/security", label: "Sécurité", icon: "shield" },
+    // L'abonnement n'était dans aucun rail : l'écran existait à une adresse que
+    // personne ne pouvait atteindre. Un écran qu'on ne peut pas ouvrir ne
+    // compte pas.
+    { href: "/v2/abonnement", label: "Abonnement", icon: "landmark" },
     { href: "/v2/roadmap", label: "Aide", icon: "help", mobile: true },
   ];
 

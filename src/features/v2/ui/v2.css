@@ -365,6 +365,46 @@
 .v2-update-table th:last-child{width:44px}
 .v2-update-table td:last-child{text-align:right}
 
+/* L'abonnement — écran 68. */
+.v2-plan-card{margin-bottom:14px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:18px 20px}
+.v2-plan-card>header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+.v2-plan-card>header h2{margin-top:4px;font:600 20px var(--font-v2-head),sans-serif;letter-spacing:-.02em}
+.v2-plan-card>header p{margin:3px 0 0;color:var(--text-3);font-size:12.5px}
+.v2-plan-price{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.v2-plan-price strong{font:600 26px var(--font-v2-head),sans-serif;letter-spacing:-.02em}
+.v2-plan-price span{color:var(--text-3);font-size:12.5px}
+.v2-plan-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;border-top:1px solid var(--line-soft);padding-top:12px}
+.v2-plan-meta span{display:block;color:var(--text-3);font-size:11.5px}
+.v2-plan-meta strong{font-size:13.5px;font-weight:550}
+
+/* L'usage : la barre dit d'un coup d'œil ce qu'un pourcentage fait lire. */
+.v2-usage-list{display:flex;flex-direction:column;gap:14px;margin:10px 0 14px}
+.v2-usage-list>div>div:first-child{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:5px}
+.v2-usage-list strong{font-size:13px;font-weight:550}
+.v2-usage-list>div>div:first-child span{color:var(--text-3);font-size:12px}
+.v2-usage-bar{height:5px;overflow:hidden;border-radius:999px;background:var(--line-soft)}
+.v2-usage-bar>span{display:block;height:100%;border-radius:999px;background:var(--orange)}
+.v2-usage-list>div[data-depasse=true] .v2-usage-bar>span{background:#b42318}
+.v2-usage-list>div[data-depasse=true] strong{color:#b42318}
+
+.v2-counted-list>div{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line-soft)}
+.v2-counted-list>div:first-child{border-top:0}
+.v2-counted-list strong{flex:none;font-size:13px;font-weight:550}
+.v2-counted-list>div>span:first-of-type{flex:1;color:var(--text-3);font-size:12px}
+
+.v2-plan-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:7px 16px;margin:10px 0 0;padding:0;list-style:none}
+.v2-plan-features li{display:flex;align-items:center;gap:7px;color:var(--text-2);font-size:12.5px}
+.v2-plan-features svg{width:14px;height:14px;flex:none;color:var(--green)}
+
+.v2-plan-others{display:flex;flex-direction:column;gap:0;margin:10px 0 14px}
+.v2-plan-others>div{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--line-soft)}
+.v2-plan-others>div:first-child{border-top:0}
+.v2-plan-others strong{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600}
+.v2-plan-others small{display:block;margin-top:2px;color:var(--text-3);font-size:11.5px}
+.v2-plan-economie{color:var(--green)!important}
+.v2-plan-others-prix{flex:none;text-align:right}
+.v2-plan-others-prix strong{display:block;font-size:14px}
+
 /* La fiche d'une relation — écran 41. Un dossier, pas un formulaire : on la
    lit, on n'y saisit rien. Modifier passe par le panneau. */
 /* 560 px, la largeur de la maquette : plus large que les panneaux de saisie,
