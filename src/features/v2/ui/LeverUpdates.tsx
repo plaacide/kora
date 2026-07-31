@@ -1102,24 +1102,20 @@ function ReviewStep({
                 ))}
               </div>
             )}
-          </section>
 
-          {demande.trim() && (
-            // La demande est un bloc DANS une section, pas la section
-            // elle-même : sinon son fond prend toute la largeur de l'aperçu
-            // pendant que le tableau d'indicateurs reste en retrait, et les
-            // deux ne s'alignent plus. Même forme que sur la mise à jour
-            // publiée — l'aperçu ne vaut que s'il montre ce que le
-            // destinataire verra, à la virgule près.
-            <section>
+            {/* La demande se lit sous le tableau, dans la même section : elle
+                prolonge les chiffres au lieu de former un bloc à part. */}
+            {demande.trim() && (
               <p className="v2-preview-request">
                 <Icon name="trend" />
                 <span>
                   <strong>Demande :</strong> {demande}
                 </span>
               </p>
-            </section>
-          )}
+            )}
+          </section>
+
+
         </div>
 
         <div className="v2-publication-grid">

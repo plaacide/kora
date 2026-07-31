@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 
@@ -82,6 +82,56 @@ const rail: Array<{
   { href: "/v2/recherche", label: "Recherche", icon: "search", mobile: true },
 ];
 
+/**
+ * Le second niveau du fil d'Ariane — « Lever › Configurer la levée ».
+ *
+ * Toutes les maquettes en portent un : le bandeau y nomme la section, puis le
+ * sous-écran ouvert. Sans lui, l'assistant de partage, la configuration d'une
+ * levée ou une mise à jour publiée s'affichent sous le seul mot de leur
+ * section, et rien ne dit d'où l'on vient ni comment revenir.
+ *
+ * Il se déduit de l'URL plutôt que d'être poussé par chaque page : ces
+ * sous-écrans sont ouverts par un paramètre de requête sur la même route, et
+ * une mise en page ne reçoit pas les paramètres de requête dans Next.
+ */
+function sousEcranCourant(
+  section: string,
+  params: URLSearchParams,
+): string | null {
+  if (section === "lever") {
+    const vue = params.get("view");
+    if (vue === "configure") return "Configurer la levée";
+    if (vue === "close") return "Clôturer la levée";
+    if (vue === "updates") {
+      // L'assistant et la mise à jour publiée sont deux étages distincts.
+      if (params.get("step") === "nouvelle") {
+        return "Mises à jour › Créer une mise à jour";
+      }
+      if (params.get("maj")) return "Mises à jour › Détail";
+      return "Mises à jour";
+    }
+    if (vue === "pipeline") return "Pipeline";
+    if (vue === "commitments") return "Engagements";
+    return null;
+  }
+
+  if (section === "access") {
+    if (params.get("share")) return "Créer un accès";
+    if (params.get("request")) return "Demande d’accès";
+    if (params.get("apercu")) return "Aperçu invité";
+    return null;
+  }
+
+  if (section === "preparation") {
+    if (params.get("exigence")) return "Détail de l’exigence";
+    if (params.get("import")) return "Importer une liste";
+    if (params.get("new")) return "Ajouter une exigence";
+    return null;
+  }
+
+  return null;
+}
+
 export function WorkspaceShell({
   children,
   email,
@@ -131,14 +181,16 @@ export function WorkspaceShell({
           data-expanded={expanded}
         >
           <div className="v2-rail-head">
+            {/* Le logo entier, pas l'icône À CÔTÉ du mot : les deux portent
+                les mêmes « a » et se répétaient. Replié, le rail n'a la place
+                que du signe — c'est le seul cas où l'icône sert. */}
             <Link className="v2-mark" href="/v2" aria-label="Sanza">
-              <SanzaMark size={30} />
+              {expanded ? (
+                <SanzaWordmark height={22} />
+              ) : (
+                <SanzaMark size={30} />
+              )}
             </Link>
-            {expanded && (
-              <span className="v2-rail-brand">
-                <SanzaWordmark height={20} />
-              </span>
-            )}
             <button
               aria-expanded={expanded}
               aria-label={expanded ? "Replier la navigation" : "Déplier la navigation"}
@@ -198,6 +250,8 @@ export function OperationShell({
     "overview";
   const folder = decodeURIComponent(path.split("/documents/")[1] ?? "").replaceAll("/", " / ");
   const currentLabel = folder || pageLabels[currentSection];
+  const params = useSearchParams();
+  const sousEcran = sousEcranCourant(currentSection, params);
   const nav = [
     ["overview", "Vue d’ensemble"],
     ["preparation", "Préparation"],
@@ -322,6 +376,12 @@ export function OperationShell({
         <header className="v2-top">
           {folder && <span className="v2-crumb-muted">Data room /</span>}
           <strong>{currentLabel}</strong>
+          {sousEcran && (
+            <>
+              <span className="v2-crumb-sep">›</span>
+              <strong className="v2-crumb-leaf">{sousEcran}</strong>
+            </>
+          )}
           <span className="v2-spacer" />
           {currentSection !== "lever" && (
             <span className="v2-privacy" data-shared={shared}>
