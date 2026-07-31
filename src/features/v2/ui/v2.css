@@ -423,6 +423,15 @@
 /* Écran 30 — Journal d'activité */
 .v2-panel-note{display:flex;align-items:flex-start;gap:9px}
 .v2-panel-note .v2-icon{flex:0 0 auto;margin-top:1px;color:var(--text-4)}
+.v2-inbox{display:flex;max-width:900px;flex-direction:column;gap:22px}
+.v2-inbox h2{color:var(--text-3);font:600 12px var(--font-v2-head),sans-serif}
+.v2-inbox ul{display:flex;flex-direction:column;overflow:hidden;margin:8px 0 0;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0;list-style:none}
+.v2-inbox li{display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--line-soft);padding:14px 18px}
+.v2-inbox li:last-child{border-bottom:0}
+.v2-inbox li>div{min-width:0;flex:1}
+.v2-inbox li strong{display:block;font-size:13.5px;font-weight:500}
+.v2-inbox li small{display:block;margin-top:2px;color:var(--text-3);font-size:12.5px}
+.v2-inbox li>time{flex:0 0 auto;color:var(--text-4);font-size:12px;white-space:nowrap}
 .v2-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .v2-panel-eyebrow{display:block;color:var(--text-4);font:600 11px var(--font-v2-head),sans-serif;letter-spacing:.06em;text-transform:uppercase}
 .v2-control em{flex:0 0 auto;color:var(--text-4);font-size:12.5px;font-style:normal}
@@ -911,6 +920,15 @@ label.v2-btn[data-busy=true]{opacity:.6;pointer-events:none}
 /* Écrans 66 (recherche) et 68 (abonnement) */
 .v2-panel-note{display:flex;align-items:flex-start;gap:9px}
 .v2-panel-note .v2-icon{flex:0 0 auto;margin-top:1px;color:var(--text-4)}
+.v2-inbox{display:flex;max-width:900px;flex-direction:column;gap:22px}
+.v2-inbox h2{color:var(--text-3);font:600 12px var(--font-v2-head),sans-serif}
+.v2-inbox ul{display:flex;flex-direction:column;overflow:hidden;margin:8px 0 0;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0;list-style:none}
+.v2-inbox li{display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--line-soft);padding:14px 18px}
+.v2-inbox li:last-child{border-bottom:0}
+.v2-inbox li>div{min-width:0;flex:1}
+.v2-inbox li strong{display:block;font-size:13.5px;font-weight:500}
+.v2-inbox li small{display:block;margin-top:2px;color:var(--text-3);font-size:12.5px}
+.v2-inbox li>time{flex:0 0 auto;color:var(--text-4);font-size:12px;white-space:nowrap}
 .v2-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .v2-panel-eyebrow{display:block;color:var(--text-4);font:600 11px var(--font-v2-head),sans-serif;letter-spacing:.06em;text-transform:uppercase}
 .v2-control em{flex:0 0 auto;color:var(--text-4);font-size:12.5px;font-style:normal}

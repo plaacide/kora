@@ -1,26 +1,46 @@
+import { accessRequest, inbox } from "@/features/v2/server/inbox";
+import { requireV2Workspace } from "@/features/v2/server/session";
 import {
   CohortInvitationScreen,
   DealroomConsentPanel,
 } from "@/features/v2/ui/Invitations";
 import { InvitationsListScreen } from "@/features/v2/ui/InvitationsList";
+import { Standalone } from "@/features/v2/ui/Shell";
 
 /**
- * L'écran 65 est la liste ; les écrans 31 et 32 sont ce qu'on voit en ouvrant
- * une invitation de cohorte.
+ * Écran 65 — la boîte de réception ; 31 et 32 restent l'invitation de cohorte.
+ *
+ * `search={false}` : rien à chercher dans une boîte qu'on traite en entier.
  */
 export default async function InvitationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ vue?: string; dealroom?: string }>;
+  searchParams: Promise<{ vue?: string; dealroom?: string; demande?: string }>;
 }) {
-  const { vue, dealroom } = await searchParams;
+  const [{ organization }, query] = await Promise.all([
+    requireV2Workspace(),
+    searchParams,
+  ]);
 
-  if (vue !== "cohorte") return <InvitationsListScreen />;
+  if (query.vue === "cohorte") {
+    return (
+      <>
+        <CohortInvitationScreen />
+        {query.dealroom === "1" && <DealroomConsentPanel />}
+      </>
+    );
+  }
+
+  const [boite, demande] = await Promise.all([
+    inbox(organization.id),
+    query.demande
+      ? accessRequest(organization.id, query.demande)
+      : Promise.resolve(null),
+  ]);
 
   return (
-    <>
-      <CohortInvitationScreen />
-      {dealroom === "1" && <DealroomConsentPanel />}
-    </>
+    <Standalone search={false} title="Invitations et demandes">
+      <InvitationsListScreen boite={boite} demande={demande} />
+    </Standalone>
   );
 }

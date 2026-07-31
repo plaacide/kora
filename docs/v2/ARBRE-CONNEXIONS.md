@@ -137,7 +137,10 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ## Le reste du produit
 
 ```
-🔴 Invitations et demandes        —                     ATTEND : invitations + access_requests
+🟢 Invitations et demandes        inbox()               → access_requests + mes_invitations()
+   ├─ 🟢 Liste (65)               → à traiter / traitées, deux sources mêlées
+   ├─ 🟢 Examiner (26)            decide_access_request() — crée les permissions
+   └─ 🔴 Cohorte (31-32)          —                     ATTEND : cohort_links
 🟢 Activité globale               organizationJournal() → même écran, autre portée
                                   (rejoint depuis l'accueil : le rail n'a pas
                                    d'entrée, la maquette n'en prévoit pas)
@@ -224,6 +227,12 @@ affichent « 18 prêtes · 4 à fournir · 2 à actualiser » à côté de « 18
 exigences requises » : 18 + 4 + 2 = 24. Le recommandé est compté à part
 (« 9/13 »). Mélanger les deux ferait paraître un dossier plus en retard qu'il
 n'est.
+
+**Accorder une demande ouvre vraiment la porte** (2 août).
+`decide_access_request` ne pose pas une étiquette : elle crée les permissions
+sur les dossiers de l'opération. Vérifié — six permissions au niveau filigrane,
+et `access_request.granted` au journal. L'écran le dit, parce qu'un fondateur
+qui croit ranger un message ouvrirait sa data room sans le savoir.
 
 **Le pipeline a deux axes** (2 août). `statut` mélangeait une ÉTAPE, un
 ENGAGEMENT et une ISSUE : un investisseur en diligence ayant soft-committé ne

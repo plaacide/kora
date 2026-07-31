@@ -1,124 +1,218 @@
-import { Standalone } from "./Shell";
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { decideV2Request } from "@/app/v2/(workspace)/invitations/actions";
+import { dateJournal } from "@/features/v2/domain/journal";
+import type { Boite, DemandeDetail, EntreeBoite } from "@/features/v2/server/inbox";
+import { EmptyMedallion } from "./EmptyArt";
+import { Icon } from "./Icon";
 
 /**
- * Écran 65 — Invitations et demandes, adapté au multi-opérations.
- * Repris de `sanza_handoff/maquettes/screens/65-invitations-demandes-adaptees.html`.
+ * Écran 65 — la boîte de réception.
+ *
+ * Le pendant de Partage et accès : là on envoie, ici on reçoit. Deux sources
+ * s'y mêlent — demandes d'accès et invitations de cohorte — parce qu'un
+ * fondateur n'a pas deux boîtes en tête : il a ce qu'il doit traiter, et ce
+ * qui l'est déjà.
  *
  * Cet écran vit hors de toute opération : chaque ligne nomme donc la sienne.
- * Une invitation de programme porte « Programme » plutôt qu'un nom — c'est
- * justement l'opération à présenter qui reste à choisir.
  */
+export function InvitationsListScreen({
+  boite,
+  demande,
+}: {
+  boite: Boite;
+  /** La demande ouverte pour examen, si l'URL en désigne une. */
+  demande: DemandeDetail | null;
+}) {
+  const vide = boite.aTraiter.length === 0 && boite.traitees.length === 0;
 
-const SCOPES = [
-  "Toutes les opérations",
-  "Série A 2026",
-  "Prêt Ecobank",
-  "Diligence IFC",
-];
-
-interface Item {
-  initials: string;
-  title: string;
-  operation: string;
-  detail: string;
-  when: string;
-  action: string;
-  href?: string;
-}
-
-const TODO: Item[] = [
-  {
-    initials: "AD",
-    title: "Amina Diallo demande un accès",
-    operation: "Série A 2026",
-    detail: "· Sahel Growth Fund · dossier financier",
-    when: "il y a 2 heures",
-    action: "Examiner",
-  },
-  {
-    initials: "DV",
-    title: "Dakar Ventures vous invite à rejoindre la cohorte 2026",
-    operation: "Programme",
-    detail: "· choisissez l’opération à présenter",
-    when: "il y a 3 jours",
-    action: "Voir l’invitation",
-    href: "/v2/invitations?vue=cohorte",
-  },
-  {
-    initials: "BA",
-    title: "BOA Sénégal demande des pièces complémentaires",
-    operation: "Prêt Ecobank",
-    detail: "· relevés bancaires certifiés",
-    when: "il y a 5 jours",
-    action: "Examiner",
-  },
-];
-
-const DONE: Item[] = [
-  {
-    initials: "KM",
-    title: "Kwame Mensah — accès accordé",
-    operation: "Série A 2026",
-    detail: "· Horizon Ventures · NDA signé",
-    when: "hier",
-    action: "Voir l’accès",
-  },
-];
-
-function Row({ item }: { item: Item }) {
   return (
-    <article className="v2-invite-row">
-      <span className="v2-journal-avatar">{item.initials}</span>
-      <div>
-        <b>{item.title}</b>
-        <small>
-          {item.operation === "Programme" ? (
-            <span className="v2-status" data-tone="blue">
-              <i className="v2-dot" />
-              {item.operation}
-            </span>
-          ) : (
-            <span className="v2-tag">{item.operation}</span>
-          )}{" "}
-          {item.detail}
-        </small>
-      </div>
-      <span className="v2-journal-place">{item.when}</span>
-      {item.href ? (
-        <a className="v2-btn-mini" href={item.href}>{item.action}</a>
+    <div className="v2-inbox">
+      {vide ? (
+        <section className="v2-drop-empty">
+          <EmptyMedallion icon="inbox" />
+          <h2>Rien à traiter</h2>
+          <p>
+            Les demandes d’accès à vos data rooms et les invitations reçues
+            d’un programme arrivent ici. Ce que vous envoyez, vous, se suit
+            depuis Partage et accès de chaque opération.
+          </p>
+        </section>
       ) : (
-        <button className="v2-btn-mini" type="button">{item.action}</button>
+        <>
+          {boite.aTraiter.length > 0 && (
+            <section>
+              <h2>À traiter</h2>
+              <ul>
+                {boite.aTraiter.map((entree) => (
+                  <Ligne entree={entree} key={entree.id} />
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {boite.traitees.length > 0 && (
+            <section>
+              <h2>Traitées récemment</h2>
+              <ul>
+                {boite.traitees.map((entree) => (
+                  <Ligne entree={entree} key={entree.id} />
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
       )}
-    </article>
+
+      {demande && <RequestPanel demande={demande} />}
+    </div>
   );
 }
 
-export function InvitationsListScreen() {
+function Ligne({ entree }: { entree: EntreeBoite }) {
   return (
-    <Standalone search={false} title="Invitations et demandes">
-      <div className="v2-invite-page">
-        <div className="v2-filterbar">
-          {SCOPES.map((scope) => (
-            <button data-active={scope === SCOPES[0]} key={scope} type="button">
-              {scope}
-            </button>
-          ))}
-        </div>
-
-        <div className="v2-nav-label">À traiter</div>
-        <div className="v2-folder-card">
-          {TODO.map((item) => (
-            <Row item={item} key={item.title} />
-          ))}
-        </div>
-
-        <div className="v2-nav-label" data-spaced="true">Traitées récemment</div>
-        <div className="v2-folder-card">
-          {DONE.map((item) => (
-            <Row item={item} key={item.title} />
-          ))}
-        </div>
+    <li>
+      <span className="v2-person-avatar">{entree.initiales}</span>
+      <div>
+        <strong>{entree.titre}</strong>
+        <small>{entree.contexte}</small>
       </div>
-    </Standalone>
+      <time>{dateJournal(entree.at)}</time>
+      <Link className="v2-btn" data-variant="secondary" href={entree.action.href}>
+        {entree.action.label}
+      </Link>
+    </li>
+  );
+}
+
+/**
+ * Écran 26 — examiner une demande d'accès.
+ *
+ * Accorder ne pose pas une étiquette : `decide_access_request` crée les
+ * permissions réelles sur les dossiers de l'opération. C'est dit à l'écran,
+ * parce que le fondateur doit savoir qu'il ouvre une porte et non qu'il range
+ * un message.
+ */
+function RequestPanel({ demande }: { demande: DemandeDetail }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [erreur, setErreur] = useState<string | null>(null);
+  const [note, setNote] = useState("");
+
+  async function decider(decision: "granted" | "refused") {
+    setBusy(decision);
+    setErreur(null);
+
+    const res = await decideV2Request({
+      requestId: demande.id,
+      decision,
+      note,
+    });
+
+    setBusy(null);
+    if (!res.ok) {
+      setErreur(res.error ?? "La demande n’a pas pu être traitée.");
+      return;
+    }
+
+    router.push("/v2/invitations");
+    router.refresh();
+  }
+
+  return (
+    <>
+      <Link aria-label="Fermer" className="v2-scrim" href="/v2/invitations" />
+      <aside className="v2-sidepanel">
+        <header>
+          <div>
+            <span className="v2-panel-eyebrow">Demande d’accès</span>
+            <h2>{demande.investisseur}</h2>
+          </div>
+          <Link aria-label="Fermer" href="/v2/invitations">×</Link>
+        </header>
+
+        <div className="v2-sidepanel-body">
+          {erreur && (
+            <p className="v2-auth-error" role="alert">
+              {erreur}
+            </p>
+          )}
+
+          <div className="v2-detail-grid">
+            <div>
+              <small>Opération demandée</small>
+              <strong>{demande.operationName}</strong>
+            </div>
+            <div>
+              <small>Reçue le</small>
+              <strong>{dateJournal(demande.createdAt)}</strong>
+            </div>
+            {demande.instrument && (
+              <div>
+                <small>Instrument</small>
+                <strong>{demande.instrument}</strong>
+              </div>
+            )}
+            {demande.email && (
+              <div>
+                <small>Adresse</small>
+                <strong>{demande.email}</strong>
+              </div>
+            )}
+          </div>
+
+          {demande.message && (
+            <section>
+              <small>Message joint</small>
+              <p className="v2-request-quote">{demande.message}</p>
+            </section>
+          )}
+
+          <label className="v2-field">
+            <span>
+              Note interne <small>— facultative, jamais transmise</small>
+            </span>
+            <span className="v2-control">
+              <textarea
+                onChange={(event) => setNote(event.target.value)}
+                placeholder="Ce qui a motivé la décision."
+                rows={3}
+                value={note}
+              />
+            </span>
+          </label>
+
+          <p className="v2-panel-note">
+            <Icon name="shield" />
+            Accorder ouvre réellement les dossiers de l’opération à cette
+            adresse — ce n’est pas un simple classement. Pour choisir un
+            périmètre plus étroit, refusez ici et créez l’accès depuis Partage
+            et accès.
+          </p>
+        </div>
+
+        <footer className="v2-sidepanel-footer">
+          <button
+            disabled={busy !== null}
+            onClick={() => decider("refused")}
+            type="button"
+          >
+            {busy === "refused" ? "…" : "Refuser"}
+          </button>
+          <button
+            className="v2-btn"
+            disabled={busy !== null}
+            onClick={() => decider("granted")}
+            type="button"
+          >
+            {busy === "granted" ? "Ouverture…" : "Accorder l’accès"}
+          </button>
+        </footer>
+      </aside>
+    </>
   );
 }
