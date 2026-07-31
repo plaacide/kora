@@ -91,11 +91,22 @@ export function estAActualiser(
   return age > exigence.freshnessDays * 86_400_000;
 }
 
-/** L'état affiché : le statut stocké, sauf si la preuve a vieilli. */
+/**
+ * L'état affiché : le statut stocké, sauf si quelque chose le dépasse.
+ *
+ * Deux états ne sont pas stockés parce qu'ils se calculent — et se calculer,
+ * c'est ne jamais devenir faux faute d'entretien :
+ *
+ *   · une suggestion en attente appelle un geste, elle passe devant ;
+ *   · une preuve périmée n'est plus une preuve.
+ */
 export function etatAffiche(
   exigence: ExigenceBrute,
   maintenant: Date,
 ): { label: string; tone: string } {
+  if (exigence.pending > 0 && exigence.proofs === 0) {
+    return { label: "Pièce à confirmer", tone: "blue" };
+  }
   if (estAActualiser(exigence, maintenant)) {
     return { label: "À actualiser", tone: "amber" };
   }
@@ -119,8 +130,11 @@ export interface ExigenceBrute {
   acceptedFormats: string | null;
   /** Date de la preuve la plus récente — c'est elle qui vieillit. */
   lastProofAt: string | null;
-  /** Nombre de pièces rattachées — la preuve, pas l'intention. */
+  /** Preuves CONFIRMÉES — celles qui comptent pour le statut. */
   proofs: number;
+  /** Suggestions en attente de confirmation. Une suggestion n'est pas une
+   *  preuve : elle ne rend pas l'exigence prête, elle appelle un geste. */
+  pending: number;
 }
 
 export interface GroupeExigences {
@@ -200,6 +214,7 @@ export function compter(exigences: readonly ExigenceBrute[]): Compte {
  * pièce se traite en déposant, une exigence qui en a une se relit.
  */
 export function actionLabel(exigence: ExigenceBrute): string {
+  if (exigence.pending > 0 && exigence.proofs === 0) return "Confirmer";
   if (exigence.proofs > 0) return "Voir la pièce";
   return exigence.folderId ? "Déposer une pièce" : "Associer une pièce";
 }

@@ -32,7 +32,12 @@ interface LigneExigence {
  *  deux écrans qui affichent la même exigence différemment. */
 function enExigence(
   ligne: LigneExigence,
-  extra: { folderName: string | null; proofs: number; lastProofAt: string | null },
+  extra: {
+    folderName: string | null;
+    proofs: number;
+    pending: number;
+    lastProofAt: string | null;
+  },
 ): ExigenceBrute {
   return {
     id: ligne.id,
@@ -56,6 +61,8 @@ export interface ProofRow {
   name: string;
   versionNo: number | null;
   linkedAt: string;
+  /** `false` = suggestion proposée par Sanza, pas encore validée. */
+  confirmed: boolean;
 }
 
 export interface RequirementDetail extends ExigenceBrute {
@@ -88,19 +95,27 @@ export async function listRequirementsFull(
   // tient lieu de réponse à l'exigence.
   const { data: preuves } = await supabase
     .from("checklist_item_documents")
-    .select("item_id, linked_at")
+    .select("item_id, linked_at, confirmed")
     .in(
       "item_id",
       lignes.map((item) => item.id),
     );
 
   const comptes = new Map<string, number>();
+  const attentes = new Map<string, number>();
   const derniere = new Map<string, string>();
   for (const row of (preuves ?? []) as Array<{
     item_id: string;
     linked_at: string;
+    confirmed: boolean;
   }>) {
+    if (!row.confirmed) {
+      attentes.set(row.item_id, (attentes.get(row.item_id) ?? 0) + 1);
+      continue;
+    }
     comptes.set(row.item_id, (comptes.get(row.item_id) ?? 0) + 1);
+    // La fraîcheur se mesure sur les preuves confirmées seules : une
+    // suggestion récente ne rajeunit pas un dossier.
     const connue = derniere.get(row.item_id);
     if (!connue || row.linked_at > connue) derniere.set(row.item_id, row.linked_at);
   }
@@ -115,6 +130,7 @@ export async function listRequirementsFull(
   return lignes.map((item) => enExigence(item, {
     folderName: item.folder_id ? (noms.get(item.folder_id) ?? null) : null,
     proofs: comptes.get(item.id) ?? 0,
+    pending: attentes.get(item.id) ?? 0,
     lastProofAt: derniere.get(item.id) ?? null,
   }));
 }
@@ -143,7 +159,7 @@ export async function requirementDetail(
     supabase
       .from("checklist_item_documents")
       .select(
-        "document_id, linked_at, documents(name, document_versions!documents_current_version_fk(version_no))",
+        "document_id, linked_at, confirmed, documents(name, document_versions!documents_current_version_fk(version_no))",
       )
       .eq("item_id", requirementId)
       .order("linked_at", { ascending: false }),
@@ -162,6 +178,7 @@ export async function requirementDetail(
     (liens ?? []) as unknown as Array<{
       document_id: string;
       linked_at: string;
+      confirmed: boolean;
       documents:
         | { name: string; document_versions: { version_no: number }[] | { version_no: number } | null }
         | Array<{ name: string; document_versions: { version_no: number }[] | { version_no: number } | null }>
@@ -176,15 +193,19 @@ export async function requirementDetail(
       name: document?.name ?? "Pièce supprimée",
       versionNo: version?.version_no ?? null,
       linkedAt: lien.linked_at,
+      confirmed: lien.confirmed,
     };
   });
+
+  const confirmees = proofDocuments.filter((p) => p.confirmed);
 
   return {
     ...enExigence(ligne, {
       folderName: (folder as { name: string } | null)?.name ?? null,
-      proofs: proofDocuments.length,
+      proofs: confirmees.length,
+      pending: proofDocuments.length - confirmees.length,
       // Les liens arrivent triés du plus récent au plus ancien.
-      lastProofAt: proofDocuments[0]?.linkedAt ?? null,
+      lastProofAt: confirmees[0]?.linkedAt ?? null,
     }),
     proofDocuments,
   };

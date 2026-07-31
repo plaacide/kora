@@ -4,7 +4,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import type { ChangeEvent, DragEvent, ReactNode } from "react";
 
-import { registerV2Document } from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
+import {
+  registerV2Document,
+  suggestV2Associations,
+} from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
 import { cleStockage } from "@/lib/storage-key";
 import { createClient } from "@/lib/supabase/client";
 import { UploadProgress, type UploadRow } from "./Upload";
@@ -210,6 +213,11 @@ export function DocumentUpload({
     // passent par l'URL — ainsi l'écran survit à un rechargement, et le lien
     // reste partageable avec un collègue.
     if (deposees.length > 0) {
+      // Les suggestions sont écrites AVANT d'ouvrir l'écran 17, non
+      // confirmées. Elles survivent ainsi à un onglet refermé : jusqu'ici,
+      // quitter l'écran sans confirmer jetait tout le rapprochement.
+      await suggestV2Associations({ operationId, documentIds: deposees });
+
       // Chemin absolu, et SANS `refresh()` derrière : re-rendre la route
       // courante juste après écrase la navigation en cours, et l'écran 17 ne
       // s'ouvrait jamais. La navigation recharge de toute façon les données

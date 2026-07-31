@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 
+import { writeSuggestions } from "@/features/v2/server/documents";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -130,6 +131,49 @@ export async function addV2Version(input: {
  * pas de trace d'un refus, parce qu'une exigence non satisfaite reste une
  * exigence non satisfaite, ce que le plan de préparation dit déjà.
  */
+/**
+ * Écrit les suggestions du lot qui vient d'être déposé, non confirmées.
+ *
+ * Appelée par le client une fois TOUT le lot enregistré, pas fichier par
+ * fichier : la suggestion tient compte des autres pièces du lot — deux
+ * fichiers ne doivent pas revendiquer la même exigence.
+ */
+export async function suggestV2Associations(input: {
+  operationId: string;
+  documentIds: string[];
+}): Promise<{ ok: boolean; written: number }> {
+  const written = await writeSuggestions(input.operationId, input.documentIds);
+  return { ok: true, written };
+}
+
+/**
+ * Écarter une suggestion sans rien rattacher.
+ *
+ * Refuser une proposition de la machine et détacher une preuve validée sont
+ * deux gestes différents : le journal les distingue, faute de quoi on ne
+ * saurait jamais si l'algorithme propose juste.
+ */
+export async function dismissV2Suggestion(input: {
+  operationId: string;
+  requirementId: string;
+  documentId: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("dismiss_checklist_suggestion", {
+    p_item: input.requirementId,
+    p_doc: input.documentId,
+  });
+
+  if (error) {
+    console.error("[v2 documents] dismiss_checklist_suggestion failed", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}
+
 export async function confirmV2Associations(input: {
   operationId: string;
   pairs: Array<{ documentId: string; requirementId: string }>;
@@ -143,6 +187,7 @@ export async function confirmV2Associations(input: {
     const { error } = await supabase.rpc("attach_checklist_document", {
       p_item: pair.requirementId,
       p_doc: pair.documentId,
+      p_confirmed: true,
     });
 
     if (error) {

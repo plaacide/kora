@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
+  confirmV2Associations,
+  dismissV2Suggestion,
+} from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
+import {
   addRequirementAction,
   applyTemplateAction,
   detachProofAction,
@@ -20,7 +24,6 @@ import {
   grouper,
   niveauLabel,
   sourceLabel,
-  statutLabel,
   type ExigenceBrute,
   type FiltreExigences,
 } from "@/features/v2/domain/preparation";
@@ -326,7 +329,9 @@ export function RequirementPanel({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
-  const statut = statutLabel(requirement.status);
+  // Le panneau montre le même état que la liste : un fondateur qui ouvre une
+  // ligne « Pièce à confirmer » ne doit pas y lire « À préparer ».
+  const statut = etatAffiche(requirement, new Date());
 
   async function changerStatut(status: string) {
     setBusy(status);
@@ -334,6 +339,27 @@ export function RequirementPanel({
       operationId,
       requirementId: requirement.id,
       status,
+    });
+    setBusy(null);
+    router.refresh();
+  }
+
+  async function confirmer(documentId: string) {
+    setBusy(documentId);
+    await confirmV2Associations({
+      operationId,
+      pairs: [{ documentId, requirementId: requirement.id }],
+    });
+    setBusy(null);
+    router.refresh();
+  }
+
+  async function ecarter(documentId: string) {
+    setBusy(documentId);
+    await dismissV2Suggestion({
+      operationId,
+      requirementId: requirement.id,
+      documentId,
     });
     setBusy(null);
     router.refresh();
@@ -434,23 +460,48 @@ export function RequirementPanel({
             ) : (
               <ul className="v2-proof-list">
                 {requirement.proofDocuments.map((proof) => (
-                  <li key={proof.id}>
+                  <li data-pending={!proof.confirmed} key={proof.id}>
                     <Icon name="file" />
                     <div>
                       <strong>{proof.name}</strong>
                       <small>
                         {proof.versionNo ? `v${proof.versionNo} · ` : ""}
-                        rattachée le {shortDate(proof.linkedAt)}
+                        {proof.confirmed
+                          ? `rattachée le ${shortDate(proof.linkedAt)}`
+                          : `proposée par Sanza le ${shortDate(proof.linkedAt)}`}
                       </small>
                     </div>
                     <Link href={`/v2/documents/${proof.id}`}>Ouvrir</Link>
-                    <button
-                      disabled={busy === proof.id}
-                      onClick={() => retirer(proof.id)}
-                      type="button"
-                    >
-                      Retirer
-                    </button>
+                    {/* Une suggestion se confirme ou s'écarte ; une preuve
+                        validée se retire. Le même bouton pour les deux
+                        effacerait la différence entre « la machine propose »
+                        et « quelqu'un a validé ». */}
+                    {proof.confirmed ? (
+                      <button
+                        disabled={busy === proof.id}
+                        onClick={() => retirer(proof.id)}
+                        type="button"
+                      >
+                        Retirer
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          disabled={busy === proof.id}
+                          onClick={() => confirmer(proof.id)}
+                          type="button"
+                        >
+                          Confirmer
+                        </button>
+                        <button
+                          disabled={busy === proof.id}
+                          onClick={() => ecarter(proof.id)}
+                          type="button"
+                        >
+                          Écarter
+                        </button>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>

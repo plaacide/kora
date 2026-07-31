@@ -407,6 +407,82 @@ export async function pendingAssociations(
 
   const supabase = await createClient();
 
+  const [{ data: docs }, { data: liens }] = await Promise.all([
+    supabase
+      .from("documents")
+      .select("id, name")
+      .eq("deal_id", operationId)
+      .in("id", documentIds),
+    supabase
+      .from("checklist_item_documents")
+      .select("document_id, item_id, confirmed, checklist_items(label)")
+      .in("document_id", documentIds),
+  ]);
+
+  // Les suggestions ne sont plus recalculées ici : elles ont été écrites au
+  // dépôt, non confirmées. Les recalculer donnerait un écran qui ne montre
+  // pas ce que la base retient — et qui changerait d'avis à chaque
+  // rechargement si l'algorithme évoluait entre-temps.
+  const suggerees = new Map<string, { requirementId: string; label: string }>();
+  const confirmees = new Set<string>();
+
+  for (const lien of (liens ?? []) as unknown as Array<{
+    document_id: string;
+    item_id: string;
+    confirmed: boolean;
+    checklist_items: { label: string } | Array<{ label: string }> | null;
+  }>) {
+    if (lien.confirmed) {
+      confirmees.add(lien.document_id);
+      continue;
+    }
+    const joint = Array.isArray(lien.checklist_items)
+      ? lien.checklist_items[0]
+      : lien.checklist_items;
+    suggerees.set(lien.document_id, {
+      requirementId: lien.item_id,
+      label: joint?.label ?? "",
+    });
+  }
+
+  const parId = new Map(
+    ((docs ?? []) as Array<{ id: string; name: string }>).map((doc) => [
+      doc.id,
+      doc.name,
+    ]),
+  );
+
+  // L'ordre de dépôt est celui que le fondateur a sous les yeux. Une pièce
+  // déjà confirmée n'a plus rien à confirmer : elle sort de l'écran.
+  return documentIds
+    .filter((id) => parId.has(id) && !confirmees.has(id))
+    .map((id) => {
+      const suggestion = suggerees.get(id);
+      return {
+        documentId: id,
+        documentName: parId.get(id) as string,
+        suggestion: suggestion
+          ? { ...suggestion, matched: [] as string[] }
+          : null,
+      };
+    });
+}
+
+/**
+ * Calcule les suggestions d'un lot et les écrit, NON confirmées.
+ *
+ * Appelée une fois le dépôt terminé. C'est le seul endroit où l'algorithme
+ * tourne : l'écran 17 relit ensuite ce qui a été écrit, au lieu de refaire le
+ * calcul et de risquer d'afficher autre chose que ce que la base retient.
+ */
+export async function writeSuggestions(
+  operationId: string,
+  documentIds: readonly string[],
+): Promise<number> {
+  if (documentIds.length === 0) return 0;
+
+  const supabase = await createClient();
+
   const [{ data: docs }, { data: items }, { data: liens }] = await Promise.all([
     supabase
       .from("documents")
@@ -419,11 +495,13 @@ export async function pendingAssociations(
       .eq("deal_id", operationId),
     supabase
       .from("checklist_item_documents")
-      .select("document_id, item_id")
+      .select("document_id")
       .in("document_id", documentIds),
   ]);
 
-  const dejaLiees = new Set(
+  // Une pièce déjà rattachée — suggestion précédente ou preuve confirmée — ne
+  // se re-suggère pas : le fondateur a déjà eu la question sous les yeux.
+  const dejaVues = new Set(
     ((liens ?? []) as Array<{ document_id: string }>).map((l) => l.document_id),
   );
 
@@ -437,30 +515,37 @@ export async function pendingAssociations(
     description: item.description ?? undefined,
   }));
 
-  const enAttente = ((docs ?? []) as Array<{ id: string; name: string }>).filter(
-    (doc) => !dejaLiees.has(doc.id),
+  const parId = new Map(
+    ((docs ?? []) as Array<{ id: string; name: string }>)
+      .filter((doc) => !dejaVues.has(doc.id))
+      .map((doc) => [doc.id, doc.name]),
   );
-
-  // L'ordre de dépôt est celui que le fondateur a sous les yeux.
-  const parId = new Map(enAttente.map((doc) => [doc.id, doc.name]));
   const ordonnes = documentIds.filter((id) => parId.has(id));
+  if (ordonnes.length === 0) return 0;
 
   const lot = suggestForBatch(
     ordonnes.map((id) => parId.get(id) as string),
     requirements,
   );
 
-  return ordonnes.map((id, index) => ({
-    documentId: id,
-    documentName: parId.get(id) as string,
-    suggestion: lot[index]?.suggestion
-      ? {
-          requirementId: lot[index].suggestion.requirementId,
-          label: lot[index].suggestion.label,
-          matched: lot[index].suggestion.matched,
-        }
-      : null,
-  }));
+  let ecrites = 0;
+  for (const [index, id] of ordonnes.entries()) {
+    const suggestion = lot[index]?.suggestion;
+    if (!suggestion) continue;
+
+    const { error } = await supabase.rpc("attach_checklist_document", {
+      p_item: suggestion.requirementId,
+      p_doc: id,
+      p_confirmed: false,
+    });
+
+    // Une suggestion qui échoue n'est pas une perte de données : la pièce est
+    // déposée, elle reste associable à la main. On continue le lot.
+    if (error) console.error("[v2 suggestions] écriture échouée", error);
+    else ecrites += 1;
+  }
+
+  return ecrites;
 }
 
 /** Toutes les exigences de l'opération, pour le choix manuel de l'écran 17. */
@@ -470,9 +555,9 @@ export async function listRequirements(
   const supabase = await createClient();
   const { data } = await supabase
     .from("checklist_items")
-    .select("id, label, category, position")
+    .select("id, label, domain, position")
     .eq("deal_id", operationId)
-    .order("category")
+    .order("domain")
     .order("position");
 
   return ((data ?? []) as Array<{ id: string; label: string }>).map((item) => ({

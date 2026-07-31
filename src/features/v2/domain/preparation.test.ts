@@ -27,6 +27,7 @@ const exigence = (patch: Partial<ExigenceBrute> = {}): ExigenceBrute => ({
   acceptedFormats: null,
   lastProofAt: null,
   proofs: 0,
+  pending: 0,
   ...patch,
 });
 
@@ -119,6 +120,21 @@ describe("correspondAuFiltre", () => {
 
   it("laisse tout passer sur « toutes »", () => {
     expect(correspondAuFiltre("done", "toutes")).toBe(true);
+  });
+});
+
+describe("suggestion en attente", () => {
+  const maintenant = new Date("2026-08-01T12:00:00Z");
+
+  it("passe devant le statut stocké : elle appelle un geste", () => {
+    const suggeree = exigence({ status: "todo", pending: 1, proofs: 0 });
+    expect(etatAffiche(suggeree, maintenant).label).toBe("Pièce à confirmer");
+    expect(actionLabel(suggeree)).toBe("Confirmer");
+  });
+
+  it("s’efface dès qu’une preuve confirmée existe", () => {
+    const mixte = exigence({ status: "done", pending: 1, proofs: 1 });
+    expect(etatAffiche(mixte, maintenant).label).toBe("Prête");
   });
 });
 
