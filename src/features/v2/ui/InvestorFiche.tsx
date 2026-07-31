@@ -24,14 +24,27 @@ import type { SignauxDocumentaires } from "@/features/v2/server/fiche";
 
 import { Icon } from "./Icon";
 
+/**
+ * Sept onglets dans 560 px.
+ *
+ * Les intitulés longs de la maquette — « Activité documentaire », « Notes
+ * internes » — imposaient une barre de défilement horizontale, qui cache la
+ * moitié des onglets derrière un geste que rien n'annonce. On abrège plutôt, et
+ * la barre passe à la ligne s'il le faut : un onglet qu'on ne voit pas n'existe
+ * pas.
+ *
+ * « Consultations » plutôt que « Documents » : le mot est déjà celui du produit
+ * pour les signaux de lecture, et « Documents » se confondrait avec la data
+ * room.
+ */
 const ONGLETS = [
   ["resume", "Résumé"],
   ["interactions", "Interactions"],
-  ["documents", "Activité documentaire"],
+  ["documents", "Consultations"],
   ["acces", "Accès"],
   ["engagements", "Engagements"],
   ["questions", "Questions"],
-  ["notes", "Notes internes"],
+  ["notes", "Notes"],
 ] as const;
 
 function lien(extra: Record<string, string>): string {
@@ -156,14 +169,22 @@ export function InvestorFiche({
 function Ligne({
   children,
   libelle,
+  precision,
 }: {
   children: React.ReactNode;
   libelle: string;
+  /**
+   * Le qualificatif — « confirmé · 31-07 ». Sur sa propre ligne plutôt qu'entre
+   * parenthèses : dans une colonne de 250 px, une parenthèse rejette le montant
+   * à la ligne et on lit « 120 000 000 XOF (confirmé, » avant la suite.
+   */
+  precision?: string | null;
 }) {
   return (
     <div>
       <span>{libelle}</span>
       <strong>{children}</strong>
+      {precision && <small>{precision}</small>}
     </div>
   );
 }
@@ -199,23 +220,42 @@ function Resume({
               {engagementLabel(investisseur.engagement)}
             </span>
           </Ligne>
-          <Ligne libelle="Montant déclaré">
+          <Ligne
+            libelle="Montant déclaré"
+            precision={
+              engagement
+                ? `${niveauDe(engagement.niveau).court.toLowerCase()} · ${dateJournal(engagement.date)}`
+                : null
+            }
+          >
             {engagement
-              ? `${engagement.montant.toLocaleString("fr-FR")} ${engagement.devise ?? ""} (${niveauDe(engagement.niveau).court.toLowerCase()}, ${dateJournal(engagement.date)})`
+              ? `${engagement.montant.toLocaleString("fr-FR")} ${engagement.devise ?? ""}`
               : "—"}
           </Ligne>
           <Ligne libelle="Responsable interne">
             {investisseur.responsable ?? "—"}
           </Ligne>
-          <Ligne libelle="Dernière interaction">
+          <Ligne
+            libelle="Dernière interaction"
+            precision={
+              derniere
+                ? `${libelleInteraction(derniere.type)} · ${dateJournal(derniere.date)}`
+                : null
+            }
+          >
             {derniere
-              ? `${derniere.resultat || libelleInteraction(derniere.type)} — ${dateJournal(derniere.date)}`
+              ? derniere.resultat || libelleInteraction(derniere.type)
               : "aucune"}
           </Ligne>
-          <Ligne libelle="Prochaine action">
-            {investisseur.prochaineAction
-              ? `${investisseur.prochaineAction}${investisseur.dateRelance ? ` — ${dateJournal(investisseur.dateRelance)}` : ""}`
-              : "—"}
+          <Ligne
+            libelle="Prochaine action"
+            precision={
+              investisseur.dateRelance
+                ? `relance le ${dateJournal(investisseur.dateRelance)}`
+                : null
+            }
+          >
+            {investisseur.prochaineAction ?? "—"}
           </Ligne>
           <Ligne libelle="Ticket indicatif">
             {investisseur.ticket
@@ -280,7 +320,7 @@ function SignauxCard({ signaux }: { signaux: SignauxDocumentaires }) {
           <strong>{signaux.visites}</strong>
         </div>
         <div>
-          <span>Pièces consultées</span>
+          <span>Pièces lues</span>
           <strong>
             {signaux.piecesConsultees}
             {signaux.piecesTotales > 0 && ` / ${signaux.piecesTotales}`}
@@ -291,7 +331,7 @@ function SignauxCard({ signaux }: { signaux: SignauxDocumentaires }) {
           <strong>{signaux.pagesVues}</strong>
         </div>
         <div>
-          <span>Dernière visite</span>
+          <span>Dernière</span>
           <strong>
             {signaux.derniereVisite ? dateJournal(signaux.derniereVisite) : "—"}
           </strong>
