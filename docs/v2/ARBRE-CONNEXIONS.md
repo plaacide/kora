@@ -3,7 +3,7 @@
 La boussole du branchement : ce qui lit vraiment la base, ce qui affiche encore
 des données écrites en dur, et ce qui manque côté serveur pour finir.
 
-**Dernière vérification : 31 juillet 2026**, branche `v2/rebuild`, par
+**Dernière vérification : 31 juillet 2026 (soir)**, branche `v2/rebuild`, par
 inventaire du code (`grep` des fichiers V2 touchant Supabase, puis lecture
 écran par écran). Ce document se périme : le relire avant de s'y fier.
 
@@ -52,14 +52,23 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 
 ```
 🔴 Vue d'ensemble                 —                     ATTEND : lecture deals + readiness
-🔴 Préparation (exigences)        —                     ATTEND : checklist_items, apply_checklist_template
+🟡 Préparation (exigences)        listRequirementsFull(), requirementDetail(), requirementHistory()
+   ├─ 🟢 Plan (écran 11)          → checklist_items + preuves + dossier attendu
+   ├─ 🟢 Détail (écran 12)        → preuves, journal, statut, retrait de preuve
+   ├─ 🟢 Ajouter une exigence     add_checklist_item()
+   ├─ 🟢 Poser le référentiel     apply_checklist_template()
+   └─ 🔴 Import d'une liste (13)  —                     ATTEND : extraction + colonne de provenance
 🟢 Data room                      listFolders(), listDocuments(), resolveFolderPath()
    ├─ 🟢 Arborescence             → folders (+ compte de pièces, accès invités)
    ├─ 🟢 Table des pièces         → documents + document_versions + checklist_item_documents
    ├─ 🟢 Détail, versions, journal → document_versions + audit_log ; restaurer et remplacer
    ├─ 🟢 Dépôt (écran 16)         → Storage direct + register_document, % réel, annulation
    └─ 🟢 Associations (écran 17)  → suggestions depuis le modèle + attach_checklist_document
-🔴 Partage et accès               —                     ATTEND : permissions, create_invitation
+🟢 Partage et accès               listAccesses(), shareableFolders(), countActiveAccesses()
+   ├─ 🟢 Assistant (écrans 20-23) → createInvitation() V1 : RPC + lien + e-mail
+   ├─ 🟢 Tableau (écran 24)       → invitations + ndas + permissions + audit_log
+   ├─ 🟢 Aperçu invité (écran 25) → dossiers et pièces réellement ouverts
+   └─ 🔴 Révocation               —                     ATTEND : RPC revoke_invitation
 🔴 Lever                          —                     ATTEND : raises, save_raise (écrans déjà faits)
 🔴 Investisseurs                  —                     ATTEND : raise_investors
 🔴 Activité (journal)             —                     ATTEND : audit_log par opération
@@ -105,12 +114,28 @@ se pose sur un dossier ; sans dossier, il n'y a nulle part où accorder — ni
 retirer — un droit. La racine est donc réservée à l'équipe interne, et le geste
 qui partage une pièce est celui qui la range.
 
-**En attente** — deux choix produit, tous deux sur la fidélité des maquettes :
+**Tranchée — l'accès ne se restreint pas à l'invitation** (31 juillet 2026).
+`accept_invitation` accorde TOUS les dossiers racine au niveau de
+l'invitation ; rien ne retient « cette invitation n'ouvre que ces
+dossiers-là ». L'assistant DIT donc ce qui s'ouvrira au lieu d'offrir un choix
+qui serait ignoré. Restreindre reste possible après, via `set_permission`.
+
+**En attente** — les choix produit, tous sur la fidélité des maquettes :
 
 1. **Pas de visibilité par pièce** — le droit se pose sur le DOSSIER
    (`permissions.folder_id`). Les maquettes montrent « Masquée aux invités »
    par document. Dériver du dossier (ce qui est fait), ou migrer ?
-2. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
+2. **La préparation : trois états contre six, et pas de niveau.**
+   `checklist_status` vaut `todo | in_progress | done`. Les maquettes montrent
+   « À actualiser », « Non applicable », « En vérification », plus trois
+   niveaux (Requis / Recommandé / Optionnel) et une juridiction. Rien de tout
+   cela n'existe en base. Trois catégories aussi, là où les maquettes en
+   montrent huit — et `ohada | financier | dfi` tient plus du financeur que du
+   domaine.
+3. **Révoquer un accès demande une migration.** Aucune RPC ne révoque, et
+   `invitations` n'a pas de politique UPDATE : le bouton semblerait marcher
+   sans rien fermer.
+4. **`doc_status` n'a que quatre valeurs** (`uploading`, `processing`, `ready`,
    `failed`). Les maquettes en montrent sept — « À actualiser », « Archivée »
    n'existent pas en base.
 
@@ -120,11 +145,10 @@ Le chemin le plus court vers un produit utilisable de bout en bout :
 
 1. ~~Dépôt de fichiers~~ — fait le 31 juillet.
 2. ~~Visionneuse~~ — fait le 31 juillet.
-3. **Partage et accès** — `create_invitation` et `set_permission` sont prêtes
-   et inutilisées. C'est ce qui donne son sens au filigrane : sans invité, la
-   visionneuse ne protège personne.
-4. **Préparation** — `apply_checklist_template` et `sync_checklist_status`
-   sont prêtes. Les exigences existent déjà en base ; l'écran les ignore.
+3. ~~Partage et accès~~ — fait le 31 juillet. Reste la révocation, qui demande
+   une migration.
+4. ~~Préparation~~ — fait le 31 juillet. Reste l'écran 13 (import d'une liste
+   reçue), qui demande une extraction et une colonne de provenance.
 5. **Vue d'ensemble** — dépend des deux précédents (prochaine action,
-   progression, activité récente).
+   progression, activité récente). C'est la suite immédiate.
 6. **Le reste** — recherche, équipe, activité globale, abonnement.
