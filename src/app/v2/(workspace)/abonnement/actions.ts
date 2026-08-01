@@ -2,8 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { MoyenDePaiement } from "@/features/v2/billing/moyens";
-import { moyen, normaliserTelephone, refusDeSaisie } from "@/features/v2/billing/moyens";
 import { billingProvider } from "@/features/v2/billing/providers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -47,21 +45,7 @@ export async function requestV2Plan(input: {
   organizationId: string;
   planCode: string;
   intervalle: "month" | "year";
-  moyen: MoyenDePaiement;
-  telephone?: string;
 }): Promise<Resultat & { reference?: string; url?: string; instruction?: string }> {
-  // Le contrôle de saisie est REFAIT ici. Celui de l'écran sert au confort de
-  // qui remplit le formulaire ; celui-ci sert à la sûreté, parce qu'une action
-  // serveur s'appelle aussi sans passer par l'écran.
-  const refus = refusDeSaisie({
-    moyen: input.moyen,
-    telephone: input.telephone ?? "",
-  });
-  if (refus) return { ok: false, error: refus };
-
-  const choisi = moyen(input.moyen);
-  if (!choisi) return { ok: false, error: "Moyen de paiement inconnu." };
-
   const supabase = await createClient();
 
   const {
@@ -99,8 +83,12 @@ export async function requestV2Plan(input: {
       montant: tarif.unit_amount,
       devise: tarif.currency ?? "XOF",
       email: user?.email ?? "",
-      telephone: input.telephone ? normaliserTelephone(input.telephone) : null,
-      moyen: choisi.paymentMethod,
+      // Ni numéro ni moyen imposé : le prestataire les demande sur sa page,
+      // où il sait quels opérateurs sont disponibles dans le pays du payeur.
+      // Les redemander ici ferait saisir deux fois la même chose et nous
+      // ferait collecter une donnée personnelle sans usage.
+      telephone: null,
+      moyen: null,
     });
 
     // RETENIR L'INTENTION, sinon on ne saura pas quoi vérifier au retour.
@@ -124,7 +112,6 @@ export async function requestV2Plan(input: {
         payload: {
           plan_code: input.planCode,
           billing_interval: input.intervalle,
-          moyen: input.moyen,
         },
       });
 
@@ -180,6 +167,41 @@ export async function activateV2Plan(input: {
 
   if (error) {
     console.error("[v2 abonnement] set_workspace_plan échoué :", error);
+    return { ok: false, error: traduire(error.message) };
+  }
+
+  revalidatePath("/v2/abonnement");
+  return { ok: true };
+}
+
+/**
+ * Redescendre vers le plan gratuit.
+ *
+ * AUCUN PAIEMENT N'EST OUVERT — c'est tout l'intérêt de la distinguer. L'écran
+ * proposait « Payer » sur un plan à zéro franc ; le prestataire l'aurait de
+ * toute façon refusé, son minimum étant de 200 XOF.
+ *
+ * `period_end` et non `now` : §15, le plan déjà réglé court jusqu'à son terme.
+ * La descente s'ANNONCE, elle ne s'applique pas le jour de la demande — sinon
+ * on garderait l'argent en retirant le service.
+ */
+export async function revenirAuPlanGratuit(input: {
+  organizationId: string;
+  planCode: string;
+}): Promise<Resultat> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("set_workspace_plan", {
+    p_org: input.organizationId,
+    p_plan_code: input.planCode,
+    p_interval: "month",
+    p_mode: "downgrade",
+    p_reference: null,
+    p_effective: "period_end",
+  });
+
+  if (error) {
+    console.error("[v2 abonnement] descente échouée :", error);
     return { ok: false, error: traduire(error.message) };
   }
 

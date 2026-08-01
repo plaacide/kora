@@ -2,30 +2,29 @@
 
 import { useState } from "react";
 
-import { prixAffiche } from "@/features/v2/billing/format";
-import type { MoyenDePaiement } from "@/features/v2/billing/moyens";
-import { MOYENS, phraseEcheance, refusDeSaisie } from "@/features/v2/billing/moyens";
+import { economieAnnuelle, prixAffiche } from "@/features/v2/billing/format";
 import type { Plan } from "@/features/v2/billing/types";
 
 import { Icon } from "./Icon";
 
 /**
- * Payer un plan — le numéro n'est demandé qu'au moment où il sert.
+ * Payer un plan — un choix, un prix, un bouton.
  *
- * LE CHOIX QUE CET ÉCRAN INCARNE. Le fondateur a tranché : pas de téléphone
- * dans le profil ni à l'inscription, mais AU MOMENT DE PAYER. C'est la bonne
- * réponse, et pas seulement par économie de champs — quelqu'un qui paie par
- * carte n'a aucune raison de laisser son numéro, et le lui réclamer à
- * l'inscription serait collecter une donnée personnelle dont on ne se servira
- * jamais.
+ * CE QUE CET ÉCRAN NE DEMANDE PLUS, ET POURQUOI. Il réclamait le moyen de
+ * paiement et le numéro de téléphone. Genius Pay redemande exactement les deux
+ * sur sa propre page : on faisait donc saisir deux fois la même chose, en
+ * collectant au passage une donnée personnelle dont on n'a aucun usage — le
+ * numéro ne servait qu'à être transmis puis oublié.
  *
- * D'où la conséquence, qui se voit à l'écran : le champ apparaît quand on
- * choisit le mobile money, et disparaît quand on choisit la carte.
+ * Ne reste ici que ce qui NOUS appartient : quel plan, et sur quel rythme. Le
+ * reste est le métier du prestataire, et sa page le fait mieux que nous — elle
+ * connaît les opérateurs disponibles dans le pays du payeur, ce que nous ne
+ * saurions pas deviner.
  *
- * CE QU'IL NE PROMET PAS. Aucune phrase ne dit « prélèvement automatique ».
- * Genius Pay ne confirme pas que le renouvellement en est un, et en mobile
- * money l'opérateur demande souvent confirmation à chaque débit. Voir
- * `phraseEcheance`.
+ * CE QU'IL NE PROMET PAS : aucune phrase ne dit « automatique ». Genius Pay ne
+ * confirme pas que le renouvellement est un prélèvement, et son tableau de bord
+ * n'expose aucun événement d'abonnement. Chaque échéance est, à ce jour, un
+ * paiement à part entière.
  */
 export function PlanCheckout({
   onFermer,
@@ -36,52 +35,38 @@ export function PlanCheckout({
   onPayer: (choix: {
     planCode: string;
     intervalle: "month" | "year";
-    moyen: MoyenDePaiement;
-    telephone: string;
   }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
   plan: Plan;
 }) {
   const [intervalle, setIntervalle] = useState<"month" | "year">("month");
-  const [choix, setChoix] = useState<MoyenDePaiement>("mobile_money");
-  const [telephone, setTelephone] = useState("");
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [instruction, setInstruction] = useState<string | null>(null);
 
-  const moyenChoisi = MOYENS.find((m) => m.code === choix);
   const prix = prixAffiche(plan, intervalle);
+  const economie = economieAnnuelle(plan);
 
   async function soumettre() {
-    const refus = refusDeSaisie({ moyen: choix, telephone });
-    if (refus) {
-      setErreur(refus);
-      return;
-    }
-
     setEnvoi(true);
     setErreur(null);
 
-    const resultat = await onPayer({
-      planCode: plan.code,
-      intervalle,
-      moyen: choix,
-      telephone,
-    });
-
-    setEnvoi(false);
+    const resultat = await onPayer({ planCode: plan.code, intervalle });
 
     if (!resultat.ok) {
+      setEnvoi(false);
       setErreur(resultat.error ?? "Le paiement n’a pas pu être ouvert.");
       return;
     }
 
     if (resultat.url) {
-      // Le paiement se termine chez le prestataire. On quitte l'application :
-      // aucune donnée de carte ni de code d'opérateur ne doit transiter ici.
+      // Le paiement se termine chez le prestataire. On ne remet pas `envoi` à
+      // faux : la page va disparaître, et un bouton qui redevient cliquable
+      // pendant la redirection invite à payer deux fois.
       window.location.href = resultat.url;
       return;
     }
 
+    setEnvoi(false);
     setInstruction(resultat.instruction ?? "Votre demande est enregistrée.");
   }
 
@@ -95,9 +80,11 @@ export function PlanCheckout({
         </p>
         <div className="v2-form-actions">
           <span />
-          <button className="v2-btn" onClick={onFermer} type="button">
-            Fermer
-          </button>
+          <div>
+            <button className="v2-btn" onClick={onFermer} type="button">
+              Fermer
+            </button>
+          </div>
         </div>
       </section>
     );
@@ -105,84 +92,39 @@ export function PlanCheckout({
 
   return (
     <section className="v2-plan-card">
-      <div className="v2-nav-label">Passer au plan {plan.nom}</div>
-
-      <fieldset className="v2-auth-roles">
-        <legend>Facturation</legend>
+      <header className="v2-checkout-header">
         <div>
+          <span className="v2-nav-label">Passer au plan</span>
+          <h2>{plan.nom}</h2>
+        </div>
+        <div className="v2-segmented">
           {(["month", "year"] as const).map((valeur) => (
             <button
-              data-selected={intervalle === valeur}
+              data-active={intervalle === valeur}
               key={valeur}
               onClick={() => setIntervalle(valeur)}
               type="button"
             >
-              {valeur === "year" ? "Annuelle" : "Mensuelle"}
+              {valeur === "year" ? "Annuel" : "Mensuel"}
             </button>
           ))}
         </div>
-      </fieldset>
+      </header>
 
       <div className="v2-plan-price">
         <strong>{prix.principal}</strong>
         {prix.detail && <span>{prix.detail}</span>}
+        {intervalle === "year" && economie !== null && (
+          <span className="v2-plan-economie">{economie} % d’économie</span>
+        )}
       </div>
 
-      <fieldset className="v2-auth-roles">
-        <legend>Moyen de paiement</legend>
-        <div>
-          {MOYENS.map((m) => (
-            <button
-              data-selected={choix === m.code}
-              key={m.code}
-              onClick={() => {
-                setChoix(m.code);
-                setErreur(null);
-              }}
-              type="button"
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-      </fieldset>
-
-      {moyenChoisi && <p className="v2-field-helper">{moyenChoisi.aide}</p>}
-
-      {/* Le champ n'existe que pour le moyen qui l'exige. Le griser plutôt que
-          le retirer laisserait croire qu'on le veut quand même. */}
-      {moyenChoisi?.exigeTelephone && (
-        <label className="v2-field">
-          <span>Numéro qui recevra la demande de paiement</span>
-          <span className="v2-control">
-            <input
-              autoComplete="tel"
-              inputMode="tel"
-              onChange={(event) => {
-                setTelephone(event.target.value);
-                setErreur(null);
-              }}
-              placeholder="07 12 34 56 78"
-              type="tel"
-              value={telephone}
-            />
-          </span>
-          <small className="v2-field-helper">
-            Il sert uniquement à ce paiement — nous ne le conservons pas.
-          </small>
-        </label>
-      )}
-
-      {moyenChoisi && !moyenChoisi.porteAbonnement && (
-        <p className="v2-panel-note">
-          <Icon name="shield" />
-          La carte ne permet pas la reconduction chez notre prestataire : chaque
-          échéance vous sera présentée. Pour un renouvellement suivi, choisissez
-          le mobile money.
-        </p>
-      )}
-
-      <p className="v2-field-helper">{phraseEcheance(choix, intervalle)}</p>
+      <p className="v2-field-helper">
+        Vous réglez {intervalle === "year" ? "un an" : "un mois"} d’avance.
+        L’opérateur ou la carte se choisit à l’étape suivante, sur la page
+        sécurisée de notre prestataire. Nous vous préviendrons avant l’échéance
+        suivante.
+      </p>
 
       {erreur && (
         <p className="v2-auth-error" role="alert">
@@ -196,7 +138,7 @@ export function PlanCheckout({
         </button>
         <div>
           <button className="v2-btn" disabled={envoi} onClick={soumettre} type="button">
-            {envoi ? "Ouverture…" : "Payer"}
+            {envoi ? "Ouverture…" : `Payer ${prix.principal}`}
           </button>
         </div>
       </div>

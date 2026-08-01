@@ -412,8 +412,15 @@
 .v2-plan-others strong{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600}
 .v2-plan-others small{display:block;margin-top:2px;color:var(--text-3);font-size:11.5px}
 .v2-plan-economie{color:var(--green)!important}
-.v2-plan-others-prix{flex:none;text-align:right}
+.v2-plan-others-prix{display:flex;flex:none;flex-direction:column;align-items:flex-end;gap:8px;text-align:right}
 .v2-plan-others-prix strong{display:block;font-size:14px}
+
+/* Le panneau de paiement. Le titre et le rythme de facturation sur une même
+   ligne : ce sont les deux seules décisions qui nous appartiennent, l'opérateur
+   et le numéro étant demandés par le prestataire sur sa propre page. */
+.v2-checkout-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.v2-checkout-header h2{margin:4px 0 0;font:600 20px var(--font-v2-head),sans-serif;letter-spacing:-.01em}
+@media(max-width:560px){.v2-checkout-header{flex-direction:column}}
 
 /* La fiche d'une relation — écran 41. Un dossier, pas un formulaire : on la
    lit, on n'y saisit rien. Modifier passe par le panneau. */

@@ -210,10 +210,15 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │                                §15 descente ANNONCÉE. L'écran porte enfin
    │                                le bouton : choix du plan, de l'intervalle
    │                                et du moyen, puis paiement.
-   ├─ 🟢 Moyen de paiement        mobile money ou carte. Le numéro n'est
-   │                                demandé QU'AU MOMENT DE PAYER, et
-   │                                uniquement par le moyen qui l'exige — la
-   │                                carte n'en réclame aucun. Non conservé.
+   ├─ 🟢 Moyen de paiement        CHOISI CHEZ LE PRESTATAIRE, pas chez nous.
+   │                                L'écran demandait le moyen et le numéro
+   │                                que Genius Pay redemande sur sa page :
+   │                                double saisie, et une donnée personnelle
+   │                                collectée sans usage. Sa page connaît en
+   │                                plus les opérateurs du pays du payeur.
+   ├─ 🟢 Revenir au plan gratuit  aucun paiement ouvert — l'écran proposait
+   │                                « Payer » sur un plan à zéro franc. C'est
+   │                                une descente : annoncée, effet au terme.
    ├─ 🟢 Résilier                 cancel_workspace_subscription(), en fin de
    │                                période payée et jamais immédiat. L'écran
    │                                dit AVANT le clic : la date jusqu'à

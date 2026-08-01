@@ -6,7 +6,6 @@ import {
   prixAffiche,
   quantite,
 } from "@/features/v2/billing/format";
-import type { MoyenDePaiement } from "@/features/v2/billing/moyens";
 import type {
   Abonnement,
   Consommation,
@@ -47,6 +46,7 @@ export function SubscriptionScreen({
   droits,
   onPayer,
   onResilier,
+  onRevenirAuGratuit,
   retourDePaiement,
   operations,
   plan,
@@ -60,11 +60,11 @@ export function SubscriptionScreen({
   onPayer: (choix: {
     planCode: string;
     intervalle: "month" | "year";
-    moyen: MoyenDePaiement;
-    telephone: string;
   }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
   /** L'action serveur qui arrête l'abonnement, en fin de période payée. */
   onResilier: (motif: string) => Promise<{ ok: boolean; error?: string }>;
+  /** Redescendre vers le plan gratuit : une annonce, pas un paiement. */
+  onRevenirAuGratuit: (planCode: string) => Promise<{ ok: boolean; error?: string }>;
   operations: readonly OperationComptee[];
   plan: Plan;
   /** Ce qu'a donné la vérification au retour du prestataire, s'il y en a eu. */
@@ -259,7 +259,11 @@ export function SubscriptionScreen({
       </section>
 
       {memeSegment.length > 0 && (
-        <ChangerDePlan autres={memeSegment} onPayer={onPayer} />
+        <ChangerDePlan
+          autres={memeSegment}
+          onPayer={onPayer}
+          onRevenirAuGratuit={onRevenirAuGratuit}
+        />
       )}
 
       {/* La résiliation n'apparaît que s'il y a quelque chose à résilier : la

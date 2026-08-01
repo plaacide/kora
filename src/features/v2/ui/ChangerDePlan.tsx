@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import { economieAnnuelle, prixAffiche } from "@/features/v2/billing/format";
-import type { MoyenDePaiement } from "@/features/v2/billing/moyens";
 import type { Plan } from "@/features/v2/billing/types";
 
 import { Icon } from "./Icon";
@@ -23,14 +22,15 @@ import { PlanCheckout } from "./PlanCheckout";
 export function ChangerDePlan({
   autres,
   onPayer,
+  onRevenirAuGratuit,
 }: {
   autres: readonly Plan[];
   onPayer: (choix: {
     planCode: string;
     intervalle: "month" | "year";
-    moyen: MoyenDePaiement;
-    telephone: string;
   }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
+  /** Redescendre vers le plan gratuit : aucun paiement, une annonce. */
+  onRevenirAuGratuit: (planCode: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const [ouvert, setOuvert] = useState<string | null>(null);
 
@@ -68,15 +68,34 @@ export function ChangerDePlan({
                 )}
               </div>
               <div className="v2-plan-others-prix">
-                <strong>{p.principal}</strong>
-                {p.detail && <small>{p.detail}</small>}
-                <button
-                  className="v2-btn"
-                  onClick={() => setOuvert(autre.code)}
-                  type="button"
-                >
-                  Choisir
-                </button>
+                <div>
+                  <strong>{p.principal}</strong>
+                  {p.detail && <small>{p.detail}</small>}
+                </div>
+                {/* On ne fait PAS payer un plan gratuit. L'écran proposait
+                    « Payer » sur un plan à zéro franc — une absurdité que le
+                    prestataire aurait de toute façon refusée, son minimum
+                    étant de 200 XOF. Y revenir est une descente : elle
+                    s'annonce et prend effet au terme déjà réglé (§15). */}
+                {autre.gratuit ? (
+                  <button
+                    className="v2-onboard-back"
+                    onClick={() => onRevenirAuGratuit(autre.code)}
+                    type="button"
+                  >
+                    Revenir à ce plan
+                  </button>
+                ) : autre.surDevis ? (
+                  <small>Sur devis — écrivez-nous</small>
+                ) : (
+                  <button
+                    className="v2-btn"
+                    onClick={() => setOuvert(autre.code)}
+                    type="button"
+                  >
+                    Choisir
+                  </button>
+                )}
               </div>
             </div>
           );
