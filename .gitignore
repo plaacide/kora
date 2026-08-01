@@ -43,3 +43,12 @@ next-env.d.ts
 # Worktrees git créés par l'outillage : une copie complète du dépôt.
 # Les suivre ferait un dépôt imbriqué, et doublerait tout parcours de src/.
 .claude/worktrees/
+
+# Identifiants des tests E2E — jamais versionnés
+.env.test.local
+e2e/.session.json
+
+# Preuves Playwright : vidéos et traces, régénérées à chaque exécution
+docs/beta-readiness/evidence/traces/
+docs/beta-readiness/evidence/playwright-report/
+docs/beta-readiness/evidence/resultats.json
