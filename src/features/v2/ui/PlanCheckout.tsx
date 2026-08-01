@@ -161,6 +161,17 @@ export function PlanCheckout({
                 votre espace passe en lecture seule — rien n’est supprimé.
               </p>
 
+              {/* CE QUE L'ATTENTE ATTEND. Leur API a mis jusqu'à 21 secondes à
+                  répondre le 1er août. Un bouton qui dit « Ouverture… » sans
+                  rien d'autre laisse croire à un blocage, et l'on recommence —
+                  ce qui crée une transaction de plus à chaque fois. */}
+              {envoi && (
+                <p className="v2-dialog-note" role="status">
+                  Nous préparons votre paiement chez Genius Pay. Cela peut
+                  prendre quelques secondes — ne fermez pas cette fenêtre.
+                </p>
+              )}
+
               {erreur && (
                 <p className="v2-auth-error" role="alert">
                   {erreur}
@@ -169,11 +180,16 @@ export function PlanCheckout({
             </div>
 
             <footer>
-              <button className="v2-btn-quiet" onClick={onFermer} type="button">
+              <button
+                className="v2-btn-quiet"
+                disabled={envoi}
+                onClick={onFermer}
+                type="button"
+              >
                 Annuler
               </button>
               <button className="v2-btn" disabled={envoi} onClick={soumettre} type="button">
-                {envoi ? "Ouverture…" : "Continuer vers le paiement →"}
+                {envoi ? "Préparation…" : "Continuer vers le paiement →"}
               </button>
             </footer>
           </>

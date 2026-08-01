@@ -121,24 +121,57 @@ export function charge<T>(reponse: unknown): T {
   return reponse as T;
 }
 
+/**
+ * Au-delà, on renonce et on le dit.
+ *
+ * MESURÉ, PAS SUPPOSÉ : le 1er août, leur API a mis entre 12 et 21 secondes à
+ * répondre — y compris sur une simple lecture de compte, ce qui désigne leur
+ * infrastructure et non le travail demandé. Le même appel prenait 0,7 seconde
+ * le matin.
+ *
+ * Sans limite, `fetch` attend indéfiniment : l'utilisateur reste devant un
+ * bouton figé, puis la plateforme coupe la requête avec une erreur qui ne dit
+ * rien. Trente secondes laissent passer une journée lente sans laisser
+ * quelqu'un devant un écran mort.
+ */
+const DELAI_MAX_MS = 30_000;
+
+export class LenteurPrestataire extends Error {
+  constructor(chemin: string) {
+    super(`Genius Pay n’a pas répondu en ${DELAI_MAX_MS / 1000} s sur ${chemin}.`);
+    this.name = "LenteurPrestataire";
+  }
+}
+
 async function appeler<T>(
   chemin: string,
   init?: { methode?: string; corps?: unknown },
 ): Promise<T> {
   const { publique, secrete } = cles();
 
-  const reponse = await fetch(`${BASE}${chemin}`, {
-    method: init?.methode ?? "GET",
-    headers: {
-      "X-API-Key": publique,
-      "X-API-Secret": secrete,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: init?.corps ? JSON.stringify(init.corps) : undefined,
-    // Une facturation ne doit jamais être servie par un cache.
-    cache: "no-store",
-  });
+  let reponse: Response;
+  try {
+    reponse = await fetch(`${BASE}${chemin}`, {
+      method: init?.methode ?? "GET",
+      headers: {
+        "X-API-Key": publique,
+        "X-API-Secret": secrete,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: init?.corps ? JSON.stringify(init.corps) : undefined,
+      // Une facturation ne doit jamais être servie par un cache.
+      cache: "no-store",
+      signal: AbortSignal.timeout(DELAI_MAX_MS),
+    });
+  } catch (erreur) {
+    // Une coupure au-delà du délai n'est pas une panne de notre côté : on la
+    // distingue pour pouvoir en parler autrement à l'utilisateur.
+    if (erreur instanceof Error && erreur.name === "TimeoutError") {
+      throw new LenteurPrestataire(chemin);
+    }
+    throw erreur;
+  }
 
   if (!reponse.ok) {
     const detail = await reponse.text().catch(() => "");

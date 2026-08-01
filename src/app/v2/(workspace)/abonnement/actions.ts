@@ -50,16 +50,21 @@ export async function requestV2Plan(input: {
 }): Promise<Resultat & { reference?: string; url?: string; instruction?: string }> {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Les deux lectures partent ENSEMBLE : elles ne dépendent pas l'une de
+  // l'autre, et les enchaîner ajoutait un demi-tour de réseau pour rien.
+  // Mesuré : 515 ms de tarif + une centaine d'identité, en série.
+  const [identite, tarifLu] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("plan_prices")
+      .select("unit_amount, currency, plans!inner(code)")
+      .eq("plans.code", input.planCode)
+      .eq("billing_interval", input.intervalle)
+      .maybeSingle(),
+  ]);
 
-  const { data: prix, error: erreurPrix } = await supabase
-    .from("plan_prices")
-    .select("unit_amount, currency, plans!inner(code)")
-    .eq("plans.code", input.planCode)
-    .eq("billing_interval", input.intervalle)
-    .maybeSingle();
+  const user = identite.data.user;
+  const { data: prix, error: erreurPrix } = tarifLu;
 
   if (erreurPrix) {
     console.error("[v2 abonnement] tarif illisible :", erreurPrix);
@@ -134,6 +139,19 @@ export async function requestV2Plan(input: {
     // Le message du prestataire peut contenir sa réponse brute : on le trace,
     // on ne le montre pas.
     console.error("[v2 abonnement] ouverture de paiement échouée :", erreur);
+
+    // UNE LENTEUR N'EST PAS UNE PANNE, et surtout : rien n'a été débité. Le
+    // dire évite qu'on recommence dix fois — et chaque tentative crée une
+    // transaction de plus chez le prestataire.
+    if (erreur instanceof Error && erreur.name === "LenteurPrestataire") {
+      return {
+        ok: false,
+        error:
+          "Notre prestataire de paiement met plus de temps que d’habitude à " +
+          "répondre. Rien ne vous a été débité — réessayez dans quelques minutes.",
+      };
+    }
+
     return {
       ok: false,
       error:
