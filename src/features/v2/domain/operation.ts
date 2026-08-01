@@ -129,3 +129,27 @@ const OBJECTIVES_BY_INTENT: Record<string, string> = {
 export function intentObjective(intent: string): string {
   return OBJECTIVES_BY_INTENT[intent] ?? "levee";
 }
+
+/**
+ * Ce que l'opération cherche, dit en toutes lettres.
+ *
+ * La base porte quatre valeurs — `levee`, `dette`, `dfi`, `diligence` — et le
+ * rail affichait « Levée en capital » quelle que soit l'opération, y compris
+ * un dossier bancaire. Une étiquette fausse sur l'écran qu'on regarde toute la
+ * journée finit par être crue.
+ *
+ * Une valeur inconnue est rendue telle quelle plutôt que remplacée : elle reste
+ * lisible, et le jour où un cinquième objectif apparaît, l'écran ne ment pas en
+ * attendant qu'on le nomme.
+ */
+const OBJECTIFS: Record<string, string> = {
+  levee: "Levée en capital",
+  dette: "Financement bancaire",
+  dfi: "Financement DFI ou impact",
+  diligence: "Diligence",
+};
+
+export function libelleObjectif(objectif: string | null): string | null {
+  if (!objectif) return null;
+  return OBJECTIFS[objectif] ?? objectif;
+}

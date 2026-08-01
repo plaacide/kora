@@ -223,7 +223,6 @@ export function WorkspaceShell({
 }
 
 /** Sélecteur rapide de l’écran 63 — les noms viennent de la maquette. */
-const OTHER_OPERATIONS = ["Série A 2026", "Prêt Ecobank", "Diligence IFC"];
 
 
 const pageLabels: Record<string, string> = {
@@ -239,12 +238,21 @@ const pageLabels: Record<string, string> = {
 export function OperationShell({
   children,
   operationId,
+  operationName,
+  operationObjectif,
+  operations = [],
   folders = [],
   activeAccesses = 0,
   preparation,
 }: {
   children: ReactNode;
   operationId: string;
+  /** Le nom réel. Le rail affichait « Série A 2026 » sur toutes les opérations. */
+  operationName?: string;
+  /** Ce que l'opération cherche, déjà mis en mots. */
+  operationObjectif?: string | null;
+  /** Les autres opérations de l'organisation, pour le sélecteur. */
+  operations?: readonly { id: string; nom: string; archivee: boolean }[];
   /** Dossiers racine de l'opération, lus en base par le layout. */
   folders?: readonly string[];
   /** Accès réellement ouverts. Le bandeau annonçait « 3 » en toutes lettres. */
@@ -320,23 +328,39 @@ export function OperationShell({
             onClick={() => setPickerOpen((value) => !value)}
             type="button"
           >
-            Série A 2026
+            {operationName ?? "Cette opération"}
             <Icon name="chevron" />
           </button>
           <div className="v2-ctx-sub">
-            <span>Levée en capital</span>
-            <span className="v2-badge">Privée</span>
+            {/* Le type se lisait « Levée en capital » sur TOUTES les
+                opérations, dossier bancaire compris. Une étiquette fausse sur
+                l'écran qu'on regarde toute la journée finit par être crue. */}
+            {operationObjectif && <span>{operationObjectif}</span>}
+            <span className="v2-badge">{shared ? "Partagée" : "Privée"}</span>
           </div>
 
           {pickerOpen && (
             <div className="v2-ctx-picker">
               <div className="v2-nav-label">Vos opérations</div>
-              {OTHER_OPERATIONS.map((name, index) => (
-                <Link data-current={index === 0} href="/v2/operations" key={name}>
-                  <i />
-                  {name}
-                </Link>
-              ))}
+              {/* TROIS NOMS EN DUR — « Série A 2026 », « Prêt Ecobank »,
+                  « Diligence IFC » — s'affichaient à tout le monde, et chacun
+                  renvoyait à la liste au lieu d'ouvrir l'opération. Un
+                  sélecteur qui ne sélectionne rien. */}
+              {operations.length === 0 ? (
+                <span className="v2-ctx-vide">Aucune autre opération</span>
+              ) : (
+                operations.map((autre) => (
+                  <Link
+                    data-current={autre.id === operationId}
+                    href={`/v2/operations/${autre.id}/overview`}
+                    key={autre.id}
+                  >
+                    <i />
+                    {autre.nom}
+                    {autre.archivee && <small>archivée</small>}
+                  </Link>
+                ))
+              )}
               <hr className="v2-hr" />
               <Link href="/v2/operations">Voir toutes les opérations</Link>
               <Link href={v2Routes.operations.new}>

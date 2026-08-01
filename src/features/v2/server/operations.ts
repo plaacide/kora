@@ -123,3 +123,52 @@ export async function listOperations(
     return a.lifecycle === "archived" ? 1 : -1;
   });
 }
+
+export interface OperationBrève {
+  id: string;
+  nom: string;
+  objectif: string | null;
+  archivee: boolean;
+}
+
+/**
+ * Les opérations de l'organisation, en version légère.
+ *
+ * SÉPARÉE DE `listOperations` À DESSEIN. Celle-ci alimente le sélecteur du
+ * rail, présent sur CHAQUE écran d'opération : lui faire compter les pièces,
+ * les invitations et la dernière activité de toutes les opérations à chaque
+ * navigation coûterait quatre requêtes pour afficher trois noms.
+ *
+ * Les archivées viennent avec, marquées : une opération rangée reste
+ * consultable, et ne plus pouvoir y revenir depuis le rail obligerait à
+ * repasser par la liste complète.
+ */
+export async function listOperationNames(
+  organizationId: string,
+): Promise<OperationBrève[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("deals")
+    .select("id, name, objectif, archived_at")
+    .eq("org_id", organizationId)
+    .order("archived_at", { ascending: true, nullsFirst: true })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("[v2 opérations] liste du sélecteur :", error);
+    return [];
+  }
+
+  return ((data ?? []) as Array<{
+    id: string;
+    name: string;
+    objectif: string | null;
+    archived_at: string | null;
+  }>).map((row) => ({
+    id: row.id,
+    nom: row.name,
+    objectif: row.objectif,
+    archivee: Boolean(row.archived_at),
+  }));
+}
