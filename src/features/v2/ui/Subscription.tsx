@@ -17,6 +17,7 @@ import { dateJournal } from "@/features/v2/domain/journal";
 
 import { ChangerDePlan } from "./ChangerDePlan";
 import { Icon } from "./Icon";
+import { MessageTemporaire } from "./MessageTemporaire";
 import { Resilier } from "./Resilier";
 
 /** Ce qui compte dans la limite, et ce qui n'y compte pas — maquette 68. */
@@ -114,10 +115,7 @@ export function SubscriptionScreen({
   return (
     <div className="v2-narrow-page">
       {retour?.texte && (
-        <p className={retour.bon ? "v2-panel-callout" : "v2-panel-note"} role="status">
-          <Icon name={retour.bon ? "check" : "clock"} />
-          {retour.texte}
-        </p>
+        <MessageTemporaire bon={retour.bon} texte={retour.texte} />
       )}
 
       <section className="v2-plan-card">
