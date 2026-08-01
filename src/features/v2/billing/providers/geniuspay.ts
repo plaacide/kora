@@ -81,6 +81,28 @@ function environnement(): "sandbox" | "live" {
   return process.env.GENIUSPAY_API_KEY?.includes("_live_") ? "live" : "sandbox";
 }
 
+/**
+ * Sortir la charge utile de son enveloppe.
+ *
+ * LEUR DOCUMENTATION MENT SUR CE POINT, et il coûte cher. Elle montre une
+ * réponse plate — `{"id":456,"reference":"MTX-…","checkout_url":…}` — alors que
+ * l'API réelle rend `{"success":true,"message":"…","data":{…}}`. Lire à la
+ * racine ne trouve rien, et le paiement échoue sur une réponse pourtant
+ * parfaitement valide, avec un message qui n'aide personne.
+ *
+ * On accepte donc les deux formes : le jour où ils aplatissent, ou pour un
+ * point d'entrée qui ne suivrait pas la convention, rien ne casse.
+ */
+export function charge<T>(reponse: unknown): T {
+  if (reponse && typeof reponse === "object" && "data" in reponse) {
+    const enveloppe = reponse as { data?: unknown };
+    if (enveloppe.data && typeof enveloppe.data === "object") {
+      return enveloppe.data as T;
+    }
+  }
+  return reponse as T;
+}
+
 async function appeler<T>(
   chemin: string,
   init?: { methode?: string; corps?: unknown },
@@ -108,7 +130,7 @@ async function appeler<T>(
     );
   }
 
-  return (await reponse.json()) as T;
+  return charge<T>(await reponse.json());
 }
 
 /**
@@ -253,7 +275,12 @@ export class GeniusPayProvider implements BillingProvider {
     });
 
     if (!paiement.reference) {
-      throw new Error("Genius Pay n’a pas rendu de référence de paiement.");
+      // Les CLÉS de la réponse, jamais les valeurs : elles disent en un coup
+      // d'œil si le format a changé, sans risquer de tracer une donnée client.
+      throw new Error(
+        "Genius Pay n’a pas rendu de référence de paiement. " +
+          `Champs reçus : ${Object.keys(paiement ?? {}).join(", ") || "aucun"}.`,
+      );
     }
 
     return {

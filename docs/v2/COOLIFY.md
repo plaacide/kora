@@ -42,10 +42,15 @@ dans l'image Docker, qui se pousse et se partage.
 
 ```text
 SANZA_BILLING_PROVIDER=geniuspay
-GENIUSPAY_API_KEY=<pk_sandbox_… en recette, pk_live_… en production>
-GENIUSPAY_API_SECRET=<sk_… correspondant>
+GENIUSPAY_API_KEY=<sk_sandbox_… en recette, sk_live_… en production>
+GENIUSPAY_API_SECRET=<ss_… correspondant>
 GENIUSPAY_WEBHOOK_SECRET=<whsec_… du webhook déclaré chez eux>
 ```
+
+⚠️ **Les préfixes réels sont `sk_` et `ss_`**, et non `pk_`/`sk_` comme
+l'annonce leur documentation. `GENIUSPAY_API_KEY` porte la valeur de l'en-tête
+`X-API-Key`, `GENIUSPAY_API_SECRET` celle de `X-API-Secret` — recopier dans
+l'ordre de leur tableau de bord, sans se fier au préfixe.
 
 Sans `SANZA_BILLING_PROVIDER`, c'est le mode manuel qui s'applique — virement et
 facture. Une valeur inconnue fait échouer au démarrage plutôt que de retomber

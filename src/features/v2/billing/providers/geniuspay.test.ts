@@ -1,7 +1,7 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
 
-import { signatureValide, traduireEvenement } from "./geniuspay";
+import { charge, signatureValide, traduireEvenement } from "./geniuspay";
 
 /**
  * La signature de webhook est le seul rempart entre un inconnu et l'activation
@@ -176,6 +176,39 @@ describe("signatureValide", () => {
         maintenant: MAINTENANT,
       }),
     ).toBe(false);
+  });
+});
+
+describe("charge", () => {
+  it("sort la charge utile de l’enveloppe {success, data}", () => {
+    // Le vrai format de leur API, et la cause d'un échec de paiement sur une
+    // réponse pourtant valide : leur documentation montre une réponse plate.
+    const reponse = {
+      success: true,
+      message: "Sandbox payment initiated successfully",
+      data: { reference: "SANDBOX_ABC", checkout_url: "https://geniuspay.ci/checkout/x" },
+    };
+
+    expect(charge<{ reference: string }>(reponse).reference).toBe("SANDBOX_ABC");
+  });
+
+  it("accepte aussi une réponse déjà plate", () => {
+    // Le jour où ils aplatissent, ou pour un point d'entrée qui ne suivrait
+    // pas la convention, rien ne doit casser.
+    expect(charge<{ reference: string }>({ reference: "MTX-1" }).reference).toBe("MTX-1");
+  });
+
+  it("ne confond pas un champ `data` qui n’est pas une enveloppe", () => {
+    // Une réponse dont `data` serait une chaîne ou un tableau ne doit pas
+    // être décapsulée : on perdrait le reste de l'objet.
+    expect(charge<{ data: string }>({ data: "brut", reference: "X" })).toEqual({
+      data: "brut",
+      reference: "X",
+    });
+  });
+
+  it("survit à null", () => {
+    expect(charge(null)).toBeNull();
   });
 });
 

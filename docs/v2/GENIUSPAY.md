@@ -21,10 +21,19 @@ jamais entrer dans le dépôt, ni dans une conversation.**
 
 ```
 SANZA_BILLING_PROVIDER=geniuspay
-GENIUSPAY_API_KEY=pk_sandbox_…
-GENIUSPAY_API_SECRET=sk_sandbox_…
-GENIUSPAY_WEBHOOK_SECRET=whsec_sandbox_…
+GENIUSPAY_API_KEY=sk_sandbox_…      → en-tête X-API-Key
+GENIUSPAY_API_SECRET=ss_sandbox_…   → en-tête X-API-Secret
+GENIUSPAY_WEBHOOK_SECRET=whsec_…
 ```
+
+⚠️ **Les préfixes réels sont `sk_` et `ss_`.** Leur documentation annonce
+`pk_`/`sk_` ; le tableau de bord délivre autre chose. Recopier dans l'ordre des
+en-têtes, sans se fier au préfixe.
+
+⚠️ **Leurs réponses sont enveloppées** dans `{"success":true,"data":{…}}`,
+alors que leur documentation les montre plates. `charge()` désencapsule, et
+accepte les deux formes. C'est ce décalage qui a fait échouer le premier
+paiement sur une réponse pourtant valide.
 
 Sans `SANZA_BILLING_PROVIDER`, c'est le mode manuel qui s'applique — virement et
 facture. C'est volontaire : le produit doit fonctionner sans dépendre de
