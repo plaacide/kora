@@ -24,6 +24,40 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+/**
+ * L'état de la facturation, en lecture.
+ *
+ * POURQUOI CETTE ROUTE EXISTE. Un paiement a échoué en recette sans qu'on
+ * puisse dire, depuis l'extérieur, si le correctif était déployé ou si une
+ * variable manquait — deux causes très différentes, et aucun moyen de trancher
+ * sans ouvrir les journaux du conteneur. Une minute de diagnostic vaut mieux
+ * qu'un aller-retour.
+ *
+ * ELLE NE RÉVÈLE AUCUN SECRET : la PRÉSENCE d'une clé, jamais sa valeur, ni
+ * même sa longueur. Savoir qu'un prestataire est configuré n'apprend rien à un
+ * attaquant — c'est déjà visible à qui tente de payer.
+ */
+export async function GET() {
+  const prestataire = billingProvider();
+
+  return NextResponse.json({
+    prestataire: prestataire.code,
+    recurrent: prestataire.recurrent,
+    cles: {
+      api: Boolean(process.env.GENIUSPAY_API_KEY),
+      secret: Boolean(process.env.GENIUSPAY_API_SECRET),
+      webhook: Boolean(process.env.GENIUSPAY_WEBHOOK_SECRET),
+    },
+    // Déduit du préfixe de la clé, comme partout ailleurs : une seule source.
+    environnement: process.env.GENIUSPAY_API_KEY?.includes("_live_")
+      ? "live"
+      : "sandbox",
+    // Le marqueur qui dit si un déploiement est passé. Renseigné par Coolify
+    // quand la variable existe ; « inconnu » sinon, ce qui reste honnête.
+    version: process.env.SOURCE_COMMIT?.slice(0, 7) ?? "inconnu",
+  });
+}
+
 export async function POST(request: Request) {
   const corps = await request.text();
 
