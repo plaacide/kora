@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import {
@@ -13,18 +13,22 @@ import { initials } from "@/features/v2/domain/activity";
 import { paysAvecZone, paysParZone } from "@/features/v2/domain/geographie";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import {
-  CATEGORIES,
-  FONCTIONS,
-  ENGAGEMENTS,
-  ETAPES,
   categorieLabel,
+  CATEGORIES,
   colonnes,
+  compteRetires,
   engagementLabel,
+  ENGAGEMENTS,
   engagementTon,
   etapeLabel,
-  ticketsCumules,
+  ETAPES,
+  type FiltrePipeline,
+  filtrerPipeline,
+  FONCTIONS,
   type Interaction,
   type InvestisseurPipeline,
+  relancesDues,
+  responsablesDuPipeline,
 } from "@/features/v2/domain/pipeline";
 import type { Engagement } from "@/features/v2/domain/engagements";
 import type { AccessRow } from "@/features/v2/server/access";
@@ -76,6 +80,7 @@ export function InvestorsScreen({
   acces,
   engagements,
   signaux,
+  filtre,
 }: {
   operationId: string;
   investisseurs: readonly InvestisseurPipeline[];
@@ -99,6 +104,8 @@ export function InvestorsScreen({
   acces: readonly AccessRow[];
   engagements: readonly Engagement[];
   signaux: SignauxDocumentaires;
+  /** Ce que la barre de filtres a retenu — maquette 38. */
+  filtre: FiltrePipeline;
 }) {
   // Le pipeline vit sous l'onglet `?view=pipeline` de Lever : chaque lien doit
   // le reconduire, sans quoi le premier clic sort de l'écran.
@@ -107,7 +114,14 @@ export function InvestorsScreen({
     return `?${params}`;
   };
   const enColonnes = vue !== "tableau";
-  const cumul = ticketsCumules(investisseurs);
+
+  // Ce que la barre laisse passer. Les colonnes et le tableau ne voient QUE
+  // cela ; le total de tickets, lui, reste celui du pipeline entier — un
+  // filtre est une lecture, il ne change pas ce qui a été levé.
+  const visibles = filtrerPipeline(investisseurs, filtre);
+  const refuses = compteRetires(investisseurs);
+  const enRetard = relancesDues(investisseurs, new Date()).length;
+  const responsables = responsablesDuPipeline(investisseurs);
   const enCours = edite
     ? (investisseurs.find((item) => item.id === edite) ?? null)
     : null;
@@ -127,21 +141,16 @@ export function InvestorsScreen({
 
   return (
     <div className="v2-pipeline-page">
-      <div className="v2-filterbar">
-        <Link data-active={enColonnes} href={lien({ mode: "colonnes" })}>Colonnes</Link>
-        <Link data-active={!enColonnes} href={lien({ mode: "tableau" })}>Tableau</Link>
-        <i />
-        {investisseurs.length > 0 && (
-          <span>
-            {investisseurs.length} relation{investisseurs.length > 1 ? "s" : ""} ·{" "}
-            <b>{cumul.toLocaleString("fr-FR")}</b> {devise} de tickets indicatifs
-          </span>
-        )}
-        <Link className="v2-btn" href={lien({ panel: "add" })}>
-          <Icon name="plus" />
-          Ajouter un investisseur
-        </Link>
-      </div>
+      {/* LA BASCULE ET LE BOUTON ONT QUITTÉ CETTE BARRE : la maquette 38 les
+          place dans le bandeau du haut, à droite, au-dessus des onglets. Ils
+          sont rendus par `PipelineActions`, que Lever passe à `LeverFrame`.
+          Ici vivent les filtres, qui manquaient entièrement. */}
+      <PipelineFiltres
+        compteRefuses={refuses}
+        filtre={filtre}
+        relancesEnRetard={enRetard}
+        responsables={responsables}
+      />
 
       {investisseurs.length === 0 ? (
         <section className="v2-drop-empty">
@@ -157,10 +166,28 @@ export function InvestorsScreen({
             <Link className="v2-btn" href={lien({ panel: "add" })}>Ajouter un investisseur</Link>
           </div>
         </section>
+      ) : visibles.length === 0 ? (
+        /* Le pipeline n'est PAS vide — ce sont les filtres qui cachent tout.
+           Afficher « Aucune relation suivie » ici ferait croire à une perte de
+           données, et le bouton « Ajouter » proposerait la mauvaise sortie. */
+        <section className="v2-drop-empty">
+          <EmptyMedallion icon="search" />
+          <h2>Aucune relation ne correspond</h2>
+          <p>
+            {investisseurs.length} relation
+            {investisseurs.length > 1 ? "s sont suivies" : " est suivie"} sur ce
+            tour, mais aucune ne répond aux filtres posés.
+          </p>
+          <div>
+            <Link className="v2-btn" href={lien({ mode: vue })}>
+              Retirer les filtres
+            </Link>
+          </div>
+        </section>
       ) : enColonnes ? (
-        <PipelineColonnes devise={devise} investisseurs={investisseurs} />
+        <PipelineColonnes devise={devise} investisseurs={visibles} />
       ) : (
-        <PipelineTableau devise={devise} investisseurs={investisseurs} />
+        <PipelineTableau devise={devise} investisseurs={visibles} />
       )}
 
       {edite && edite !== "interaction" && (
@@ -794,5 +821,168 @@ function InvestorPanel({
         </footer>
       </aside>
     </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// La barre de filtres et les actions du bandeau — maquette 38
+// ---------------------------------------------------------------------------
+
+/**
+ * La bascule de vue et « Ajouter un investisseur », dans le bandeau du haut.
+ *
+ * ELLES ÉTAIENT AILLEURS. L'écran les posait sous les onglets, à gauche, dans
+ * la même barre que — rien d'autre. La maquette 38 les met à droite du bandeau
+ * « Lever », au-dessus des onglets, là où vivent déjà les actions des autres
+ * vues de la levée. C'est aussi l'ordre de la maquette : Tableau puis Colonnes.
+ */
+export function PipelineActions({ mode }: { mode: string }) {
+  const enColonnes = mode !== "tableau";
+  const params = useSearchParams();
+
+  // Les filtres posés SURVIVENT au changement de vue : passer en tableau pour
+  // retrouver tout le pipeline, filtres effacés, serait une perte silencieuse
+  // du travail de lecture en cours.
+  const lien = (m: string) => {
+    const suivant = new URLSearchParams(params.toString());
+    suivant.set("view", "pipeline");
+    suivant.set("mode", m);
+    suivant.delete("panel");
+    return `?${suivant}`;
+  };
+
+  return (
+    <>
+      <div className="v2-segmented">
+        <Link data-active={!enColonnes} href={lien("tableau")}>Tableau</Link>
+        <Link data-active={enColonnes} href={lien("colonnes")}>Colonnes</Link>
+      </div>
+      <Link className="v2-btn" href="?view=pipeline&panel=add">
+        <Icon name="plus" />
+        Ajouter un investisseur
+      </Link>
+    </>
+  );
+}
+
+/**
+ * Catégorie, responsable, accès, engagement, relances dues, refusés.
+ *
+ * Des `<select>` et non des menus déroulants faits main : ils fonctionnent au
+ * clavier et sur mobile sans une ligne de code, et la maquette ne demande rien
+ * de plus qu'une liste de choix.
+ *
+ * Un filtre qui ne peut RIEN trouver n'est pas proposé — pas de menu
+ * « Responsable » quand personne n'en porte, pas de puce « Relance en retard »
+ * quand aucune n'est due. Un filtre qui rend toujours zéro use la confiance.
+ */
+function PipelineFiltres({
+  compteRefuses,
+  filtre,
+  relancesEnRetard,
+  responsables,
+}: {
+  compteRefuses: number;
+  filtre: FiltrePipeline;
+  relancesEnRetard: number;
+  responsables: readonly string[];
+}) {
+  const router = useRouter();
+  const params = useSearchParams();
+
+  // `useSearchParams` et non `window.location` : ce composant est aussi rendu
+  // sur le serveur, où `window` n'existe pas.
+  const suivant = () => {
+    const copie = new URLSearchParams(params.toString());
+    copie.set("view", "pipeline");
+    return copie;
+  };
+
+  // Une valeur vide RETIRE le paramètre : `?categorie=` filtrerait sur la
+  // chaîne vide et ne rendrait jamais rien.
+  function poser(cle: string, valeur: string) {
+    const copie = suivant();
+    if (valeur) copie.set(cle, valeur);
+    else copie.delete(cle);
+    router.push(`?${copie}`);
+  }
+
+  function bascule(cle: string, actif: boolean): string {
+    const copie = suivant();
+    if (actif) copie.delete(cle);
+    else copie.set(cle, "1");
+    return `?${copie}`;
+  }
+
+  return (
+    <div className="v2-filterbar">
+      <select
+        aria-label="Catégorie"
+        data-active={Boolean(filtre.categorie)}
+        onChange={(e) => poser("categorie", e.target.value)}
+        value={filtre.categorie ?? ""}
+      >
+        <option value="">Catégorie</option>
+        {CATEGORIES.map(([valeur, label]) => (
+          <option key={valeur} value={valeur}>{label}</option>
+        ))}
+      </select>
+
+      {responsables.length > 0 && (
+        <select
+          aria-label="Responsable"
+          data-active={Boolean(filtre.responsable)}
+          onChange={(e) => poser("responsable", e.target.value)}
+          value={filtre.responsable ?? ""}
+        >
+          <option value="">Responsable</option>
+          {responsables.map((nom) => (
+            <option key={nom} value={nom}>{nom}</option>
+          ))}
+        </select>
+      )}
+
+      <select
+        aria-label="Accès"
+        data-active={Boolean(filtre.acces)}
+        onChange={(e) => poser("acces", e.target.value)}
+        value={filtre.acces ?? ""}
+      >
+        <option value="">Accès</option>
+        <option value="avec">Avec accès</option>
+        <option value="sans">Sans accès</option>
+      </select>
+
+      <select
+        aria-label="Engagement"
+        data-active={Boolean(filtre.engagement)}
+        onChange={(e) => poser("engagement", e.target.value)}
+        value={filtre.engagement ?? ""}
+      >
+        <option value="">Engagement</option>
+        {ENGAGEMENTS.map(([valeur, label]) => (
+          <option key={valeur} value={valeur}>{label}</option>
+        ))}
+      </select>
+
+      {relancesEnRetard > 0 && (
+        <Link
+          className="v2-filter-alerte"
+          data-active={Boolean(filtre.relanceEnRetard)}
+          href={bascule("relance", Boolean(filtre.relanceEnRetard))}
+        >
+          Relance en retard · {relancesEnRetard}
+        </Link>
+      )}
+
+      {compteRefuses > 0 && (
+        <Link
+          className="v2-filter-refuses"
+          href={bascule("refuses", Boolean(filtre.avecRetires))}
+        >
+          Refusés ({compteRefuses}) — {filtre.avecRetires ? "affichés" : "repliés"}
+        </Link>
+      )}
+    </div>
   );
 }

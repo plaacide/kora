@@ -2,11 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import {
   colonnes,
+  compteRetires,
   engagementTon,
   etapeLabel,
-  relancesDues,
-  ticketsCumules,
+  filtrerPipeline,
   type InvestisseurPipeline,
+  relancesDues,
+  responsablesDuPipeline,
+  ticketsCumules,
 } from "./pipeline";
 
 const investisseur = (
@@ -126,5 +129,90 @@ describe("relancesDues", () => {
         maintenant,
       ),
     ).toHaveLength(0);
+  });
+});
+
+describe("les filtres du pipeline", () => {
+  const base = {
+    id: "1",
+    nom: "Fonds A",
+    organisation: null,
+    email: null,
+    ticket: null,
+    etape: "contacte",
+    engagement: "tiede",
+    categorie: null,
+    fonction: null,
+    pays: null,
+    source: null,
+    responsable: null,
+    prochaineAction: null,
+    dateRelance: null,
+    notes: null,
+    acces: null,
+  } satisfies InvestisseurPipeline;
+
+  const le = (n: number) => new Date(2026, 7, n).toISOString();
+  const maintenant = new Date(2026, 7, 15);
+
+  it("replie les retirés par défaut", () => {
+    const liste = [base, { ...base, id: "2", engagement: "retire" }];
+    expect(filtrerPipeline(liste, {}, maintenant)).toHaveLength(1);
+  });
+
+  it("les rouvre à la demande", () => {
+    const liste = [base, { ...base, id: "2", engagement: "retire" }];
+    expect(filtrerPipeline(liste, { avecRetires: true }, maintenant)).toHaveLength(2);
+  });
+
+  it("ne garde que les relances échues", () => {
+    const liste = [
+      { ...base, id: "hier", dateRelance: le(10) },
+      { ...base, id: "demain", dateRelance: le(20) },
+      { ...base, id: "jamais" },
+    ];
+    const dus = filtrerPipeline(liste, { relanceEnRetard: true }, maintenant);
+    expect(dus.map((i) => i.id)).toEqual(["hier"]);
+  });
+
+  it("distingue avec et sans accès", () => {
+    const liste = [
+      { ...base, id: "ouvert", acces: "Accès actif" },
+      { ...base, id: "ferme" },
+    ];
+    expect(filtrerPipeline(liste, { acces: "avec" }, maintenant).map((i) => i.id))
+      .toEqual(["ouvert"]);
+    expect(filtrerPipeline(liste, { acces: "sans" }, maintenant).map((i) => i.id))
+      .toEqual(["ferme"]);
+  });
+
+  it("combine les critères", () => {
+    const liste = [
+      { ...base, id: "cible", categorie: "fonds", responsable: "Awa" },
+      { ...base, id: "autre", categorie: "fonds", responsable: "Kofi" },
+      { ...base, id: "encore", categorie: "business_angel", responsable: "Awa" },
+    ];
+    const trouves = filtrerPipeline(
+      liste,
+      { categorie: "fonds", responsable: "Awa" },
+      maintenant,
+    );
+    expect(trouves.map((i) => i.id)).toEqual(["cible"]);
+  });
+
+  it("compte les retirés même quand ils sont repliés", () => {
+    const liste = [base, { ...base, id: "2", engagement: "retire" }];
+    expect(compteRetires(liste)).toBe(1);
+  });
+
+  it("ne propose que les responsables réellement présents", () => {
+    const liste = [
+      { ...base, id: "1", responsable: "Kofi" },
+      { ...base, id: "2", responsable: "Awa" },
+      { ...base, id: "3", responsable: "Kofi" },
+      { ...base, id: "4", responsable: "  " },
+      { ...base, id: "5" },
+    ];
+    expect(responsablesDuPipeline(liste)).toEqual(["Awa", "Kofi"]);
   });
 });

@@ -31,7 +31,7 @@ import type {
 } from "@/features/v2/server/raise";
 import type { MiseAJour, MiseAJourResume } from "@/features/v2/server/updates";
 import { CommitmentsScreen } from "./Commitments";
-import { InvestorsScreen } from "./Investors";
+import { InvestorsScreen, PipelineActions } from "./Investors";
 import { EmptyArt } from "./EmptyArt";
 import { RaiseClose, RaiseConfigure, RaiseEmpty } from "./RaiseForms";
 
@@ -56,6 +56,14 @@ export type LeverQuery = {
   /** La fiche de relation ouverte — écran 41 — et son onglet. */
   fiche?: string;
   onglet?: string;
+  /** Les filtres de la barre du pipeline — maquette 38. */
+  categorie?: string;
+  responsable?: string;
+  acces?: string;
+  engagement?: string;
+  relance?: string;
+  /** `1` déplie les relations retirées, repliées par défaut. */
+  refuses?: string;
 };
 
 
@@ -166,7 +174,10 @@ export function Lever({
   }
   if (current === "pipeline") {
     return (
-      <LeverFrame current="pipeline">
+      <LeverFrame
+        current="pipeline"
+        actions={<PipelineActions mode={query.mode ?? "colonnes"} />}
+      >
         <InvestorsScreen
           devise={raise?.currency ?? "XOF"}
           edite={query.panel ?? null}
@@ -182,6 +193,17 @@ export function Lever({
           investisseurs={investisseurs}
           operationId={operationId}
           vue={query.mode ?? "colonnes"}
+          filtre={{
+            categorie: query.categorie ?? null,
+            responsable: query.responsable ?? null,
+            acces:
+              query.acces === "avec" || query.acces === "sans"
+                ? query.acces
+                : null,
+            engagement: query.engagement ?? null,
+            relanceEnRetard: query.relance === "1",
+            avecRetires: query.refuses === "1",
+          }}
         />
       </LeverFrame>
     );

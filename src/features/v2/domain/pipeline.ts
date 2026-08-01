@@ -247,3 +247,83 @@ export function parDateDecroissante(
 ): Interaction[] {
   return [...interactions].sort((a, b) => b.date.localeCompare(a.date));
 }
+
+// ---------------------------------------------------------------------------
+// Les filtres du pipeline — barre de la maquette 38
+// ---------------------------------------------------------------------------
+
+/**
+ * POURQUOI CES FILTRES EXISTENT. L'écran rendait les sept colonnes et rien
+ * d'autre. La maquette 38 pose au-dessus une barre — catégorie, responsable,
+ * accès, engagement, relance en retard — et replie les refusés. Sur un tour à
+ * quarante relations, sept colonnes sans filtre ne se lisent plus : la question
+ * du fondateur n'est pas « qui est au pipeline » mais « qui dois-je relancer
+ * cette semaine ».
+ */
+
+export interface FiltrePipeline {
+  categorie?: string | null;
+  responsable?: string | null;
+  /** « avec » : un accès existe, quel qu'en soit l'état. « sans » : aucun. */
+  acces?: "avec" | "sans" | null;
+  engagement?: string | null;
+  /** Ne garder que les relances échues. */
+  relanceEnRetard?: boolean;
+  /**
+   * Montrer les retirés.
+   *
+   * Repliés par défaut, comme dans la maquette. Ils ne sont pas SUPPRIMÉS de la
+   * vue pour autant : `colonnes()` explique qu'une relation retirée en
+   * diligence doit rester lisible là où elle s'est arrêtée — c'est ce qu'on
+   * veut se rappeler au tour suivant. Le lien « Refusés (n) » les rouvre.
+   */
+  avecRetires?: boolean;
+}
+
+export function filtrerPipeline(
+  investisseurs: readonly InvestisseurPipeline[],
+  filtre: FiltrePipeline,
+  maintenant: Date = new Date(),
+): InvestisseurPipeline[] {
+  const echeance = maintenant.getTime();
+
+  return investisseurs.filter((item) => {
+    if (!filtre.avecRetires && item.engagement === "retire") return false;
+    if (filtre.categorie && item.categorie !== filtre.categorie) return false;
+    if (filtre.responsable && item.responsable !== filtre.responsable) return false;
+    if (filtre.engagement && item.engagement !== filtre.engagement) return false;
+
+    if (filtre.acces === "avec" && !item.acces) return false;
+    if (filtre.acces === "sans" && item.acces) return false;
+
+    if (filtre.relanceEnRetard) {
+      if (!item.dateRelance) return false;
+      if (new Date(item.dateRelance).getTime() > echeance) return false;
+    }
+
+    return true;
+  });
+}
+
+/** Combien de relations sont retirées — le compte du lien « Refusés (n) ». */
+export function compteRetires(
+  investisseurs: readonly InvestisseurPipeline[],
+): number {
+  return investisseurs.filter((item) => item.engagement === "retire").length;
+}
+
+/**
+ * Les responsables réellement présents, pour peupler le menu.
+ *
+ * Tirés des données et non d'une liste fermée : le responsable est saisi à la
+ * main, et proposer des noms que personne ne porte ferait filtrer sur du vide.
+ */
+export function responsablesDuPipeline(
+  investisseurs: readonly InvestisseurPipeline[],
+): string[] {
+  const vus = new Set<string>();
+  for (const item of investisseurs) {
+    if (item.responsable?.trim()) vus.add(item.responsable.trim());
+  }
+  return [...vus].sort((a, b) => a.localeCompare(b, "fr"));
+}

@@ -1702,3 +1702,19 @@ html[data-nav="back"]::view-transition-old(root){z-index:1}
 .v2-envoi-labels>span:last-child{visibility:hidden}
 .v2-envoi-labels[data-pending=true]>span:first-child{visibility:hidden}
 .v2-envoi-labels[data-pending=true]>span:last-child{visibility:visible}
+
+/* La bascule Tableau / Colonnes du bandeau — maquette 38. Un seul cadre pour
+   les deux, comme un interrupteur : deux pastilles séparées se lisent comme
+   deux boutons indépendants, alors que les vues s'excluent. */
+.v2-segmented{display:flex;overflow:hidden;border:1px solid var(--line);border-radius:var(--r-md,8px)}
+.v2-segmented>a{padding:7px 14px;color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none}
+.v2-segmented>a+a{border-left:1px solid var(--line)}
+.v2-segmented>a[data-active=true]{background:var(--orange-soft);color:var(--orange-text);font-weight:600}
+.v2-segmented>a:hover:not([data-active=true]){background:var(--band)}
+
+/* La puce d'alerte porte le rouge en contour, pas en fond : c'est un compte à
+   traiter, pas une erreur. */
+.v2-filter-alerte{display:inline-flex;height:32px;align-items:center;border:1.5px solid var(--red);border-radius:999px;background:#fff;padding:0 13px;color:var(--red);font-size:12px;font-weight:600;text-decoration:none}
+.v2-filter-alerte[data-active=true]{background:var(--red-soft);}
+.v2-filter-refuses{margin-left:auto;color:var(--text-3);font-size:12.5px;text-decoration:none}
+.v2-filter-refuses:hover{color:var(--text-2);text-decoration:underline}
