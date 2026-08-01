@@ -6,6 +6,7 @@ import {
   workspaceSubscription,
 } from "@/features/v2/billing/entitlements";
 import { listOperations } from "@/features/v2/server/operations";
+import { verifierPaiementEnAttente } from "@/features/v2/server/paiement";
 import { requireV2Workspace } from "@/features/v2/server/session";
 import { Standalone } from "@/features/v2/ui/Shell";
 import {
@@ -22,8 +23,25 @@ import { cancelV2Subscription, requestV2Plan } from "./actions";
  * adresse que personne ne pouvait atteindre. Tout ce qu'il montre est
  * désormais lu : le plan, ses droits, l'usage réel.
  */
-export default async function AbonnementPage() {
+export default async function AbonnementPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ paiement?: string }>;
+}) {
   const { organization } = await requireV2Workspace();
+  const { paiement } = await searchParams;
+
+  // AU RETOUR DU PRESTATAIRE, ON VÉRIFIE NOUS-MÊMES.
+  //
+  // Le 1er août, Genius Pay affichait « webhooks envoyés : 0 » alors qu'une
+  // transaction était bien réglée. Attendre une notification qui ne vient pas,
+  // c'est laisser quelqu'un qui a payé devant un plan qui n'a pas bougé.
+  //
+  // La vérification tourne AVANT la lecture du plan, pour que l'écran montre
+  // l'état d'après. Elle ne croit rien de l'URL : la référence est relue en
+  // base, et c'est le prestataire qui dit si c'est réglé.
+  const retourDePaiement =
+    paiement === "ok" ? await verifierPaiementEnAttente(organization.id) : null;
 
   const [plan, abonnement, consommation, droits, catalogue, operations] =
     await Promise.all([
@@ -51,6 +69,7 @@ export default async function AbonnementPage() {
     <Standalone search={false} title="Abonnement">
       <SubscriptionScreen
         abonnement={abonnement}
+        retourDePaiement={retourDePaiement?.etat ?? null}
         catalogue={catalogue}
         consommation={consommation}
         droits={droits}

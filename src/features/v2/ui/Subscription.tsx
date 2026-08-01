@@ -46,6 +46,7 @@ export function SubscriptionScreen({
   droits,
   onPayer,
   onResilier,
+  retourDePaiement,
   operations,
   plan,
 }: {
@@ -65,6 +66,8 @@ export function SubscriptionScreen({
   onResilier: (motif: string) => Promise<{ ok: boolean; error?: string }>;
   operations: readonly OperationComptee[];
   plan: Plan;
+  /** Ce qu'a donné la vérification au retour du prestataire, s'il y en a eu. */
+  retourDePaiement?: string | null;
 }) {
   const statut = abonnement
     ? libelleStatut(abonnement.statut)
@@ -79,8 +82,44 @@ export function SubscriptionScreen({
     (p) => p.segment === plan.segment && p.code !== plan.code,
   );
 
+  // Ce qu'on dit à quelqu'un qui revient de la page de paiement. Chaque état
+  // mérite sa phrase : « toujours en cours » n'est PAS un échec — en mobile
+  // money l'opérateur met parfois plusieurs minutes, et le payeur revient
+  // avant lui. Lui annoncer un échec le ferait payer deux fois.
+  const RETOURS: Record<string, { texte: string; bon: boolean }> = {
+    plan_active: { texte: "Paiement confirmé. Votre plan est ouvert.", bon: true },
+    deja_traite: { texte: "Paiement confirmé. Votre plan est ouvert.", bon: true },
+    toujours_en_cours: {
+      texte:
+        "Votre paiement est en cours de validation par votre opérateur. " +
+        "Cela prend parfois quelques minutes — rafraîchissez cette page, " +
+        "il n’y a rien d’autre à faire et surtout rien à repayer.",
+      bon: false,
+    },
+    echoue: {
+      texte: "Le paiement n’a pas abouti. Rien ne vous a été débité.",
+      bon: false,
+    },
+    indisponible: {
+      texte:
+        "Nous n’avons pas pu joindre notre prestataire à l’instant. Si vous " +
+        "avez payé, votre plan s’ouvrira dès que nous aurons sa confirmation.",
+      bon: false,
+    },
+    aucune_attente: { texte: "", bon: false },
+  };
+
+  const retour = retourDePaiement ? RETOURS[retourDePaiement] : null;
+
   return (
     <div className="v2-narrow-page">
+      {retour?.texte && (
+        <p className={retour.bon ? "v2-panel-callout" : "v2-panel-note"} role="status">
+          <Icon name={retour.bon ? "check" : "clock"} />
+          {retour.texte}
+        </p>
+      )}
+
       <section className="v2-plan-card">
         <header>
           <div>
