@@ -587,8 +587,13 @@ alors que les fichiers restent.
 
 ### Le reste
 
-- **Cohortes** (31-32) — `cohort_links` n'existe pas. Le seul écran majeur des
-  maquettes qui n'a aucune existence.
+- **Cohortes** (31-32) — **CE DOCUMENT SE TROMPAIT** : `cohort_links` existe,
+  ainsi que `cohorts`, `cohort_members`, `cohort_snapshots`, et sept fonctions
+  dont `invite_to_cohort`, `accept_cohort_link`, `revoke_cohort_link` et
+  `program_cohorts`. Ce qui manque n'est pas le socle mais **une lecture** —
+  `mes_invitations`, appelée par `inbox()` et absente de la base — et le
+  branchement des écrans sur elle. Les écrans sont fermés depuis `ef94371` ;
+  ils affichaient des fixtures et ignoraient le jeton de l'URL.
 - **Pipeline investisseurs dans Vue d'ensemble** (maquette 10).
 - **Consultations des mises à jour** — `seen_raise_update()` existe et n'est
   appelée nulle part : on ne sait pas qui a lu quoi.

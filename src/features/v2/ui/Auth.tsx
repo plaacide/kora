@@ -13,6 +13,7 @@ import type { AuthState } from "@/lib/validation/auth";
 import { createClient } from "@/lib/supabase/client";
 import { cheminInterne } from "@/lib/redirect";
 import { messageDErreur } from "@/features/v2/domain/erreurs";
+import { FocusPremiereErreur } from "./FocusErreur";
 import { Icon } from "./Icon";
 import { SanzaWordmark } from "./Logo";
 
@@ -121,6 +122,23 @@ function AuthError({ state }: { state: AuthState }) {
   );
 }
 
+/**
+ * L'identifiant du message d'erreur d'un champ.
+ *
+ * C'est lui qui relie le message au champ par `aria-describedby`. Sans ce
+ * lien, un lecteur d'écran annonce « Adresse e-mail, champ de saisie » et rien
+ * de plus : le message « cette adresse est déjà utilisée » est bien à l'écran,
+ * il est même annoncé à part, mais rien ne dit qu'il concerne CE champ.
+ */
+function idErreur(name: string): string {
+  return `erreur-${name}`;
+}
+
+/** L'attribut à poser sur le champ, ou rien s'il n'est pas en cause. */
+function decritPar(state: AuthState, name: string): string | undefined {
+  return state?.fieldErrors?.[name]?.[0] ? idErreur(name) : undefined;
+}
+
 function FieldError({
   state,
   name,
@@ -131,7 +149,7 @@ function FieldError({
   const message = state?.fieldErrors?.[name]?.[0];
   if (!message) return null;
   return (
-    <span className="v2-auth-field-error">
+    <span className="v2-auth-field-error" id={idErreur(name)}>
       {FIELD_MESSAGES[message] ?? message}
     </span>
   );
@@ -246,6 +264,7 @@ function PasswordField({
       <span className="v2-auth-control">
         <Icon name="lock" />
         <input
+          aria-describedby={decritPar(state, "password")}
           aria-invalid={Boolean(state?.fieldErrors?.password)}
           autoComplete={autoComplete}
           minLength={autoComplete === "new-password" ? 12 : undefined}
@@ -318,6 +337,7 @@ export function SignupForm({
       <SocialAuth />
 
       <form action={action} className="v2-auth-form" noValidate>
+        <FocusPremiereErreur cle={state} />
         <input name="auth_surface" type="hidden" value="v2" />
         <input name="suivant" type="hidden" value={suivant} />
         <input name="account_type" type="hidden" value={role} />
@@ -348,6 +368,7 @@ export function SignupForm({
           <span>Nom complet</span>
           <span className="v2-auth-control">
             <input
+              aria-describedby={decritPar(state, "full_name")}
               aria-invalid={Boolean(state?.fieldErrors?.full_name)}
               autoComplete="name"
               defaultValue={saisi.full_name ?? ""}
@@ -362,6 +383,7 @@ export function SignupForm({
           <span>Poste</span>
           <span className="v2-auth-control">
             <select
+              aria-describedby={decritPar(state, "job_title")}
               aria-invalid={Boolean(state?.fieldErrors?.job_title)}
               autoComplete="organization-title"
               name="job_title"
@@ -384,6 +406,7 @@ export function SignupForm({
           <span className="v2-auth-control">
             <Icon name="mail" />
             <input
+              aria-describedby={decritPar(state, "email")}
               aria-invalid={Boolean(state?.fieldErrors?.email)}
               autoComplete="email"
               defaultValue={saisi.email ?? email ?? ""}
@@ -480,6 +503,7 @@ export function LoginForm({
       <SocialAuth />
 
       <form action={action} className="v2-auth-form">
+        <FocusPremiereErreur cle={state} />
         <input name="auth_surface" type="hidden" value="v2" />
         <input name="suivant" type="hidden" value={suivant} />
         <AuthError state={state} />
@@ -489,6 +513,8 @@ export function LoginForm({
           <span className="v2-auth-control">
             <Icon name="mail" />
             <input
+              aria-describedby={decritPar(state, "email")}
+              aria-invalid={Boolean(state?.fieldErrors?.email)}
               autoComplete="email"
               defaultValue={saisi.email ?? email ?? ""}
               name="email"
@@ -659,13 +685,21 @@ export function ForgotPasswordForm({ erreur }: { erreur?: string } = {}) {
       )}
 
       <form action={action} className="v2-auth-form">
+        <FocusPremiereErreur cle={state} />
         <input name="auth_surface" type="hidden" value="v2" />
         <AuthError state={state} />
         <label className="v2-auth-field">
           <span>E-mail professionnel</span>
           <span className="v2-auth-control">
             <Icon name="mail" />
-            <input autoComplete="email" name="email" required type="email" />
+            <input
+              aria-describedby={decritPar(state, "email")}
+              aria-invalid={Boolean(state?.fieldErrors?.email)}
+              autoComplete="email"
+              name="email"
+              required
+              type="email"
+            />
           </span>
           <FieldError name="email" state={state} />
         </label>
@@ -691,6 +725,7 @@ export function ResetPasswordForm() {
         <p>Utilisez un mot de passe unique et difficile à deviner.</p>
       </div>
       <form action={action} className="v2-auth-form">
+        <FocusPremiereErreur cle={state} />
         <input name="auth_surface" type="hidden" value="v2" />
         <AuthError state={state} />
         {(["password", "confirm"] as const).map((name) => (

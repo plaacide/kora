@@ -114,13 +114,17 @@ export function RaiseConfigure({
 
     setBusy(false);
     if (!res.ok) {
-      // PAS DE MISE AU POINT SUR LE CHAMP FAUTIF ici, bien que l'action rende
-      // désormais `res.champ` : cet écran n'a ni `<form>` ni attributs `name`,
-      // ses champs sont contrôlés un par un. Un `querySelector` ne trouverait
-      // rien et ferait semblant. Les messages nomment le champ en toutes
-      // lettres — « la part de capital se saisit entre 0 et 100 » —, ce qui
-      // suffit sur un écran d'une douzaine de champs.
       setErreur(messageDErreur(res.code));
+      // LE CURSEUR VA SUR LE CHAMP FAUTIF. Cet écran n'a ni `<form>` ni
+      // attributs `name` — ses champs sont contrôlés un par un —, si bien
+      // qu'un `querySelector` sur `aria-invalid` ne trouverait rien. Chaque
+      // champ porte donc `id="champ-<nom du schéma>"`, et l'action rend le nom
+      // du premier problème dans l'ordre du formulaire.
+      const fautif = res.champ
+        ? document.getElementById(`champ-${res.champ}`)
+        : null;
+      fautif?.focus({ preventScroll: true });
+      fautif?.scrollIntoView({ block: "center", behavior: "smooth" });
       return;
     }
 
@@ -168,6 +172,7 @@ export function RaiseConfigure({
                 <span>Nom de la levée</span>
                 <span className="v2-control">
                   <input
+                    id="champ-nom"
                     onChange={(event) => setName(event.target.value)}
                     placeholder="Série A 2026"
                     value={name}
@@ -179,6 +184,7 @@ export function RaiseConfigure({
                 <span>Stade</span>
                 <span className="v2-control">
                   <select
+                    id="champ-stade"
                     onChange={(event) => setStage(event.target.value)}
                     value={stage}
                   >
@@ -194,6 +200,7 @@ export function RaiseConfigure({
                 <span className="v2-control">
                   <input
                     inputMode="numeric"
+                    id="champ-montantCible"
                     onChange={(event) => setTarget(event.target.value)}
                     placeholder="500 000 000"
                     value={target}
@@ -205,6 +212,7 @@ export function RaiseConfigure({
                 <span>Devise</span>
                 <span className="v2-control">
                   <select
+                    id="champ-devise"
                     onChange={(event) => setCurrency(event.target.value)}
                     value={currency}
                   >
@@ -219,6 +227,7 @@ export function RaiseConfigure({
                 <span>Instrument envisagé</span>
                 <span className="v2-control">
                   <select
+                    id="champ-instrument"
                     onChange={(event) => setInstrument(event.target.value)}
                     value={instrument}
                   >
@@ -235,6 +244,7 @@ export function RaiseConfigure({
                 </span>
                 <span className="v2-control">
                   <input
+                    id="champ-echeance"
                     onChange={(event) => setDeadline(event.target.value)}
                     type="date"
                     value={deadline}
@@ -257,6 +267,7 @@ export function RaiseConfigure({
                 <span className="v2-control">
                   <input
                     inputMode="numeric"
+                    id="champ-valorisation"
                     onChange={(event) => setPreMoney(event.target.value)}
                     placeholder="2 000 000 000"
                     value={preMoney}
@@ -271,6 +282,7 @@ export function RaiseConfigure({
                 <span className="v2-control">
                   <input
                     inputMode="decimal"
+                    id="champ-partCapital"
                     onChange={(event) => setPartCapital(event.target.value)}
                     placeholder="15"
                     value={partCapital}
@@ -286,6 +298,7 @@ export function RaiseConfigure({
                 <span className="v2-control">
                   <input
                     inputMode="numeric"
+                    id="champ-ticketMin"
                     onChange={(event) => setTicketMin(event.target.value)}
                     placeholder="25 000 000"
                     value={ticketMin}
@@ -300,6 +313,7 @@ export function RaiseConfigure({
                 <span className="v2-control">
                   <input
                     inputMode="numeric"
+                    id="champ-ticketMax"
                     onChange={(event) => setTicketMax(event.target.value)}
                     placeholder="150 000 000"
                     value={ticketMax}
@@ -313,6 +327,7 @@ export function RaiseConfigure({
                 </span>
                 <span className="v2-control">
                   <select
+                    id="champ-lead"
                     onChange={(event) => setLeadStatut(event.target.value)}
                     value={leadStatut}
                   >
@@ -506,6 +521,7 @@ export function RaiseClose({
           <span className="v2-control">
             <input
               inputMode="numeric"
+              id="champ-montantEngage"
               onChange={(event) => setMontant(event.target.value)}
               placeholder={raise.target ? String(raise.target) : "450 000 000"}
               value={montant}
