@@ -103,8 +103,18 @@ export async function workspaceSubscription(
   const { data, error } = await supabase
     .from("subscriptions")
     .select(
+      // LA CLÉ ÉTRANGÈRE EST NOMMÉE, ET ELLE DOIT L'ÊTRE. Depuis la descente
+      // différée, `subscriptions` pointe DEUX fois vers `plans` : `plan_id`,
+      // le plan servi, et `pending_plan_id`, celui qui prendra effet au terme.
+      // Écrire `plans(…)` laisse PostgREST devant deux chemins, et il refuse
+      // la requête entière (PGRST201) plutôt que d'en choisir un.
+      //
+      // L'écran retombait alors sur le plan gratuit et affichait « Ready » à
+      // une organisation qui venait de payer Raise. Une lecture qui échoue
+      // doit se voir ; ici elle se déguisait en réponse plausible.
       `id, status, billing_interval, current_period_start, current_period_end,
-       trial_end, cancel_at_period_end, plans(${CHAMPS_PLAN})`,
+       trial_end, cancel_at_period_end,
+       plans!subscriptions_plan_id_fkey(${CHAMPS_PLAN})`,
     )
     .eq("workspace_id", workspaceId)
     .in("status", [
