@@ -7,6 +7,7 @@ import {
   echec,
   type Resultat,
 } from "@/features/v2/domain/erreurs";
+import { type ChampLevee, validerLevee } from "@/features/v2/domain/levee-schema";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -63,7 +64,32 @@ export async function saveV2Raise(input: {
   partCapital?: number | null;
   /** Répartition de l'usage des fonds : [{ poste, part }]. */
   usagesFonds?: Array<{ poste: string; part: number }> | null;
-}): Promise<Resultat> {
+}): Promise<{ champ?: ChampLevee } & Resultat> {
+  // RIEN N'ÉTAIT VÉRIFIÉ ICI. Les dix-sept paramètres partaient tels quels :
+  // une fourchette inversée, une part de capital à 250 %, une devise inventée
+  // étaient rangées en base sans un mot.
+  const problemes = validerLevee({
+    nom: input.name,
+    montantCible: input.target,
+    montantEngage: input.secured,
+    devise: input.currency,
+    stade: input.stage,
+    instrument: input.instrument,
+    lead: input.leadStatut,
+    valorisation: input.preMoney,
+    ticketMin: input.ticketMin,
+    ticketMax: input.ticketMax,
+    partCapital: input.partCapital,
+    echeance: input.deadline,
+    usagesFonds: input.usagesFonds,
+  });
+
+  if (problemes.length > 0) {
+    // Le premier problème dans l'ordre du formulaire : c'est celui sur lequel
+    // l'écran posera le curseur.
+    return { ...echec(problemes[0].code), champ: problemes[0].champ };
+  }
+
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("save_raise", {

@@ -83,6 +83,16 @@ export type CodeErreur =
   | "preuve.introuvable"
   // Levée
   | "levee.nom_requis"
+  | "levee.montant_invalide"
+  | "levee.devise_inconnue"
+  | "levee.stade_inconnu"
+  | "levee.instrument_inconnu"
+  | "levee.lead_inconnu"
+  | "levee.part_capital_invalide"
+  | "levee.ticket_incoherent"
+  | "levee.echeance_invalide"
+  | "levee.usage_negatif"
+  | "levee.usage_depasse"
   | "levee.introuvable"
   | "levee.deja_en_cours"
   | "levee.aucune_en_cours"
@@ -225,6 +235,20 @@ const MESSAGES: Record<CodeErreur, string> = {
   "preuve.introuvable": "Cette pièce n’est plus associée à cette exigence.",
 
   "levee.nom_requis": "Indiquez un nom pour cette levée.",
+  "levee.montant_invalide":
+    "Ce montant n’est pas valide. Saisissez un nombre positif, sans espace ni symbole.",
+  "levee.devise_inconnue": "Choisissez une devise dans la liste.",
+  "levee.stade_inconnu": "Choisissez un stade dans la liste.",
+  "levee.instrument_inconnu": "Choisissez un instrument dans la liste.",
+  "levee.lead_inconnu": "Choisissez un statut de lead dans la liste.",
+  "levee.part_capital_invalide":
+    "La part de capital se saisit en pourcentage, entre 0 et 100.",
+  "levee.ticket_incoherent":
+    "Le ticket minimum dépasse le maximum. Inversez les deux montants.",
+  "levee.echeance_invalide": "Cette date n’est pas valide.",
+  "levee.usage_negatif": "Une part d’usage des fonds ne peut pas être négative.",
+  "levee.usage_depasse":
+    "La répartition dépasse 100 %. Ajustez les parts avant d’enregistrer.",
   "levee.introuvable": "Cette levée n’existe plus.",
   "levee.deja_en_cours":
     "Une levée est déjà en cours sur cette opération. Clôturez-la avant d’en ouvrir une autre.",

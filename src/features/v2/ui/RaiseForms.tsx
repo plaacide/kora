@@ -114,6 +114,12 @@ export function RaiseConfigure({
 
     setBusy(false);
     if (!res.ok) {
+      // PAS DE MISE AU POINT SUR LE CHAMP FAUTIF ici, bien que l'action rende
+      // désormais `res.champ` : cet écran n'a ni `<form>` ni attributs `name`,
+      // ses champs sont contrôlés un par un. Un `querySelector` ne trouverait
+      // rien et ferait semblant. Les messages nomment le champ en toutes
+      // lettres — « la part de capital se saisit entre 0 et 100 » —, ce qui
+      // suffit sur un écran d'une douzaine de champs.
       setErreur(messageDErreur(res.code));
       return;
     }
@@ -318,9 +324,12 @@ export function RaiseConfigure({
                 </span>
               </label>
             </div>
-            {/* La cohérence se dit AVANT l'enregistrement. La base refuse une
-                fourchette inversée ; l'apprendre par un message d'erreur après
-                avoir rempli tout le formulaire serait une punition. */}
+            {/* La cohérence se dit AVANT l'enregistrement : l'apprendre par un
+                message après avoir rempli tout le formulaire serait une
+                punition. Le serveur la vérifie aussi — ce commentaire affirmait
+                que la base refusait une fourchette inversée, ce qui était faux :
+                `save_raise` l'acceptait, et l'écran affichait ensuite
+                « 25 M – 5 M XOF ». */}
             {ticketInverse && (
               <p className="v2-panel-note">
                 Le ticket minimum dépasse le maximum — vérifiez les deux
