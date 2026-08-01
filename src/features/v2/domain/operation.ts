@@ -233,3 +233,89 @@ export function libelleObjectif(objectif: string | null): string | null {
   if (!objectif) return null;
   return OBJECTIFS[objectif] ?? objectif;
 }
+
+// ---------------------------------------------------------------------------
+// L'étape « Détails » — ce qu'on demande, et à qui
+// ---------------------------------------------------------------------------
+
+/**
+ * CETTE ÉTAPE ÉTAIT LA MÊME POUR TOUT LE MONDE, et intitulée « Votre levée en
+ * capital ». Elle s'affichait aux six objectifs, avec un champ « Stade de la
+ * levée » gradué de Pré-amorçage à Série C.
+ *
+ * Trois choses n'allaient pas. Le titre mentait pour cinq objectifs sur six —
+ * un prêt bancaire n'est pas une levée en capital. Les champs eux-mêmes étaient
+ * du vocabulaire de capital-risque : « Série B » ne décrit rien d'une
+ * subvention. Et pour audit, diligence et « autre », les réponses n'étaient
+ * jamais lues : `complete_onboarding` ne crée une levée que pour les trois
+ * objectifs de financement. On faisait remplir un formulaire dont la sortie
+ * était jetée.
+ *
+ * Surtout, cela contredisait le modèle : la data room existe SANS levée. Le
+ * découplage avait été fait en base, l'onboarding ne l'avait pas suivi.
+ */
+export function objectifPorteFinancement(objectif: string): boolean {
+  return objectif === "levee" || objectif === "dette" || objectif === "dfi";
+}
+
+export interface EtapeFinancement {
+  titre: string;
+  description: string;
+  /** Le troisième champ, dont le vocabulaire change avec l'objectif. */
+  modalite: { label: string; aide?: string; options: readonly string[] };
+}
+
+const ETAPES_FINANCEMENT: Record<string, EtapeFinancement> = {
+  levee: {
+    titre: "Votre levée en capital",
+    description: "Tous les champs non indispensables peuvent être remplis plus tard.",
+    modalite: {
+      label: "Stade de la levée",
+      options: ["Pré-amorçage", "Amorçage", "Série A", "Série B", "Série C et plus"],
+    },
+  },
+  dette: {
+    titre: "Votre financement bancaire",
+    description: "Tous les champs non indispensables peuvent être remplis plus tard.",
+    modalite: {
+      // Le type de concours, et non un stade : c'est lui qui décide des pièces.
+      // Un crédit-bail ne se justifie pas avec les mêmes documents qu'une ligne
+      // de trésorerie, alors qu'une « Série A » ne dit rien d'un prêt.
+      label: "Type de concours",
+      aide: "Il détermine les pièces que la banque demandera.",
+      options: [
+        "Crédit d’investissement",
+        "Ligne de trésorerie",
+        "Crédit-bail",
+        "Financement d’équipement",
+        "Crédit documentaire",
+        "Autre concours",
+      ],
+    },
+  },
+  dfi: {
+    titre: "Votre financement institutionnel",
+    description: "Tous les champs non indispensables peuvent être remplis plus tard.",
+    modalite: {
+      // RECOMMANDÉ POUR LES DFI : l'instrument, pas le stade ni le bailleur.
+      // Le bailleur se saisirait en texte libre et ne se regrouperait jamais ;
+      // l'instrument, lui, change tout le dossier — une subvention demande une
+      // note de projet et un budget, un prêt concessionnel des états financiers
+      // et des sûretés, une garantie l'engagement d'une banque tierce.
+      label: "Type de financement",
+      aide: "Il détermine les pièces attendues par le bailleur.",
+      options: [
+        "Subvention",
+        "Prêt concessionnel",
+        "Garantie",
+        "Assistance technique",
+        "Investissement en fonds propres",
+        "Autre instrument",
+      ],
+    },
+  },
+};
+
+export function etapeFinancement(objectif: string): EtapeFinancement | null {
+  return ETAPES_FINANCEMENT[objectif] ?? null;
+}

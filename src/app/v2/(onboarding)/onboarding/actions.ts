@@ -2,7 +2,10 @@
 
 import { redirect } from "next/navigation";
 
-import { intentObjective } from "@/features/v2/domain/operation";
+import {
+  intentObjective,
+  objectifPorteFinancement,
+} from "@/features/v2/domain/operation";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -81,7 +84,16 @@ export async function saveV2Objective(formData: FormData) {
   });
 
   if (error) fail(v2Routes.onboarding.operation, "objective save failed", error);
-  redirect(v2Routes.onboarding.details);
+
+  // L'ÉTAPE « DÉTAILS » NE CONCERNE QUE CE QUI SE FINANCE. Elle demandait un
+  // montant et un stade de levée à tout le monde, y compris à qui prépare un
+  // audit — et `complete_onboarding` jetait ces réponses, puisqu'elle n'ouvre
+  // une levée que pour levee, dette et dfi. La data room existe sans levée :
+  // le tunnel doit le refléter.
+  if (objective && objectifPorteFinancement(objective)) {
+    redirect(v2Routes.onboarding.details);
+  }
+  redirect(v2Routes.onboarding.result);
 }
 
 export async function saveV2Details(formData: FormData) {
@@ -95,7 +107,7 @@ export async function saveV2Details(formData: FormData) {
       // deux écrivaient ici la même colonne : le dernier enregistré écrasait
       // l'autre, et leurs listes ne coïncidaient même pas.
       p_stage: null,
-      p_stade_levee: value(formData, "roundStage"),
+      p_modalite: value(formData, "modalite"),
       p_one_liner: null,
       p_amount: amount(value(formData, "targetAmount")),
       // La devise était saisie puis jetée : aucun paramètre ne la portait.

@@ -68,10 +68,26 @@ export function OnboardingFrame({
   );
 }
 
-export function Stepper({ current }: { current: number }) {
+/**
+ * Le fil d'étapes.
+ *
+ * `avecDetails` à `false` retire « Détails » ET renumérote : cette étape ne
+ * s'affiche que pour un objectif de financement, et annoncer une étape qu'on
+ * ne traversera jamais fait paraître le tunnel plus long qu'il n'est — puis
+ * donne l'impression d'avoir sauté quelque chose en arrivant au bout.
+ */
+export function Stepper({
+  avecDetails = true,
+  current,
+}: {
+  avecDetails?: boolean;
+  current: number;
+}) {
+  const visibles = avecDetails ? steps : steps.filter((s) => s !== "Détails");
+
   return (
     <ol className="v2-steps" aria-label="Progression de l’onboarding">
-      {steps.map((label, index) => {
+      {visibles.map((label, index) => {
         const number = index + 1;
         const done = number < current;
         const active = number === current;

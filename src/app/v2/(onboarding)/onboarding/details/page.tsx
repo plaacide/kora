@@ -9,6 +9,9 @@ import {
 import { AvisEphemere } from "@/features/v2/ui/AvisEphemere";
 import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
 import { v2Routes } from "@/features/v2/navigation/routes";
+import { redirect } from "next/navigation";
+
+import { etapeFinancement } from "@/features/v2/domain/operation";
 import { saisieOnboarding } from "@/features/v2/server/startup";
 
 import { saveV2Details } from "../actions";
@@ -21,12 +24,19 @@ export default async function OperationDetailsOnboardingPage({
   const { erreur } = await searchParams;
   const saisie = await saisieOnboarding();
 
+  // CETTE ÉTAPE N'EXISTE QUE POUR CE QUI SE FINANCE. Y arriver avec un objectif
+  // d'audit ou de diligence signifie une adresse tapée à la main : on renvoie
+  // là où le tunnel continue, plutôt que de demander une « Série B » à
+  // quelqu'un qui prépare un audit.
+  const etape = etapeFinancement(saisie.objectif);
+  if (!etape) redirect(v2Routes.onboarding.result);
+
   return (
     <div className="v2-onboard-body">
       <Stepper current={4} />
       <OnboardingTitle
-        title="Votre levée en capital"
-        description="Tous les champs non indispensables peuvent être remplis plus tard."
+        title={etape.titre}
+        description={etape.description}
       />
 
       <form action={saveV2Details} className="v2-onboard-form">
@@ -51,11 +61,15 @@ export default async function OperationDetailsOnboardingPage({
             options={["XOF", "EUR", "USD", "GHS"]}
           />
         </div>
+        {/* Le vocabulaire suit l'objectif : stade du tour pour une levée, type
+            de concours pour une dette, type d'instrument pour un bailleur.
+            « Série B » ne décrit rien d'une subvention. */}
         <SelectField
-          label="Stade de la levée"
-          defaultValue={saisie.stadeLevee}
-          name="roundStage"
-          options={["Pré-amorçage", "Amorçage", "Série A", "Série B", "Série C et plus"]}
+          label={etape.modalite.label}
+          defaultValue={saisie.modalite}
+          helper={etape.modalite.aide}
+          name="modalite"
+          options={[...etape.modalite.options]}
         />
         <Field
           label="Date cible"

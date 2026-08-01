@@ -34,14 +34,14 @@ export interface SaisieOnboarding {
   objectif: string;
   montant: string;
   devise: string;
-  /** Le stade du TOUR — distinct de `stade`, qui est la maturité de l'entreprise. */
-  stadeLevee: string;
+  /** Le « comment » du financement — son vocabulaire dépend de l'objectif. */
+  modalite: string;
   horizon: string;
 }
 
 const VIDE: SaisieOnboarding = {
   nom: "", pays: "", secteur: "", stade: "",
-  description: "", objectif: "", montant: "", devise: "", stadeLevee: "",
+  description: "", objectif: "", montant: "", devise: "", modalite: "",
   horizon: "",
 };
 
@@ -55,7 +55,7 @@ export async function saisieOnboarding(): Promise<SaisieOnboarding> {
 
   const { data } = await supabase
     .from("startups")
-    .select("name, country, sector, stage, one_liner, objectif, amount_sought_usd, devise, stade_levee, horizon")
+    .select("name, country, sector, stage, one_liner, objectif, amount_sought_usd, devise, modalite_financement, horizon")
     .eq("owner_id", user.id)
     .maybeSingle();
 
@@ -68,7 +68,7 @@ export async function saisieOnboarding(): Promise<SaisieOnboarding> {
     objectif: string | null;
     amount_sought_usd: number | null;
     devise: string | null;
-    stade_levee: string | null;
+    modalite_financement: string | null;
     horizon: string | null;
   } | null;
 
@@ -83,7 +83,7 @@ export async function saisieOnboarding(): Promise<SaisieOnboarding> {
     // réaffiche pas un zéro là où le fondateur n'a rien écrit.
     montant: ligne?.amount_sought_usd ? String(ligne.amount_sought_usd) : "",
     devise: ligne?.devise ?? "",
-    stadeLevee: ligne?.stade_levee ?? "",
+    modalite: ligne?.modalite_financement ?? "",
     horizon: ligne?.horizon ?? "",
   };
 }

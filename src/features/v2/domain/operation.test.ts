@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  etapeFinancement,
   intentCanCarryRaise,
   INTENTIONS,
   intentObjective,
   libelleObjectif,
+  objectifPorteFinancement,
   operationLifecycle,
   operationSupportsInvestorTracking,
   operationType,
@@ -164,5 +166,51 @@ describe("les six intentions", () => {
     // dfi. Audit, diligence et autre n'ont pas de levée à ouvrir.
     const porteuses = INTENTIONS.filter((i) => intentCanCarryRaise(i.valeur));
     expect(porteuses.map((i) => i.valeur)).toEqual(["equity", "debt", "dfi"]);
+  });
+});
+
+describe("l’étape Détails", () => {
+  it("n’existe que pour ce qui se finance", () => {
+    // Elle demandait un montant et un stade de levée à tout le monde, y compris
+    // à qui prépare un audit — et `complete_onboarding` jetait ces réponses.
+    for (const objectif of ["levee", "dette", "dfi"]) {
+      expect(objectifPorteFinancement(objectif), objectif).toBe(true);
+      expect(etapeFinancement(objectif), objectif).not.toBeNull();
+    }
+    for (const objectif of ["diligence", "audit", "autre", ""]) {
+      expect(objectifPorteFinancement(objectif), objectif).toBe(false);
+      expect(etapeFinancement(objectif), objectif).toBeNull();
+    }
+  });
+
+  it("ne dit « levée en capital » qu’à une levée en capital", () => {
+    expect(etapeFinancement("levee")?.titre).toMatch(/levée en capital/i);
+    expect(etapeFinancement("dette")?.titre).not.toMatch(/levée|capital/i);
+    expect(etapeFinancement("dfi")?.titre).not.toMatch(/levée|capital/i);
+  });
+
+  it("ne parle de « Série » que pour du capital", () => {
+    // « Série B » ne décrit rien d'un prêt bancaire ni d'une subvention.
+    const serie = (o: string) =>
+      etapeFinancement(o)!.modalite.options.some((x) => /série/i.test(x));
+    expect(serie("levee")).toBe(true);
+    expect(serie("dette")).toBe(false);
+    expect(serie("dfi")).toBe(false);
+  });
+
+  it("demande aux bailleurs l’instrument, pas le bailleur", () => {
+    // Un bailleur se saisirait en texte libre et ne se regrouperait jamais ;
+    // l'instrument, lui, change tout le dossier attendu.
+    const dfi = etapeFinancement("dfi")!;
+    expect(dfi.modalite.options).toContain("Subvention");
+    expect(dfi.modalite.options).toContain("Prêt concessionnel");
+    expect(dfi.modalite.options).toContain("Garantie");
+  });
+
+  it("laisse une échappatoire à chaque objectif", () => {
+    for (const objectif of ["levee", "dette", "dfi"]) {
+      const dernier = etapeFinancement(objectif)!.modalite.options.at(-1)!;
+      expect(dernier.toLowerCase(), objectif).toMatch(/autre|et plus/);
+    }
   });
 });

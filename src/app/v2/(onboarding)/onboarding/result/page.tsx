@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
+import { objectifPorteFinancement } from "@/features/v2/domain/operation";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { Icon } from "@/features/v2/ui/Icon";
 import {
@@ -54,10 +55,13 @@ export default async function OnboardingResultPage({
     : startup.name;
   const objective =
     objectiveLabels[startup.objectif ?? ""] ?? "Plan de préparation";
+  // Le fil d'étapes n'annonce « Détails » qu'à ceux qui l'ont traversé.
+  const avecDetails = objectifPorteFinancement(startup.objectif ?? "");
 
   return (
     <div className="v2-onboard-body v2-onboard-wide">
-      <Stepper current={5} />
+      {/* Sans étape « Détails », le plan est la quatrième et non la cinquième. */}
+      <Stepper avecDetails={avecDetails} current={avecDetails ? 5 : 4} />
       <div className="v2-result-title">
         <span className="v2-result-icon"><Icon name="shield-check" /></span>
         <OnboardingTitle
