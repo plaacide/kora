@@ -119,7 +119,21 @@ docker run --rm -v "$PWD":/app -w /app node:22-bookworm-slim \
   npm install --package-lock-only
 ```
 
-(sans Docker en local : le faire sur le serveur, il en a un.)
+**Sans Docker sur le Mac**, `npx` sait exécuter la bonne version de npm — c'est
+le npm qui compte, pas le Node qui l'exécute :
+
+```bash
+npx --yes npm@10.9.8 install --package-lock-only
+npx --yes npm@10.9.8 ci --dry-run    # doit passer, sinon le build cassera
+```
+
+Le `ci --dry-run` est la vérification qui manquait : `npm run build` en local ne
+révèle rien, et l'erreur n'apparaît qu'au déploiement. Le lancer après TOUTE
+installation de dépendance.
+
+⚠️ Ce piège s'est reproduit le 1er août, en ajoutant Playwright : la consigne
+existait déjà ci-dessus et n'a pas été appliquée. Le déploiement a échoué sur
+exactement le paquet nommé ici.
 
 ## Sortie standalone : les imports construits à l'exécution ne sont pas tracés
 
