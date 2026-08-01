@@ -566,22 +566,37 @@ export async function listRequirements(
   }));
 }
 
+/**
+ * Les pièces d'un dossier — ou celles de la RACINE quand `folderId` est nul.
+ *
+ * LA RACINE N'ÉTAIT LUE PAR PERSONNE, et c'est ce qui a rendu des fichiers
+ * invisibles. Le dépôt accepte `folder_id = null` depuis le début — c'est même
+ * ce qui se passe quand une opération n'a aucune structure documentaire — mais
+ * l'écran ne listait que les dossiers et les pièces qu'ils contiennent. Les
+ * fichiers déposés à la racine existaient, comptaient dans le stockage
+ * facturé, et personne ne pouvait les voir ni les récupérer.
+ */
 export async function listDocuments(
   operationId: string,
-  folderId: string,
+  folderId: string | null,
 ): Promise<DocumentRow[]> {
   const supabase = await createClient();
 
   // `documents_current_version_fk` désigne la version ACTIVE, pas la dernière
   // déposée : après une restauration, les deux diffèrent.
-  const { data, error } = await supabase
+  const requete = supabase
     .from("documents")
     .select(
       "id, name, index_path, status, hidden_from_guests, folder_id, created_by, document_versions!documents_current_version_fk(version_no, created_at, uploaded_by)",
     )
-    .eq("deal_id", operationId)
-    .eq("folder_id", folderId)
-    .order("position");
+    .eq("deal_id", operationId);
+
+  // `.is(null)` et non `.eq(null)` : en SQL, rien n'est jamais ÉGAL à NULL, et
+  // PostgREST suit la même règle. Un `.eq("folder_id", null)` ne rend rien.
+  const { data, error } = await (folderId === null
+    ? requete.is("folder_id", null)
+    : requete.eq("folder_id", folderId)
+  ).order("position");
 
   if (error) throw error;
 
@@ -599,7 +614,10 @@ export async function listDocuments(
     guestCountByFolder(supabase, operationId),
   ]);
 
-  const guestCount = guests.get(folderId) ?? 0;
+  // Une pièce à la racine n'appartient à aucun dossier : elle n'est donc
+  // partagée avec personne, quel que soit l'état des partages ailleurs. Zéro
+  // est ici un fait, pas une valeur par défaut.
+  const guestCount = folderId === null ? 0 : (guests.get(folderId) ?? 0);
 
   return rows.map((row) => {
     const version = row.document_versions;

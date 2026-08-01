@@ -56,8 +56,17 @@ export default async function DocumentsPage({
   if ((folderPath?.length ?? 0) > 0 && !folder) notFound();
 
   if (!folder) {
-    const folders = await listFolders(operationId);
-    const total = folders.reduce((sum, row) => sum + row.documentCount, 0);
+    // LES PIÈCES DE LA RACINE SE LISENT AUSSI. Le dépôt les y accepte depuis le
+    // début — c'est même le seul endroit possible quand une opération n'a
+    // aucune structure documentaire — mais l'écran ne listait que les dossiers.
+    // Les fichiers déposés là existaient, occupaient le stockage facturé, et
+    // personne ne pouvait les voir ni les récupérer.
+    const [folders, racine] = await Promise.all([
+      listFolders(operationId),
+      listDocuments(operationId, null),
+    ]);
+    const total =
+      folders.reduce((sum, row) => sum + row.documentCount, 0) + racine.length;
 
     return (
       <div className="v2-documents-page">
@@ -120,6 +129,38 @@ export default async function DocumentsPage({
                   </span>
                   <span className="v2-status" data-tone="neutral">
                     {row.guestCount === 0 ? "Privé" : folderVisibilityLabel(row.guestCount)}
+                  </span>
+                </Link>
+                <SampleRowMenu label={row.name} />
+              </div>
+            ))}
+          </section>
+        )}
+
+        {/* Les pièces hors dossier. Le texte ne les présente pas comme un
+            oubli : déposer à la racine est un choix valable — elles restent
+            privées à l'équipe. Il dit simplement ce que le rangement change,
+            car c'est la seule conséquence qui compte. */}
+        {racine.length > 0 && (
+          <section className="v2-folder-card">
+            <header>
+              <strong>Pièces hors dossier</strong>
+              <span>
+                — visibles de votre équipe seule ; rangez-les dans un dossier
+                pour pouvoir les partager
+              </span>
+            </header>
+            {racine.map((row) => (
+              <div className="v2-folder-row" key={row.id}>
+                <Link
+                  className="v2-folder-link"
+                  href={`?document=${row.id}`}
+                >
+                  <Icon name="file" />
+                  <strong>{row.name}</strong>
+                  <span>{frenchDate(row.updatedAt)}</span>
+                  <span className="v2-status" data-tone="neutral">
+                    {row.hidden ? "Masquée" : "Privée"}
                   </span>
                 </Link>
                 <SampleRowMenu label={row.name} />
