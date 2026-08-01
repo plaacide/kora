@@ -644,3 +644,58 @@ export async function listDocuments(
     };
   });
 }
+
+/**
+ * Consultations par pièce — LES INVITÉS SEULEMENT.
+ *
+ * DÉCISION DU FONDATEUR, et elle change tout : sur une data room, « 12 vues »
+ * ne veut rien dire si onze viennent de l'équipe qui a déposé le fichier. Ce
+ * chiffre sert à savoir ce que les investisseurs ont réellement regardé — il
+ * doit donc exclure ceux qui sont de la maison.
+ *
+ * Un dépôt suivi de trois relectures internes doit afficher zéro : personne
+ * d'extérieur n'a encore ouvert la pièce, et c'est précisément l'information
+ * qu'on cherche.
+ */
+export async function guestViewsByDocument(
+  operationId: string,
+  organizationId: string,
+): Promise<Map<string, number>> {
+  const supabase = await createClient();
+
+  const [{ data: vues, error }, { data: internes }] = await Promise.all([
+    supabase
+      .from("audit_log")
+      .select("target_id, actor_id")
+      .eq("deal_id", operationId)
+      .eq("target_type", "document")
+      .in("action", ["document.page_viewed", "document.downloaded"]),
+    supabase
+      .from("memberships")
+      .select("user_id, role")
+      .eq("org_id", organizationId)
+      .neq("role", "guest"),
+  ]);
+
+  // Un journal illisible ne doit pas vider la colonne d'un tiret trompeur :
+  // on rend une carte vide, et l'écran affichera « — » de lui-même.
+  if (error) return new Map();
+
+  const maison = new Set(
+    ((internes ?? []) as Array<{ user_id: string }>).map((m) => m.user_id),
+  );
+
+  const comptes = new Map<string, number>();
+  for (const ligne of (vues ?? []) as Array<{
+    target_id: string | null;
+    actor_id: string | null;
+  }>) {
+    if (!ligne.target_id) continue;
+    // Un acteur inconnu — session expirée, lien public — n'est PAS de la
+    // maison : il compte. C'est le sens de la colonne.
+    if (ligne.actor_id && maison.has(ligne.actor_id)) continue;
+    comptes.set(ligne.target_id, (comptes.get(ligne.target_id) ?? 0) + 1);
+  }
+
+  return comptes;
+}

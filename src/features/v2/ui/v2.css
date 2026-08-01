@@ -255,6 +255,23 @@
 .v2-hide-toggle .v2-switch{flex:0 0 auto;margin-top:2px}
 .v2-empty-medallion{display:grid;width:88px;height:88px;margin-bottom:4px;place-items:center;border-radius:50%;background:var(--orange-soft);color:var(--orange-text)}
 .v2-empty-medallion .v2-icon{width:34px;height:34px}.v2-drop-empty p{max-width:440px;margin:5px 0 0;color:var(--text-2);font-size:13.5px}.v2-drop-empty>div{display:flex;margin-top:16px;gap:10px}
+/* Les actions de la data room. Une seule est orange — déposer une pièce est ce
+   pour quoi on vient ici ; partager et ranger sont des gestes de second temps. */
+.v2-dataroom-actions{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px}
+.v2-dataroom-actions .v2-icon{width:15px;height:15px}
+.v2-folder-vues{color:var(--text-4);font-size:12px;white-space:nowrap}
+
+/* Le nom cliquable ne se déguise PAS en bouton : il garde exactement l'allure
+   du texte qu'il remplace. Un nom qui prend un cadre au survol dit « je suis
+   un bouton » et détourne du vrai geste de la ligne, qui est d'ouvrir. Seul
+   le soulignement pointillé, discret, signale qu'il se modifie. */
+.v2-nom-editable{border:0;background:transparent;padding:0;color:inherit;font:inherit;text-align:left;cursor:text}
+.v2-nom-editable:hover{text-decoration:underline dotted var(--text-4);text-underline-offset:3px}
+.v2-nom-editable-champ{display:inline-flex;min-width:0;flex-direction:column;gap:2px}
+.v2-nom-editable-champ input{width:100%;min-width:180px;border:1px solid var(--orange);border-radius:5px;background:#fff;padding:2px 7px;color:var(--text);font:inherit;outline:0}
+.v2-nom-editable-champ input:disabled{opacity:.6}
+.v2-nom-editable-champ small{color:#b42318;font-size:11.5px;font-weight:400}
+
 /* Un intertitre DANS la carte, pour distinguer sans découper : les pièces hors
    dossier suivent les dossiers, et un second cadre aurait obligé à comprendre
    pourquoi il y en a deux. */

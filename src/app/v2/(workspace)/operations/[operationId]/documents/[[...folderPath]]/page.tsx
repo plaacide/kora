@@ -9,6 +9,7 @@ import { v2Routes } from "@/features/v2/navigation/routes";
 import type { DocumentRow } from "@/features/v2/server/documents";
 import {
   documentDetail,
+  guestViewsByDocument,
   listDocuments,
   listFolders,
   listRequirements,
@@ -32,7 +33,9 @@ import { DocumentPanel } from "@/features/v2/ui/DocumentPanel";
 import { DocumentUpload } from "@/features/v2/ui/DocumentUpload";
 import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import { Icon } from "@/features/v2/ui/Icon";
+import { BarreDataRoom } from "@/features/v2/ui/BarreDataRoom";
 import { DocumentMenu, FolderMenu } from "@/features/v2/ui/DocumentMenu";
+import { NomEditable } from "@/features/v2/ui/NomEditable";
 
 /** Les fixtures affichaient « 03-04-2026 » ; la base rend un horodatage ISO. */
 function frenchDate(value: string | null): string {
@@ -161,15 +164,20 @@ export default async function DocumentsPage({
   // c'est un lien périmé, et le dire vaut mieux que de montrer un écran vide.
   if ((folderPath?.length ?? 0) > 0 && !folder) notFound();
 
+  // L'adresse d'où l'on est venu : « Ajouter du contenu » doit déposer DANS le
+  // dossier ouvert, pas à la racine.
+  const cheminActuel = v2Routes.operations.documents(operationId, folderPath ?? []);
+
   if (!folder) {
     // LES PIÈCES DE LA RACINE SE LISENT AUSSI. Le dépôt les y accepte depuis le
     // début — c'est même le seul endroit possible quand une opération n'a
     // aucune structure documentaire — mais l'écran ne listait que les dossiers.
     // Les fichiers déposés là existaient, occupaient le stockage facturé, et
     // personne ne pouvait les voir ni les récupérer.
-    const [folders, racine] = await Promise.all([
+    const [folders, racine, vues] = await Promise.all([
       listFolders(operationId),
       listDocuments(operationId, null),
+      guestViewsByDocument(operationId, organization.id),
     ]);
     const total =
       folders.reduce((sum, row) => sum + row.documentCount, 0) + racine.length;
@@ -178,6 +186,19 @@ export default async function DocumentsPage({
 
     return (
       <div className="v2-documents-page">
+        <BarreDataRoom
+          hrefAjouter={`${cheminActuel}?upload=1`}
+          hrefPartager={`/v2/operations/${operationId}/access`}
+          onCreerDossier={async (nomDossier) => {
+            "use server";
+            return createV2Folder({
+              operationId,
+              parentId: null,
+              name: nomDossier,
+            });
+          }}
+        />
+
         {total === 0 && (
           <section className="v2-drop-empty">
             <EmptyArt name="files" />
@@ -228,7 +249,20 @@ export default async function DocumentsPage({
                 href={v2Routes.operations.documents(operationId, [row.name])}
               >
                 <Icon name="folder" />
-                <strong>{row.name}</strong>
+                <strong>
+                  <NomEditable
+                    nom={row.name}
+                    onRenommer={async (nouveau) => {
+                      "use server";
+                      return renameV2Folder({
+                        operationId,
+                        folderId: row.id,
+                        name: nouveau,
+                      });
+                    }}
+                    titre="ce dossier"
+                  />
+                </strong>
                 <span>
                   {row.documentCount === 0
                     ? "0 pièce"
@@ -262,8 +296,30 @@ export default async function DocumentsPage({
                 <div className="v2-folder-row" key={row.id}>
                   <Link className="v2-folder-link" href={`?document=${row.id}`}>
                     <Icon name="file" />
-                    <strong>{row.name}</strong>
+                    <strong>
+                      <NomEditable
+                        nom={row.name}
+                        onRenommer={async (nouveau) => {
+                          "use server";
+                          return renameV2Document({
+                            operationId,
+                            documentId: row.id,
+                            name: nouveau,
+                          });
+                        }}
+                        titre="cette pièce"
+                      />
+                    </strong>
                     <span>{frenchDate(row.updatedAt)}</span>
+                    {/* Les consultations n'ont de sens qu'externes : « 12 vues »
+                        ne dit rien si onze viennent de l'équipe qui a déposé le
+                        fichier. Zéro se dit par un tiret — l'absence de lecture
+                        n'est pas un chiffre, c'est une attente. */}
+                    <span className="v2-folder-vues">
+                      {vues.get(row.id)
+                        ? `${vues.get(row.id)} consultation${(vues.get(row.id) as number) > 1 ? "s" : ""}`
+                        : "—"}
+                    </span>
                     <span className="v2-status" data-tone="neutral">
                       {row.hidden ? "Masquée" : "Privée"}
                     </span>
@@ -283,9 +339,10 @@ export default async function DocumentsPage({
     );
   }
 
-  const [documents, tousLesDossiers] = await Promise.all([
+  const [documents, tousLesDossiers, vues] = await Promise.all([
     listDocuments(operationId, folder.id),
     listFolders(operationId),
+    guestViewsByDocument(operationId, organization.id),
   ]);
   const choixDossiers = tousLesDossiers.map((f) => ({ id: f.id, nom: f.name }));
   // Le panneau lit le détail complet — versions et journal compris — que la
@@ -306,6 +363,19 @@ export default async function DocumentsPage({
   return (
     <>
       <div className="v2-document-table-wrap">
+        <BarreDataRoom
+          hrefAjouter={`${cheminActuel}?upload=1`}
+          hrefPartager={`/v2/operations/${operationId}/access`}
+          onCreerDossier={async (nomDossier) => {
+            "use server";
+            return createV2Folder({
+              operationId,
+              parentId: folder.id,
+              name: nomDossier,
+            });
+          }}
+        />
+
         {documents.length === 0 ? (
           <section className="v2-drop-empty">
             <EmptyArt name="files" />
@@ -327,7 +397,8 @@ export default async function DocumentsPage({
               <thead>
                 <tr>
                   <th>#</th><th>Nom</th><th>Exigence associée</th><th>Visibilité</th>
-                  <th>Version</th><th>Mise à jour</th><th>Propriétaire</th><th>Statut</th><th />
+                  <th>Version</th><th>Mise à jour</th><th>Consultations</th>
+                  <th>Propriétaire</th><th>Statut</th><th />
                 </tr>
               </thead>
               <tbody>
@@ -339,7 +410,21 @@ export default async function DocumentsPage({
                       <td>{row.indexPath || "—"}</td>
                       <td>
                         <Link href={`?document=${row.id}`}>
-                          <Icon name="file" /><strong>{row.name}</strong>
+                          <Icon name="file" />
+                          <strong>
+                            <NomEditable
+                              nom={row.name}
+                              onRenommer={async (nouveau) => {
+                                "use server";
+                                return renameV2Document({
+                                  operationId,
+                                  documentId: row.id,
+                                  name: nouveau,
+                                });
+                              }}
+                              titre="cette pièce"
+                            />
+                          </strong>
                         </Link>
                       </td>
                       <td>{row.requirement ?? "—"}</td>
@@ -354,6 +439,8 @@ export default async function DocumentsPage({
                       </td>
                       <td>{row.versionNo ? `v${row.versionNo}` : "—"}</td>
                       <td>{frenchDate(row.updatedAt)}</td>
+                      {/* Externes seulement — voir `guestViewsByDocument`. */}
+                      <td>{vues.get(row.id) ?? "—"}</td>
                       <td>{row.owner ?? "—"}</td>
                       <td>
                         <span className="v2-status" data-tone={state.tone}>
