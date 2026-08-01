@@ -1,4 +1,4 @@
-export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize";
+export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize"|"logout";
 
 const paths:Record<string,string[]>={
 // Rail — tracés repris à l'identique des maquettes du handoff.
@@ -7,6 +7,7 @@ inbox:["M22 12h-6l-2 3h-4l-2-3H2","M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 
 users:["M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2","M22 21v-2a4 4 0 0 0-3-3.87","M16 3.13a4 4 0 0 1 0 7.75"],
 shield:["M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"],
 help:["M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3","M12 17h.01"],
+logout:["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4","m16 17 5-5-5-5","M21 12H9"],
 search:["m21 21-4.3-4.3"],
 briefcase:["M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2","M3 7h18v13H3z"],
 mail:["M3 5h18v14H3z","m3 6 9 7 9-7"],

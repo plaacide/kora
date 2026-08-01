@@ -6,6 +6,7 @@ import { useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 
 import { v2Routes } from "../navigation/routes";
+import { CompteMenu } from "./CompteMenu";
 import { Icon, type IconName } from "./Icon";
 import { SanzaMark, SanzaWordmark } from "./Logo";
 import { PushLink } from "./PushTransitions";
@@ -214,7 +215,7 @@ export function WorkspaceShell({
           {rail.map(link)}
           <span className="v2-rail-space" />
           {bottom.map(link)}
-          <span className="v2-avatar">{email.slice(0, 2).toUpperCase() || "SA"}</span>
+          <CompteMenu email={email} />
         </nav>
         {children}
       </div>
