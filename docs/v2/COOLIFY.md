@@ -2,15 +2,21 @@
 
 ## Isolation
 
-**La production est hors périmètre.** Décision du fondateur le 1er août 2026 :
-« oublie la production parce qu'on utilisera ce que tu as avec la V2 ». Le projet
-`bileqzpguyynkktndazs` ne reçoit pas les migrations de la V2 et n'a aucune
-donnée client à reprendre — Sanza est en pré-lancement. La base de recette
-`jourzsgjnutktsrgxkoo` est celle qui sera lancée.
+**`jourzsgjnutktsrgxkoo` N'EST PLUS UNE RECETTE : la V2 deviendra la
+production.** Décisions du fondateur le 1er août 2026 — « oublie la production
+parce qu'on utilisera ce que tu as avec la V2 », puis « la V2 deviendra la
+production ». Le projet `bileqzpguyynkktndazs` est abandonné et n'a aucune
+donnée à reprendre : Sanza est en pré-lancement.
 
-L'isolation ci-dessous reste la règle : écrire dans une base hors périmètre est
-un geste qu'on ne peut pas défaire, et la raison n'est plus de protéger des
-clients mais de ne pas salir ce qu'on n'a pas à toucher.
+**Conséquence à ne pas manquer.** Ce qu'on écrit aujourd'hui dans
+`jourzsgjnutktsrgxkoo` — comptes d'essai, organisations, documents — sera là au
+lancement si personne ne le retire. Le mot « recette » employé plus bas dans ce
+document est donc trompeur : il décrit un environnement séparé de l'ancienne
+production, pas une base jetable.
+
+Toute écriture de test doit être identifiable. La suite Playwright préfixe ce
+qu'elle crée par `ZZ-TEST` ; la purge tient en une requête plutôt qu'en un tri
+à l'œil de noms plausibles.
 
 Créer une application Coolify distincte de la production :
 

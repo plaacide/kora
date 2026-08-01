@@ -1,6 +1,16 @@
 import { expect, test } from "@playwright/test";
 
 /**
+ * Ce que la suite écrit porte ce marqueur, sans exception.
+ *
+ * `jourzsgjnutktsrgxkoo` n'est plus une recette : c'est la future production.
+ * Purge :
+ *
+ *   delete from public.startups where name like 'ZZ-TEST%';
+ */
+export const MARQUEUR_TEST = "ZZ-TEST";
+
+/**
  * L'étape 3 de l'onboarding — le choix d'objectif.
  *
  * CE QUE CES TESTS EMPÊCHENT DE REVENIR. Les cartes étaient des `<button>`
@@ -92,7 +102,11 @@ test.describe("Onboarding — la saisie ne se perd pas", () => {
       test.skip(true, "Le compte de recette a déjà terminé son onboarding.");
     }
 
-    const nom = `Recette ${Date.now()}`;
+    // PRÉFIXE OBLIGATOIRE. Cette base deviendra la production : ce que la
+    // suite y écrit sera là au lancement si personne ne le retire. Le marqueur
+    // rend le nettoyage possible en une requête, plutôt que de laisser
+    // quelqu'un trier à l'œil des noms plausibles.
+    const nom = `${MARQUEUR_TEST} ${Date.now()}`;
     await page.locator('input[name="companyName"]').fill(nom);
     await page.locator('select[name="country"]').selectOption("Mali");
     await page.locator('select[name="sector"]').selectOption("Énergie");
