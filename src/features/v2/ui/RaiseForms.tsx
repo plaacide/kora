@@ -15,6 +15,7 @@ import {
   createV2Raise,
   saveV2Raise,
 } from "@/app/v2/(workspace)/operations/[operationId]/lever/actions";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import type { Raise } from "@/features/v2/server/raise";
 import { Icon } from "./Icon";
 
@@ -113,7 +114,7 @@ export function RaiseConfigure({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(res.error ?? "La levée n’a pas pu être enregistrée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -408,7 +409,7 @@ export function RaiseEmpty({
     if (!res.ok) {
       // Un échec silencieux fait recliquer. C'est exactement ce qui a produit
       // les levées vides : la RPC refusait, et l'écran ne disait rien.
-      setErreur(res.error ?? "La levée n’a pas pu être ouverte.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -460,7 +461,7 @@ export function RaiseClose({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(res.error ?? "La levée n’a pas pu être clôturée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 

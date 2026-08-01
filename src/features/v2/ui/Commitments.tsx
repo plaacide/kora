@@ -18,6 +18,7 @@ import {
   type NiveauEngagement,
   type Requalification,
 } from "@/features/v2/domain/engagements";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { dateJournal } from "@/features/v2/domain/journal";
 import type { InvestisseurPipeline } from "@/features/v2/domain/pipeline";
 
@@ -303,7 +304,7 @@ function CommitmentPanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "L’engagement n’a pas pu être enregistré.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -320,7 +321,7 @@ function CommitmentPanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "L’engagement n’a pas pu être retiré.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 

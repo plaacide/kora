@@ -8,6 +8,7 @@ import {
   deleteV2Interaction,
   saveV2Interaction,
 } from "@/app/v2/(workspace)/operations/[operationId]/lever/actions";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { dateJournal } from "@/features/v2/domain/journal";
 import {
   TYPES_INTERACTION,
@@ -183,7 +184,7 @@ export function InteractionPanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "L’interaction n’a pas pu être enregistrée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -200,7 +201,7 @@ export function InteractionPanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "L’interaction n’a pas pu être retirée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 

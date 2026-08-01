@@ -8,6 +8,7 @@ import {
   deleteV2Investor,
   saveV2Investor,
 } from "@/app/v2/(workspace)/operations/[operationId]/lever/actions";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { initials } from "@/features/v2/domain/activity";
 import { paysAvecZone, paysParZone } from "@/features/v2/domain/geographie";
 import { v2Routes } from "@/features/v2/navigation/routes";
@@ -404,7 +405,7 @@ function InvestorPanel({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(res.error ?? "La relation n’a pas pu être retirée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -437,7 +438,7 @@ function InvestorPanel({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(res.error ?? "L’investisseur n’a pas pu être enregistré.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 

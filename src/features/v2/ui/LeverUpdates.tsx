@@ -10,6 +10,7 @@ import {
   publishV2Update,
   saveV2Update,
 } from "@/app/v2/(workspace)/operations/[operationId]/lever/actions";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { dateJournal } from "@/features/v2/domain/journal";
 import type { InvestisseurPipeline } from "@/features/v2/domain/pipeline";
 import {
@@ -291,7 +292,7 @@ function UpdateWizard({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(res.error ?? "Le brouillon n’a pas pu être enregistré.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -323,7 +324,7 @@ function UpdateWizard({
 
     if (!enregistre.ok) {
       setBusy(false);
-      setErreur(enregistre.error ?? "Le brouillon n’a pas pu être enregistré.");
+      setErreur(messageDErreur(enregistre.code));
       return;
     }
 
@@ -331,11 +332,9 @@ function UpdateWizard({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(
-        res.error?.includes("aucun destinataire")
-          ? "Choisissez au moins un destinataire avant de publier."
-          : (res.error ?? "La mise à jour n’a pas pu être publiée."),
-      );
+      // L'écran reniflait le message brut pour reconnaître l'absence de
+      // destinataire ; c'est la base qui nomme le cas, désormais.
+      setErreur(messageDErreur(res.code));
       return;
     }
 

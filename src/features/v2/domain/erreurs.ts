@@ -85,14 +85,17 @@ export type CodeErreur =
   | "levee.deja_en_cours"
   | "levee.aucune_en_cours"
   | "investisseur.requis"
+  | "investisseur.nom_requis"
   | "investisseur.introuvable"
   | "engagement.montant_requis"
+  | "engagement.montant_negatif"
   | "engagement.introuvable"
   | "interaction.introuvable"
   | "maj.introuvable"
   | "maj.deja_publiee"
   | "maj.titre_trop_court"
   | "maj.vide"
+  | "maj.destinataire_requis"
   // Abonnement
   | "abonnement.plan_inconnu"
   | "abonnement.aucun"
@@ -214,7 +217,9 @@ const MESSAGES: Record<CodeErreur, string> = {
     "Aucune levée n’est en cours sur cette opération. Ouvrez-en une d’abord.",
   "investisseur.requis": "Choisissez un investisseur.",
   "investisseur.introuvable": "Cet investisseur n’est plus au pipeline.",
-  "engagement.montant_requis": "Indiquez un montant.",
+  "investisseur.nom_requis": "Indiquez le nom de cet investisseur.",
+  "engagement.montant_requis": "Indiquez le montant engagé.",
+  "engagement.montant_negatif": "Le montant engagé ne peut pas être négatif.",
   "engagement.introuvable": "Cet engagement n’existe plus.",
   "interaction.introuvable": "Cette interaction n’existe plus.",
   "maj.introuvable": "Cette mise à jour n’existe plus.",
@@ -222,6 +227,8 @@ const MESSAGES: Record<CodeErreur, string> = {
     "Cette mise à jour est déjà publiée. Publiez une correction plutôt que de la modifier.",
   "maj.titre_trop_court": "Le titre est trop court.",
   "maj.vide": "Une mise à jour vide ne se publie pas.",
+  "maj.destinataire_requis":
+    "Choisissez au moins un destinataire avant de publier.",
 
   "abonnement.plan_inconnu": "Ce plan n’existe pas ou n’est plus proposé.",
   "abonnement.aucun": "Aucun abonnement à résilier.",
@@ -299,6 +306,7 @@ const FRAGMENTS: ReadonlyArray<readonly [string, CodeErreur]> = [
   ["mise à jour déjà publiée", "maj.deja_publiee"],
   ["mise à jour introuvable", "maj.introuvable"],
   ["brouillon introuvable ou déjà publié", "maj.deja_publiee"],
+  ["aucun destinataire", "maj.destinataire_requis"],
   ["impossible de publier une réponse vide", "maj.vide"],
   ["titre trop court", "maj.titre_trop_court"],
   ["note vide", "maj.vide"],

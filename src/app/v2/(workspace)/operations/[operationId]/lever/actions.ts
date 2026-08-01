@@ -2,6 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -12,7 +17,6 @@ import { createClient } from "@/lib/supabase/server";
  * journalisent. Une écriture directe sur `raises` ferait les trois de travers.
  */
 
-type Resultat = { ok: boolean; error?: string };
 
 function revalider(operationId: string): void {
   revalidatePath(`/v2/operations/${operationId}`, "layout");
@@ -86,7 +90,7 @@ export async function saveV2Raise(input: {
 
   if (error) {
     console.error("[v2 lever] save_raise échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -118,7 +122,7 @@ export async function closeV2Raise(input: {
 
     if (error) {
       console.error("[v2 lever] récapitulatif non enregistré :", error);
-      return { ok: false, error: error.message };
+      return echec(codeDepuisPostgres(error.message));
     }
   }
 
@@ -128,7 +132,7 @@ export async function closeV2Raise(input: {
 
   if (error) {
     console.error("[v2 lever] close_raise échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -149,7 +153,7 @@ export async function createV2Raise(input: {
 
   if (error) {
     console.error("[v2 lever] create_raise échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -183,7 +187,7 @@ export async function saveV2Investor(input: {
   notes?: string | null;
 }): Promise<Resultat> {
   const nom = input.nom.trim();
-  if (nom.length < 2) return { ok: false, error: "Indiquez un nom." };
+  if (nom.length < 2) return echec("investisseur.nom_requis");
 
   const supabase = await createClient();
 
@@ -211,7 +215,7 @@ export async function saveV2Investor(input: {
 
   if (error) {
     console.error("[v2 lever] save_raise_investor échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -242,7 +246,7 @@ export async function deleteV2Investor(input: {
 
   if (error) {
     console.error("[v2 lever] delete_raise_investor échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -268,9 +272,11 @@ export async function saveV2Commitment(input: {
   commentaire?: string | null;
   responsable?: string | null;
 }): Promise<Resultat> {
-  if (!input.investorId) return { ok: false, error: "Choisissez un investisseur." };
+  if (!input.investorId) return echec("investisseur.requis");
   if (!Number.isFinite(input.montant) || input.montant < 0) {
-    return { ok: false, error: "Indiquez un montant." };
+    return echec(
+      input.montant < 0 ? "engagement.montant_negatif" : "engagement.montant_requis",
+    );
   }
 
   const supabase = await createClient();
@@ -288,7 +294,7 @@ export async function saveV2Commitment(input: {
 
   if (error) {
     console.error("[v2 lever] save_raise_commitment échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -308,7 +314,7 @@ export async function deleteV2Commitment(input: {
 
   if (error) {
     console.error("[v2 lever] delete_raise_commitment échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -333,7 +339,7 @@ export async function saveV2Update(input: {
   indicateurs?: unknown[] | null;
   documentId?: string | null;
   destinataires?: string[] | null;
-}): Promise<Resultat & { id?: string }> {
+}): Promise<Resultat<{ id?: string }>> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("save_raise_update", {
@@ -351,7 +357,7 @@ export async function saveV2Update(input: {
 
   if (error) {
     console.error("[v2 lever] save_raise_update échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -375,7 +381,7 @@ export async function publishV2Update(input: {
 
   if (error) {
     console.error("[v2 lever] publish_raise_update échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -386,7 +392,7 @@ export async function publishV2Update(input: {
 export async function correctV2Update(input: {
   operationId: string;
   id: string;
-}): Promise<Resultat & { id?: string }> {
+}): Promise<Resultat<{ id?: string }>> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("correct_raise_update", {
@@ -395,7 +401,7 @@ export async function correctV2Update(input: {
 
   if (error) {
     console.error("[v2 lever] correct_raise_update échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -413,7 +419,7 @@ export async function deleteV2Update(input: {
 
   if (error) {
     console.error("[v2 lever] delete_raise_update échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -441,7 +447,7 @@ export async function saveV2Interaction(input: {
   dateRelance?: string | null;
 }): Promise<Resultat> {
   if (!input.investorId) {
-    return { ok: false, error: "Choisissez un investisseur." };
+    return echec("investisseur.requis");
   }
 
   const supabase = await createClient();
@@ -463,7 +469,7 @@ export async function saveV2Interaction(input: {
 
   if (error) {
     console.error("[v2 lever] save_raise_interaction échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -483,7 +489,7 @@ export async function deleteV2Interaction(input: {
 
   if (error) {
     console.error("[v2 lever] delete_raise_interaction échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
