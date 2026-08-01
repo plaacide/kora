@@ -2,6 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -12,7 +17,7 @@ import { createClient } from "@/lib/supabase/server";
  */
 export async function acceptV2TeamInvitation(input: {
   token: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("accept_org_invitation", {
@@ -22,17 +27,9 @@ export async function acceptV2TeamInvitation(input: {
   if (error) {
     console.error("[v2 équipe] accept_org_invitation échoué :", error);
 
-    const dit: Record<string, string> = {
-      "cette invitation ne vous est pas destinée":
-        "Cette invitation est adressée à une autre adresse e-mail.",
-      "invitation expirée": "Ce lien a expiré.",
-      "invitation révoquée": "Cette invitation a été révoquée.",
-      "invitation déjà acceptée": "Cette invitation a déjà été acceptée.",
-      "non authentifié": "Connectez-vous d’abord.",
-    };
-    const cle = Object.keys(dit).find((m) => error.message.includes(m));
-
-    return { ok: false, error: cle ? dit[cle] : error.message };
+    // Le troisième dictionnaire local, avec le même repli brut que les deux
+    // autres. Il vit désormais dans le catalogue commun.
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath("/v2", "layout");

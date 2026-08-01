@@ -2,6 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -16,7 +21,7 @@ export async function decideV2Request(input: {
   requestId: string;
   decision: "granted" | "refused";
   note?: string | null;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("decide_access_request", {
@@ -27,7 +32,7 @@ export async function decideV2Request(input: {
 
   if (error) {
     console.error("[v2 invitations] decide_access_request échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath("/v2/invitations");

@@ -20,6 +20,7 @@ import {
 const TOUS = [
   "droits.insuffisants",
   "session.expiree",
+  "session.absente",
   "inattendu",
   "limite.operations_actives",
   "limite.membres_internes",
@@ -94,6 +95,10 @@ const TOUS = [
   "paiement.lenteur_prestataire",
   "paiement.ouverture_impossible",
   "securite.action_inconnue",
+  "securite.deconnexion_impossible",
+  "mfa.activation_impossible",
+  "mfa.code_invalide",
+  "mfa.desactivation_impossible",
 ] as const satisfies readonly CodeErreur[];
 
 /**

@@ -22,7 +22,7 @@ import type {
 import { dateJournal } from "@/features/v2/domain/journal";
 
 import { ChangerDePlan } from "./ChangerDePlan";
-import { messageDErreur, type Resultat } from "@/features/v2/domain/erreurs";
+import type { Resultat } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 import { MessageTemporaire } from "./MessageTemporaire";
 import { Resilier } from "./Resilier";

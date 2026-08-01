@@ -2,6 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -12,8 +17,6 @@ import { createClient } from "@/lib/supabase/server";
  * donc pas l'authentification — elles en gardent la trace, et déconnectent les
  * autres appareils.
  */
-
-type Resultat = { ok: boolean; error?: string };
 
 export async function logV2Security(input: {
   action:
@@ -30,7 +33,7 @@ export async function logV2Security(input: {
 
   if (error) {
     console.error("[v2 sécurité] log_security_event échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath("/v2/security");
@@ -57,7 +60,7 @@ export async function signOutOtherDevices(): Promise<Resultat> {
 
   if (error) {
     console.error("[v2 sécurité] déconnexion des autres appareils :", error);
-    return { ok: false, error: error.message };
+    return echec("securite.deconnexion_impossible");
   }
 
   await supabase.rpc("log_security_event", {

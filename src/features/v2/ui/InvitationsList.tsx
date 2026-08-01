@@ -8,6 +8,7 @@ import { decideV2Request } from "@/app/v2/(workspace)/invitations/actions";
 import { dateJournal } from "@/features/v2/domain/journal";
 import type { Boite, DemandeDetail, EntreeBoite } from "@/features/v2/server/inbox";
 import { EmptyMedallion } from "./EmptyArt";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 
 /**
@@ -115,7 +116,7 @@ function RequestPanel({ demande }: { demande: DemandeDetail }) {
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "La demande n’a pas pu être traitée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 

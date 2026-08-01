@@ -61,7 +61,7 @@ export function DocumentPanel({
   const active = detail.versions.find((version) => version.active);
   const statut = documentStateLabel(detail.status);
 
-  async function restaurer(versionId: string, versionNo: number) {
+  async function restaurer(versionId: string) {
     setErreur(null);
     setBusy(`restore-${versionId}`);
 
@@ -231,7 +231,7 @@ export function DocumentPanel({
                 {!version.active && (
                   <button
                     disabled={busy !== null}
-                    onClick={() => void restaurer(version.id, version.versionNo)}
+                    onClick={() => void restaurer(version.id)}
                     type="button"
                   >
                     {busy === `restore-${version.id}` ? "…" : "Restaurer"}

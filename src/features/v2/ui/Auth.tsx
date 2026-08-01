@@ -12,6 +12,7 @@ import {
 import type { AuthState } from "@/lib/validation/auth";
 import { createClient } from "@/lib/supabase/client";
 import { cheminInterne } from "@/lib/redirect";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 import { SanzaWordmark } from "./Logo";
 
@@ -24,6 +25,11 @@ const ERROR_MESSAGES: Record<string, string> = {
   passwordTooWeak: "Choisissez un mot de passe plus robuste.",
   resetLinkExpired:
     "Ce lien n’est plus valide. Demandez un nouveau lien de réinitialisation.",
+  // Ces deux clés existaient côté serveur sans texte ici : elles tombaient donc
+  // dans le repli générique, qui ne disait pas ce qu'il fallait corriger.
+  notAuthenticated: "Votre session a expiré. Connectez-vous de nouveau.",
+  passwordSameAsOld:
+    "Ce mot de passe est identique au précédent. Choisissez-en un autre.",
 };
 
 const FIELD_MESSAGES: Record<string, string> = {
@@ -76,11 +82,19 @@ const JOB_TITLES_BY_ROLE: Record<AccountType, string[]> = {
 
 function AuthError({ state }: { state: AuthState }) {
   if (!state?.errorKey && !state?.errorRaw) return null;
+
+  // `errorRaw` porte le message de Supabase Auth, en anglais — « Email link is
+  // invalid or has expired ». Il était affiché tel quel. Il part au journal, et
+  // l'écran dit ce qu'on sait dire.
+  if (state.errorRaw) console.error("[v2 auth] échec non traduit :", state.errorRaw);
+
+  const message = state.errorKey
+    ? ERROR_MESSAGES[state.errorKey]
+    : undefined;
+
   return (
     <p className="v2-auth-error" role="alert">
-      {state.errorKey
-        ? (ERROR_MESSAGES[state.errorKey] ?? "Une erreur est survenue.")
-        : state.errorRaw}
+      {message ?? messageDErreur("inattendu")}
     </p>
   );
 }
@@ -476,7 +490,9 @@ export function TwoFactorForm({ suivant }: { suivant?: string }) {
     const challenge = await supabase.auth.mfa.challenge({ factorId: factor.id });
     if (challenge.error) {
       setBusy(false);
-      setError(challenge.error.message);
+      // Le SDK répond en anglais — « MFA challenge failed ». Il part au journal.
+      console.error("[v2 auth] défi MFA échoué :", challenge.error);
+      setError(messageDErreur("mfa.activation_impossible"));
       return;
     }
     const result = await supabase.auth.mfa.verify({

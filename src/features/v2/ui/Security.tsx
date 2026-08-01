@@ -14,6 +14,7 @@ import type {
 } from "@/features/v2/server/securite";
 import { createClient } from "@/lib/supabase/client";
 
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 
 /**
@@ -66,7 +67,8 @@ export function SecurityScreen({
 
     setBusy(null);
     if (error) {
-      setErreur(error.message);
+      console.error("[v2 sécurité] enrôlement échoué :", error);
+      setErreur(messageDErreur("mfa.activation_impossible"));
       return;
     }
 
@@ -85,7 +87,8 @@ export function SecurityScreen({
 
     if (defi.error) {
       setBusy(null);
-      setErreur(defi.error.message);
+      console.error("[v2 sécurité] défi échoué :", defi.error);
+      setErreur(messageDErreur("mfa.activation_impossible"));
       return;
     }
 
@@ -97,7 +100,7 @@ export function SecurityScreen({
 
     if (v.error) {
       setBusy(null);
-      setErreur("Ce code n’est pas le bon. Vérifiez l’heure de votre téléphone.");
+      setErreur(messageDErreur("mfa.code_invalide"));
       return;
     }
 
@@ -122,7 +125,8 @@ export function SecurityScreen({
       const { error } = await supabase.auth.mfa.unenroll({ factorId: f.id });
       if (error) {
         setBusy(null);
-        setErreur(error.message);
+        console.error("[v2 sécurité] désinscription échouée :", error);
+        setErreur(messageDErreur("mfa.desactivation_impossible"));
         return;
       }
     }
@@ -142,7 +146,7 @@ export function SecurityScreen({
     setBusy(null);
     setConfirmeArret(false);
     if (!res.ok) {
-      setErreur(res.error ?? "La déconnexion n’a pas abouti.");
+      setErreur(messageDErreur(res.code));
       return;
     }
     router.refresh();

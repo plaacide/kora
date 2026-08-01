@@ -24,6 +24,7 @@ export type CodeErreur =
   // Transverses
   | "droits.insuffisants"
   | "session.expiree"
+  | "session.absente"
   | "inattendu"
   // Limites de plan — le texte vient de `billing/limites`, qui porte déjà
   // l'issue à proposer.
@@ -109,7 +110,12 @@ export type CodeErreur =
   | "paiement.lenteur_prestataire"
   | "paiement.ouverture_impossible"
   // Sécurité
-  | "securite.action_inconnue";
+  | "securite.action_inconnue"
+  | "securite.deconnexion_impossible"
+  // Double facteur
+  | "mfa.activation_impossible"
+  | "mfa.code_invalide"
+  | "mfa.desactivation_impossible";
 
 /**
  * Un échec ne porte QU'un code. Pas de `message`, pas de `details` : le premier
@@ -142,6 +148,7 @@ const MESSAGES: Record<CodeErreur, string> = {
     "Vous n’avez pas l’autorisation de faire cela. Demandez à un administrateur de l’organisation.",
   "session.expiree":
     "Votre session a expiré. Reconnectez-vous pour reprendre où vous en étiez.",
+  "session.absente": "Connectez-vous d’abord pour continuer.",
   inattendu:
     "L’action n’a pas abouti. Réessayez ; si cela se reproduit, écrivez-nous.",
 
@@ -259,6 +266,17 @@ const MESSAGES: Record<CodeErreur, string> = {
     "Le paiement n’a pas pu être ouvert et rien ne vous a été débité. Réessayez dans un instant, ou écrivez-nous.",
 
   "securite.action_inconnue": "Cette action de sécurité n’existe pas.",
+  "securite.deconnexion_impossible":
+    "Les autres sessions n’ont pas pu être fermées. Réessayez dans un instant.",
+
+  "mfa.activation_impossible":
+    "La double authentification n’a pas pu être activée. Réessayez dans un instant.",
+  // La cause la plus fréquente est une horloge décalée, pas un mauvais code :
+  // le dire évite de retaper trois fois la même chose.
+  "mfa.code_invalide":
+    "Ce code n’est pas le bon. Vérifiez l’heure de votre téléphone, puis saisissez le code affiché.",
+  "mfa.desactivation_impossible":
+    "La double authentification n’a pas pu être désactivée. Réessayez dans un instant.",
 };
 
 export function messageDErreur(code: CodeErreur): string {
@@ -341,6 +359,7 @@ const FRAGMENTS: ReadonlyArray<readonly [string, CodeErreur]> = [
   ["deal introuvable", "operation.introuvable"],
   ["salle inconnue", "operation.introuvable"],
 
+  ["non authentifié", "session.absente"],
   ["adresse invalide", "equipe.adresse_invalide"],
   ["email invalide", "equipe.adresse_invalide"],
 

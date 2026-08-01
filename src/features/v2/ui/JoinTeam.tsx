@@ -7,6 +7,7 @@ import { useState } from "react";
 import { acceptV2TeamInvitation } from "@/app/v2/rejoindre-equipe/actions";
 import { v2Routes } from "@/features/v2/navigation/routes";
 
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 import { SanzaWordmark } from "./Logo";
 
@@ -59,7 +60,7 @@ export function JoinTeam({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(res.error ?? "L’invitation n’a pas pu être acceptée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
