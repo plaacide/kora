@@ -29,6 +29,8 @@ export interface DocumentRow {
   requirement: string | null;
   /** Masquée aux invités — la table le signale, la maquette 15 aussi. */
   hidden: boolean;
+  /** Pièce essentielle : elle remonte dans la préparation. */
+  estCle: boolean;
   guestCount: number;
   versionNo: number | null;
   updatedAt: string | null;
@@ -174,7 +176,8 @@ interface DocumentRecord {
   index_path: string;
   status: string;
   hidden_from_guests: boolean | null;
-  folder_id: string;
+  is_key: boolean | null;
+  folder_id: string | null;
   created_by: string | null;
   document_versions: {
     version_no: number;
@@ -587,7 +590,7 @@ export async function listDocuments(
   const requete = supabase
     .from("documents")
     .select(
-      "id, name, index_path, status, hidden_from_guests, folder_id, created_by, document_versions!documents_current_version_fk(version_no, created_at, uploaded_by)",
+      "id, name, index_path, status, hidden_from_guests, is_key, folder_id, created_by, document_versions!documents_current_version_fk(version_no, created_at, uploaded_by)",
     )
     .eq("deal_id", operationId);
 
@@ -629,6 +632,7 @@ export async function listDocuments(
       name: row.name,
       requirement: requirements.get(row.id) ?? null,
       hidden: row.hidden_from_guests ?? false,
+      estCle: row.is_key ?? false,
       // Une pièce masquée n'est visible d'aucun invité, quel que soit le
       // droit posé sur son dossier : afficher le compte du dossier ferait
       // croire l'inverse.

@@ -1,4 +1,4 @@
-export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key";
+export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus";
 
 const paths:Record<string,string[]>={
 // Rail — tracés repris à l'identique des maquettes du handoff.
@@ -21,7 +21,20 @@ plus:["M12 5v14","M5 12h14"],calendar:["M3 5h18v16H3z","M7 3v4","M17 3v4","M3 10
 arrow:["M5 12h14","m13 6 6 6-6 6"],check:["m5 12 4 4L19 6"],
 columns:["M4 4h6v16H4z","M14 4h6v16h-6z"],list:["M8 6h13","M8 12h13","M8 18h13","M3 6h.01","M3 12h.01","M3 18h.01"],
 clock:["M12 6v6l4 2"],trend:["m3 17 6-6 4 4 8-9","M15 6h6v6"],
-key:["m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"]};
+key:["m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"],
+// Les gestes sur une pièce ou un dossier — menus « ⋯ ».
+// Même jeu de tracés que le reste : trait de 1,75, cadre 24, bouts arrondis.
+// Une icône par geste, et jamais deux gestes sous la même : dans une liste
+// qu'on parcourt vite, la forme est lue avant le mot.
+pencil:["M12 20h9","M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"],
+download:["M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4","m7 10 5 5 5-5","M12 15V3"],
+upload:["M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4","m17 8-5-5-5 5","M12 3v12"],
+trash:["M3 6h18","M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6","M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"],
+move:["m15 14 5-5-5-5","M4 20v-7a4 4 0 0 1 4-4h12"],
+history:["M3 12a9 9 0 1 0 3-6.7L3 8","M3 3v5h5","M12 7v5l3.5 2"],
+star:["m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"],
+"eye-off":["M9.9 4.2A11 11 0 0 1 12 4c7 0 10 7 10 7a18 18 0 0 1-2.2 3.2M6.7 6.7A18 18 0 0 0 2 11s3 7 10 7a11 11 0 0 0 5.3-1.3","m2 2 20 20","M14.1 14.1a3 3 0 1 1-4.2-4.2"],
+"folder-plus":["M3 6h7l2 2h9v11H3z","M12 12v5","M9.5 14.5h5"]};
 
 /** Cercles des maquettes : `<circle>`, pas un chemin approché. */
 const circles:Record<string,Array<[number,number,number]>>={

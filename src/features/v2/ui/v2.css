@@ -1561,13 +1561,25 @@ html[data-nav="back"]::view-transition-old(root){z-index:1}
 
 /* Écran 54 — menu « ⋯ » d'une ligne d'opération */
 .v2-icon-button{flex-shrink:0}
-.v2-row-menu-list{position:fixed;z-index:60;display:flex;width:210px;flex-direction:column;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 12px 32px rgba(16,24,40,.14);padding:6px;animation:v2-drop var(--motion-fast) var(--motion-ease-enter) both;transform-origin:top right}
+.v2-row-menu-list{position:fixed;z-index:60;display:flex;width:232px;flex-direction:column;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 12px 32px rgba(16,24,40,.14);padding:6px;animation:v2-drop var(--motion-fast) var(--motion-ease-enter) both;transform-origin:top right}
 .v2-row-menu-list>*{display:flex;align-items:center;gap:9px;border:0;border-radius:6px;background:transparent;padding:8px 10px;color:var(--text-2)!important;font:400 13px var(--font-v2-sans),sans-serif;text-align:left;cursor:pointer}
 .v2-row-menu-list>*:hover{background:var(--line-soft);color:var(--text)!important}
 
 /* Menus « ⋯ » génériques (CRUD/Partager/Audit) et lien de dossier associé */
-.v2-row-menu-list [data-destructive=true]{color:#b42318!important}
-.v2-row-menu-list [data-destructive=true]:hover{background:#fef3f2}
+.v2-row-menu-list [data-destructive=true]{color:var(--red)!important}
+.v2-row-menu-list [data-destructive=true]:hover{background:var(--red-soft)}
+/* Les icônes ne crient pas : elles servent à reconnaître une ligne d'un coup
+   d'œil, pas à attirer l'attention. Elles prennent donc la couleur du texte,
+   y compris celle du rouge destructif. */
+/* L'icône se cale en HAUT, pas au milieu : « Marquer comme pièce clé » passe
+   sur deux lignes selon la police et la langue, et une icône centrée se
+   retrouve alors entre les deux, alignée sur rien. Compter les caractères pour
+   l'éviter serait tenir un équilibre qui se rompt au premier libellé ajouté. */
+.v2-row-menu-list>*{align-items:flex-start}
+.v2-row-menu-list .v2-icon{width:15px;height:15px;flex:none;margin-top:1px;opacity:.75}
+/* Une séparation avant le geste qu'on ne veut pas cliquer par erreur : la
+   distance vaut mieux qu'un avertissement. */
+.v2-row-menu-list [data-separateur=true]{margin-top:5px;border-top:1px solid var(--line-soft);padding-top:9px;border-radius:0 0 6px 6px}
 .v2-folder-link{display:flex;flex:1;min-width:0;align-items:center;gap:12px;color:inherit;text-decoration:none}
 .v2-folder-link>strong{flex:1;font-size:13.5px}
 .v2-folder-link>span:not(.v2-status){color:var(--text-4);font-size:12px}

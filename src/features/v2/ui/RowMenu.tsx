@@ -11,12 +11,24 @@ interface Position {
   left: number;
 }
 
-interface MenuItem {
+import type { IconName } from "./Icon";
+
+export interface MenuItem {
   label: string;
   href?: string;
   /** Une entrée qui AGIT plutôt que de mener quelque part. */
   onSelect?: () => void;
   destructive?: boolean;
+  /**
+   * L'icône du geste.
+   *
+   * Une par geste, et jamais deux gestes sous la même : dans une liste qu'on
+   * parcourt vite, la forme est reconnue avant le mot. C'est aussi ce qui
+   * permet de distinguer « Masquer aux invités » de « Supprimer » sans lire.
+   */
+  icon?: IconName;
+  /** Une séparation AU-DESSUS de cette entrée — pour isoler le destructif. */
+  separateur?: boolean;
 }
 
 /**
@@ -42,8 +54,10 @@ function Menu({ label, items }: { label: string; items: MenuItem[] }) {
     }
     const rect = trigger.current?.getBoundingClientRect();
     if (!rect) return;
-    // Aligné sur le bord droit du bouton, comme un menu qui se déroule vers le bas.
-    setPosition({ top: rect.bottom + 4, left: rect.right - 210 });
+    // Aligné sur le bord droit du bouton, comme un menu qui se déroule vers le
+    // bas. La valeur suit la largeur de `.v2-row-menu-list` — les deux doivent
+    // changer ensemble, sinon le menu déborde du côté qu'il devait longer.
+    setPosition({ top: rect.bottom + 4, left: rect.right - 232 });
     setOpen(true);
   }
 
@@ -99,16 +113,19 @@ function Menu({ label, items }: { label: string; items: MenuItem[] }) {
                 item.href ? (
                   <Link
                     data-destructive={item.destructive}
+                    data-separateur={item.separateur}
                     href={item.href}
                     key={item.label}
                     onClick={() => setOpen(false)}
                     role="menuitem"
                   >
+                    {item.icon && <Icon name={item.icon} />}
                     {item.label}
                   </Link>
                 ) : (
                   <button
                     data-destructive={item.destructive}
+                    data-separateur={item.separateur}
                     key={item.label}
                     onClick={() => {
                       setOpen(false);
@@ -117,6 +134,7 @@ function Menu({ label, items }: { label: string; items: MenuItem[] }) {
                     role="menuitem"
                     type="button"
                   >
+                    {item.icon && <Icon name={item.icon} />}
                     {item.label}
                   </button>
                 ),

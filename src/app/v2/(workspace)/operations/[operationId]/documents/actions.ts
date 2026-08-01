@@ -232,3 +232,186 @@ export async function setV2DocumentHidden(input: {
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
   return { ok: true };
 }
+
+/**
+ * Renommer une pièce.
+ *
+ * Le nom d'origine du fichier est rarement celui qu'on veut montrer à un
+ * investisseur : « S0 Donnees etudiants 2026 01 23 v4.xlsx » devient
+ * « Tableau de bord — janvier 2026 ». Renommer ne touche NI le fichier stocké
+ * ni ses versions : seule l'étiquette change.
+ */
+export async function renameV2Document(input: {
+  operationId: string;
+  documentId: string;
+  name: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const nom = input.name.trim();
+  if (!nom) return { ok: false, error: "Le nom ne peut pas être vide." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("rename_document", {
+    p_doc: input.documentId,
+    p_name: nom,
+  });
+
+  if (error) {
+    console.error("[v2 documents] rename_document failed", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}
+
+/**
+ * Déplacer une pièce vers un dossier — ou vers la racine.
+ *
+ * CE GESTE CHANGE QUI PEUT VOIR LA PIÈCE, et c'est sa conséquence la plus
+ * importante : les partages se font par dossier. Sortir une pièce d'un dossier
+ * partagé la retire de la vue des invités ; l'y placer la leur ouvre. L'écran
+ * doit le dire avant, pas après.
+ */
+export async function moveV2Document(input: {
+  operationId: string;
+  documentId: string;
+  folderId: string | null;
+}): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("move_document", {
+    p_doc: input.documentId,
+    p_folder: input.folderId,
+  });
+
+  if (error) {
+    console.error("[v2 documents] move_document failed", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}
+
+/** Marquer une pièce comme essentielle — elle remonte dans la préparation. */
+export async function setV2DocumentKey(input: {
+  operationId: string;
+  documentId: string;
+  key: boolean;
+}): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_document_key", {
+    p_doc: input.documentId,
+    p_key: input.key,
+  });
+
+  if (error) {
+    console.error("[v2 documents] set_document_key failed", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}
+
+/**
+ * Supprimer une pièce.
+ *
+ * `delete_document` retire la ligne et ses versions. LE FICHIER STOCKÉ, LUI,
+ * RESTE : aucune cascade en base ne touche un objet de stockage. C'est ce qui a
+ * permis de reconstruire une opération entière le 1er août — et c'est aussi ce
+ * qui fait qu'un client croit avoir effacé alors que le fichier survit. Le
+ * dire ici tant que le nettoyage du bucket n'est pas écrit.
+ */
+export async function deleteV2Document(input: {
+  operationId: string;
+  documentId: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_document", {
+    p_doc: input.documentId,
+  });
+
+  if (error) {
+    console.error("[v2 documents] delete_document failed", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}
+
+/** Créer un dossier — à la racine, ou sous un autre. */
+export async function createV2Folder(input: {
+  operationId: string;
+  parentId: string | null;
+  name: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const nom = input.name.trim();
+  if (!nom) return { ok: false, error: "Donnez un nom au dossier." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("create_folder", {
+    p_deal: input.operationId,
+    p_parent: input.parentId,
+    p_name: nom,
+  });
+
+  if (error) {
+    console.error("[v2 documents] create_folder failed", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}
+
+/** Renommer un dossier. Les partages le suivent : ils portent sur le dossier. */
+export async function renameV2Folder(input: {
+  operationId: string;
+  folderId: string;
+  name: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const nom = input.name.trim();
+  if (!nom) return { ok: false, error: "Le nom ne peut pas être vide." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("rename_folder", {
+    p_folder: input.folderId,
+    p_name: nom,
+  });
+
+  if (error) {
+    console.error("[v2 documents] rename_folder failed", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}
+
+/**
+ * Supprimer un dossier.
+ *
+ * `p_cascade` décide du sort des pièces : à `false`, la base REFUSE si le
+ * dossier n'est pas vide — c'est le comportement qu'on veut par défaut, pour
+ * qu'une suppression de dossier n'emporte jamais des pièces par surprise.
+ */
+export async function deleteV2Folder(input: {
+  operationId: string;
+  folderId: string;
+  cascade: boolean;
+}): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_folder", {
+    p_folder: input.folderId,
+    p_cascade: input.cascade,
+  });
+
+  if (error) {
+    console.error("[v2 documents] delete_folder failed", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/v2/operations/${input.operationId}`, "layout");
+  return { ok: true };
+}

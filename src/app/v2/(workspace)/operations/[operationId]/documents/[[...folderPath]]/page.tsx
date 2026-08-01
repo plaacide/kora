@@ -6,6 +6,7 @@ import {
   folderVisibilityLabel,
 } from "@/features/v2/domain/documents";
 import { v2Routes } from "@/features/v2/navigation/routes";
+import type { DocumentRow } from "@/features/v2/server/documents";
 import {
   documentDetail,
   listDocuments,
@@ -15,12 +16,23 @@ import {
   resolveFolderPath,
 } from "@/features/v2/server/documents";
 import { requireV2Workspace } from "@/features/v2/server/session";
+
+import {
+  createV2Folder,
+  deleteV2Document,
+  deleteV2Folder,
+  moveV2Document,
+  renameV2Document,
+  renameV2Folder,
+  setV2DocumentHidden,
+  setV2DocumentKey,
+} from "../actions";
 import { AssociationsPanel } from "@/features/v2/ui/Associations";
 import { DocumentPanel } from "@/features/v2/ui/DocumentPanel";
 import { DocumentUpload } from "@/features/v2/ui/DocumentUpload";
 import { EmptyArt } from "@/features/v2/ui/EmptyArt";
 import { Icon } from "@/features/v2/ui/Icon";
-import { SampleRowMenu } from "@/features/v2/ui/RowMenu";
+import { DocumentMenu, FolderMenu } from "@/features/v2/ui/DocumentMenu";
 
 /** Les fixtures affichaient « 03-04-2026 » ; la base rend un horodatage ISO. */
 function frenchDate(value: string | null): string {
@@ -28,6 +40,95 @@ function frenchDate(value: string | null): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleDateString("fr-FR").replaceAll("/", "-");
+}
+
+/**
+ * Les menus « ⋯ » avec leurs actions, liés une seule fois.
+ *
+ * Les actions serveur sont définies ICI plutôt que dans chaque ligne : une
+ * `"use server"` déclarée dans une boucle serait recréée à chaque élément, et
+ * l'identifiant d'opération y serait recopié autant de fois qu'il y a de
+ * pièces. Un seul endroit le porte, et il vient du serveur — jamais du
+ * navigateur, qui pourrait le remplacer par celui d'une autre organisation.
+ */
+function MenuPiece({
+  document,
+  dossierActuel,
+  dossiers,
+  operationId,
+}: {
+  document: DocumentRow;
+  dossierActuel: string | null;
+  dossiers: readonly { id: string; nom: string }[];
+  operationId: string;
+}) {
+  return (
+    <DocumentMenu
+      documentId={document.id}
+      dossierActuel={dossierActuel}
+      dossiers={dossiers}
+      estCle={document.estCle}
+      masquee={document.hidden}
+      nom={document.name}
+      onDeplacer={async (folderId) => {
+        "use server";
+        return moveV2Document({ operationId, documentId: document.id, folderId });
+      }}
+      onMarquerCle={async (key) => {
+        "use server";
+        return setV2DocumentKey({ operationId, documentId: document.id, key });
+      }}
+      onMasquer={async (hidden) => {
+        "use server";
+        return setV2DocumentHidden({ operationId, documentId: document.id, hidden });
+      }}
+      onRenommer={async (nom) => {
+        "use server";
+        return renameV2Document({ operationId, documentId: document.id, name: nom });
+      }}
+      onSupprimer={async () => {
+        "use server";
+        return deleteV2Document({ operationId, documentId: document.id });
+      }}
+      urlVisionneuse={`?document=${document.id}`}
+    />
+  );
+}
+
+function MenuDossier({
+  contient,
+  folderId,
+  nom,
+  operationId,
+  urlOuvrir,
+}: {
+  contient: number;
+  folderId: string;
+  nom: string;
+  operationId: string;
+  urlOuvrir: string;
+}) {
+  return (
+    <FolderMenu
+      contient={contient}
+      nom={nom}
+      onCreerSous={async (sousNom) => {
+        "use server";
+        return createV2Folder({ operationId, parentId: folderId, name: sousNom });
+      }}
+      onRenommer={async (nouveau) => {
+        "use server";
+        return renameV2Folder({ operationId, folderId, name: nouveau });
+      }}
+      onSupprimer={async () => {
+        "use server";
+        // Jamais en cascade : la base refuse un dossier non vide, et c'est ce
+        // qu'on veut — un rangement ne doit pas emporter ce qu'il range.
+        return deleteV2Folder({ operationId, folderId, cascade: false });
+      }}
+      urlOuvrir={urlOuvrir}
+    />
+  );
 }
 
 export default async function DocumentsPage({
@@ -67,6 +168,8 @@ export default async function DocumentsPage({
     ]);
     const total =
       folders.reduce((sum, row) => sum + row.documentCount, 0) + racine.length;
+    // Les destinations offertes par « Déplacer vers… ».
+    const choixDossiers = folders.map((f) => ({ id: f.id, nom: f.name }));
 
     return (
       <div className="v2-documents-page">
@@ -131,7 +234,13 @@ export default async function DocumentsPage({
                     {row.guestCount === 0 ? "Privé" : folderVisibilityLabel(row.guestCount)}
                   </span>
                 </Link>
-                <SampleRowMenu label={row.name} />
+                <MenuDossier
+                  contient={row.documentCount}
+                  folderId={row.id}
+                  nom={row.name}
+                  operationId={operationId}
+                  urlOuvrir={v2Routes.operations.documents(operationId, [row.name])}
+                />
               </div>
             ))}
           </section>
@@ -163,7 +272,12 @@ export default async function DocumentsPage({
                     {row.hidden ? "Masquée" : "Privée"}
                   </span>
                 </Link>
-                <SampleRowMenu label={row.name} />
+                <MenuPiece
+                  document={row}
+                  dossierActuel={null}
+                  dossiers={choixDossiers}
+                  operationId={operationId}
+                />
               </div>
             ))}
           </section>
@@ -172,7 +286,11 @@ export default async function DocumentsPage({
     );
   }
 
-  const documents = await listDocuments(operationId, folder.id);
+  const [documents, tousLesDossiers] = await Promise.all([
+    listDocuments(operationId, folder.id),
+    listFolders(operationId),
+  ]);
+  const choixDossiers = tousLesDossiers.map((f) => ({ id: f.id, nom: f.name }));
   // Le panneau lit le détail complet — versions et journal compris — que la
   // liste ne porte pas.
   const detail = document ? await documentDetail(operationId, document) : null;
@@ -245,7 +363,14 @@ export default async function DocumentsPage({
                           {state.label}
                         </span>
                       </td>
-                      <td><SampleRowMenu label={row.name} /></td>
+                      <td>
+                        <MenuPiece
+                          document={row}
+                          dossierActuel={folder.id}
+                          dossiers={choixDossiers}
+                          operationId={operationId}
+                        />
+                      </td>
                     </tr>
                   );
                 })}
