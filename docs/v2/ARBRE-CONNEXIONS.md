@@ -446,6 +446,41 @@ autorisés — mais staging reste la première étape.
 
 ## Ce qui reste, tout écran confondu
 
+### 1. Réglages d'une opération — PRIORITÉ, décidée le 1er août
+
+**Rien ne permet de modifier une opération après sa création.** Ni son nom, ni
+son montant, ni sa devise, ni son étape, ni l'exigence de NDA ; ni de
+l'archiver, ni de la clôturer, ni de la supprimer. Le dossier de l'opération
+contient `overview`, `preparation`, `documents`, `access`, `lever`,
+`investors`, `activity` — et aucun `settings`.
+
+C'est ce trou qui rend mortes trois options du menu « ⋯ » : « Modifier » ne
+mène nulle part, et `OperationDialog` (clôture, archivage) est entièrement
+décoratif — ses boutons n'ont aucun gestionnaire.
+
+**Tout est prêt en base**, rien n'est à écrire côté SQL :
+
+| Section | Fonction |
+|---|---|
+| Identité — nom, type, montant, devise | `update_deal` |
+| Étape — sourcing → signé | `set_deal_stage` |
+| NDA avant consultation | `set_deal_nda` |
+| Recalculer la numérotation | `reindex_deal` |
+| Archiver — réversible, sort du décompte du plan | `set_deal_archived` |
+| Supprimer — irréversible | `delete_deal` |
+
+C'est aussi l'endroit où « Supprimer » a sa place, et non dans le menu d'une
+ligne de liste où l'on clique en passant : on arrive dans les réglages
+délibérément, après avoir lu le reste.
+
+**Question ouverte, à trancher avant d'écrire la suppression** : doit-elle
+effacer aussi les fichiers du stockage ? Aujourd'hui la cascade en base ne les
+touche pas — c'est ce qui a permis de reconstruire *Pre-seed 2nd Round* le
+1er août — mais cela signifie qu'un client qui supprime croit avoir effacé
+alors que les fichiers restent.
+
+### Le reste
+
 - **Cohortes** (31-32) — `cohort_links` n'existe pas. Le seul écran majeur des
   maquettes qui n'a aucune existence.
 - **Pipeline investisseurs dans Vue d'ensemble** (maquette 10).
