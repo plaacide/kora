@@ -85,10 +85,6 @@ function MenuPiece({
         "use server";
         return setV2DocumentHidden({ operationId, documentId: document.id, hidden });
       }}
-      onRenommer={async (nom) => {
-        "use server";
-        return renameV2Document({ operationId, documentId: document.id, name: nom });
-      }}
       onSupprimer={async () => {
         "use server";
         return deleteV2Document({ operationId, documentId: document.id });
@@ -119,14 +115,11 @@ function MenuDossier({
   return (
     <FolderMenu
       contient={contient}
+      folderId={folderId}
       nom={nom}
       onCreerSous={async (sousNom) => {
         "use server";
         return createV2Folder({ operationId, parentId: folderId, name: sousNom });
-      }}
-      onRenommer={async (nouveau) => {
-        "use server";
-        return renameV2Folder({ operationId, folderId, name: nouveau });
       }}
       onSupprimer={async () => {
         "use server";
@@ -251,6 +244,7 @@ export default async function DocumentsPage({
                 <Icon name="folder" />
                 <strong>
                   <NomEditable
+                    cle={row.id}
                     nom={row.name}
                     onRenommer={async (nouveau) => {
                       "use server";
@@ -298,6 +292,7 @@ export default async function DocumentsPage({
                     <Icon name="file" />
                     <strong>
                       <NomEditable
+                        cle={row.id}
                         nom={row.name}
                         onRenommer={async (nouveau) => {
                           "use server";
@@ -413,6 +408,7 @@ export default async function DocumentsPage({
                           <Icon name="file" />
                           <strong>
                             <NomEditable
+                              cle={row.id}
                               nom={row.name}
                               onRenommer={async (nouveau) => {
                                 "use server";

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { demanderRenommage } from "./NomEditable";
 import { ActionsMenu } from "./RowMenu";
 
 /**
@@ -25,7 +26,7 @@ export interface DossierChoix {
   nom: string;
 }
 
-type Dialogue = "renommer" | "deplacer" | "supprimer" | null;
+type Dialogue = "deplacer" | "supprimer" | null;
 
 export function DocumentMenu({
   documentId,
@@ -37,7 +38,6 @@ export function DocumentMenu({
   onDeplacer,
   onMarquerCle,
   onMasquer,
-  onRenommer,
   onSupprimer,
   urlVisionneuse,
 }: {
@@ -51,13 +51,11 @@ export function DocumentMenu({
   onDeplacer: (folderId: string | null) => Promise<{ ok: boolean; error?: string }>;
   onMarquerCle: (key: boolean) => Promise<{ ok: boolean; error?: string }>;
   onMasquer: (hidden: boolean) => Promise<{ ok: boolean; error?: string }>;
-  onRenommer: (nom: string) => Promise<{ ok: boolean; error?: string }>;
   onSupprimer: () => Promise<{ ok: boolean; error?: string }>;
   urlVisionneuse: string;
 }) {
   const router = useRouter();
   const [dialogue, setDialogue] = useState<Dialogue>(null);
-  const [saisie, setSaisie] = useState(nom);
   const [cible, setCible] = useState<string>(dossierActuel ?? "");
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -83,11 +81,11 @@ export function DocumentMenu({
           {
             label: "Renommer",
             icon: "pencil",
-            onSelect: () => {
-              setSaisie(nom);
-              setErreur(null);
-              setDialogue("renommer");
-            },
+            // LE MÊME GESTE QUE LE CLIC SUR LE NOM, pas une fenêtre de plus.
+            // Deux chemins vers une même action doivent aboutir au même
+            // endroit : sinon on apprend deux façons de renommer, dont l'une
+            // fait perdre de vue la ligne qu'on modifie.
+            onSelect: () => demanderRenommage(documentId),
           },
           {
             label: "Déplacer vers…",
@@ -131,26 +129,6 @@ export function DocumentMenu({
             type="button"
           />
           <div aria-modal="true" className="v2-dialog" role="dialog">
-            {dialogue === "renommer" && (
-              <>
-                <h2>Renommer la pièce</h2>
-                <p>
-                  Seule l’étiquette change. Le fichier déposé et son historique
-                  de versions restent intacts.
-                </p>
-                <label className="v2-field" data-wide="true">
-                  <span>Nom affiché</span>
-                  <span className="v2-control">
-                    <input
-                      autoFocus
-                      onChange={(event) => setSaisie(event.target.value)}
-                      value={saisie}
-                    />
-                  </span>
-                </label>
-              </>
-            )}
-
             {dialogue === "deplacer" && (
               <>
                 <h2>Déplacer « {nom} »</h2>
@@ -219,16 +197,10 @@ export function DocumentMenu({
                 <button
                   className="v2-btn"
                   disabled={envoi}
-                  onClick={() =>
-                    void agir(() =>
-                      dialogue === "renommer"
-                        ? onRenommer(saisie)
-                        : onDeplacer(cible || null),
-                    )
-                  }
+                  onClick={() => void agir(() => onDeplacer(cible || null))}
                   type="button"
                 >
-                  {envoi ? "…" : dialogue === "renommer" ? "Renommer" : "Déplacer"}
+                  {envoi ? "…" : "Déplacer"}
                 </button>
               )}
               <button
@@ -257,25 +229,27 @@ export function DocumentMenu({
  */
 export function FolderMenu({
   contient,
+  folderId,
   nom,
   onCreerSous,
-  onRenommer,
   onSupprimer,
   urlOuvrir,
 }: {
   /** Nombre de pièces dans le dossier — décide si la suppression est possible. */
   contient: number;
+  /** L'identifiant, pour viser le bon nom lors du renommage sur place. */
+  folderId: string;
   nom: string;
   onCreerSous: (nom: string) => Promise<{ ok: boolean; error?: string }>;
-  onRenommer: (nom: string) => Promise<{ ok: boolean; error?: string }>;
   onSupprimer: () => Promise<{ ok: boolean; error?: string }>;
   urlOuvrir: string;
 }) {
   const router = useRouter();
-  const [dialogue, setDialogue] = useState<"renommer" | "sous" | "supprimer" | null>(
-    null,
-  );
-  const [saisie, setSaisie] = useState(nom);
+  // Plus de « renommer » : le nom du dossier s'édite sur place, comme celui
+  // d'une pièce. Ne restent que les deux gestes qui demandent une saisie
+  // nouvelle ou un avertissement.
+  const [dialogue, setDialogue] = useState<"sous" | "supprimer" | null>(null);
+  const [saisie, setSaisie] = useState("");
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
@@ -300,11 +274,7 @@ export function FolderMenu({
           {
             label: "Renommer",
             icon: "pencil",
-            onSelect: () => {
-              setSaisie(nom);
-              setErreur(null);
-              setDialogue("renommer");
-            },
+            onSelect: () => demanderRenommage(folderId),
           },
           {
             label: "Nouveau sous-dossier",
@@ -340,18 +310,14 @@ export function FolderMenu({
           <div aria-modal="true" className="v2-dialog" role="dialog">
             {dialogue !== "supprimer" ? (
               <>
-                <h2>
-                  {dialogue === "renommer"
-                    ? "Renommer le dossier"
-                    : `Nouveau dossier dans « ${nom} »`}
-                </h2>
+                <h2>Nouveau dossier dans « {nom} »</h2>
                 <label className="v2-field" data-wide="true">
                   <span>Nom</span>
                   <span className="v2-control">
                     <input
                       autoFocus
                       onChange={(event) => setSaisie(event.target.value)}
-                      placeholder={dialogue === "sous" ? "Juridique, Finances…" : undefined}
+                      placeholder="Juridique, Finances…"
                       value={saisie}
                     />
                   </span>
@@ -398,14 +364,10 @@ export function FolderMenu({
                 <button
                   className="v2-btn"
                   disabled={envoi}
-                  onClick={() =>
-                    void agir(() =>
-                      dialogue === "renommer" ? onRenommer(saisie) : onCreerSous(saisie),
-                    )
-                  }
+                  onClick={() => void agir(() => onCreerSous(saisie))}
                   type="button"
                 >
-                  {envoi ? "…" : dialogue === "renommer" ? "Renommer" : "Créer"}
+                  {envoi ? "…" : "Créer"}
                 </button>
               )}
               <button

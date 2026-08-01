@@ -21,11 +21,31 @@ import { useEffect, useRef, useState } from "react";
  * `blur` se déclenche aussi quand la page se recharge après l'enregistrement,
  * ce qui relancerait le même appel en boucle.
  */
+/**
+ * L'événement qui ouvre l'édition depuis ailleurs.
+ *
+ * POURQUOI UN ÉVÉNEMENT, ET NON UN ÉTAT PARTAGÉ. « Renommer » est proposé à
+ * deux endroits : sur le nom, et dans le menu « ⋯ ». Or le menu vit dans un
+ * PORTAIL, rattaché à `document.body` — il n'est pas dans l'arbre React de la
+ * ligne, et aucun état ne peut descendre de l'un vers l'autre sans remonter le
+ * contexte jusqu'à la page entière. Un événement porté par la fenêtre traverse
+ * les deux, et laisse chaque composant indépendant.
+ */
+const OUVRIR_EDITION = "sanza:renommer";
+
+/** Ouvrir l'édition du nom identifié par `cle`, depuis n'importe où. */
+export function demanderRenommage(cle: string): void {
+  window.dispatchEvent(new CustomEvent(OUVRIR_EDITION, { detail: { cle } }));
+}
+
 export function NomEditable({
+  cle,
   nom,
   onRenommer,
   titre,
 }: {
+  /** L'identifiant de la ligne — celui que le menu « ⋯ » rappellera. */
+  cle: string;
   nom: string;
   onRenommer: (nom: string) => Promise<{ ok: boolean; error?: string }>;
   /** Ce qu'annonce le bouton d'édition aux lecteurs d'écran. */
@@ -38,6 +58,21 @@ export function NomEditable({
   const [erreur, setErreur] = useState<string | null>(null);
   const champ = useRef<HTMLInputElement>(null);
   const enCours = useRef(false);
+
+  // « Renommer » du menu « ⋯ » ouvre exactement la même édition que le clic
+  // sur le nom : un seul geste à apprendre, quel que soit le chemin pris.
+  useEffect(() => {
+    const ouvrir = (event: Event) => {
+      const vise = (event as CustomEvent<{ cle: string }>).detail?.cle;
+      if (vise !== cle) return;
+      setValeur(nom);
+      setErreur(null);
+      setEdite(true);
+    };
+
+    window.addEventListener(OUVRIR_EDITION, ouvrir);
+    return () => window.removeEventListener(OUVRIR_EDITION, ouvrir);
+  }, [cle, nom]);
 
   useEffect(() => {
     if (!edite) return;
