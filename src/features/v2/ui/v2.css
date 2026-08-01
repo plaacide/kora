@@ -464,12 +464,16 @@
 .v2-btn-danger:hover{border-color:#9a1d14;background:#9a1d14}
 .v2-btn-sm{min-height:30px;padding:6px 11px;font-size:12px}
 
-/* La modale de paiement — écran 75, 520 px. */
+/* La modale de paiement et de résiliation — écrans 75 et 77, 520 px.
+   L'AIR EST LA MOITIÉ DU TRAVAIL sur ces deux écrans : on y prend une décision
+   qui engage de l'argent, et un texte tassé se parcourt au lieu de se lire. */
 .v2-dialog-lg{width:min(520px,calc(100% - 32px));padding:0}
-.v2-dialog-lg>header{padding:22px 26px 0}
-.v2-dialog-lg>header h2{margin-top:4px;font-size:17px}
-.v2-dialog-lg-body{display:flex;flex-direction:column;gap:16px;padding:18px 26px}
-.v2-dialog-lg>footer{display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line-soft);margin:0;padding:14px 26px}
+.v2-dialog-lg>header{padding:26px 28px 0}
+.v2-dialog-lg>header h2{margin-top:5px;font-size:18px;letter-spacing:-.01em}
+.v2-dialog-lg>header>p{margin:9px 0 0;color:var(--text-2);font-size:13.5px;line-height:1.55}
+.v2-dialog-lg>header>p b{color:var(--text);font-weight:600}
+.v2-dialog-lg-body{display:flex;flex-direction:column;gap:20px;padding:22px 28px 24px}
+.v2-dialog-lg>footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;border-top:1px solid var(--line-soft);margin:0;padding:16px 28px}
 
 /* Le rythme de facturation : deux cartes côte à côte, le MONTANT dedans.
    Un intervalle sans son prix oblige à chercher ailleurs ce qu'il coûte. */
@@ -491,11 +495,15 @@
 .v2-dialog-band{border-radius:8px;background:var(--band);padding:11px 14px;color:var(--text-2);font-size:12.5px}
 .v2-dialog-band b{color:var(--text)}
 
-/* Les trois assurances de la résiliation — écran 77. */
-.v2-check-list{display:flex;flex-direction:column;gap:8px}
-.v2-check-list li{display:flex;align-items:flex-start;gap:10px;color:var(--text-2);font-size:13.5px}
+/* Les trois assurances de la résiliation — écran 77.
+   POSÉES SUR UN FOND, et non en vrac dans le corps : ce sont elles qui
+   répondent à la seule question qu'on se pose en résiliant — « qu'est-ce que je
+   perds ». Les distinguer du reste leur donne le poids qu'elles méritent, et
+   évite qu'on les saute pour aller au bouton. */
+.v2-check-list{display:flex;flex-direction:column;gap:11px;border-radius:9px;background:var(--band);padding:15px 17px}
+.v2-check-list li{display:flex;align-items:flex-start;gap:11px;color:var(--text-2);font-size:13.5px;line-height:1.5}
 .v2-check-list svg{width:15px;height:15px;flex-shrink:0;margin-top:2px;color:var(--green)}
-ul.v2-check-list{margin:0;padding:0;list-style:none}
+ul.v2-check-list{margin:0;list-style:none}
 
 /* Les blocs d'attente. Le balayage reste LENT et discret : une animation
    pressée donne l'impression que l'application s'agite sans avancer. Elle
