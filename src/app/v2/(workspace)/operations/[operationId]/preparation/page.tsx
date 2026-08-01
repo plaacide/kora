@@ -5,22 +5,26 @@ import {
   requirementDetail,
   requirementHistory,
 } from "@/features/v2/server/preparation";
-import { ImportListPanel } from "@/features/v2/ui/ImportList";
 import { PreparationPlan, RequirementPanel } from "@/features/v2/ui/Preparation";
 
 /**
  * Écrans 11 et 12 — le plan de préparation et le détail d'une exigence.
  *
- * L'écran 13 (import d'une liste reçue) reste une maquette : rien n'extrait
- * d'exigences d'un PDF, et `checklist_items` n'a pas où retenir « demandé par
- * telle banque ». Le motif est écrit dans `preparation/actions.ts`.
+ * L'écran 13 (import d'une liste reçue) n'est plus atteignable : il affichait
+ * « Banque Atlantique Sénégal » déjà saisi et cinq exigences écrites en dur,
+ * alors que rien n'extrait d'exigences d'un PDF et que `checklist_items` n'a
+ * pas où retenir « demandé par telle banque ». Nommer une banque réelle sur un
+ * écran qui ne fait rien est le défaut même des huit phrases retirées.
+ *
+ * C'est probablement la fonctionnalité la plus utile de celles qui restent :
+ * elle appartient au lot L, avec la provenance nominative.
  */
 export default async function PreparationPage({
   params,
   searchParams,
 }: {
   params: Promise<{ operationId: string }>;
-  searchParams: Promise<{ exigence?: string; new?: string; import?: string }>;
+  searchParams: Promise<{ exigence?: string; new?: string }>;
 }) {
   const [{ operationId }, query] = await Promise.all([params, searchParams]);
 
@@ -58,7 +62,6 @@ export default async function PreparationPage({
         />
       )}
 
-      {query.import === "1" && <ImportListPanel />}
     </>
   );
 }

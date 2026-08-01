@@ -7,15 +7,14 @@ import { createClient } from "@/lib/supabase/server";
  *
  * Le pendant de Partage et accès : là on envoie, ici on reçoit. Deux sources
  * réelles, qui n'ont rien à voir l'une avec l'autre sinon qu'elles attendent
- * toutes deux une réponse :
+ * une réponse : les DEMANDES d'accès à une data room (`access_requests`),
+ * posées par un investisseur depuis une vitrine.
  *
- *   · les DEMANDES d'accès à une data room (`access_requests`), posées par un
- *     investisseur depuis une vitrine ;
- *   · les INVITATIONS de cohorte (`mes_invitations`), qu'un programme adresse
- *     à l'entreprise.
- *
- * Les rassembler est le propre de cet écran : un fondateur n'a pas deux boîtes
- * en tête, il a des choses à traiter et des choses traitées.
+ * Les INVITATIONS de cohorte devaient les rejoindre — un fondateur n'a pas deux
+ * boîtes en tête, il a des choses à traiter et des choses traitées. Elles en
+ * sont retirées pour la bêta : la lecture qu'elles appelaient,
+ * `mes_invitations`, n'existe pas en base, et l'écran vers lequel elles
+ * menaient affichait des données inventées. Voir le lot K.
  */
 
 export interface EntreeBoite {
@@ -53,7 +52,12 @@ export interface Boite {
 export async function inbox(organizationId: string): Promise<Boite> {
   const supabase = await createClient();
 
-  const [{ data: demandes }, { data: cohortes }] = await Promise.all([
+  // `mes_invitations` était appelée ici et N'EXISTE PAS EN BASE : l'erreur
+  // était jetée avec le reste du résultat, si bien que l'écran chargeait une
+  // fonction absente à chaque affichage sans jamais le dire. Les invitations de
+  // cohorte sortent du périmètre de la bêta ; l'appel part avec elles plutôt
+  // que d'échouer en silence. Voir le lot K.
+  const [{ data: demandes }] = await Promise.all([
     // Les demandes adressées à MON organisation. La RLS borne déjà, mais
     // filtrer ici évite d'afficher celles qu'un programme voit pour d'autres.
     supabase
@@ -64,7 +68,6 @@ export async function inbox(organizationId: string): Promise<Boite> {
       .eq("startup_org_id", organizationId)
       .order("created_at", { ascending: false })
       .limit(50),
-    supabase.rpc("mes_invitations"),
   ]);
 
   const lignes = (demandes ?? []) as unknown as Array<{
@@ -136,26 +139,6 @@ export async function inbox(organizationId: string): Promise<Boite> {
 
     if (row.status === "pending") aTraiter.push(entree);
     else traitees.push(entree);
-  }
-
-  for (const row of ((cohortes ?? []) as Array<{
-    token: string;
-    programme: string;
-    cohorte: string | null;
-    invitee_le: string;
-  }>)) {
-    aTraiter.push({
-      id: row.token,
-      type: "cohorte",
-      titre: `${row.programme} vous invite à rejoindre ${row.cohorte ?? "sa cohorte"}`,
-      contexte: "Programme · choisissez l’opération à présenter",
-      at: row.invitee_le,
-      action: {
-        label: "Voir l’invitation",
-        href: `/v2/invitations/rejoindre?token=${row.token}`,
-      },
-      initiales: initiales(row.programme),
-    });
   }
 
   const parDate = (a: EntreeBoite, b: EntreeBoite) => b.at.localeCompare(a.at);
