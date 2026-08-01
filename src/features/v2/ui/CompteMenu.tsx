@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { logoutV2 } from "@/app/v2/(workspace)/actions";
+import { logoutV2 } from "@/app/v2/actions";
 
 import { Icon } from "./Icon";
 

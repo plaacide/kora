@@ -86,3 +86,53 @@ test.describe("Se déconnecter", () => {
     await expect(page).toHaveURL(/\/v2\/connexion/);
   });
 });
+
+test.describe("Bandeau de l’onboarding", () => {
+  /**
+   * L'onboarding n'offrait aucune sortie : ni aide, ni déconnexion. C'est
+   * pourtant le moment où l'on se trompe le plus de compte — on vient de
+   * s'inscrire, parfois avec la mauvaise adresse, et rien ne permettait de
+   * revenir en arrière.
+   *
+   * Ces tests ne s'exécutent que si le compte de recette n'a PAS terminé son
+   * onboarding ; sinon la route redirige vers l'espace de travail.
+   */
+  test("porte le logo, l’aide et la déconnexion", async ({ page }) => {
+    await page.goto("/v2/onboarding/company");
+
+    if (!page.url().includes("/onboarding")) {
+      test.skip(true, "Le compte de recette a déjà terminé son onboarding.");
+    }
+
+    const entete = page.locator(".v2-onboard-head");
+
+    // Le vrai logo, et non le carré à lettre « S » qui traînait ici.
+    await expect(entete.locator("svg")).toBeVisible();
+    await expect(entete.getByLabel("Sanza")).toBeVisible();
+
+    await expect(entete.getByText(/connecté en tant que/i)).toBeVisible();
+
+    const aide = entete.getByRole("link", { name: /besoin d’aide/i });
+    await expect(aide).toHaveAttribute("href", /^mailto:contact@sanza\.africa/);
+
+    await expect(
+      entete.getByRole("button", { name: /se déconnecter/i }),
+    ).toBeVisible();
+  });
+
+  test("la déconnexion depuis l’onboarding ramène à la connexion V2", async ({
+    page,
+  }) => {
+    await page.goto("/v2/onboarding/company");
+    if (!page.url().includes("/onboarding")) {
+      test.skip(true, "Le compte de recette a déjà terminé son onboarding.");
+    }
+
+    await page
+      .locator(".v2-onboard-head")
+      .getByRole("button", { name: /se déconnecter/i })
+      .click();
+
+    await page.waitForURL(/\/v2\/connexion/);
+  });
+});

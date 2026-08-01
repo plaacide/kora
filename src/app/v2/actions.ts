@@ -19,6 +19,10 @@ import { createClient } from "@/lib/supabase/server";
  * `scope: "local"` est le défaut et c'est celui qu'on veut : fermer les sessions
  * des autres appareils au passage serait un geste bien plus large que ce que
  * « se déconnecter » annonce. L'écran Sécurité le propose séparément, et le dit.
+ *
+ * Ce fichier vit à la racine de `/v2` et non dans `(workspace)` : l'onboarding
+ * en a besoin lui aussi, et c'est même là qu'il manque le plus. Quelqu'un qui
+ * s'est trompé de compte à l'inscription y était prisonnier.
  */
 export async function logoutV2(): Promise<void> {
   const supabase = await createClient();

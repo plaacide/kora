@@ -58,8 +58,18 @@
 .v2-onboard-page{display:flex;min-height:100vh;align-items:center;flex-direction:column;background:#fff}
 .v2-onboard-head{display:flex;width:100%;align-items:center;justify-content:space-between;padding:24px 48px}
 .v2-brand{display:inline-flex;align-items:center;gap:9px;font:600 19px var(--font-v2-head),sans-serif;letter-spacing:-.02em}
+/* Aide et déconnexion, à droite du bandeau d'onboarding. Discrètes — ce
+   sont des sorties de secours, pas le chemin qu'on veut faire prendre. */
+.v2-onboard-actions{display:flex;align-items:center;gap:12px}
+.v2-onboard-actions form{margin:0}
+.v2-onboard-sep{width:1px;height:16px;background:var(--line)}
+.v2-onboard-action{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:6px;background:transparent;padding:6px 8px;color:var(--text-2);font:600 12.5px var(--font-v2-sans),sans-serif;text-decoration:none;cursor:pointer}
+.v2-onboard-action:hover{background:var(--line-soft);color:var(--text)}
+.v2-onboard-action:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.v2-onboard-action .v2-icon{width:14px;height:14px;color:var(--text-4)}
 .v2-brand>span{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border-radius:6px;background:var(--orange);color:#fff;font-size:15px}
-.v2-onboard-email{color:var(--text-3);font-size:13px}
+.v2-onboard-email{overflow:hidden;max-width:34ch;color:var(--text-3);font-size:12.5px;text-overflow:ellipsis;white-space:nowrap}
+.v2-onboard-email b{color:var(--text-2);font-weight:500}
 .v2-onboard-body{display:flex;width:480px;flex-direction:column;gap:24px;padding:40px 0 80px}
 .v2-onboard-wide{width:720px}
 .v2-steps{display:flex;width:100%;margin:0;padding:0;align-items:center;justify-content:center;color:var(--text-4);font-size:12px;list-style:none}
@@ -170,7 +180,7 @@
 .v2-private-note strong{color:var(--text)}
 .v2-result-actions{display:flex;justify-content:center;gap:12px}
 .v2-result-actions form{margin:0}
-@media(max-width:760px){.v2-onboard-head{padding:20px}.v2-onboard-email{display:none}.v2-onboard-body,.v2-onboard-wide{width:100%;padding:28px 20px 56px}.v2-steps{width:100%;justify-content:center}.v2-steps li>span:last-child{display:none}.v2-step-line{width:20px}.v2-form-grid,.v2-form-grid-amount,.v2-objective-grid,.v2-result-card{grid-template-columns:1fr}.v2-result-cell:nth-child(odd){border-right:0}.v2-result-folders{grid-column:auto}.v2-form-actions{gap:12px}.v2-form-actions>div{gap:8px}.v2-onboard-later{display:none}.v2-result-actions{flex-direction:column}.v2-result-actions form,.v2-result-actions button{width:100%}}
+@media(max-width:760px){.v2-onboard-head{padding:20px}.v2-onboard-email,.v2-onboard-sep{display:none}.v2-onboard-body,.v2-onboard-wide{width:100%;padding:28px 20px 56px}.v2-steps{width:100%;justify-content:center}.v2-steps li>span:last-child{display:none}.v2-step-line{width:20px}.v2-form-grid,.v2-form-grid-amount,.v2-objective-grid,.v2-result-card{grid-template-columns:1fr}.v2-result-cell:nth-child(odd){border-right:0}.v2-result-folders{grid-column:auto}.v2-form-actions{gap:12px}.v2-form-actions>div{gap:8px}.v2-onboard-later{display:none}.v2-result-actions{flex-direction:column}.v2-result-actions form,.v2-result-actions button{width:100%}}
 
 /* Authentication */
 .v2-auth-page{display:flex;min-height:100vh;flex-direction:column;background:#fff}

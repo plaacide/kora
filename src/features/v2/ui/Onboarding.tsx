@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 
+import { logoutV2 } from "@/app/v2/actions";
+
 import { BoutonEnvoi } from "./BoutonEnvoi";
 import { v2Routes } from "../navigation/routes";
 import { ChipField } from "./ChipField";
 import { Icon, type IconName } from "./Icon";
+import { SanzaWordmark } from "./Logo";
 import { saveV2Objective } from "@/app/v2/(onboarding)/onboarding/actions";
 
 const steps = ["Compte", "Entreprise", "Objectif", "Détails", "Plan"];
@@ -21,11 +24,42 @@ export function OnboardingFrame({
   return (
     <div className="v2 v2-onboard-page">
       <header className="v2-onboard-head">
-        <Link className="v2-brand" href={v2Routes.root}>
-          <span>S</span>
-          Sanza
+        {/* LE VRAI LOGO, pas le carré à lettre « S ». Celui-ci traînait encore
+            ici alors que le reste de la V2 porte la marque officielle depuis
+            longtemps — l'onboarding est pourtant le premier écran qu'on voit
+            après l'inscription, celui où la marque compte le plus. */}
+        <Link aria-label="Sanza" className="v2-brand" href={v2Routes.root}>
+          <SanzaWordmark height={22} />
         </Link>
-        <span className="v2-onboard-email">{email}</span>
+
+        {/* CE BANDEAU N'AVAIT QUE L'ADRESSE, en texte mort. Quelqu'un qui
+            s'inscrivait avec le mauvais compte, ou qui bloquait sur une étape,
+            n'avait aucune sortie : ni aide, ni déconnexion. L'onboarding est
+            précisément le moment où l'on se trompe de compte. */}
+        <div className="v2-onboard-actions">
+          <span className="v2-onboard-email">
+            Connecté en tant que <b>{email}</b>
+          </span>
+
+          <span className="v2-onboard-sep" aria-hidden="true" />
+
+          <a
+            className="v2-onboard-action"
+            href={`mailto:contact@sanza.africa?subject=${encodeURIComponent(
+              "Aide — création de mon espace Sanza",
+            )}`}
+          >
+            <Icon name="help" />
+            Besoin d’aide
+          </a>
+
+          <form action={logoutV2}>
+            <button className="v2-onboard-action" type="submit">
+              <Icon name="logout" />
+              Se déconnecter
+            </button>
+          </form>
+        </div>
       </header>
       {children}
     </div>
