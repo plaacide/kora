@@ -480,6 +480,16 @@ ul.v2-check-list{margin:0;padding:0;list-style:none}
 @keyframes v2-skel-pass{0%{background-position:100% 50%}100%{background-position:0 50%}}
 @media(prefers-reduced-motion:reduce){.v2-skel{animation:none}}
 
+/* Les factures. Les montants en chiffres tabulaires et alignés à droite : une
+   colonne de sommes qu'on ne peut pas comparer d'un coup d'œil ne sert à rien. */
+.v2-invoice-rows{display:flex;flex-direction:column;margin-top:6px}
+.v2-invoice-rows>div{display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--line-soft);padding:11px 0;font-size:13.5px}
+.v2-invoice-rows>div:last-child{border-bottom:0}
+.v2-invoice-rows b{width:150px;font:500 13px var(--font-v2-sans),sans-serif;font-variant-numeric:tabular-nums}
+.v2-invoice-rows>div>span:not(.v2-status){color:var(--text-2);font-size:13px}
+.v2-invoice-montant{flex:1;font-variant-numeric:tabular-nums;font-weight:500;text-align:right}
+@media(max-width:560px){.v2-invoice-rows>div{flex-wrap:wrap;gap:8px}.v2-invoice-rows b{width:auto}}
+
 /* Le bandeau d'état. Il ne s'efface pas tout seul, contrairement au message de
    retour de paiement : il ne raconte pas un événement passé, il décrit une
    situation en cours. */
@@ -519,7 +529,9 @@ ul.v2-check-list{margin:0;padding:0;list-style:none}
    comparer — ce qui est pourtant tout ce qu'on fait sur cet écran. */
 .v2-plan-rows>div{display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--line-soft);padding:16px 0}
 .v2-plan-rows>div>div:first-child{min-width:0;flex:1}
-.v2-plan-rows b{font:600 14.5px var(--font-v2-head),sans-serif}
+/* Le nom et son badge respirent : collés, « Raise » et « Recommandé » se
+   lisaient comme un seul mot. */
+.v2-plan-rows b{display:inline-flex;align-items:center;gap:9px;font:600 14.5px var(--font-v2-head),sans-serif}
 .v2-plan-rows p{margin:2px 0 0;color:var(--text-2);font-size:13px}
 .v2-plan-rows-prix{width:140px;text-align:right}
 .v2-plan-rows-prix strong{display:block;font:600 15px var(--font-v2-head),sans-serif;font-variant-numeric:tabular-nums}

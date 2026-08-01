@@ -175,6 +175,57 @@ export async function workspacePlan(workspaceId: string): Promise<Plan> {
   return enPlan(data as unknown as LignePlan);
 }
 
+export interface Facture {
+  id: string;
+  numero: string;
+  statut: string;
+  montant: number;
+  devise: string;
+  emiseLe: string | null;
+  reference: string | null;
+}
+
+/**
+ * Les factures de l'organisation, la plus récente d'abord.
+ *
+ * Elles n'existent que depuis le 4 août : avant, rien ne les émettait. Un
+ * paiement antérieur n'a donc pas de facture, et il serait malhonnête d'en
+ * fabriquer une rétroactivement — sa date d'émission serait fausse.
+ */
+export async function workspaceInvoices(workspaceId: string): Promise<Facture[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("invoices")
+    .select("id, number, status, total_amount, currency, issued_at, external_invoice_id")
+    .eq("workspace_id", workspaceId)
+    .order("issued_at", { ascending: false, nullsFirst: false })
+    .limit(24);
+
+  if (error) {
+    console.error("[v2 abonnement] factures :", error);
+    return [];
+  }
+
+  return ((data ?? []) as Array<{
+    id: string;
+    number: string | null;
+    status: string;
+    total_amount: number;
+    currency: string;
+    issued_at: string | null;
+    external_invoice_id: string | null;
+  }>).map((row) => ({
+    id: row.id,
+    numero: row.number ?? "—",
+    statut: row.status,
+    montant: row.total_amount,
+    devise: row.currency,
+    emiseLe: row.issued_at,
+    reference: row.external_invoice_id,
+  }));
+}
+
 /** Ce qu'un plan ouvre, tel qu'il est écrit en base. */
 export async function planEntitlements(planCode: string): Promise<Droit[]> {
   const supabase = await createClient();

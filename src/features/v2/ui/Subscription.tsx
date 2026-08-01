@@ -6,7 +6,13 @@ import {
   etatAbonnement,
   limiteLaPlusTendue,
 } from "@/features/v2/billing/etat";
-import { joursRestants, prixAffiche, quantite } from "@/features/v2/billing/format";
+import {
+  joursRestants,
+  montant,
+  prixAffiche,
+  quantite,
+} from "@/features/v2/billing/format";
+import type { Facture } from "@/features/v2/billing/entitlements";
 import type {
   Abonnement,
   Consommation,
@@ -45,6 +51,7 @@ export function SubscriptionScreen({
   catalogue,
   consommation,
   droits,
+  factures,
   onPayer,
   onReprendre,
   onResilier,
@@ -58,6 +65,7 @@ export function SubscriptionScreen({
   catalogue: readonly Plan[];
   consommation: readonly Consommation[];
   droits: readonly Droit[];
+  factures: readonly Facture[];
   /** L'action serveur qui ouvre le paiement. */
   onPayer: (choix: {
     planCode: string;
@@ -314,11 +322,37 @@ export function SubscriptionScreen({
 
       <section className="v2-plan-card">
         <div className="v2-nav-label">Facturation</div>
-        <p className="v2-field-helper">
-          Aucune facture pour l’instant.{" "}
-          {abonnement?.statut === "trialing"
-            ? "L’essai n’en génère pas."
-            : "Elles apparaîtront ici dès le premier paiement."}
+        {factures.length === 0 ? (
+          <p className="v2-field-helper">
+            Aucune facture pour l’instant.{" "}
+            {abonnement?.statut === "trialing"
+              ? "L’essai n’en génère pas."
+              : "Elles apparaîtront ici dès le premier paiement."}
+          </p>
+        ) : (
+          <div className="v2-invoice-rows">
+            {factures.map((f) => (
+              <div key={f.id}>
+                <b>{f.numero}</b>
+                <span>{f.emiseLe ? dateJournal(f.emiseLe) : "—"}</span>
+                <span className="v2-invoice-montant">
+                  {montant(f.montant, f.devise)}
+                </span>
+                <span className="v2-status" data-tone={f.statut === "paid" ? "green" : undefined}>
+                  {f.statut === "paid" ? "Réglée" : f.statut}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+        {/* PAS DE LIEN « PDF » TANT QU'IL N'Y A PAS DE PDF. Le handoff en
+            prévoit un ; rien ne le produit encore, et un lien qui ne télécharge
+            rien est pire qu'une colonne absente. On dit ce qu'on sait faire. */}
+        <p className="v2-roles-note">
+          <Icon name="file" />
+          Besoin d’une facture au format PDF, ou d’une mention particulière
+          (numéro de contribuable, bon de commande) ? Écrivez-nous, nous
+          l’établissons.
         </p>
       </section>
 

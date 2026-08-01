@@ -7,7 +7,7 @@ import {
   recentReadings,
 } from "@/features/v2/server/activity";
 import { requireV2Workspace } from "@/features/v2/server/session";
-import { HomeScreen, isActivityTab } from "@/features/v2/ui/Home";
+import { estUneFenetre, HomeScreen, isActivityTab } from "@/features/v2/ui/Home";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -35,14 +35,17 @@ async function firstNameOf(userId: string, email: string): Promise<string> {
 export default async function AccueilPage({
   searchParams,
 }: {
-  searchParams: Promise<{ onglet?: string }>;
+  searchParams: Promise<{ onglet?: string; jours?: string }>;
 }) {
-  const [{ user, organization }, { onglet }] = await Promise.all([
+  const [{ user, organization }, { onglet, jours }] = await Promise.all([
     requireV2Workspace(),
     searchParams,
   ]);
 
   const tab = isActivityTab(onglet) ? onglet : "consultations";
+  // Une liste fermée, et non un nombre libre : `?jours=100000` ferait lire
+  // trois cents ans de journal pour dessiner une courbe illisible.
+  const fenetre = estUneFenetre(jours) ? Number(jours) : 30;
 
   // Les quatre onglets se lisent d'un coup : ils dérivent tous des mêmes
   // tranches de lecture, et l'onglet n'est qu'un changement de regroupement.
@@ -52,7 +55,7 @@ export default async function AccueilPage({
     await Promise.all([
       firstNameOf(user.id, user.email),
       activeOperationCount(organization.id),
-      dailyViews(organization.id),
+      dailyViews(organization.id, fenetre),
       recentReadings(organization.id),
       accessOverview(organization.id),
       documentActivity(organization.id),
@@ -63,6 +66,7 @@ export default async function AccueilPage({
     <HomeScreen
       accesses={accesses}
       documents={documents}
+      fenetre={fenetre}
       firstName={firstName}
       guests={guests}
       operationCount={operationCount}

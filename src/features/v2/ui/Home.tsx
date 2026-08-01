@@ -45,6 +45,25 @@ export function isActivityTab(value: string | undefined): value is ActivityTab {
   return ACTIVITY_TABS.some(([key]) => key === value);
 }
 
+/**
+ * Les fenêtres d'observation proposées.
+ *
+ * Trois, et pas davantage : un sélecteur de dates libre sur un tableau de bord
+ * d'accueil demande de réfléchir avant de regarder. Sept jours pour « que
+ * s'est-il passé cette semaine », trente pour la tendance, quatre-vingt-dix
+ * pour un tour complet de levée.
+ */
+export const FENETRES = [
+  { jours: 7, label: "7 jours" },
+  { jours: 30, label: "30 jours" },
+  { jours: 90, label: "90 jours" },
+] as const;
+
+/** Une fenêtre proposée, et rien d'autre — voir la page qui l'appelle. */
+export function estUneFenetre(valeur: string | undefined): boolean {
+  return FENETRES.some((f) => String(f.jours) === valeur);
+}
+
 /** Les colonnes changent d'un onglet à l'autre ; la grille les suit. */
 const TAB_COLUMNS: Record<ActivityTab, string[]> = {
   consultations: ["Invité", "Document", "Opération", "Temps passé"],
@@ -135,6 +154,25 @@ function Chart({ series }: { series: readonly DailyViews[] }) {
           strokeLinejoin="round"
           strokeWidth="2.25"
         />
+
+        {/* UN POINT PAR JOUR. Sans eux, une courbe plate ne dit pas si elle
+            porte trente relevés ou deux : on ne voit qu'un trait. Les points
+            donnent la granularité — on lit d'un coup que chaque journée a été
+            mesurée, et laquelle manque. Le disque blanc les détache de la
+            ligne quand ils se rapprochent. */}
+        <g>
+          {geometry.points.map((point) => (
+            <circle
+              cx={point.x}
+              cy={point.y}
+              fill="#fff"
+              key={`${point.x}-${point.y}`}
+              r="3.5"
+              stroke="var(--orange)"
+              strokeWidth="2"
+            />
+          ))}
+        </g>
       </svg>
     </section>
   );
@@ -280,6 +318,7 @@ function GuestRows({ guests }: { guests: readonly GuestActivity[] }) {
 }
 
 export function HomeScreen({
+  fenetre,
   firstName,
   operationCount,
   views,
@@ -289,6 +328,8 @@ export function HomeScreen({
   documents,
   guests,
 }: {
+  /** Le nombre de jours observés, choisi par le lecteur. */
+  fenetre: number;
   firstName: string;
   operationCount: number;
   views: readonly DailyViews[];
@@ -316,9 +357,21 @@ export function HomeScreen({
                   } active${operationCount > 1 ? "s" : ""}.`}
             </p>
           </div>
-          <span className="v2-btn" data-variant="secondary">
-            30 derniers jours
-          </span>
+          {/* La fenêtre d'observation, et non un libellé décoratif. Elle
+              passait par un `span` qui annonçait « 30 derniers jours » sans
+              que rien ne puisse en changer — un réglage affiché mais figé
+              laisse croire à une panne quand on essaie de le toucher. */}
+          <nav aria-label="Période observée" className="v2-segmented">
+            {FENETRES.map((f) => (
+              <Link
+                data-active={fenetre === f.jours}
+                href={`?onglet=${tab}&jours=${f.jours}`}
+                key={f.jours}
+              >
+                {f.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
         {firstDay && (
@@ -351,9 +404,15 @@ export function HomeScreen({
                 se rejoint d'ici, où l'on regarde déjà l'activité. */}
             <Link href="/v2/activite">Journal complet →</Link>
           </header>
+          {/* L'onglet emporte la fenêtre avec lui : changer de regroupement ne
+              doit pas remettre la période à trente jours. */}
           <div className="v2-home-tabs">
             {ACTIVITY_TABS.map(([key, label]) => (
-              <Link data-active={key === tab} href={`?onglet=${key}`} key={key}>
+              <Link
+                data-active={key === tab}
+                href={`?onglet=${key}&jours=${fenetre}`}
+                key={key}
+              >
                 {label}
               </Link>
             ))}

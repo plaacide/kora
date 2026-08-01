@@ -2,6 +2,7 @@ import {
   planCatalog,
   workspaceConsumption,
   workspaceEntitlements,
+  workspaceInvoices,
   workspacePlan,
   workspaceSubscription,
 } from "@/features/v2/billing/entitlements";
@@ -58,6 +59,8 @@ export default async function AbonnementPage({
       listOperations(organization.id),
     ]);
 
+  const factures = await workspaceInvoices(organization.id);
+
   // Une archive ne compte pas dans la limite, et c'est ce qui la rend tenable :
   // le fondateur n'a pas à choisir entre garder une trace et ouvrir un tour.
   const comptees: OperationComptee[] = operations.map((o) => ({
@@ -78,6 +81,7 @@ export default async function AbonnementPage({
         catalogue={catalogue}
         consommation={consommation}
         droits={droits}
+        factures={factures}
         onPayer={async (choix) => {
           "use server";
           // L'identifiant d'organisation vient du SERVEUR, jamais du navigateur :
