@@ -6,8 +6,11 @@ import {
   SelectField,
   Stepper,
 } from "@/features/v2/ui/Onboarding";
+import { AvisEphemere } from "@/features/v2/ui/AvisEphemere";
 import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
 import { v2Routes } from "@/features/v2/navigation/routes";
+import { saisieOnboarding } from "@/features/v2/server/startup";
+
 import { saveV2Details } from "../actions";
 
 export default async function OperationDetailsOnboardingPage({
@@ -16,6 +19,7 @@ export default async function OperationDetailsOnboardingPage({
   searchParams: Promise<{ erreur?: string }>;
 }) {
   const { erreur } = await searchParams;
+  const saisie = await saisieOnboarding();
 
   return (
     <div className="v2-onboard-body">
@@ -28,12 +32,14 @@ export default async function OperationDetailsOnboardingPage({
       <form action={saveV2Details} className="v2-onboard-form">
         {erreur && (
           <p className="v2-auth-error" role="alert">
+            <AvisEphemere />
             L’enregistrement a échoué. Vérifiez les informations puis réessayez.
           </p>
         )}
         <div className="v2-form-grid v2-form-grid-amount">
           <Field
             label="Montant recherché"
+            defaultValue={saisie.montant}
             name="targetAmount"
             placeholder="500 000 000"
             inputMode="numeric"
@@ -46,11 +52,13 @@ export default async function OperationDetailsOnboardingPage({
         </div>
         <SelectField
           label="Stade de la levée"
+          defaultValue={saisie.stade}
           name="roundStage"
           options={["Pré-amorçage", "Amorçage", "Série A", "Série B", "Série C et plus"]}
         />
         <Field
           label="Date cible"
+          defaultValue={saisie.horizon}
           name="targetDate"
           placeholder="Par exemple : 30 novembre 2026"
         />

@@ -5,6 +5,7 @@ import type { InputHTMLAttributes, ReactNode } from "react";
 
 import { logoutV2 } from "@/app/v2/actions";
 
+import { AvisEphemere } from "./AvisEphemere";
 import { BoutonEnvoi } from "./BoutonEnvoi";
 import { INTENTIONS } from "../domain/operation";
 import { v2Routes } from "../navigation/routes";
@@ -222,7 +223,14 @@ export function FormActions({
  * d'écran, et un formulaire qui fonctionne même si le JavaScript n'a pas chargé
  * — ce qui arrive sur les connexions que Sanza vise.
  */
-export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) {
+export function ObjectiveSelector({
+  hasError = false,
+  objectifEnregistre = "",
+}: {
+  hasError?: boolean;
+  /** L'objectif déjà retenu, pour le retrouver coché en revenant. */
+  objectifEnregistre?: string;
+}) {
   return (
     <form
       action={saveV2Objective}
@@ -235,7 +243,8 @@ export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) 
       />
       {hasError && (
         <p className="v2-auth-error" role="alert">
-          L’enregistrement a échoué. Sélectionnez votre objectif puis réessayez.
+          <AvisEphemere />
+          Choisissez ce que vous préparez pour continuer.
         </p>
       )}
       <fieldset className="v2-objective-grid">
@@ -249,6 +258,7 @@ export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) 
                 qui porte `formNoValidate` parce que c'est justement l'absence de
                 réponse qu'il exprime. */}
             <input
+              defaultChecked={objective.objectif === objectifEnregistre}
               name="objective"
               required
               type="radio"

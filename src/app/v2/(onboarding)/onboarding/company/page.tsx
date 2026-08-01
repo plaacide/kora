@@ -1,5 +1,5 @@
 import { paysZoneFranc } from "@/features/v2/domain/geographie";
-import { secteursParGroupe } from "@/features/v2/domain/secteurs";
+import { SECTEURS } from "@/features/v2/domain/secteurs";
 import {
   Field,
   FormActions,
@@ -7,8 +7,11 @@ import {
   SelectField,
   Stepper,
 } from "@/features/v2/ui/Onboarding";
+import { AvisEphemere } from "@/features/v2/ui/AvisEphemere";
 import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
 import { v2Routes } from "@/features/v2/navigation/routes";
+import { saisieOnboarding } from "@/features/v2/server/startup";
+
 import { saveV2Company } from "../actions";
 
 export default async function CompanyOnboardingPage({
@@ -17,6 +20,9 @@ export default async function CompanyOnboardingPage({
   searchParams: Promise<{ erreur?: string }>;
 }) {
   const { erreur } = await searchParams;
+  // Ce que la personne a déjà donné, réaffiché tel quel. Revenir à cette étape
+  // montrait des champs vides : on croyait avoir tout perdu, et on ressaisissait.
+  const saisie = await saisieOnboarding();
 
   return (
     <div className="v2-onboard-body">
@@ -29,6 +35,9 @@ export default async function CompanyOnboardingPage({
       <form action={saveV2Company} className="v2-onboard-form">
         {erreur && (
           <p className="v2-auth-error" role="alert">
+            {/* L'avis s'efface de l'URL après lecture : sans cela, recharger
+                la page rejouait une erreur déjà corrigée. */}
+            <AvisEphemere />
             {erreur === "nom"
               ? "Indiquez le nom de votre entreprise pour continuer."
               : "L’enregistrement a échoué. Vérifiez les informations puis réessayez."}
@@ -36,6 +45,7 @@ export default async function CompanyOnboardingPage({
         )}
         <Field
           label="Nom commercial"
+          defaultValue={saisie.nom}
           name="companyName"
           placeholder="Nom de votre entreprise"
           required
@@ -47,6 +57,7 @@ export default async function CompanyOnboardingPage({
               où un fonds londonien est un cas courant. */}
           <SelectField
             label="Pays d’immatriculation"
+            defaultValue={saisie.pays}
             name="country"
             groupes={paysZoneFranc().map((g) => ({
               titre: g.zone,
@@ -69,19 +80,18 @@ export default async function CompanyOnboardingPage({
         />
 
         <div className="v2-form-grid">
-          {/* Cinq secteurs aussi : une entreprise de logistique, de BTP ou de
-              télécoms n'avait rien à cocher. Un secteur faux vaut moins qu'un
-              secteur vide — il fausse tout regroupement sans qu'on le sache. */}
+          {/* Dix secteurs, assez larges pour ne pas hésiter. Cinq, c'était trop
+              peu — la logistique et le BTP n'avaient rien à cocher. Trente-six,
+              c'était pire : il fallait tout lire pour cocher. */}
           <SelectField
             label="Secteur"
+            defaultValue={saisie.secteur}
             name="sector"
-            groupes={secteursParGroupe().map((g) => ({
-              titre: g.groupe,
-              options: g.secteurs,
-            }))}
+            options={[...SECTEURS]}
           />
           <SelectField
             label="Stade de développement"
+            defaultValue={saisie.stade}
             name="stage"
             options={["Pré-amorçage", "Amorçage", "Série A", "Série B et plus"]}
           />
@@ -96,6 +106,7 @@ export default async function CompanyOnboardingPage({
         <Field
           label="Phrase de présentation"
           optional
+          defaultValue={saisie.description}
           name="description"
           placeholder="Ce que fait votre entreprise, en une phrase"
         />

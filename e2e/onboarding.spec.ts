@@ -68,3 +68,53 @@ test.describe("Onboarding — choix de l’objectif", () => {
     expect(requete.postData() ?? "").toContain(attendu);
   });
 });
+
+test.describe("Onboarding — la saisie ne se perd pas", () => {
+  test("l’erreur s’efface de l’URL après lecture", async ({ page }) => {
+    await page.goto("/v2/onboarding/operation?erreur=objectif");
+    if (!page.url().includes("/onboarding/operation")) {
+      test.skip(true, "Le compte de recette a déjà terminé son onboarding.");
+    }
+
+    // Le message reste lisible pour ce rendu-ci…
+    await expect(page.locator(".v2-auth-error")).toBeVisible();
+    // …mais l'adresse est nettoyée : recharger ne rejoue plus une erreur
+    // déjà corrigée, et un lien mis en favori n'ouvre plus sur un échec.
+    await expect(page).toHaveURL(/\/onboarding\/operation$/);
+
+    await page.reload();
+    await expect(page.locator(".v2-auth-error")).toHaveCount(0);
+  });
+
+  test("revenir à une étape retrouve ce qu’on y a saisi", async ({ page }) => {
+    await page.goto("/v2/onboarding/company");
+    if (!page.url().includes("/onboarding/company")) {
+      test.skip(true, "Le compte de recette a déjà terminé son onboarding.");
+    }
+
+    const nom = `Recette ${Date.now()}`;
+    await page.locator('input[name="companyName"]').fill(nom);
+    await page.locator('select[name="country"]').selectOption("Mali");
+    await page.locator('select[name="sector"]').selectOption("Énergie");
+    await page.locator('select[name="stage"]').selectOption({ index: 1 });
+    await page.getByRole("button", { name: /continuer/i }).click();
+
+    await page.waitForURL(/\/onboarding\/operation/);
+    await page.goto("/v2/onboarding/company");
+
+    // Ce n'est PAS un retour des valeurs par défaut : ce sont les réponses
+    // données, relues depuis la base.
+    await expect(page.locator('input[name="companyName"]')).toHaveValue(nom);
+    await expect(page.locator('select[name="country"]')).toHaveValue("Mali");
+    await expect(page.locator('select[name="sector"]')).toHaveValue("Énergie");
+  });
+
+  test("un champ jamais rempli reste vide", async ({ page }) => {
+    await page.goto("/v2/onboarding/company");
+    if (!page.url().includes("/onboarding/company")) {
+      test.skip(true, "Le compte de recette a déjà terminé son onboarding.");
+    }
+    // `website` n'est enregistré nulle part : il ne doit pas se remplir seul.
+    await expect(page.locator('input[name="website"]')).toHaveValue("");
+  });
+});

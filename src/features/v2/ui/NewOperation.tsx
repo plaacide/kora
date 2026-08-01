@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createOperation } from "@/app/v2/operations/nouvelle/actions";
 import { messageDErreur } from "../domain/erreurs";
 import { INTENTIONS } from "../domain/operation";
+import { AvisEphemere } from "./AvisEphemere";
 import { BoutonEnvoiExterne } from "./BoutonEnvoi";
 import { intentCanCarryRaise } from "../domain/operation";
 import { Icon, type IconName } from "./Icon";
@@ -308,6 +309,7 @@ export function NewOperationWizard({
 
         {erreur && (
           <p className="v2-auth-error" role="alert">
+            <AvisEphemere />
             {ERROR_MESSAGES[erreur] ?? messageDErreur("inattendu")}
           </p>
         )}
