@@ -274,7 +274,7 @@ export function ObjectiveSelector({
       <Stepper current={3} />
       <OnboardingTitle
         title="Que préparez-vous aujourd’hui ?"
-        description="Votre réponse adapte les pièces, les étapes et le suivi. Vous pourrez la modifier."
+        description="Votre réponse détermine les étapes de création et le suivi proposé. Vous pourrez la modifier."
       />
       {hasError && (
         <p className="v2-auth-error" role="alert">

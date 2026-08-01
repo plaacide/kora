@@ -29,7 +29,7 @@ export default async function CompanyOnboardingPage({
       <Stepper current={2} />
       <OnboardingTitle
         title="Parlez-nous de votre entreprise"
-        description="Ces informations permettent d’adapter votre plan de préparation."
+        description="Elles identifient votre entreprise sur Sanza et figureront dans les dossiers que vous partagerez."
       />
 
       <form action={saveV2Company} className="v2-onboard-form">
@@ -63,7 +63,7 @@ export default async function CompanyOnboardingPage({
               titre: g.zone,
               options: g.pays,
             }))}
-            helper="La structure documentaire sera adaptée à ce pays."
+            helper="Le pays où votre société est immatriculée."
           />
           <SelectField
             label="Forme juridique"

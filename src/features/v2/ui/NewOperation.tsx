@@ -76,7 +76,7 @@ const STRUCTURES: Choice[] = [
   {
     value: "recommandee",
     title: "Structure recommandée par Sanza",
-    body: "24 exigences requises et 8 dossiers adaptés à une Série A sous droit OHADA.",
+    body: "Le socle juridique OHADA et les pièces qu’un financeur réclame le plus souvent.",
     icon: "check",
   },
   {
@@ -257,7 +257,7 @@ function sameValue(values: string[]): Array<[string, string]> {
 const COPY: Record<Step, { title: string; lead: string; cta: string }> = {
   type: {
     title: "Que préparez-vous ?",
-    lead: "Sanza adaptera la préparation et la structure documentaire à votre besoin.",
+    lead: "Sanza ouvre un plan de préparation de départ et une data room, que vous adapterez à votre opération.",
     cta: "Continuer",
   },
   infos: {

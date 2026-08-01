@@ -66,7 +66,7 @@ export default async function OnboardingResultPage({
         <span className="v2-result-icon"><Icon name="shield-check" /></span>
         <OnboardingTitle
           title="Votre plan de préparation est prêt"
-          description="Sanza a adapté les pièces attendues à votre situation. Vous pouvez le modifier à tout moment."
+          description="Ce plan de départ rassemble les pièces qu’un financeur réclame le plus souvent. Vous le compléterez au fil des demandes que vous recevrez."
         />
       </div>
 
