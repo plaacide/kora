@@ -282,7 +282,7 @@ const ETAPES_FINANCEMENT: Record<string, EtapeFinancement> = {
       // Un crédit-bail ne se justifie pas avec les mêmes documents qu'une ligne
       // de trésorerie, alors qu'une « Série A » ne dit rien d'un prêt.
       label: "Type de concours",
-      aide: "Il détermine les pièces que la banque demandera.",
+      aide: "Un crédit-bail et une ligne de trésorerie ne se justifient pas avec les mêmes pièces.",
       options: [
         "Crédit d’investissement",
         "Ligne de trésorerie",
@@ -303,7 +303,7 @@ const ETAPES_FINANCEMENT: Record<string, EtapeFinancement> = {
       // note de projet et un budget, un prêt concessionnel des états financiers
       // et des sûretés, une garantie l'engagement d'une banque tierce.
       label: "Type de financement",
-      aide: "Il détermine les pièces attendues par le bailleur.",
+      aide: "Une subvention, un prêt concessionnel et une garantie n’appellent pas les mêmes justificatifs.",
       options: [
         "Subvention",
         "Prêt concessionnel",
