@@ -14,11 +14,12 @@ import {
  * sous les yeux du fondateur.
  */
 
-// La liste est reconstruite ici volontairement : si `CodeErreur` gagne un
-// membre sans que cette liste suive, TypeScript refuse de compiler le
-// `satisfies`, et le test manquant devient visible à la compilation.
+// La liste est reconstruite ici volontairement, et l'oubli est rattrapé à la
+// compilation par `Manquants` plus bas — `satisfies` seul ne vérifierait que le
+// sens facile, celui où chaque entrée est bien un code.
 const TOUS = [
   "droits.insuffisants",
+  "session.expiree",
   "inattendu",
   "limite.operations_actives",
   "limite.membres_internes",
@@ -52,6 +53,10 @@ const TOUS = [
   "document.introuvable",
   "document.invalide",
   "document.version_invalide",
+  "document.envoi_echoue",
+  "document.trop_volumineux",
+  "document.deja_depose",
+  "document.envoi_annule",
   "dossier.nom_requis",
   "dossier.introuvable",
   "dossier.non_vide",
@@ -82,6 +87,16 @@ const TOUS = [
   "abonnement.expire",
   "securite.action_inconnue",
 ] as const satisfies readonly CodeErreur[];
+
+/**
+ * Le garde-fou qui compte vraiment : tout code absent de `TOUS` apparaît ici,
+ * et l'affectation cesse de compiler en nommant le manquant. Sans lui, un code
+ * ajouté sans texte passerait tous les tests ci-dessous — ils ne parcourent que
+ * `TOUS`.
+ */
+type Manquants = Exclude<CodeErreur, (typeof TOUS)[number]>;
+const _aucunCodeOublie: Manquants extends never ? true : Manquants = true;
+void _aucunCodeOublie;
 
 describe("le catalogue", () => {
   it("donne un texte à chaque code", () => {

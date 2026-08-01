@@ -8,6 +8,12 @@ import {
   registerV2Document,
   suggestV2Associations,
 } from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
+import {
+  codeDepotRefuse,
+  echec,
+  messageDErreur,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { cleStockage } from "@/lib/storage-key";
 import { createClient } from "@/lib/supabase/client";
 import { UploadProgress, type UploadRow } from "./Upload";
@@ -77,7 +83,7 @@ export function DocumentUpload({
     key: string,
     token: string,
     onProgress: (pourcent: number) => void,
-  ): Promise<{ ok: boolean; error?: string }> {
+  ): Promise<Resultat> {
     return new Promise((resolve) => {
       const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/documents/${key}`;
       const xhr = new XMLHttpRequest();
@@ -99,24 +105,21 @@ export function DocumentUpload({
           resolve({ ok: true });
           return;
         }
-        let message = `dépôt refusé (${xhr.status})`;
-        try {
-          const corps = JSON.parse(xhr.responseText);
-          if (corps?.message) message = corps.message;
-        } catch {
-          // Réponse non-JSON : on garde le message par défaut.
-        }
-        resolve({ ok: false, error: message });
+        // Le corps de la réponse porte le message du stockage — « The resource
+        // already exists », « Payload too large ». Il part au journal, pas à
+        // l'écran : c'est le statut qui dit ce qui s'est passé.
+        console.error("[v2 dépôt] refusé :", xhr.status, xhr.responseText);
+        resolve(echec(codeDepotRefuse(xhr.status)));
       };
 
       xhr.onerror = () => {
         encours.current = null;
-        resolve({ ok: false, error: "connexion interrompue" });
+        resolve(echec("document.envoi_echoue"));
       };
 
       xhr.onabort = () => {
         encours.current = null;
-        resolve({ ok: false, error: "annulé" });
+        resolve(echec("document.envoi_annule"));
       };
 
       xhr.send(file);
@@ -173,8 +176,8 @@ export function DocumentUpload({
       if (!envoi.ok) {
         echecs = true;
         majLigne(index, {
-          state: envoi.error === "annulé" ? "canceled" : "failed",
-          error: envoi.error,
+          state: envoi.code === "document.envoi_annule" ? "canceled" : "failed",
+          error: messageDErreur(envoi.code),
           progress: undefined,
         });
         continue;
@@ -190,11 +193,13 @@ export function DocumentUpload({
       });
 
       if (!registered.ok) echecs = true;
-      if (registered.documentId) deposees.push(registered.documentId);
+      if (registered.ok && registered.documentId) {
+        deposees.push(registered.documentId);
+      }
 
       majLigne(index, {
         state: registered.ok ? "done" : "failed",
-        error: registered.error,
+        error: registered.ok ? undefined : messageDErreur(registered.code),
         progress: undefined,
       });
     }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { confirmV2Associations } from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import type { PendingAssociation } from "@/features/v2/server/documents";
 import { Icon } from "./Icon";
 
@@ -65,10 +66,13 @@ export function AssociationsPanel({
 
     setBusy(false);
     if (!res.ok) {
+      const cause = messageDErreur(res.code);
+      // Le lot s'arrête à la première association refusée, mais celles d'avant
+      // sont enregistrées : le dire évite qu'on recommence tout.
       setErreur(
         res.confirmed > 0
-          ? `${res.confirmed} association${res.confirmed > 1 ? "s" : ""} enregistrée${res.confirmed > 1 ? "s" : ""}, puis : ${res.error}`
-          : (res.error ?? "Les associations n’ont pas pu être enregistrées."),
+          ? `${res.confirmed} association${res.confirmed > 1 ? "s" : ""} enregistrée${res.confirmed > 1 ? "s" : ""}, puis : ${cause}`
+          : cause,
       );
       return;
     }

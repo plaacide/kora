@@ -10,6 +10,7 @@ import {
   setV2DocumentHidden,
 } from "@/app/v2/(workspace)/operations/[operationId]/documents/actions";
 import { dateJournal, nomActeur } from "@/features/v2/domain/journal";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import {
   documentEventLabel,
   documentStateLabel,
@@ -72,7 +73,7 @@ export function DocumentPanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? `La version ${versionNo} n’a pas pu être restaurée.`);
+      setErreur(messageDErreur(res.code));
       return;
     }
     router.refresh();
@@ -90,7 +91,7 @@ export function DocumentPanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "La visibilité n’a pas pu être changée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
     router.refresh();
@@ -109,7 +110,8 @@ export function DocumentPanel({
 
     if (uploadError) {
       setBusy(null);
-      setErreur(uploadError.message);
+      // Le message du stockage est technique — « The resource already exists ».
+      setErreur(messageDErreur("document.envoi_echoue"));
       return;
     }
 
@@ -123,7 +125,7 @@ export function DocumentPanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "La nouvelle version n’a pas pu être enregistrée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
     router.refresh();

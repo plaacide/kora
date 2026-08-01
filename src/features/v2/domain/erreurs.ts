@@ -23,6 +23,7 @@ import { texteDeRefus } from "../billing/limites";
 export type CodeErreur =
   // Transverses
   | "droits.insuffisants"
+  | "session.expiree"
   | "inattendu"
   // Limites de plan — le texte vient de `billing/limites`, qui porte déjà
   // l'issue à proposer.
@@ -63,6 +64,10 @@ export type CodeErreur =
   | "document.introuvable"
   | "document.invalide"
   | "document.version_invalide"
+  | "document.envoi_echoue"
+  | "document.trop_volumineux"
+  | "document.deja_depose"
+  | "document.envoi_annule"
   | "dossier.nom_requis"
   | "dossier.introuvable"
   | "dossier.non_vide"
@@ -106,7 +111,11 @@ export interface Echec {
   code: CodeErreur;
 }
 
-export type Resultat<T = Record<string, never>> = ({ ok: true } & T) | Echec;
+/**
+ * `object` et non `Record<string, never>` : ce dernier rendait `{ ok: true }`
+ * seul inassignable, alors que c'est le succès le plus courant.
+ */
+export type Resultat<T = object> = ({ ok: true } & T) | Echec;
 
 export function echec(code: CodeErreur): Echec {
   return { ok: false, code };
@@ -122,6 +131,8 @@ export function echec(code: CodeErreur): Echec {
 const MESSAGES: Record<CodeErreur, string> = {
   "droits.insuffisants":
     "Vous n’avez pas l’autorisation de faire cela. Demandez à un administrateur de l’organisation.",
+  "session.expiree":
+    "Votre session a expiré. Reconnectez-vous pour reprendre où vous en étiez.",
   inattendu:
     "L’action n’a pas abouti. Réessayez ; si cela se reproduit, écrivez-nous.",
 
@@ -173,6 +184,14 @@ const MESSAGES: Record<CodeErreur, string> = {
   "document.introuvable": "Cette pièce n’existe plus.",
   "document.invalide": "Cette pièce ne peut pas être utilisée ici.",
   "document.version_invalide": "Cette version n’existe plus.",
+  "document.envoi_echoue":
+    "L’envoi du fichier a été interrompu. Vérifiez votre connexion puis réessayez.",
+  "document.trop_volumineux":
+    "Ce fichier dépasse la taille autorisée. Compressez-le ou déposez-le en plusieurs pièces.",
+  "document.deja_depose":
+    "Une pièce portant ce nom vient d’être déposée. Renommez le fichier avant de réessayer.",
+  // Un dépôt annulé n'est pas un incident : le texte le dit sans dramatiser.
+  "document.envoi_annule": "Envoi annulé. Rien n’a été déposé.",
   "dossier.nom_requis": "Donnez un nom au dossier.",
   "dossier.introuvable": "Ce dossier n’existe plus.",
   "dossier.non_vide":
@@ -319,6 +338,20 @@ const LIMITES: Record<string, CodeErreur> = {
  * catalogue, et le fondateur n'a pas à lire nos trous. Le message brut part
  * dans `console.error`, où il sert à qui peut en faire quelque chose.
  */
+/**
+ * Ce qu'un dépôt refusé par le stockage veut dire, à partir du seul statut.
+ *
+ * Le corps de la réponse porte le message anglais de Supabase Storage ; le
+ * statut suffit à dire ce que le fondateur doit faire, et lui ne parle pas
+ * anglais.
+ */
+export function codeDepotRefuse(statut: number): CodeErreur {
+  if (statut === 413) return "document.trop_volumineux";
+  if (statut === 409) return "document.deja_depose";
+  if (statut === 401 || statut === 403) return "droits.insuffisants";
+  return "document.envoi_echoue";
+}
+
 export function codeDepuisPostgres(message: string): CodeErreur {
   const bas = message.toLowerCase();
 

@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 
 
+import {
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { writeSuggestions } from "@/features/v2/server/documents";
 import { createClient } from "@/lib/supabase/server";
 
@@ -26,7 +31,7 @@ export async function registerV2Document(input: {
   storageKey: string;
   size: number;
   mime: string;
-}): Promise<{ ok: boolean; error?: string; documentId?: string }> {
+}): Promise<Resultat<{ documentId?: string }>> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("register_document", {
@@ -40,7 +45,7 @@ export async function registerV2Document(input: {
 
   if (error) {
     console.error("[v2 documents] register_document failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   // PAS de `revalidatePath` ici, et c'est délibéré (voir plus bas).
@@ -71,7 +76,7 @@ export async function restoreV2Version(input: {
   operationId: string;
   documentId: string;
   versionId: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("restore_document_version", {
@@ -81,7 +86,7 @@ export async function restoreV2Version(input: {
 
   if (error) {
     console.error("[v2 documents] restore_document_version failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   // Ici la revalidation est juste : une restauration est un geste unique, pas
@@ -104,7 +109,7 @@ export async function addV2Version(input: {
   storageKey: string;
   size: number;
   mime: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("add_document_version", {
@@ -116,7 +121,7 @@ export async function addV2Version(input: {
 
   if (error) {
     console.error("[v2 documents] add_document_version failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -141,7 +146,7 @@ export async function addV2Version(input: {
 export async function suggestV2Associations(input: {
   operationId: string;
   documentIds: string[];
-}): Promise<{ ok: boolean; written: number }> {
+}): Promise<Resultat<{ written: number }>> {
   const written = await writeSuggestions(input.operationId, input.documentIds);
   return { ok: true, written };
 }
@@ -157,7 +162,7 @@ export async function dismissV2Suggestion(input: {
   operationId: string;
   requirementId: string;
   documentId: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("dismiss_checklist_suggestion", {
@@ -167,7 +172,7 @@ export async function dismissV2Suggestion(input: {
 
   if (error) {
     console.error("[v2 documents] dismiss_checklist_suggestion failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -177,7 +182,7 @@ export async function dismissV2Suggestion(input: {
 export async function confirmV2Associations(input: {
   operationId: string;
   pairs: Array<{ documentId: string; requirementId: string }>;
-}): Promise<{ ok: boolean; confirmed: number; error?: string }> {
+}): Promise<{ confirmed: number } & Resultat> {
   if (input.pairs.length === 0) return { ok: true, confirmed: 0 };
 
   const supabase = await createClient();
@@ -195,7 +200,7 @@ export async function confirmV2Associations(input: {
       // On rend ce qui a été fait plutôt que d'annuler le reste : les
       // associations déjà posées sont justes, et les refaire n'apporterait
       // rien.
-      return { ok: false, confirmed, error: error.message };
+      return { ...echec(codeDepuisPostgres(error.message)), confirmed };
     }
     confirmed += 1;
   }
@@ -216,7 +221,7 @@ export async function setV2DocumentHidden(input: {
   operationId: string;
   documentId: string;
   hidden: boolean;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("set_document_hidden", {
@@ -226,7 +231,7 @@ export async function setV2DocumentHidden(input: {
 
   if (error) {
     console.error("[v2 documents] set_document_hidden failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -245,9 +250,9 @@ export async function renameV2Document(input: {
   operationId: string;
   documentId: string;
   name: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const nom = input.name.trim();
-  if (!nom) return { ok: false, error: "Le nom ne peut pas être vide." };
+  if (!nom) return echec("document.nom_requis");
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("rename_document", {
@@ -257,7 +262,7 @@ export async function renameV2Document(input: {
 
   if (error) {
     console.error("[v2 documents] rename_document failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -276,7 +281,7 @@ export async function moveV2Document(input: {
   operationId: string;
   documentId: string;
   folderId: string | null;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("move_document", {
     p_doc: input.documentId,
@@ -285,7 +290,7 @@ export async function moveV2Document(input: {
 
   if (error) {
     console.error("[v2 documents] move_document failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -297,7 +302,7 @@ export async function setV2DocumentKey(input: {
   operationId: string;
   documentId: string;
   key: boolean;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("set_document_key", {
     p_doc: input.documentId,
@@ -306,7 +311,7 @@ export async function setV2DocumentKey(input: {
 
   if (error) {
     console.error("[v2 documents] set_document_key failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -325,7 +330,7 @@ export async function setV2DocumentKey(input: {
 export async function deleteV2Document(input: {
   operationId: string;
   documentId: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("delete_document", {
     p_doc: input.documentId,
@@ -333,7 +338,7 @@ export async function deleteV2Document(input: {
 
   if (error) {
     console.error("[v2 documents] delete_document failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -345,9 +350,9 @@ export async function createV2Folder(input: {
   operationId: string;
   parentId: string | null;
   name: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const nom = input.name.trim();
-  if (!nom) return { ok: false, error: "Donnez un nom au dossier." };
+  if (!nom) return echec("dossier.nom_requis");
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("create_folder", {
@@ -358,7 +363,7 @@ export async function createV2Folder(input: {
 
   if (error) {
     console.error("[v2 documents] create_folder failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -370,9 +375,9 @@ export async function renameV2Folder(input: {
   operationId: string;
   folderId: string;
   name: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const nom = input.name.trim();
-  if (!nom) return { ok: false, error: "Le nom ne peut pas être vide." };
+  if (!nom) return echec("dossier.nom_requis");
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("rename_folder", {
@@ -382,7 +387,7 @@ export async function renameV2Folder(input: {
 
   if (error) {
     console.error("[v2 documents] rename_folder failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -400,7 +405,7 @@ export async function deleteV2Folder(input: {
   operationId: string;
   folderId: string;
   cascade: boolean;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<Resultat> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("delete_folder", {
     p_folder: input.folderId,
@@ -409,7 +414,7 @@ export async function deleteV2Folder(input: {
 
   if (error) {
     console.error("[v2 documents] delete_folder failed", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
