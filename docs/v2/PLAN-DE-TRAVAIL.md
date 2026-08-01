@@ -272,7 +272,15 @@ règle — **aucun dossier existant n'est supprimé ou déplacé**.
 
 ---
 
-## LOT H — 🟠 Fermer le hors-périmètre *(B-02)*
+## LOT H — ✅ Fermer le hors-périmètre *(B-02)*
+
+**Livré** — `ef94371`. Et deux affirmations de ma documentation étaient
+fausses : des liens menaient bel et bien à ces écrans, et `cohort_links`
+existe. Le sous-système cohorte a ses quatre tables et sept fonctions ; il lui
+manque une lecture, `mes_invitations`, que `inbox()` appelait et qui **n'existe
+pas en base** — l'erreur était avalée à chaque affichage.
+
+### Rédaction d'origine
 
 `CohortJoin`, le panneau cohorte des invitations et `ImportList` affichent des
 fixtures (« Nimba Solar », « Banque Atlantique ») et s'ouvrent par une URL
@@ -283,7 +291,14 @@ fixture.
 
 ---
 
-## LOT I — 🟠 Accessibilité des formulaires *(B-03, B-04)*
+## LOT I — ✅ Accessibilité des formulaires *(B-03, B-04)*
+
+**Livré** — `1e8013a`. Les six champs à erreur d'`Auth.tsx` portent
+`aria-describedby` et `aria-invalid` appariés ; le curseur va sur le premier
+champ fautif dans les quatre formulaires d'authentification et dans la levée,
+dont les douze champs saisissables sont reliés au schéma.
+
+### Rédaction d'origine
 
 - `aria-describedby` : **zéro occurrence dans toute la V2**. Un lecteur d'écran
   annonce le champ invalide, jamais le message qui dit quoi corriger.
