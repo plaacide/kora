@@ -33,8 +33,19 @@ export async function GET(request: NextRequest) {
 
   const destination = cheminInterne(next, "/dashboard");
 
+  // LES CHEMINS D'ÉCHEC SUIVENT LA VERSION D'OÙ VIENT LE LIEN. Ils étaient
+  // écrits en dur vers la V1 : un fondateur inscrit sur la V2, dont le lien
+  // avait expiré, se retrouvait sur l'écran de connexion de la V1 — un autre
+  // produit, une autre mise en page, et le sentiment d'avoir été éjecté. La
+  // destination de succès, elle, respectait déjà la V2.
+  const versLaV2 = destination.startsWith("/v2");
+  const connexion = versLaV2 ? "/v2/connexion" : "/connexion";
+  const motDePasseOublie = versLaV2
+    ? "/v2/mot-de-passe-oublie"
+    : "/mot-de-passe-oublie";
+
   if (!tokenHash || !type) {
-    return NextResponse.redirect(`${origin}/connexion?erreur=lien_invalide`);
+    return NextResponse.redirect(`${origin}${connexion}?erreur=lien_invalide`);
   }
 
   const supabase = await createClient();
@@ -51,7 +62,7 @@ export async function GET(request: NextRequest) {
     // Lien expiré ou déjà utilisé : on renvoie vers la demande, pas vers une
     // page d'erreur muette — l'utilisateur doit pouvoir en redemander un.
     return NextResponse.redirect(
-      `${origin}/mot-de-passe-oublie?erreur=lien_expire`,
+      `${origin}${motDePasseOublie}?erreur=lien_expire`,
     );
   }
 

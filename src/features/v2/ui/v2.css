@@ -1718,3 +1718,8 @@ html[data-nav="back"]::view-transition-old(root){z-index:1}
 .v2-filter-alerte[data-active=true]{background:var(--red-soft);}
 .v2-filter-refuses{margin-left:auto;color:var(--text-3);font-size:12.5px;text-decoration:none}
 .v2-filter-refuses:hover{color:var(--text-2);text-decoration:underline}
+
+/* L'avis porté par l'URL après un aller-retour par e-mail. Ambre et non rouge :
+   un lien périmé n'est pas une faute de saisie, et le rouge ferait chercher
+   l'erreur dans le formulaire qu'on vient d'ouvrir. */
+.v2-auth-notice{margin:0 0 18px;border-left:2px solid var(--amber);border-radius:0 6px 6px 0;background:var(--amber-soft);padding:10px 12px;color:var(--text-2);font-size:12.5px;line-height:1.5}

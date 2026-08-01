@@ -32,6 +32,22 @@ const ERROR_MESSAGES: Record<string, string> = {
     "Ce mot de passe est identique au précédent. Choisissez-en un autre.",
 };
 
+/**
+ * Ce qu'on dit quand un lien d'e-mail n'a pas abouti.
+ *
+ * Ces avis ne viennent PAS d'une action : ils sont posés dans l'URL par
+ * `/auth/confirm`, qui a déjà tenté l'échange du jeton et échoué. Ils ne sont
+ * donc pas des erreurs de saisie, et ne s'affichent pas en rouge.
+ */
+const AVIS_DE_LIEN: Record<string, string> = {
+  lien_invalide:
+    "Ce lien est incomplet. Ouvrez-le depuis votre boîte mail plutôt que de le recopier, ou demandez-en un nouveau.",
+  lien_expire:
+    "Ce lien a expiré ou a déjà servi. Demandez-en un nouveau ci-dessous.",
+  session_absente:
+    "Votre adresse est confirmée. Connectez-vous pour continuer.",
+};
+
 const FIELD_MESSAGES: Record<string, string> = {
   nameMin: "Indiquez votre nom complet.",
   jobTitleRequired: "Sélectionnez votre poste.",
@@ -398,12 +414,20 @@ export function SignupForm({
 
 export function LoginForm({
   email,
+  erreur,
   suivant = "/v2",
 }: {
   email?: string;
+  /** Ce qui vient de se passer AILLEURS — un lien d'e-mail qui n'a pas abouti. */
+  erreur?: string;
   suivant?: string;
 }) {
   const [state, action, pending] = useActionState(login, undefined);
+
+  // Sans cet avis, un lien périmé ramenait à un formulaire de connexion muet :
+  // rien n'expliquait pourquoi on se retrouvait là, et la seule sortie — en
+  // redemander un — n'était pas proposée.
+  const avis = AVIS_DE_LIEN[erreur ?? ""];
 
   return (
     <>
@@ -411,6 +435,12 @@ export function LoginForm({
         <h1>Connectez-vous</h1>
         <p>Retrouvez vos opérations, vos documents et vos accès.</p>
       </div>
+
+      {avis && (
+        <p className="v2-auth-notice" role="status">
+          {avis}
+        </p>
+      )}
 
       <SocialAuth />
 
@@ -550,11 +580,15 @@ export function TwoFactorForm({ suivant }: { suivant?: string }) {
   );
 }
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ erreur }: { erreur?: string } = {}) {
   const [state, action, pending] = useActionState(
     requestPasswordReset,
     undefined,
   );
+
+  // `/auth/confirm` renvoie ici avec `lien_expire` : sans cet avis, on
+  // atterrissait sur un formulaire vierge sans savoir pourquoi.
+  const avis = AVIS_DE_LIEN[erreur ?? ""];
 
   if (state?.sent) {
     return (
@@ -582,6 +616,13 @@ export function ForgotPasswordForm() {
         <h1>Réinitialisez votre mot de passe</h1>
         <p>Nous vous enverrons un lien sécurisé par e-mail.</p>
       </div>
+
+      {avis && (
+        <p className="v2-auth-notice" role="status">
+          {avis}
+        </p>
+      )}
+
       <form action={action} className="v2-auth-form">
         <input name="auth_surface" type="hidden" value="v2" />
         <AuthError state={state} />

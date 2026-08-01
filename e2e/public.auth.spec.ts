@@ -127,3 +127,49 @@ test.describe("Pages protégées", () => {
     });
   }
 });
+
+test.describe("Retours d’un lien d’e-mail", () => {
+  /**
+   * Les chemins d'échec de `/auth/confirm` étaient écrits en dur vers la V1 :
+   * un fondateur inscrit sur la V2, dont le lien avait expiré, atterrissait sur
+   * l'écran de connexion de la V1 — un autre produit, une autre mise en page.
+   * Ces tests gardent le retour au bon endroit ET la présence d'une explication.
+   */
+  const cas: Array<[string, string, RegExp]> = [
+    [
+      "/v2/connexion?erreur=lien_invalide",
+      "connexion, lien incomplet",
+      /lien est incomplet/i,
+    ],
+    [
+      "/v2/connexion?erreur=lien_expire",
+      "connexion, lien expiré",
+      /a expiré ou a déjà servi/i,
+    ],
+    [
+      "/v2/mot-de-passe-oublie?erreur=lien_expire",
+      "mot de passe oublié, lien expiré",
+      /a expiré ou a déjà servi/i,
+    ],
+  ];
+
+  for (const [url, cadre, attendu] of cas) {
+    test(`${cadre} — l’écran explique ce qui vient de se passer`, async ({ page }) => {
+      await page.goto(url);
+
+      const texte = await page.locator("body").innerText();
+      expect(texte, "aucune explication affichée").toMatch(attendu);
+      await aucunJargonVisible(texte);
+
+      // L'avis n'est pas une erreur de saisie : il ne doit pas crier en rouge
+      // sur un formulaire que l'utilisateur vient d'ouvrir.
+      await expect(page.locator(".v2-auth-notice")).toBeVisible();
+    });
+  }
+
+  test("un paramètre inconnu n’affiche aucun avis", async ({ page }) => {
+    // Une clé inventée ne doit pas produire de bloc vide.
+    await page.goto("/v2/connexion?erreur=nimportequoi");
+    await expect(page.locator(".v2-auth-notice")).toHaveCount(0);
+  });
+});
