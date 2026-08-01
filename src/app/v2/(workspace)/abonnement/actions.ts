@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { billingProvider } from "@/features/v2/billing/providers";
+import { previenirDeLaResiliation } from "@/features/v2/server/courriers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -277,6 +278,10 @@ export async function cancelV2Subscription(input: {
     console.error("[v2 abonnement] résiliation échouée :", error);
     return { ok: false, error: traduire(error.message) };
   }
+
+  // La trace écrite de ce qui a été décidé, et de la date jusqu'à laquelle le
+  // service reste dû. C'est ce courrier qu'on relira en cas de désaccord.
+  await previenirDeLaResiliation(input.organizationId);
 
   revalidatePath("/v2/abonnement");
   return { ok: true };

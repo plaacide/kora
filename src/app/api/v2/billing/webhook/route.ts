@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { billingProvider } from "@/features/v2/billing/providers";
+import { previenirDuPaiement } from "@/features/v2/server/courriers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -113,6 +114,13 @@ export async function POST(request: Request) {
   console.info(
     `[v2 facturation] ${prestataire.code} ${evenement.type} → ${String(data)}`,
   );
+
+  // On ne prévient QUE sur une ouverture réelle. « deja_traite » veut dire que
+  // l'autre chemin est passé avant nous et a déjà écrit : renvoyer un second
+  // courrier ferait croire à un double paiement.
+  if (String(data) === "plan_active" && evenement.workspaceId) {
+    await previenirDuPaiement(evenement.workspaceId);
+  }
 
   return NextResponse.json({ recu: true, resultat: data }, { status: 200 });
 }

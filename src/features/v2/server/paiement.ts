@@ -3,6 +3,8 @@ import "server-only";
 import { billingProvider } from "@/features/v2/billing/providers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+import { previenirDuPaiement } from "./courriers";
+
 /**
  * Vérifier soi-même qu'un paiement a été réglé, au lieu de l'attendre.
  *
@@ -127,6 +129,12 @@ export async function verifierPaiementEnAttente(
   }
 
   const dit = String(resultat);
+
+  // Même règle que dans le webhook : seule une ouverture réelle déclenche le
+  // courrier. Si le webhook nous a devancés, il l'a déjà envoyé.
+  if (dit === "plan_active") {
+    await previenirDuPaiement(orgId);
+  }
 
   return {
     // « Déjà traité » veut dire que le webhook nous a devancés : le plan EST
