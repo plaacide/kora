@@ -77,9 +77,13 @@ Si le point 2 échoue, le crochet n'est pas branché : voir `KNOWN-ISSUES.md` B-
 
 ---
 
-## LOT B — 🔴 Niveau 1 · Sortir le référentiel de la procédure stockée
+## LOT B — ✅ Niveau 1 · Sortir le référentiel de la procédure stockée
 
-Les 23 exigences sont un littéral JSONB dans `apply_checklist_template`. Tant
+**Livré le 1er août** — `8fb2556`. Le catalogue est la table
+`checklist_catalog`. Équivalence prouvée par empreinte md5 : voir l'en-tête
+de `supabase/migrations/20260804120000_catalogue_des_exigences.sql`.
+
+Les 22 exigences sont un littéral JSONB dans `apply_checklist_template`. Tant
 que c'est le cas : aucun versionnement, aucune administration, et chaque mot
 corrigé est une migration.
 
@@ -88,7 +92,7 @@ vérifiable par l'absence de différence.
 
 ### Ce que je fais
 
-1. Table `checklist_catalog` — les 23 exigences, avec `domain`, `level`,
+1. Table `checklist_catalog` — les 22 exigences, avec `domain`, `level`,
    `sources`, `freshness_days`, `expected_period`, `accepted_formats`.
 2. `apply_checklist_template` lit la table au lieu du littéral.
 3. Supprimer l'enum `checklist_category`, mort : aucune colonne ne l'utilise,
@@ -148,7 +152,7 @@ deux plans différents.**
 
 `objectif → modèle`, et le catalogue filtré en conséquence.
 
-**Attention — ce lot ne doit pas partir seul.** Filtrer les 23 exigences
+**Attention — ce lot ne doit pas partir seul.** Filtrer les 22 exigences
 actuelles donnerait à un dossier bancaire une liste de levée en capital amputée
 de quatre lignes : la promesse deviendrait *plus crédible tout en restant
 fausse*. **Le Lot D se livre avec le Lot E, ou pas du tout.**

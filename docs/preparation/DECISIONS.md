@@ -186,7 +186,7 @@ inventer une règle sur le montant de la levée.
 | Tables `referentiels` / `referentiel_items` | moi | Dupliquent ce que `sources` fait déjà, avec une jointure de plus |
 | `NULL` valant « s'applique à tout » | moi | Astuce de base de données. Personne ne peut prédire de tête ce que produit une combinaison |
 | Déduplication sur l'intitulé normalisé | moi | « Statuts à jour » ≠ « Statuts certifiés conformes ». Problème disparu : une ligne porte déjà plusieurs sources |
-| Six tableaux `applicable_*` (§7) | ChatGPT | Reproduit exactement la combinatoire ci-dessus. Moteur de règles pour 23 exigences et zéro utilisateur |
+| Six tableaux `applicable_*` (§7) | ChatGPT | Reproduit exactement la combinatoire ci-dessus. Moteur de règles pour 22 exigences et zéro utilisateur |
 | Sept couches cumulatives (§6) | ChatGPT | Même problème de prédictibilité |
 | Quatre documents livrables avant d'écrire du code (§12) | ChatGPT | L'audit a demandé six requêtes. Plus d'écriture que le correctif |
 | Masquer les exigences impossibles | moi | Voir décision 7 |

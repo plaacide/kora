@@ -99,7 +99,7 @@ C'est faux.**
 
 La colonne existe : `sources text[]`. Elle est remplie, affichée en badges dans
 l'écran Préparation, filtrable, et le domaine sait même écrire « réclamée par la
-banque et le DFI ». Sur les vingt-trois exigences du modèle :
+banque et le DFI ». Sur les vingt-deux exigences du modèle :
 
 | `sources` | Exemple |
 |---|---|
@@ -159,7 +159,7 @@ rien ne les ferme.
 
 Le modèle existe. Ce qui manque tient en une phrase :
 
-> `apply_checklist_template` insère les vingt-trois exigences **sans jamais
+> `apply_checklist_template` insère les vingt-deux exigences **sans jamais
 > regarder `sources`**, alors que chacune sait déjà à qui elle s'adresse.
 
 Le compte, mesuré sur la base :
