@@ -1,3 +1,5 @@
+import { paysParZone } from "@/features/v2/domain/geographie";
+import { secteursParGroupe } from "@/features/v2/domain/secteurs";
 import {
   Field,
   FormActions,
@@ -40,11 +42,17 @@ export default async function CompanyOnboardingPage({
         />
 
         <div className="v2-form-grid">
+          {/* Cinq pays étaient proposés. Une entreprise africaine s'immatricule
+              couramment à Maurice, au Luxembourg ou aux États-Unis — et le champ
+              étant obligatoire, elle en choisissait un au hasard. */}
           <SelectField
             label="Pays d’immatriculation"
             name="country"
             defaultValue="Sénégal"
-            options={["Sénégal", "Bénin", "Côte d’Ivoire", "Cameroun", "Ghana"]}
+            groupes={paysParZone().map((g) => ({
+              titre: g.zone,
+              options: g.pays,
+            }))}
             helper="La structure documentaire sera adaptée à ce pays."
           />
           <SelectField
@@ -63,11 +71,17 @@ export default async function CompanyOnboardingPage({
         />
 
         <div className="v2-form-grid">
+          {/* Cinq secteurs aussi : une entreprise de logistique, de BTP ou de
+              télécoms n'avait rien à cocher. Un secteur faux vaut moins qu'un
+              secteur vide — il fausse tout regroupement sans qu'on le sache. */}
           <SelectField
             label="Secteur"
             name="sector"
             defaultValue="Énergie"
-            options={["Énergie", "Finance", "Agriculture", "Santé", "Éducation"]}
+            groupes={secteursParGroupe().map((g) => ({
+              titre: g.groupe,
+              options: g.secteurs,
+            }))}
           />
           <SelectField
             label="Stade de développement"

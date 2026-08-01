@@ -39,3 +39,39 @@ describe("paysParZone", () => {
     expect(new Set(tous).size).toBe(tous.length);
   });
 });
+
+describe("le périmètre mondial", () => {
+  it("couvre le monde et non plus la seule Afrique", () => {
+    expect(PAYS.length).toBeGreaterThanOrEqual(180);
+  });
+
+  it("propose les juridictions d’immatriculation courantes", () => {
+    // Une entreprise africaine s'immatricule couramment ailleurs : le
+    // formulaire n'en proposait que cinq, tous africains.
+    const noms = PAYS.map(([p]) => p);
+    for (const attendu of [
+      "Maurice", "Luxembourg", "États-Unis", "France",
+      "Royaume-Uni", "Pays-Bas", "Émirats arabes unis", "Singapour",
+    ]) {
+      expect(noms, attendu).toContain(attendu);
+    }
+  });
+
+  it("ne laisse plus qu’« Autre pays » dans International", () => {
+    // Tant qu'il contenait la France et les États-Unis, ce groupe ne
+    // regroupait rien.
+    const international = PAYS.filter(([, z]) => z === "International");
+    expect(international.map(([p]) => p)).toEqual(["Autre pays"]);
+  });
+
+  it("range la France en Europe et non plus à l’international", () => {
+    expect(zoneDuPays("France")).toBe("Europe");
+    expect(zoneDuPays("États-Unis")).toBe("Amériques");
+    expect(zoneDuPays("Singapour")).toBe("Asie");
+  });
+
+  it("n’a aucun doublon sur cent quatre-vingts entrées", () => {
+    const noms = PAYS.map(([p]) => p);
+    expect(new Set(noms).size).toBe(noms.length);
+  });
+});

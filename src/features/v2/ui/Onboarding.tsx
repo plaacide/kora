@@ -127,12 +127,22 @@ export function SelectField({
   name,
   defaultValue,
   options,
+  groupes,
   helper,
 }: {
   label: string;
   name: string;
   defaultValue: string;
-  options: string[];
+  /** Liste plate, pour les choix courts. */
+  options?: string[];
+  /**
+   * Liste groupée, rendue en `<optgroup>`.
+   *
+   * Cent quatre-vingt-huit pays ou trente-six secteurs en liste plate obligent
+   * à tout parcourir. Le groupe n'est PAS enregistré — c'est le libellé seul
+   * qui est stocké ; il ne sert qu'à guider l'œil.
+   */
+  groupes?: Array<{ titre: string; options: string[] }>;
   helper?: string;
 }) {
   return (
@@ -140,7 +150,17 @@ export function SelectField({
       <span>{label}</span>
       <span className="v2-control">
         <select name={name} defaultValue={defaultValue}>
-          {options.map((option) => <option key={option}>{option}</option>)}
+          {groupes
+            ? groupes.map((groupe) => (
+                <optgroup key={groupe.titre} label={groupe.titre}>
+                  {groupe.options.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </optgroup>
+              ))
+            : (options ?? []).map((option) => (
+                <option key={option}>{option}</option>
+              ))}
         </select>
       </span>
       {helper && <small className="v2-field-helper">{helper}</small>}
