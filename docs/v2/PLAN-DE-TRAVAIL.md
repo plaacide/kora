@@ -2,6 +2,21 @@
 
 **Date :** 1er août 2026 · **Branche :** `v2/rebuild`
 
+**La refonte de la Préparation suit le vocabulaire à trois niveaux arrêté le
+1er août** — voir `../preparation/DECISIONS.md` pour le détail de chaque
+arbitrage, ce qui a été retenu, ce qui a été rejeté et pourquoi.
+
+```text
+Référentiel   niveau 1   la bibliothèque interne        → LOT B
+Modèle        niveau 2   une sélection pour un besoin   → LOT D
+Plan          niveau 3   la version d'une opération     → existe déjà
+                         (le seul niveau que le fondateur voit)
+```
+
+Les lots C, E, F et G enrichissent le passage du niveau 1 au niveau 3 :
+modificateurs, exigences manquantes, extensions sectorielles, structure de la
+data room.
+
 Chaque lot se termine par un **protocole de test que vous exécutez vous-même**.
 Aucun lot n'est déclaré fini sur ma parole : il l'est quand vous avez vu le
 résultat. Un lot ne dépend jamais d'un lot qui le suit.
@@ -62,7 +77,7 @@ Si le point 2 échoue, le crochet n'est pas branché : voir `KNOWN-ISSUES.md` B-
 
 ---
 
-## LOT B — 🔴 Sortir le référentiel de la procédure stockée
+## LOT B — 🔴 Niveau 1 · Sortir le référentiel de la procédure stockée
 
 Les 23 exigences sont un littéral JSONB dans `apply_checklist_template`. Tant
 que c'est le cas : aucun versionnement, aucune administration, et chaque mot
@@ -90,7 +105,7 @@ vérifiable par l'absence de différence.
 
 ---
 
-## LOT C — 🟠 Les quatre modificateurs qui n'attendent personne
+## LOT C — 🟠 Niveau 1 → 3 · Les quatre modificateurs qui n'attendent personne
 
 Ce lot produit la **première adaptation réelle** du produit, sans dépendre de
 votre travail éditorial. Il utilise des données déjà collectées à l'onboarding.
@@ -129,7 +144,7 @@ deux plans différents.**
 
 ---
 
-## LOT D — 🟠 Les modèles de préparation *(attend D1, D2)*
+## LOT D — 🟠 Niveau 2 · Les modèles de préparation *(attend D1, D2)*
 
 `objectif → modèle`, et le catalogue filtré en conséquence.
 
