@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { createOperation } from "@/app/v2/operations/nouvelle/actions";
 import { messageDErreur } from "../domain/erreurs";
+import { BoutonEnvoiExterne } from "./BoutonEnvoi";
 import { intentCanCarryRaise } from "../domain/operation";
 import { Icon, type IconName } from "./Icon";
 
@@ -406,9 +407,13 @@ export function NewOperationWizard({
         <footer>
           <Link href="/v2/operations">Annuler</Link>
           <div>
-            <button className="v2-btn" form="v2-new-operation-form" type="submit">
+            <BoutonEnvoiExterne
+              className="v2-btn"
+              enCours="Création…"
+              form="v2-new-operation-form"
+            >
               {copy.cta}
-            </button>
+            </BoutonEnvoiExterne>
           </div>
         </footer>
       </section>

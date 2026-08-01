@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 /**
@@ -55,6 +56,70 @@ export function BoutonEnvoi({
       ) : (
         children
       )}
+    </button>
+  );
+}
+
+/**
+ * La même garde, pour un bouton posé HORS de son formulaire.
+ *
+ * POURQUOI UNE SECONDE VARIANTE. L'assistant de création d'opération pose son
+ * bouton dans un pied de page, relié au formulaire par `form="…"`. Il n'est donc
+ * pas descendant du `<form>`, et `useFormStatus` — qui lit un contexte React —
+ * ne le voit pas : le bouton restait cliquable pendant tout l'envoi, et un
+ * double clic sur connexion lente créait DEUX opérations, la seconde consommant
+ * une place de plan.
+ *
+ * On écoute l'évènement `submit` natif du formulaire visé. C'est le seul signal
+ * disponible de l'extérieur, et il suffit : le navigateur ne l'émet qu'une fois
+ * par envoi accepté.
+ */
+export function BoutonEnvoiExterne({
+  children,
+  className,
+  enCours,
+  form,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  enCours: string;
+  /** L'identifiant du `<form>` que ce bouton soumet. */
+  form: string;
+}) {
+  const [envoi, setEnvoi] = useState(false);
+
+  useEffect(() => {
+    const cible = document.getElementById(form);
+    if (!cible) return;
+
+    const surEnvoi = () => setEnvoi(true);
+    cible.addEventListener("submit", surEnvoi);
+
+    // Le retour arrière du navigateur restitue la page depuis son cache sans
+    // la remonter : sans cela, le bouton resterait désactivé pour toujours.
+    const surRetour = (e: PageTransitionEvent) => {
+      if (e.persisted) setEnvoi(false);
+    };
+    window.addEventListener("pageshow", surRetour);
+
+    return () => {
+      cible.removeEventListener("submit", surEnvoi);
+      window.removeEventListener("pageshow", surRetour);
+    };
+  }, [form]);
+
+  return (
+    <button
+      aria-busy={envoi}
+      className={className}
+      disabled={envoi}
+      form={form}
+      type="submit"
+    >
+      <span className="v2-envoi-labels" data-pending={envoi}>
+        <span>{children}</span>
+        <span>{enCours}</span>
+      </span>
     </button>
   );
 }
