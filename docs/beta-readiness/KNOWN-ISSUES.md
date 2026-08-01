@@ -84,4 +84,7 @@ Sans cela les e-mails restent en anglais, expédiés depuis
 `mail.app.supabase.io`, et non signés Sanza — ce qui, pour une plateforme de
 data rooms, se lit comme du hameçonnage.
 
-**À vérifier aussi sur la production** : le même symptôme y aurait la même cause.
+**La production est hors périmètre** — décision du fondateur le 1er août :
+« oublie la production parce qu'on utilisera ce que tu as avec la V2 ». Le
+projet `bileqzpguyynkktndazs` ne recevra ni ce crochet ni les migrations de la
+V2 ; `jourzsgjnutktsrgxkoo` est la base qui sera lancée.

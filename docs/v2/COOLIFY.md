@@ -2,6 +2,16 @@
 
 ## Isolation
 
+**La production est hors périmètre.** Décision du fondateur le 1er août 2026 :
+« oublie la production parce qu'on utilisera ce que tu as avec la V2 ». Le projet
+`bileqzpguyynkktndazs` ne reçoit pas les migrations de la V2 et n'a aucune
+donnée client à reprendre — Sanza est en pré-lancement. La base de recette
+`jourzsgjnutktsrgxkoo` est celle qui sera lancée.
+
+L'isolation ci-dessous reste la règle : écrire dans une base hors périmètre est
+un geste qu'on ne peut pas défaire, et la raison n'est plus de protéger des
+clients mais de ne pas salir ce qu'on n'a pas à toucher.
+
 Créer une application Coolify distincte de la production :
 
 - dépôt : `plaacide/kora` ;
