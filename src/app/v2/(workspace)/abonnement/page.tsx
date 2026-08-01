@@ -16,6 +16,7 @@ import {
 
 import {
   cancelV2Subscription,
+  reprendreV2Subscription,
   requestV2Plan,
   revenirAuPlanGratuit,
 } from "./actions";
@@ -83,6 +84,11 @@ export default async function AbonnementPage({
           // le passer par le client permettrait de payer pour l'espace d'un autre.
           const { organization: espace } = await requireV2Workspace();
           return requestV2Plan({ organizationId: espace.id, ...choix });
+        }}
+        onReprendre={async () => {
+          "use server";
+          const { organization: espace } = await requireV2Workspace();
+          return reprendreV2Subscription({ organizationId: espace.id });
         }}
         onRevenirAuGratuit={async (planCode) => {
           "use server";

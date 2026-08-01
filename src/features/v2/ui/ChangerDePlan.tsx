@@ -23,6 +23,7 @@ export function ChangerDePlan({
   autres,
   onPayer,
   onRevenirAuGratuit,
+  prochaineEcheance,
 }: {
   autres: readonly Plan[];
   onPayer: (choix: {
@@ -31,82 +32,102 @@ export function ChangerDePlan({
   }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
   /** Redescendre vers le plan gratuit : aucun paiement, une annonce. */
   onRevenirAuGratuit: (planCode: string) => Promise<{ ok: boolean; error?: string }>;
+  prochaineEcheance: string | null;
 }) {
   const [ouvert, setOuvert] = useState<string | null>(null);
+  // La bascule vit DANS l'en-tête de la carte, avec son avantage : le handoff
+  // refuse le « −17 % » en texte vert isolé, qui flotte sans dire à quoi il
+  // s'applique.
+  const [intervalle, setIntervalle] = useState<"month" | "year">("month");
 
   const planOuvert = autres.find((p) => p.code === ouvert) ?? null;
-
-  if (planOuvert) {
-    return (
-      <PlanCheckout
-        onFermer={() => setOuvert(null)}
-        onPayer={onPayer}
-        plan={planOuvert}
-      />
-    );
-  }
+  const remise = autres.map(economieAnnuelle).find((e) => e !== null) ?? null;
 
   return (
-    <section className="v2-plan-card">
-      <div className="v2-nav-label">Changer de plan</div>
-      <div className="v2-plan-others">
-        {autres.map((autre) => {
-          const p = prixAffiche(autre, "month");
-          const economie = economieAnnuelle(autre);
-          return (
-            <div key={autre.code}>
-              <div>
-                <strong>
-                  {autre.nom}
-                  {autre.badge && <span className="v2-tag">{autre.badge}</span>}
-                </strong>
-                <small>{autre.description}</small>
-                {economie !== null && (
-                  <small className="v2-plan-economie">
-                    {economie} % d’économie à l’année
-                  </small>
-                )}
-              </div>
-              <div className="v2-plan-others-prix">
+    <>
+      <section className="v2-plan-card">
+        <header className="v2-checkout-header">
+          <span className="v2-nav-label">Changer de plan</span>
+          <div className="v2-segmented">
+            <button
+              data-active={intervalle === "month"}
+              onClick={() => setIntervalle("month")}
+              type="button"
+            >
+              Mensuel
+            </button>
+            <button
+              data-active={intervalle === "year"}
+              onClick={() => setIntervalle("year")}
+              type="button"
+            >
+              Annuel{remise !== null ? ` · −${remise} %` : ""}
+            </button>
+          </div>
+        </header>
+
+        <div className="v2-plan-rows">
+          {autres.map((autre) => {
+            const p = prixAffiche(autre, intervalle);
+            return (
+              <div key={autre.code}>
                 <div>
-                  <strong>{p.principal}</strong>
-                  {p.detail && <small>{p.detail}</small>}
+                  <b>
+                    {autre.nom}
+                    {autre.badge && <span className="v2-tag">{autre.badge}</span>}
+                  </b>
+                  <p>{autre.description}</p>
                 </div>
-                {/* On ne fait PAS payer un plan gratuit. L'écran proposait
-                    « Payer » sur un plan à zéro franc — une absurdité que le
-                    prestataire aurait de toute façon refusée, son minimum
-                    étant de 200 XOF. Y revenir est une descente : elle
-                    s'annonce et prend effet au terme déjà réglé (§15). */}
-                {autre.gratuit ? (
-                  <button
-                    className="v2-onboard-back"
-                    onClick={() => onRevenirAuGratuit(autre.code)}
-                    type="button"
-                  >
-                    Revenir à ce plan
-                  </button>
-                ) : autre.surDevis ? (
-                  <small>Sur devis — écrivez-nous</small>
-                ) : (
-                  <button
-                    className="v2-btn"
-                    onClick={() => setOuvert(autre.code)}
-                    type="button"
-                  >
-                    Choisir
-                  </button>
-                )}
+                <div className="v2-plan-rows-prix">
+                  <strong>{p.principal}</strong>
+                  {p.detail && <span>{p.detail}</span>}
+                </div>
+                <div className="v2-plan-rows-action">
+                  {/* On ne fait PAS payer un plan gratuit : le prestataire
+                      refuse sous 200 XOF, et y revenir est une descente, pas
+                      un achat. Et « Choisir » reste GRIS — l'orange est
+                      réservé à l'action primaire de la page. */}
+                  {autre.gratuit ? (
+                    <button
+                      className="v2-btn v2-btn-grey v2-btn-sm"
+                      onClick={() => onRevenirAuGratuit(autre.code)}
+                      type="button"
+                    >
+                      Revenir à ce plan
+                    </button>
+                  ) : autre.surDevis ? (
+                    <span className="v2-plan-rows-devis">Sur devis</span>
+                  ) : (
+                    <button
+                      className="v2-btn v2-btn-grey v2-btn-sm"
+                      onClick={() => setOuvert(autre.code)}
+                      type="button"
+                    >
+                      Choisir
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-      <p className="v2-roles-note">
-        <Icon name="shield" />
-        Passer à un plan inférieur ne supprime aucune donnée : le plan que vous
-        avez réglé court jusqu’à son terme, et seules les créations au-delà de la
-        nouvelle limite sont refusées ensuite.
-      </p>
-    </section>
+            );
+          })}
+        </div>
+
+        <p className="v2-plan-rows-note">
+          <Icon name="shield" />
+          Passer à un plan inférieur ne supprime aucune donnée. La période déjà
+          réglée court jusqu’à son terme ; seules les créations au-delà de la
+          nouvelle limite sont refusées ensuite.
+        </p>
+      </section>
+
+      {planOuvert && (
+        <PlanCheckout
+          onFermer={() => setOuvert(null)}
+          onPayer={onPayer}
+          plan={planOuvert}
+          prochaineEcheance={prochaineEcheance}
+        />
+      )}
+    </>
   );
 }

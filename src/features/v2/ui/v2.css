@@ -11,6 +11,12 @@
   --orange:#e85c2b;--orange-h:#d24e1f;--orange-text:#c24619;--orange-soft:#fdf4ef;
   --ink:#14161f;--text:#1a1b1f;--text-2:#475467;--text-3:#667085;--text-4:#98a2b3;
   --line:#ecebe6;--line-soft:#f1f0ec;--band:#fafaf8;--green:#147a5c;--green-bg:#eaf4f1;
+  /* Deux couleurs que le produit n'avait pas, et dont l'absence faisait mentir
+     les écrans. L'ORANGE EST L'ACTION PRIMAIRE — pas l'alerte, pas le danger.
+     Résilier n'est pas « l'action principale de la page » : c'est un geste
+     destructif, il porte le rouge. Une limite atteinte n'est pas une erreur :
+     elle porte l'ambre. Les confondre revient à crier tout le temps. */
+  --red:#b42318;--red-soft:#fef3f2;--amber:#b54708;--amber-soft:#fffaeb;
   min-height:100vh;background:#fff;color:var(--text);font:14px/1.5 var(--font-v2-sans),var(--font-instrument),sans-serif
 }
 .v2 *,.v2 *::before,.v2 *::after{box-sizing:border-box}.v2 a{color:inherit;text-decoration:none}
@@ -415,12 +421,101 @@
 .v2-plan-others-prix{display:flex;flex:none;flex-direction:column;align-items:flex-end;gap:8px;text-align:right}
 .v2-plan-others-prix strong{display:block;font-size:14px}
 
-/* Le panneau de paiement. Le titre et le rythme de facturation sur une même
-   ligne : ce sont les deux seules décisions qui nous appartiennent, l'opérateur
-   et le numéro étant demandés par le prestataire sur sa propre page. */
-.v2-checkout-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
-.v2-checkout-header h2{margin:4px 0 0;font:600 20px var(--font-v2-head),sans-serif;letter-spacing:-.01em}
-@media(max-width:560px){.v2-checkout-header{flex-direction:column}}
+/* Abonnement — écrans 75, 76 et 77.
+   Le handoff impose « zéro réinterprétation » : ces règles transcrivent les
+   écrans, elles ne les réinventent pas. */
+
+/* DEUX VARIANTES DE BOUTON QUE LE PRODUIT N'AVAIT PAS, et dont l'absence
+   m'avait fait peindre en orange des gestes qui ne sont pas l'action primaire
+   de leur écran. « Choisir un plan » est un choix parmi d'autres : gris.
+   « Confirmer la résiliation » détruit : rouge. */
+.v2-btn-grey{border-color:var(--line);background:#fff;color:var(--text)!important}
+.v2-btn-grey:hover{border-color:#d0d5dd;background:var(--band)}
+.v2-btn-danger{border-color:var(--red);background:var(--red);color:#fff!important}
+.v2-btn-danger:hover{border-color:#9a1d14;background:#9a1d14}
+.v2-btn-sm{min-height:30px;padding:6px 11px;font-size:12px}
+
+/* La modale de paiement — écran 75, 520 px. */
+.v2-dialog-lg{width:min(520px,calc(100% - 32px));padding:0}
+.v2-dialog-lg>header{padding:22px 26px 0}
+.v2-dialog-lg>header h2{margin-top:4px;font-size:17px}
+.v2-dialog-lg-body{display:flex;flex-direction:column;gap:16px;padding:18px 26px}
+.v2-dialog-lg>footer{display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line-soft);margin:0;padding:14px 26px}
+
+/* Le rythme de facturation : deux cartes côte à côte, le MONTANT dedans.
+   Un intervalle sans son prix oblige à chercher ailleurs ce qu'il coûte. */
+.v2-billing-choices{display:flex;gap:10px}
+.v2-billing-choices button{display:flex;flex:1;flex-direction:column;align-items:flex-start;gap:2px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:12px 16px;text-align:left;cursor:pointer}
+.v2-billing-choices button b{font:600 14px var(--font-v2-head),sans-serif;color:var(--text)}
+.v2-billing-choices button span{color:var(--text-2);font-size:12.5px}
+.v2-billing-choices button[data-selected=true]{border:1.5px solid var(--orange);background:var(--orange-soft)}
+.v2-billing-choices button[data-selected=true] b{color:var(--orange-text)}
+
+/* Le récapitulatif. « À régler aujourd'hui » est la seule ligne en graisse :
+   c'est le chiffre qu'on cherche avant de cliquer. */
+.v2-kv-rows{display:flex;flex-direction:column}
+.v2-kv-rows>div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line-soft);padding:9px 0;font-size:13.5px}
+.v2-kv-rows>div>span:first-child{color:var(--text-2)}
+.v2-kv-rows>div>span:last-child{font-weight:500;text-align:right}
+.v2-kv-rows>div[data-fort=true]>span:last-child{font:600 15px var(--font-v2-head),sans-serif}
+
+.v2-dialog-band{border-radius:8px;background:var(--band);padding:11px 14px;color:var(--text-2);font-size:12.5px}
+.v2-dialog-band b{color:var(--text)}
+
+/* Les trois assurances de la résiliation — écran 77. */
+.v2-check-list{display:flex;flex-direction:column;gap:8px}
+.v2-check-list li{display:flex;align-items:flex-start;gap:10px;color:var(--text-2);font-size:13.5px}
+.v2-check-list svg{width:15px;height:15px;flex-shrink:0;margin-top:2px;color:var(--green)}
+ul.v2-check-list{margin:0;padding:0;list-style:none}
+
+/* La résiliation : une carte compacte, texte à gauche, bouton à droite.
+   Jamais un lien flottant seul — le handoff l'interdit, et pour cause : un
+   lien isolé au bas d'un écran se clique sans qu'on ait rien lu. */
+.v2-plan-resiliation{display:flex;align-items:center;gap:16px;padding:18px 24px}
+.v2-plan-resiliation>div{flex:1}
+.v2-plan-resiliation b{font:600 13.5px var(--font-v2-head),sans-serif}
+.v2-plan-resiliation p{margin:2px 0 0;color:var(--text-2);font-size:13px}
+.v2-plan-resiliation>button{flex-shrink:0}
+
+/* La page — écran 76. */
+.v2-plan-head{display:flex;align-items:flex-start;gap:12px}
+.v2-plan-head>div:first-child{flex:1}
+.v2-plan-head h2{display:flex;align-items:center;gap:10px;font-size:20px}
+.v2-plan-head p{margin:3px 0 0;color:var(--text-2);font-size:13.5px}
+.v2-plan-head-prix{text-align:right}
+.v2-plan-head-prix strong{display:block;font:600 22px var(--font-v2-head),sans-serif;font-variant-numeric:tabular-nums}
+.v2-plan-head-prix span{color:var(--text-3);font-size:12.5px}
+.v2-plan-foot{display:flex;align-items:center;gap:24px;border-top:1px solid var(--line-soft);margin-top:16px;padding-top:14px}
+.v2-plan-foot .v2-kv{display:flex;flex-direction:column;gap:2px}
+.v2-plan-foot .v2-kv b{font-size:13px;font-weight:500}
+.v2-plan-foot .v2-kv span{color:var(--text-3);font-size:11.5px}
+
+/* Les lignes de plans : largeurs FIXES pour le prix et le bouton, sinon les
+   montants ne s'alignent pas d'une ligne à l'autre et l'œil ne peut plus les
+   comparer — ce qui est pourtant tout ce qu'on fait sur cet écran. */
+.v2-plan-rows>div{display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--line-soft);padding:16px 0}
+.v2-plan-rows>div>div:first-child{min-width:0;flex:1}
+.v2-plan-rows b{font:600 14.5px var(--font-v2-head),sans-serif}
+.v2-plan-rows p{margin:2px 0 0;color:var(--text-2);font-size:13px}
+.v2-plan-rows-prix{width:140px;text-align:right}
+.v2-plan-rows-prix strong{display:block;font:600 15px var(--font-v2-head),sans-serif;font-variant-numeric:tabular-nums}
+.v2-plan-rows-prix span{color:var(--text-3);font-size:12px}
+/* La colonne d'action a une largeur MINIMALE, pas fixe : les boutons doivent
+   s'aligner d'une ligne à l'autre, mais « Revenir à ce plan » est plus long que
+   « Choisir » et se briserait sur deux lignes dans une colonne calibrée pour le
+   second. */
+.v2-plan-rows-action{display:flex;min-width:110px;justify-content:flex-end}
+.v2-plan-rows-action button{white-space:nowrap}
+.v2-plan-rows-devis{color:var(--text-3);font-size:12px}
+.v2-plan-rows-note{display:flex;align-items:flex-start;gap:8px;margin:13px 0 0;color:var(--text-3);font-size:12.5px}
+.v2-plan-rows-note svg{width:14px;height:14px;flex:none;margin-top:2px}
+.v2-plan-rows>div:last-of-type{border-bottom:0}
+@media(max-width:640px){
+  .v2-plan-head,.v2-plan-rows>div{flex-direction:column;align-items:flex-start;gap:10px}
+  .v2-plan-head-prix,.v2-plan-rows-prix{width:auto;text-align:left}
+  .v2-plan-foot{flex-wrap:wrap;gap:14px}
+  .v2-billing-choices{flex-direction:column}
+}
 
 /* La fiche d'une relation — écran 41. Un dossier, pas un formulaire : on la
    lit, on n'y saisit rien. Modifier passe par le panneau. */

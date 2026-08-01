@@ -8,29 +8,38 @@ import { dateJournal } from "@/features/v2/domain/journal";
 import { Icon } from "./Icon";
 
 /**
- * Résilier — le seul geste d'abonnement qui ne dépend d'aucun prestataire.
+ * Résilier — écran 77, transcrit.
  *
- * Arrêter un abonnement ne demande à personne d'encaisser. Ce bouton pouvait
- * donc exister bien avant Genius Pay, et il manquait quand même : les RPC et
- * l'action serveur étaient là, rien ne les appelait.
+ * LE ROUGE N'EST PAS UN DÉTAIL. J'avais peint « Confirmer la résiliation » en
+ * orange, la couleur d'action primaire du produit — celle de « Continuer »,
+ * « Enregistrer », « Payer ». Un geste destructif porté par la couleur du
+ * geste qu'on fait vingt fois par jour se clique par habitude. Le handoff
+ * tranche : rouge plein, et « Garder mon abonnement » en gris à côté.
  *
- * TROIS CHOSES QUE CET ÉCRAN DOIT DIRE AVANT QUE LE CLIC N'ARRIVE, parce
- * qu'elles décident si quelqu'un résilie ou renonce :
+ * LES TROIS ASSURANCES VIENNENT AVANT LE CHAMP, pas après. Quelqu'un qui hésite
+ * les lit avant de décider ; les mettre sous le formulaire reviendrait à
+ * rassurer une fois la décision prise.
  *
- *   1. la date exacte jusqu'à laquelle le service reste dû — §15, ce qui est
- *      payé est servi jusqu'au bout ;
- *   2. que RIEN n'est supprimé, jamais — §16, l'espace passe en lecture, il
- *      ne se vide pas ;
- *   3. qu'on peut revenir en arrière tant que la date n'est pas passée.
- *
- * Une résiliation qu'on croit destructrice ne se prend pas : elle se subit en
- * silence, puis se termine par un impayé et un client qui ne répond plus.
+ * Et jamais « Êtes-vous sûr ? » — on dit ce qui se passe, pourquoi, et ce
+ * qu'on peut faire ensuite.
  */
+
+const ASSURANCES = [
+  "Aucune donnée n’est supprimée, ni maintenant ni après. Vos opérations, vos " +
+    "pièces et votre journal restent consultables.",
+  "Après l’échéance, votre espace passe en lecture seule — seules les créations " +
+    "au-delà du plan gratuit se ferment.",
+  "Vous pouvez vous réabonner à tout moment et tout retrouver.",
+];
+
 export function Resilier({
   abonnement,
+  onReprendre,
   onResilier,
 }: {
   abonnement: Abonnement;
+  /** Revenir sur une résiliation annoncée, tant que le terme n'est pas passé. */
+  onReprendre: () => Promise<{ ok: boolean; error?: string }>;
   onResilier: (motif: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const [ouvert, setOuvert] = useState(false);
@@ -38,133 +47,149 @@ export function Resilier({
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
-  // Déjà résiliée : on ne propose pas de le refaire, on dit où on en est.
+  const terme = abonnement.finPeriode ? dateJournal(abonnement.finPeriode) : null;
+
+  // DÉJÀ RÉSILIÉ : on ne propose pas de recommencer, on offre le retour. Le
+  // texte promet qu'on peut se réabonner à tout moment — sans ce bouton, cette
+  // promesse obligerait à écrire au support.
   if (abonnement.resiliationEnFinDePeriode) {
     return (
-      <section className="v2-plan-card">
-        <div className="v2-nav-label">Résiliation</div>
-        <p className="v2-panel-callout">
-          <Icon name="clock" />
-          Votre abonnement prend fin
-          {abonnement.finPeriode ? ` le ${dateJournal(abonnement.finPeriode)}` : ""}.
-          D’ici là, rien ne change. Ensuite, votre espace reste consultable et
-          aucune donnée n’est supprimée.
-        </p>
-        <p className="v2-roles-note">
-          <Icon name="help" />
-          Pour revenir sur cette décision, choisissez de nouveau votre plan
-          ci-dessus — la reprise annule la résiliation.
-        </p>
-      </section>
-    );
-  }
-
-  if (!ouvert) {
-    return (
-      <section className="v2-plan-card">
-        <div className="v2-nav-label">Résiliation</div>
-        <p className="v2-field-helper">
-          Vous pouvez arrêter votre abonnement à tout moment. Il court jusqu’au
-          terme que vous avez déjà réglé.
-        </p>
-        <div className="v2-form-actions">
-          <span />
-          <div>
-            <button
-              className="v2-onboard-back"
-              onClick={() => setOuvert(true)}
-              type="button"
-            >
-              Résilier mon abonnement
-            </button>
-          </div>
+      <section className="v2-plan-card v2-plan-resiliation">
+        <div>
+          <b>Résiliation</b>
+          <p>
+            Votre abonnement prend fin{terme ? ` le ${terme}` : ""}. D’ici là,
+            rien ne change — et vous pouvez encore revenir sur cette décision.
+          </p>
         </div>
+        <button
+          className="v2-btn"
+          disabled={envoi}
+          onClick={async () => {
+            setEnvoi(true);
+            setErreur(null);
+            const resultat = await onReprendre();
+            setEnvoi(false);
+            if (!resultat.ok) setErreur(resultat.error ?? "La reprise a échoué.");
+          }}
+          type="button"
+        >
+          {envoi ? "…" : "Reprendre mon abonnement"}
+        </button>
+        {erreur && (
+          <p className="v2-auth-error" role="alert">
+            {erreur}
+          </p>
+        )}
       </section>
     );
   }
 
   return (
-    <section className="v2-plan-card">
-      <div className="v2-nav-label">Résilier</div>
-
-      <p className="v2-panel-callout">
-        <Icon name="shield" />
-        {abonnement.finPeriode ? (
-          <>
-            Votre plan reste entier jusqu’au{" "}
-            <strong>{dateJournal(abonnement.finPeriode)}</strong> — la période
-            que vous avez réglée vous est due. Rien n’est coupé aujourd’hui.
-          </>
-        ) : (
-          <>
-            Votre plan reste entier jusqu’au terme de la période en cours. Rien
-            n’est coupé aujourd’hui.
-          </>
-        )}
-      </p>
-
-      <p className="v2-roles-note">
-        <Icon name="folder" />
-        <strong>Aucune donnée n’est supprimée</strong>, ni maintenant ni après.
-        Vos opérations, vos pièces et votre journal restent en place et
-        consultables. Seules les créations au-delà du plan gratuit se ferment.
-      </p>
-
-      <label className="v2-field">
-        <span>
-          Ce qui vous fait partir <small> — facultatif</small>
-        </span>
-        <span className="v2-control">
-          <input
-            onChange={(event) => setMotif(event.target.value)}
-            placeholder="Trop cher, levée terminée, une fonction qui manque…"
-            value={motif}
-          />
-        </span>
-        <small className="v2-field-helper">
-          Personne ne vous rappellera pour vous retenir. C’est pour savoir ce
-          qu’il faut corriger.
-        </small>
-      </label>
-
-      {erreur && (
-        <p className="v2-auth-error" role="alert">
-          {erreur}
-        </p>
-      )}
-
-      <div className="v2-form-actions">
-        <button
-          className="v2-onboard-back"
-          onClick={() => {
-            setOuvert(false);
-            setErreur(null);
-          }}
-          type="button"
-        >
-          Garder mon abonnement
-        </button>
+    <>
+      <section className="v2-plan-card v2-plan-resiliation">
         <div>
-          <button
-            className="v2-btn"
-            disabled={envoi}
-            onClick={async () => {
-              setEnvoi(true);
-              setErreur(null);
-              const resultat = await onResilier(motif);
-              setEnvoi(false);
-              if (!resultat.ok) {
-                setErreur(resultat.error ?? "La résiliation n’a pas abouti.");
-                return;
-              }
-              setOuvert(false);
-            }}
-            type="button"
-          >
-            {envoi ? "Enregistrement…" : "Confirmer la résiliation"}
-          </button>
+          <b>Résiliation</b>
+          <p>
+            Votre abonnement court jusqu’au terme déjà réglé, puis l’espace
+            passe en lecture seule — rien n’est supprimé.
+          </p>
         </div>
-      </div>
-    </section>
+        <button className="v2-btn v2-btn-grey" onClick={() => setOuvert(true)} type="button">
+          Résilier mon abonnement
+        </button>
+      </section>
+
+      {ouvert && (
+        <>
+          <button
+            aria-label="Fermer"
+            className="v2-scrim"
+            onClick={() => setOuvert(false)}
+            type="button"
+          />
+          <div aria-modal="true" className="v2-dialog v2-dialog-lg" role="dialog">
+            <header>
+              <h2>Résilier votre abonnement&nbsp;?</h2>
+              <p>
+                Votre plan reste entier
+                {terme ? (
+                  <>
+                    {" "}
+                    jusqu’au <b>{terme}</b>
+                  </>
+                ) : (
+                  " jusqu’au terme de la période en cours"
+                )}{" "}
+                — la période réglée vous est due. Rien n’est coupé aujourd’hui.
+              </p>
+            </header>
+
+            <div className="v2-dialog-lg-body">
+              <ul className="v2-check-list">
+                {ASSURANCES.map((phrase) => (
+                  <li key={phrase}>
+                    <Icon name="check" />
+                    <span>{phrase}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <label className="v2-field" data-wide="true">
+                <span>
+                  Ce qui vous fait partir <small> · facultatif</small>
+                </span>
+                <span className="v2-control" data-multiline="true">
+                  <textarea
+                    onChange={(event) => setMotif(event.target.value)}
+                    placeholder="Trop cher, levée terminée, une fonction qui manque…"
+                    rows={3}
+                    value={motif}
+                  />
+                </span>
+                <small className="v2-field-helper">
+                  Personne ne vous rappellera pour vous retenir — c’est pour
+                  savoir ce qu’il faut corriger.
+                </small>
+              </label>
+
+              {erreur && (
+                <p className="v2-auth-error" role="alert">
+                  {erreur}
+                </p>
+              )}
+            </div>
+
+            <footer>
+              <button
+                className="v2-btn v2-btn-grey"
+                onClick={() => setOuvert(false)}
+                type="button"
+              >
+                Garder mon abonnement
+              </button>
+              <button
+                className="v2-btn v2-btn-danger"
+                disabled={envoi}
+                onClick={async () => {
+                  setEnvoi(true);
+                  setErreur(null);
+                  const resultat = await onResilier(motif);
+                  setEnvoi(false);
+                  if (!resultat.ok) {
+                    setErreur(resultat.error ?? "La résiliation n’a pas abouti.");
+                    return;
+                  }
+                  setOuvert(false);
+                }}
+                type="button"
+              >
+                {envoi ? "Enregistrement…" : "Confirmer la résiliation"}
+              </button>
+            </footer>
+          </div>
+        </>
+      )}
+    </>
   );
 }

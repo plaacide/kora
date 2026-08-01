@@ -45,6 +45,7 @@ export function SubscriptionScreen({
   consommation,
   droits,
   onPayer,
+  onReprendre,
   onResilier,
   onRevenirAuGratuit,
   retourDePaiement,
@@ -63,6 +64,8 @@ export function SubscriptionScreen({
   }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
   /** L'action serveur qui arrête l'abonnement, en fin de période payée. */
   onResilier: (motif: string) => Promise<{ ok: boolean; error?: string }>;
+  /** Revenir sur une résiliation annoncée, tant que le terme n'est pas passé. */
+  onReprendre: () => Promise<{ ok: boolean; error?: string }>;
   /** Redescendre vers le plan gratuit : une annonce, pas un paiement. */
   onRevenirAuGratuit: (planCode: string) => Promise<{ ok: boolean; error?: string }>;
   operations: readonly OperationComptee[];
@@ -118,23 +121,51 @@ export function SubscriptionScreen({
         <MessageTemporaire bon={retour.bon} texte={retour.texte} />
       )}
 
+      {/* Le plan actuel — écran 76. Le nom porte le badge d'état à côté de lui
+          et non à l'autre bout de la carte : « Raise » et « Actif » sont une
+          seule information, les séparer oblige l'œil à faire l'aller-retour.
+          Le prix se lit à droite, aligné en chiffres tabulaires. */}
       <section className="v2-plan-card">
-        <header>
+        <div className="v2-plan-head">
           <div>
-            <span className="v2-nav-label">Plan actuel</span>
-            <h2>{plan.nom}</h2>
+            <h2>
+              {plan.nom}
+              <span className="v2-status" data-tone={statut.tone}>
+                <i className="v2-dot" />
+                {statut.label}
+              </span>
+            </h2>
             {plan.description && <p>{plan.description}</p>}
           </div>
-          <span className="v2-status" data-tone={statut.tone}>
-            <i className="v2-dot" />
-            {statut.label}
-          </span>
-        </header>
-
-        <div className="v2-plan-price">
-          <strong>{prix.principal}</strong>
-          {prix.detail && <span>{prix.detail}</span>}
+          <div className="v2-plan-head-prix">
+            <strong>{prix.principal}</strong>
+            {prix.detail && <span>{prix.detail}</span>}
+          </div>
         </div>
+
+        {abonnement && abonnement.statut !== "trialing" && (
+          <div className="v2-plan-foot">
+            {abonnement.finPeriode && (
+              <div className="v2-kv">
+                <b>
+                  {abonnement.resiliationEnFinDePeriode
+                    ? "Se termine le"
+                    : "Renouvellement"}
+                </b>
+                <span>{dateJournal(abonnement.finPeriode)}</span>
+              </div>
+            )}
+            <div className="v2-kv">
+              <b>Moyen de paiement</b>
+              <span>
+                {/* Ce que nous savons vraiment : que le paiement passe par le
+                    prestataire. Nous ne conservons ni le moyen ni le numéro —
+                    afficher « Mobile money » sans le savoir serait inventer. */}
+                Réglé via Genius Pay
+              </span>
+            </div>
+          </div>
+        )}
 
         {abonnement?.statut === "trialing" && restant !== null && (
           <p className="v2-panel-callout">
@@ -148,26 +179,6 @@ export function SubscriptionScreen({
           </p>
         )}
 
-        {abonnement?.finPeriode && abonnement.statut !== "trialing" && (
-          <div className="v2-plan-meta">
-            <div>
-              <span>
-                {abonnement.resiliationEnFinDePeriode
-                  ? "Se termine le"
-                  : "Renouvellement le"}
-              </span>
-              <strong>{dateJournal(abonnement.finPeriode)}</strong>
-            </div>
-            {abonnement.intervalle && (
-              <div>
-                <span>Facturation</span>
-                <strong>
-                  {abonnement.intervalle === "year" ? "Annuelle" : "Mensuelle"}
-                </strong>
-              </div>
-            )}
-          </div>
-        )}
       </section>
 
       {depassements.length > 0 && (
@@ -263,13 +274,18 @@ export function SubscriptionScreen({
           autres={memeSegment}
           onPayer={onPayer}
           onRevenirAuGratuit={onRevenirAuGratuit}
+          prochaineEcheance={abonnement?.finPeriode ?? null}
         />
       )}
 
       {/* La résiliation n'apparaît que s'il y a quelque chose à résilier : la
           proposer sur le plan gratuit n'aurait aucun sens. */}
       {abonnement && abonnement.statut !== "cancelled" && (
-        <Resilier abonnement={abonnement} onResilier={onResilier} />
+        <Resilier
+          abonnement={abonnement}
+          onReprendre={onReprendre}
+          onResilier={onResilier}
+        />
       )}
 
       <section className="v2-plan-card">

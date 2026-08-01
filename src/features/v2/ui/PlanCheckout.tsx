@@ -2,34 +2,35 @@
 
 import { useState } from "react";
 
-import { economieAnnuelle, prixAffiche } from "@/features/v2/billing/format";
+import { moisOfferts, prixAffiche } from "@/features/v2/billing/format";
 import type { Plan } from "@/features/v2/billing/types";
+import { dateJournal } from "@/features/v2/domain/journal";
 
 import { Icon } from "./Icon";
 
 /**
- * Payer un plan — un choix, un prix, un bouton.
+ * « Passer au plan X » — écran 75, transcrit.
  *
- * CE QUE CET ÉCRAN NE DEMANDE PLUS, ET POURQUOI. Il réclamait le moyen de
- * paiement et le numéro de téléphone. Genius Pay redemande exactement les deux
- * sur sa propre page : on faisait donc saisir deux fois la même chose, en
- * collectant au passage une donnée personnelle dont on n'a aucun usage — le
- * numéro ne servait qu'à être transmis puis oublié.
+ * UNE MODALE ET NON UNE SECTION. Choisir un plan interrompt ce qu'on faisait :
+ * l'écran le dit en posant un voile sur la page. Une section dépliée en ligne,
+ * comme dans ma première version, laisse croire qu'on peut continuer à lire
+ * autour — alors qu'il n'y a plus qu'une décision à prendre.
  *
- * Ne reste ici que ce qui NOUS appartient : quel plan, et sur quel rythme. Le
- * reste est le métier du prestataire, et sa page le fait mieux que nous — elle
- * connaît les opérateurs disponibles dans le pays du payeur, ce que nous ne
- * saurions pas deviner.
+ * SANZA NE COLLECTE AUCUNE DONNÉE DE PAIEMENT. Pas de moyen, pas de numéro :
+ * Genius Pay les demande sur sa page, où il connaît les opérateurs du pays du
+ * payeur. Le bouton dit « Continuer vers le paiement » et non « Payer » —
+ * parce que c'est exactement ce qu'il fait : il emmène ailleurs.
  *
- * CE QU'IL NE PROMET PAS : aucune phrase ne dit « automatique ». Genius Pay ne
- * confirme pas que le renouvellement est un prélèvement, et son tableau de bord
- * n'expose aucun événement d'abonnement. Chaque échéance est, à ce jour, un
- * paiement à part entière.
+ * LE MONTANT AFFICHÉ EST CELUI DÛ AUJOURD'HUI. Aujourd'hui c'est le tarif
+ * plein : rien ne calcule encore de prorata côté base. Le jour où ce sera le
+ * cas, seule la valeur changera — la ligne « À régler aujourd'hui » est déjà
+ * là, et c'est elle que le handoff veut voir.
  */
 export function PlanCheckout({
   onFermer,
   onPayer,
   plan,
+  prochaineEcheance,
 }: {
   onFermer: () => void;
   onPayer: (choix: {
@@ -37,14 +38,18 @@ export function PlanCheckout({
     intervalle: "month" | "year";
   }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
   plan: Plan;
+  /** La date de la prochaine échéance, telle que la base la connaîtra. */
+  prochaineEcheance: string | null;
 }) {
   const [intervalle, setIntervalle] = useState<"month" | "year">("month");
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [instruction, setInstruction] = useState<string | null>(null);
 
-  const prix = prixAffiche(plan, intervalle);
-  const economie = economieAnnuelle(plan);
+  const mensuel = prixAffiche(plan, "month");
+  const annuel = prixAffiche(plan, "year");
+  const choisi = intervalle === "year" ? annuel : mensuel;
+  const offerts = moisOfferts(plan);
 
   async function soumettre() {
     setEnvoi(true);
@@ -59,9 +64,8 @@ export function PlanCheckout({
     }
 
     if (resultat.url) {
-      // Le paiement se termine chez le prestataire. On ne remet pas `envoi` à
-      // faux : la page va disparaître, et un bouton qui redevient cliquable
-      // pendant la redirection invite à payer deux fois.
+      // On ne relâche PAS le bouton : la page va disparaître, et un bouton
+      // redevenu cliquable pendant la redirection invite à payer deux fois.
       window.location.href = resultat.url;
       return;
     }
@@ -70,78 +74,111 @@ export function PlanCheckout({
     setInstruction(resultat.instruction ?? "Votre demande est enregistrée.");
   }
 
-  if (instruction) {
-    return (
-      <section className="v2-plan-card">
-        <div className="v2-nav-label">Paiement demandé</div>
-        <p className="v2-panel-callout">
-          <Icon name="check" />
-          {instruction}
-        </p>
-        <div className="v2-form-actions">
-          <span />
-          <div>
-            <button className="v2-btn" onClick={onFermer} type="button">
-              Fermer
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="v2-plan-card">
-      <header className="v2-checkout-header">
-        <div>
-          <span className="v2-nav-label">Passer au plan</span>
-          <h2>{plan.nom}</h2>
-        </div>
-        <div className="v2-segmented">
-          {(["month", "year"] as const).map((valeur) => (
-            <button
-              data-active={intervalle === valeur}
-              key={valeur}
-              onClick={() => setIntervalle(valeur)}
-              type="button"
-            >
-              {valeur === "year" ? "Annuel" : "Mensuel"}
-            </button>
-          ))}
-        </div>
-      </header>
+    <>
+      <button aria-label="Fermer" className="v2-scrim" onClick={onFermer} type="button" />
+      <div aria-modal="true" className="v2-dialog v2-dialog-lg" role="dialog">
+        <header>
+          <span className="v2-nav-label">Votre abonnement</span>
+          <h2>Passer au plan {plan.nom}</h2>
+        </header>
 
-      <div className="v2-plan-price">
-        <strong>{prix.principal}</strong>
-        {prix.detail && <span>{prix.detail}</span>}
-        {intervalle === "year" && economie !== null && (
-          <span className="v2-plan-economie">{economie} % d’économie</span>
+        {instruction ? (
+          <>
+            <div className="v2-dialog-lg-body">
+              <p className="v2-panel-callout">
+                <Icon name="check" />
+                {instruction}
+              </p>
+            </div>
+            <footer>
+              <button className="v2-btn" onClick={onFermer} type="button">
+                Fermer
+              </button>
+            </footer>
+          </>
+        ) : (
+          <>
+            <div className="v2-dialog-lg-body">
+              <div className="v2-field" data-wide="true">
+                <span>Facturation</span>
+                <div className="v2-billing-choices">
+                  <button
+                    data-selected={intervalle === "month"}
+                    onClick={() => setIntervalle("month")}
+                    type="button"
+                  >
+                    <b>Mensuelle</b>
+                    <span>{mensuel.principal} / mois</span>
+                  </button>
+                  <button
+                    data-selected={intervalle === "year"}
+                    onClick={() => setIntervalle("year")}
+                    type="button"
+                  >
+                    <b>Annuelle</b>
+                    <span>
+                      {annuel.principal} / an
+                      {offerts ? ` · ${offerts} mois offerts` : ""}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="v2-kv-rows">
+                <div>
+                  <span>Plan</span>
+                  <span>
+                    {plan.nom}
+                    {plan.description ? ` · ${plan.description}` : ""}
+                  </span>
+                </div>
+                <div>
+                  <span>Prochaine échéance</span>
+                  <span>
+                    {prochaineEcheance
+                      ? dateJournal(prochaineEcheance)
+                      : intervalle === "year"
+                        ? "dans un an"
+                        : "dans un mois"}
+                  </span>
+                </div>
+                <div data-fort="true">
+                  <span>À régler aujourd’hui</span>
+                  <span>{choisi.principal}</span>
+                </div>
+              </div>
+
+              <p className="v2-dialog-band">
+                Le paiement se fait sur la page sécurisée de <b>Genius Pay</b>.
+                Vous y choisirez votre moyen de paiement — mobile money (Wave,
+                Orange Money, MTN, Moov) ou carte bancaire. Sanza ne conserve
+                aucune donnée de paiement.
+              </p>
+
+              <p className="v2-dialog-note">
+                Nous vous préviendrons avant chaque échéance. Sans paiement,
+                votre espace passe en lecture seule — rien n’est supprimé.
+              </p>
+
+              {erreur && (
+                <p className="v2-auth-error" role="alert">
+                  {erreur}
+                </p>
+              )}
+            </div>
+
+            <footer>
+              <button className="v2-btn-quiet" onClick={onFermer} type="button">
+                Annuler
+              </button>
+              <button className="v2-btn" disabled={envoi} onClick={soumettre} type="button">
+                {envoi ? "Ouverture…" : "Continuer vers le paiement →"}
+              </button>
+            </footer>
+          </>
         )}
       </div>
-
-      <p className="v2-field-helper">
-        Vous réglez {intervalle === "year" ? "un an" : "un mois"} d’avance.
-        L’opérateur ou la carte se choisit à l’étape suivante, sur la page
-        sécurisée de notre prestataire. Nous vous préviendrons avant l’échéance
-        suivante.
-      </p>
-
-      {erreur && (
-        <p className="v2-auth-error" role="alert">
-          {erreur}
-        </p>
-      )}
-
-      <div className="v2-form-actions">
-        <button className="v2-onboard-back" onClick={onFermer} type="button">
-          Annuler
-        </button>
-        <div>
-          <button className="v2-btn" disabled={envoi} onClick={soumettre} type="button">
-            {envoi ? "Ouverture…" : `Payer ${prix.principal}`}
-          </button>
-        </div>
-      </div>
-    </section>
+    </>
   );
 }

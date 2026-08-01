@@ -240,16 +240,18 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │                                répondront — pas avant.
    ├─ 🟢 Essayé pour de vrai      1er août : paiement Wave 21 750 XOF, webhook
    │                                signé reçu 11 s après, plan ouvert seul.
-   ├─ 🔴 Conforme aux écrans 75-77 NON. Le handoff du 1er août livre trois
-   │                                écrans de référence — modale de paiement,
-   │                                page complète, modale de résiliation — et
-   │                                impose « zéro réinterprétation ». Ce qui
-   │                                est codé s'en écarte : sections en ligne
-   │                                au lieu de modales, « Choisir » en orange
-   │                                alors qu'il doit rester gris, résiliation
-   │                                en orange alors qu'elle doit être ROUGE,
-   │                                récapitulatif « À régler aujourd'hui »
-   │                                absent, six états non couverts.
+   ├─ 🟡 Conforme aux écrans 75-77 la FORME l'est : les deux modales, le
+   │                                récapitulatif « À régler aujourd'hui »,
+   │                                « Choisir » en gris, la résiliation en
+   │                                ROUGE, la bascule qui porte sa remise.
+   │                                Restent les états — payment_pending,
+   │                                payment_failed, read_only, limit_reached,
+   │                                loading — et les factures.
+   ├─ 🟢 Reprendre un abonnement  resume_workspace_subscription() : lève la
+   │                                résiliation sans recalculer la période,
+   │                                sinon résilier puis se raviser offrirait
+   │                                un mois. L'écran promettait ce retour,
+   │                                rien ne savait le faire.
    └─ 🟢 Faire respecter la limite trois triggers, faits le 3 août : créer une
                                     opération, ajouter un collaborateur,
                                     inviter un externe. En base et non dans

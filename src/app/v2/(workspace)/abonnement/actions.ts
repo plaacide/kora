@@ -25,6 +25,8 @@ const MESSAGES: Record<string, string> = {
     "Seuls le propriétaire et les administrateurs gèrent l’abonnement.",
   "plan inconnu": "Ce plan n’existe pas ou n’est plus proposé.",
   "aucun abonnement en cours": "Aucun abonnement à résilier.",
+  "aucune résiliation à reprendre":
+    "Aucune résiliation en cours — votre abonnement suit son cours.",
 };
 
 function traduire(message: string): string {
@@ -167,6 +169,30 @@ export async function activateV2Plan(input: {
 
   if (error) {
     console.error("[v2 abonnement] set_workspace_plan échoué :", error);
+    return { ok: false, error: traduire(error.message) };
+  }
+
+  revalidatePath("/v2/abonnement");
+  return { ok: true };
+}
+
+/**
+ * Reprendre un abonnement résilié, tant que le terme n'est pas passé.
+ *
+ * L'écran de résiliation promet qu'on peut revenir : sans ce geste, la
+ * promesse obligeait à écrire au support.
+ */
+export async function reprendreV2Subscription(input: {
+  organizationId: string;
+}): Promise<Resultat> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("resume_workspace_subscription", {
+    p_org: input.organizationId,
+  });
+
+  if (error) {
+    console.error("[v2 abonnement] reprise échouée :", error);
     return { ok: false, error: traduire(error.message) };
   }
 

@@ -73,6 +73,28 @@ export function economieAnnuelle(plan: Plan): number | null {
   return Math.round(((pleinTarif - an) / pleinTarif) * 100);
 }
 
+/**
+ * L'avantage de l'annuel, dit en MOIS plutôt qu'en pourcentage.
+ *
+ * « 2 mois offerts » se comprend d'un coup ; « 17 % d'économie » demande de
+ * calculer. Les écrans 75 et 76 emploient les deux, chacun là où il porte :
+ * les mois dans le choix de facturation, où l'on compare deux formules ; le
+ * pourcentage dans la bascule de la page, où la place manque.
+ *
+ * `null` quand l'annuel n'offre pas un nombre entier de mois : annoncer « 1,6
+ * mois offert » serait ridicule, et arrondir serait mentir.
+ */
+export function moisOfferts(plan: Plan): number | null {
+  const mois = plan.prix.find((p) => p.intervalle === "month")?.montant;
+  const an = plan.prix.find((p) => p.intervalle === "year")?.montant;
+  if (!mois || !an || an >= mois * 12) return null;
+
+  const offerts = (mois * 12 - an) / mois;
+  // Une tolérance étroite : les tarifs sont ronds, un écart de plus d'un
+  // centième de mois veut dire que la remise n'est pas un nombre de mois.
+  return Math.abs(offerts - Math.round(offerts)) < 0.01 ? Math.round(offerts) : null;
+}
+
 const STATUTS: Record<StatutAbonnement, { label: string; tone: string }> = {
   trialing: { label: "Essai en cours", tone: "blue" },
   active: { label: "Actif", tone: "green" },

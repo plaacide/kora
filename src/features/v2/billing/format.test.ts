@@ -4,6 +4,7 @@ import {
   economieAnnuelle,
   joursRestants,
   libelleStatut,
+  moisOfferts,
   prixAffiche,
   quantite,
 } from "./format";
@@ -82,6 +83,48 @@ describe("economieAnnuelle", () => {
       ],
     });
     expect(economieAnnuelle(p)).toBeNull();
+  });
+});
+
+describe("moisOfferts", () => {
+  it("traduit la remise annuelle en mois offerts", () => {
+    // Le tarif réel de Raise : douze mois payés dix.
+    const p = plan({
+      prix: [
+        { devise: "XOF", intervalle: "month", montant: 21750, periodes: 1 },
+        { devise: "XOF", intervalle: "year", montant: 217500, periodes: 1 },
+      ],
+    });
+    expect(moisOfferts(p)).toBe(2);
+  });
+
+  it("se tait quand la remise ne tombe pas sur un nombre entier de mois", () => {
+    // 15 % de remise font 1,8 mois. « 2 mois offerts » serait un mensonge de
+    // 5 000 francs, et « 1,8 mois offert » ne se dit pas.
+    const p = plan({
+      prix: [
+        { devise: "XOF", intervalle: "month", montant: 10000, periodes: 1 },
+        { devise: "XOF", intervalle: "year", montant: 102000, periodes: 1 },
+      ],
+    });
+    expect(moisOfferts(p)).toBeNull();
+  });
+
+  it("ne promet rien quand l’annuel n’avantage pas", () => {
+    const p = plan({
+      prix: [
+        { devise: "XOF", intervalle: "month", montant: 1000, periodes: 1 },
+        { devise: "XOF", intervalle: "year", montant: 12000, periodes: 1 },
+      ],
+    });
+    expect(moisOfferts(p)).toBeNull();
+  });
+
+  it("ne promet rien quand un des deux tarifs manque", () => {
+    const p = plan({
+      prix: [{ devise: "XOF", intervalle: "month", montant: 1000, periodes: 1 }],
+    });
+    expect(moisOfferts(p)).toBeNull();
   });
 });
 
