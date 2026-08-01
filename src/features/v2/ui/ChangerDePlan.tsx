@@ -35,6 +35,8 @@ export function ChangerDePlan({
   prochaineEcheance: string | null;
 }) {
   const [ouvert, setOuvert] = useState<string | null>(null);
+  const [descente, setDescente] = useState<string | null>(null);
+  const [erreur, setErreur] = useState<string | null>(null);
   // La bascule vit DANS l'en-tête de la carte, avec son avantage : le handoff
   // refuse le « −17 % » en texte vert isolé, qui flotte sans dire à quoi il
   // s'applique.
@@ -90,10 +92,26 @@ export function ChangerDePlan({
                   {autre.gratuit ? (
                     <button
                       className="v2-btn v2-btn-grey v2-btn-sm"
-                      onClick={() => onRevenirAuGratuit(autre.code)}
+                      disabled={descente === autre.code}
+                      // LE RÉSULTAT ÉTAIT IGNORÉ. La promesse partait sans
+                      // qu'on l'attende : en cas de refus — droits
+                      // insuffisants, plan inconnu — le bouton clignotait et
+                      // rien ne changeait, sans un mot d'explication. Un geste
+                      // qui échoue en silence est pire qu'un geste absent.
+                      onClick={async () => {
+                        setDescente(autre.code);
+                        setErreur(null);
+                        const resultat = await onRevenirAuGratuit(autre.code);
+                        setDescente(null);
+                        if (!resultat.ok) {
+                          setErreur(
+                            resultat.error ?? "Le changement de plan n’a pas abouti.",
+                          );
+                        }
+                      }}
                       type="button"
                     >
-                      Revenir à ce plan
+                      {descente === autre.code ? "…" : "Revenir à ce plan"}
                     </button>
                   ) : autre.surDevis ? (
                     <span className="v2-plan-rows-devis">Sur devis</span>
@@ -111,6 +129,12 @@ export function ChangerDePlan({
             );
           })}
         </div>
+
+        {erreur && (
+          <p className="v2-auth-error" role="alert">
+            {erreur}
+          </p>
+        )}
 
         <p className="v2-plan-rows-note">
           <Icon name="shield" />
