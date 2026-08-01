@@ -1,4 +1,4 @@
-import { paysParZone } from "@/features/v2/domain/geographie";
+import { paysZoneFranc } from "@/features/v2/domain/geographie";
 import { secteursParGroupe } from "@/features/v2/domain/secteurs";
 import {
   Field,
@@ -42,14 +42,13 @@ export default async function CompanyOnboardingPage({
         />
 
         <div className="v2-form-grid">
-          {/* Cinq pays étaient proposés. Une entreprise africaine s'immatricule
-              couramment à Maurice, au Luxembourg ou aux États-Unis — et le champ
-              étant obligatoire, elle en choisissait un au hasard. */}
+          {/* UEMOA puis CEMAC — quatorze pays, le périmètre commercial de
+              Sanza. La liste mondiale reste disponible pour les investisseurs,
+              où un fonds londonien est un cas courant. */}
           <SelectField
             label="Pays d’immatriculation"
             name="country"
-            defaultValue="Sénégal"
-            groupes={paysParZone().map((g) => ({
+            groupes={paysZoneFranc().map((g) => ({
               titre: g.zone,
               options: g.pays,
             }))}
@@ -58,7 +57,6 @@ export default async function CompanyOnboardingPage({
           <SelectField
             label="Forme juridique"
             name="legalForm"
-            defaultValue="SAS"
             options={["SAS", "SA", "SARL", "Entreprise individuelle"]}
           />
         </div>
@@ -77,7 +75,6 @@ export default async function CompanyOnboardingPage({
           <SelectField
             label="Secteur"
             name="sector"
-            defaultValue="Énergie"
             groupes={secteursParGroupe().map((g) => ({
               titre: g.groupe,
               options: g.secteurs,
@@ -86,7 +83,6 @@ export default async function CompanyOnboardingPage({
           <SelectField
             label="Stade de développement"
             name="stage"
-            defaultValue="Série A"
             options={["Pré-amorçage", "Amorçage", "Série A", "Série B et plus"]}
           />
         </div>

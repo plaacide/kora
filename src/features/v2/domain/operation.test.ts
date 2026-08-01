@@ -77,17 +77,19 @@ describe("intentObjective", () => {
     expect(intentObjective("diligence")).toBe("diligence");
   });
 
-  it("replie sur levee ce qu’il ne connaît pas", () => {
+  it("ne décide plus à la place de l’utilisateur", () => {
     // CE TEST CONSACRAIT UN DÉFAUT. Il affirmait que « audit » devait valoir
     // « levee », parce que la contrainte CHECK n'acceptait que quatre valeurs —
     // et documentait ainsi comme voulu le fait que le rail annonce « Levée en
     // capital » sur une opération d'audit. La migration `20260801180000` a
     // rendu les six valeurs légitimes ; seul l'inconnu se replie désormais.
-    expect(intentObjective("valeur-jamais-vue")).toBe("levee");
-    // « other » était l'ancien nom de « autre » : il n'est plus reconnu, et
-    // c'est sans conséquence — cette valeur ne vit que le temps d'un envoi de
-    // formulaire, jamais en base.
-    expect(intentObjective("other")).toBe("levee");
+    // Le repli enregistrait « Lever en capital » pour quelqu'un qui n'avait
+    // rien choisi. `null` oblige l'appelant à trancher.
+    expect(intentObjective("valeur-jamais-vue")).toBeNull();
+    expect(intentObjective(null)).toBeNull();
+    expect(intentObjective("")).toBeNull();
+    // « other » était l'ancien nom de « autre » : plus reconnu, donc null.
+    expect(intentObjective("other")).toBeNull();
   });
 });
 
@@ -141,9 +143,11 @@ describe("les six intentions", () => {
     expect(intentObjective("diligence")).toBe("diligence");
   });
 
-  it("retombent sur « levee » pour une intention inconnue", () => {
-    // Mieux vaut l'objectif par défaut qu'un enregistrement refusé.
-    expect(intentObjective("nimportequoi")).toBe("levee");
+  it("rendent null pour une intention inconnue", () => {
+    // « Mieux vaut l'objectif par défaut qu'un enregistrement refusé », disait
+    // le commentaire d'origine. C'était faux : le défaut n'était pas refusé,
+    // il était ENREGISTRÉ — « Lever en capital » pour qui n'avait rien dit.
+    expect(intentObjective("nimportequoi")).toBeNull();
   });
 
   it("donnent un libellé à chacun des six objectifs", () => {

@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { PAYS, ZONES, paysAvecZone, paysParZone, zoneDuPays } from "./geographie";
+import {
+  PAYS,
+  paysAvecZone,
+  paysParZone,
+  paysZoneFranc,
+  zoneDuPays,
+  ZONES,
+} from "./geographie";
 
 describe("zoneDuPays", () => {
   it("rattache un pays à sa zone", () => {
@@ -85,14 +92,28 @@ describe("l’UEMOA en tête", () => {
     ]);
   });
 
-  it("ouvre la liste, suivie de l’Afrique Centrale", () => {
-    // Le premier marché de Sanza ne doit pas se chercher : huit pays, une
-    // monnaie, un droit des sociétés commun.
+  it("ouvre la liste, suivie de la CEMAC", () => {
     expect(ZONES[0]).toBe("UEMOA");
-    expect(ZONES[1]).toBe("Afrique Centrale");
+    expect(ZONES[1]).toBe("CEMAC");
     const groupes = paysParZone().map((g) => g.zone);
     expect(groupes[0]).toBe("UEMOA");
-    expect(groupes[1]).toBe("Afrique Centrale");
+    expect(groupes[1]).toBe("CEMAC");
+  });
+
+  it("isole la zone franc sans amputer la liste mondiale", () => {
+    const franc = paysZoneFranc();
+    expect(franc.map((g) => g.zone)).toEqual(["UEMOA", "CEMAC"]);
+    expect(franc.reduce((n, g) => n + g.pays.length, 0)).toBe(14);
+    // La liste complète reste entière : l'écran investisseurs en dépend, et un
+    // fonds londonien y est un cas courant.
+    expect(PAYS.length).toBeGreaterThanOrEqual(180);
+  });
+
+  it("range la RDC hors CEMAC — elle n’en est pas membre", () => {
+    expect(zoneDuPays("République démocratique du Congo")).toBe(
+      "Afrique Centrale (hors CEMAC)",
+    );
+    expect(zoneDuPays("Cameroun")).toBe("CEMAC");
   });
 
   it("ne laisse aucun pays de l’UEMOA dans l’Ouest résiduel", () => {

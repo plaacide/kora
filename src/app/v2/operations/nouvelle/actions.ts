@@ -54,17 +54,23 @@ function back(formData: FormData, erreur: string): never {
 }
 
 export async function createOperation(formData: FormData) {
-  const type = value(formData, "type") ?? "equity";
   const nom = value(formData, "nom");
   const structure = value(formData, "structure");
+  // `?? "equity"` a disparu ici aussi : une intention absente ou inconnue
+  // devenait une levée en capital sans que personne l'ait demandé.
+  // `type` reste l'intention de l'écran — c'est elle, et non l'objectif
+  // enregistré, qui dit si une levée peut être ouverte.
+  const type = value(formData, "type") ?? "";
+  const objectif = intentObjective(type);
 
   if (!nom) back(formData, "nom");
   if (structure !== "recommandee" && structure !== "vide") back(formData, "structure");
+  if (!objectif) back(formData, "type");
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_data_room", {
     p_name: nom,
-    p_objectif: intentObjective(type),
+    p_objectif: objectif,
     p_template: structure === "recommandee",
   });
 

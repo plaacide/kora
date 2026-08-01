@@ -22,16 +22,16 @@ test.describe("Onboarding — choix de l’objectif", () => {
 
   test("le clic change ce que l’écran montre", async ({ page }) => {
     const cartes = page.locator(".v2-objective");
-    // Six, comme l'écran « Nouvelle opération » : les deux listes ont été
-    // réunies dans le domaine.
     await expect(cartes).toHaveCount(6);
 
     const premiere = cartes.nth(0);
     const seconde = cartes.nth(1);
 
-    // Un groupe radio doit partir avec un choix : sans lui, le formulaire
-    // s'envoie sans objectif et la base en invente un.
-    await expect(premiere.locator("input")).toBeChecked();
+    // AUCUN choix par défaut : celui qui passait l'étape sans y toucher
+    // enregistrait « Lever en capital » sans l'avoir dit.
+    for (const i of [0, 1, 2, 3, 4, 5]) {
+      await expect(cartes.nth(i).locator("input")).not.toBeChecked();
+    }
 
     await seconde.click();
 

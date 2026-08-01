@@ -26,7 +26,8 @@ export const ZONES = [
   // (OHADA) et les mêmes pièces d'immatriculation. C'est le premier marché de
   // Sanza, et le fondateur qui le cherche ne doit pas défiler pour le trouver.
   "UEMOA",
-  "Afrique Centrale",
+  "CEMAC",
+  "Afrique Centrale (hors CEMAC)",
   "Afrique de l’Ouest (hors UEMOA)",
   "Afrique de l’Est",
   "Afrique Australe",
@@ -55,14 +56,16 @@ export const PAYS: Array<[string, Zone]> = [
   ["Sénégal", "UEMOA"],
   ["Togo", "UEMOA"],
 
-  // Afrique Centrale
-  ["Cameroun", "Afrique Centrale"],
-  ["Congo", "Afrique Centrale"],
-  ["Gabon", "Afrique Centrale"],
-  ["Guinée équatoriale", "Afrique Centrale"],
-  ["République centrafricaine", "Afrique Centrale"],
-  ["République démocratique du Congo", "Afrique Centrale"],
-  ["Tchad", "Afrique Centrale"],
+  // CEMAC
+  ["Cameroun", "CEMAC"],
+  ["Congo", "CEMAC"],
+  ["Gabon", "CEMAC"],
+  ["Guinée équatoriale", "CEMAC"],
+  ["République centrafricaine", "CEMAC"],
+  ["Tchad", "CEMAC"],
+
+  // Afrique Centrale (hors CEMAC)
+  ["République démocratique du Congo", "Afrique Centrale (hors CEMAC)"],
 
   // Afrique de l’Ouest (hors UEMOA)
   ["Cap-Vert", "Afrique de l’Ouest (hors UEMOA)"],
@@ -284,4 +287,20 @@ export function paysParZone(): Array<{ zone: Zone; pays: string[] }> {
     zone,
     pays: PAYS.filter(([, z]) => z === zone).map(([nom]) => nom),
   })).filter((groupe) => groupe.pays.length > 0);
+}
+
+/**
+ * La zone franc seule — UEMOA puis CEMAC, quatorze pays.
+ *
+ * POURQUOI UN SOUS-ENSEMBLE PLUTÔT QUE DE RÉDUIRE `PAYS`. La liste complète sert
+ * aussi à l'écran investisseurs, où un fonds ghanéen, kényan ou londonien est un
+ * cas courant sur un tour africain. La couper partout aurait rendu ces
+ * relations impossibles à enregistrer — sur un écran que personne n'a demandé de
+ * changer.
+ *
+ * Ici, c'est le pays d'IMMATRICULATION d'une entreprise cliente : le périmètre
+ * commercial de Sanza, pas celui de ses interlocuteurs.
+ */
+export function paysZoneFranc(): Array<{ zone: Zone; pays: string[] }> {
+  return paysParZone().filter((g) => g.zone === "UEMOA" || g.zone === "CEMAC");
 }

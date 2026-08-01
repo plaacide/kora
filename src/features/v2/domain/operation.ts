@@ -196,8 +196,17 @@ const OBJECTIVES_BY_INTENT: Record<string, string> = Object.fromEntries(
   INTENTIONS.map((i) => [i.valeur, i.objectif]),
 );
 
-export function intentObjective(intent: string): string {
-  return OBJECTIVES_BY_INTENT[intent] ?? "levee";
+/**
+ * `null` quand l'intention est absente ou inconnue — et non « levee ».
+ *
+ * Le repli silencieux enregistrait « Lever en capital » pour quelqu'un qui
+ * n'avait rien choisi, ou dont le choix n'était pas reconnu. Un défaut posé à la
+ * place de l'utilisateur est indiscernable d'une réponse, et c'est ce qui rend
+ * l'erreur invisible : l'appelant décide maintenant quoi en faire.
+ */
+export function intentObjective(intent: string | null): string | null {
+  if (!intent) return null;
+  return OBJECTIVES_BY_INTENT[intent] ?? null;
 }
 
 /**

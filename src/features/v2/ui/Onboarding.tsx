@@ -132,7 +132,16 @@ export function SelectField({
 }: {
   label: string;
   name: string;
-  defaultValue: string;
+  /**
+   * À N'UTILISER QUE POUR REPRENDRE UNE SAISIE, jamais pour préremplir.
+   *
+   * Les six champs de l'onboarding arrivaient préremplis — Sénégal, SAS,
+   * Énergie, Série A, XOF. Un fondateur ivoirien qui ne touchait pas au champ
+   * enregistrait « Sénégal » sans l'avoir dit, et rien à l'écran ne distinguait
+   * un choix d'un défaut. Une valeur qu'on n'a pas donnée ne doit pas être
+   * enregistrée comme si on l'avait donnée.
+   */
+  defaultValue?: string;
   /** Liste plate, pour les choix courts. */
   options?: string[];
   /**
@@ -149,7 +158,20 @@ export function SelectField({
     <label className="v2-field">
       <span>{label}</span>
       <span className="v2-control">
-        <select name={name} defaultValue={defaultValue}>
+        {/* `defaultValue=""` N'EST PAS DÉCORATIF. Sans lui, le navigateur
+            sélectionne la première option NON désactivée — « Sénégal » — et le
+            champ redevient prérempli tout en passant la validation. Vérifié :
+            en HTML nu la valeur initiale est « Sénégal » et le champ est
+            valide ; avec `defaultValue=""` c'est « Choisissez… » et l'envoi est
+            refusé. Ne pas retirer cette ligne. */}
+        <select defaultValue={defaultValue ?? ""} name={name} required>
+          {/* Le choix vide est `disabled` : il s'affiche à l'ouverture, mais on
+              ne peut pas y revenir. `required` refuse alors l'envoi tant que
+              rien n'est retenu — la contrainte est portée par le navigateur,
+              donc elle tient même sans JavaScript. */}
+          <option disabled value="">
+            Choisissez…
+          </option>
           {groupes
             ? groupes.map((groupe) => (
                 <optgroup key={groupe.titre} label={groupe.titre}>
@@ -218,14 +240,17 @@ export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) 
       )}
       <fieldset className="v2-objective-grid">
         <legend className="v2-sr-only">Objectif de financement</legend>
-        {INTENTIONS.map((objective, index) => (
+        {INTENTIONS.map((objective) => (
           <label className="v2-objective" key={objective.valeur}>
-            {/* Le premier est coché par défaut : un groupe radio sans choix
-                initial laisse partir le formulaire sans objectif, et la base
-                retombe alors sur « levee » sans que personne l'ait décidé. */}
+            {/* AUCUN CHOIX PAR DÉFAUT. Le premier était coché à l'arrivée :
+                celui qui passait l'étape sans y toucher enregistrait « Lever en
+                capital » sans l'avoir dit. `required` refuse maintenant l'envoi
+                tant que rien n'est retenu — sauf par « Je ne sais pas encore »,
+                qui porte `formNoValidate` parce que c'est justement l'absence de
+                réponse qu'il exprime. */}
             <input
-              defaultChecked={index === 0}
               name="objective"
+              required
               type="radio"
               value={objective.valeur}
             />
@@ -244,6 +269,7 @@ export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) 
         <BoutonEnvoi
           className="v2-onboard-later"
           name="skipObjective"
+          sansValidation
           value="1"
         >
           Je ne sais pas encore

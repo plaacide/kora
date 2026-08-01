@@ -58,10 +58,14 @@ export async function saveV2Objective(formData: FormData) {
   const objective =
     formData.get("skipObjective") === "1"
       ? null
-      // TROISIÈME copie de la correspondance intention → objectif, elle aussi
-      // limitée à quatre entrées : « audit » et « autre » y retombaient sur
-      // « levee ». Elle vient maintenant du domaine, comme les deux autres.
-      : intentObjective(selected ?? "equity");
+      // `?? "equity"` A DISPARU. Il enregistrait « Lever en capital » pour
+      // quelqu'un qui n'avait rien choisi — le navigateur bloque désormais
+      // l'envoi, mais un formulaire peut toujours arriver sans le champ.
+      // Retomber sur une valeur revient à décider à la place du fondateur.
+      : intentObjective(selected);
+  if (objective === null && formData.get("skipObjective") !== "1") {
+    redirect(`${v2Routes.onboarding.operation}?erreur=objectif`);
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("save_startup", {

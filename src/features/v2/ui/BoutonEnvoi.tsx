@@ -22,6 +22,7 @@ export function BoutonEnvoi({
   className,
   enCours,
   name,
+  sansValidation,
   value,
 }: {
   /** Le libellé au repos. */
@@ -35,6 +36,14 @@ export function BoutonEnvoi({
    */
   enCours?: string;
   name?: string;
+  /**
+   * Soumettre SANS passer par la validation du navigateur.
+   *
+   * Pour les boutons qui expriment l'absence de réponse — « Je ne sais pas
+   * encore », « Remplir plus tard ». Sans cela, un champ `required` du
+   * formulaire les bloquerait, et l'échappatoire n'en serait plus une.
+   */
+  sansValidation?: boolean;
   value?: string;
 }) {
   const { pending } = useFormStatus();
@@ -44,6 +53,7 @@ export function BoutonEnvoi({
       aria-busy={pending}
       className={className}
       disabled={pending}
+      formNoValidate={sansValidation}
       name={name}
       type="submit"
       value={value}
