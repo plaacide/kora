@@ -1032,7 +1032,13 @@ ul.v2-check-list{margin:0;padding:0;list-style:none}
 .v2-viewer-zoom{color:rgba(255,255,255,.7);font-size:12.5px;white-space:nowrap}
 .v2-viewer-download{display:inline-flex;height:36px;flex:0 0 auto;align-items:center;border-radius:6px;background:rgba(255,255,255,.1);padding:0 13px;color:rgba(255,255,255,.45);font:600 12.5px var(--font-v2-sans),sans-serif;cursor:default}
 .v2-viewer-stage{display:flex;flex:1;align-items:center;justify-content:center;padding:28px}
-.v2-page{position:relative;width:680px;max-width:100%;height:660px;overflow:hidden;border-radius:4px;background:#fff;box-shadow:0 24px 64px rgba(0,0,0,.4)}
+/* SEUL LE DOCUMENT EST VISIBLE. Le cadre blanc, l'ombre portée et la hauteur
+   fixe dessinaient une « feuille » autour de la page — un décor qui rognait le
+   document et le faisait paraître plus petit qu'il n'est. La page arrive déjà
+   rendue en image, avec ses propres marges : lui en ajouter d'autres revient à
+   encadrer un cadre. */
+.v2-page{position:relative;width:auto;max-width:100%;height:auto;overflow:visible;border-radius:0;background:transparent;box-shadow:none}
+.v2-page img{display:block;max-width:100%;height:auto}
 .v2-page-content{padding:48px 56px}
 .v2-page-title{font:600 18px var(--font-v2-head),sans-serif}
 .v2-page-sub{margin-top:2px;color:var(--text-3);font-size:12px}

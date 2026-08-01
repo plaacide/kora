@@ -183,12 +183,15 @@ export function RowMenu({
   return (
     <Menu
       items={[
-        { label: "Ouvrir", href },
-        { label: "Modifier" },
-        { label: "Dupliquer la structure" },
-        { label: "Clôturer", href: "?dialogue=cloture" },
-        { label: "Archiver", href: "?dialogue=archivage" },
-        { label: "Exporter l’index" },
+        { label: "Ouvrir", href, icon: "arrow" },
+        // TROIS OPTIONS SONT RETIRÉES, pas grisées : « Modifier »,
+        // « Dupliquer la structure » et « Exporter l'index » n'avaient aucune
+        // action derrière elles. Une entrée de menu qui ne fait rien est pire
+        // qu'une entrée absente — on la clique, rien ne se passe, et l'on croit
+        // l'application cassée. Elles reviendront avec l'écran de réglages
+        // d'opération, qui est en tête de la roadmap.
+        { label: "Clôturer", href: "?dialogue=cloture", icon: "check" },
+        { label: "Archiver", href: "?dialogue=archivage", icon: "folder" },
       ]}
       label={label}
     />

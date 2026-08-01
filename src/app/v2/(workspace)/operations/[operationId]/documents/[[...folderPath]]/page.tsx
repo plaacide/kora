@@ -90,7 +90,12 @@ function MenuPiece({
         "use server";
         return deleteV2Document({ operationId, documentId: document.id });
       }}
-      urlVisionneuse={`?document=${document.id}`}
+      // « Ouvrir » mène à la VISIONNEUSE, pas au panneau latéral : celui-ci
+      // montre les versions et le journal, jamais le document lui-même.
+      // C'est ce qui donnait l'impression que le lecteur ne marchait pas.
+      urlVisionneuse={`/v2/visionneuse?document=${document.id}&retour=${encodeURIComponent(
+        `/v2/operations/${operationId}/documents`,
+      )}`}
     />
   );
 }
