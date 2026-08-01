@@ -20,8 +20,14 @@ const ERROR_MESSAGES: Record<string, string> = {
   invalidCredentials: "Adresse e-mail ou mot de passe incorrect.",
   alreadyRegistered: "Un compte existe déjà avec cette adresse.",
   emailNotConfirmed: "Confirmez votre adresse e-mail avant de vous connecter.",
+  // « Quelques minutes » vaut pour NOTRE garde-fou : dix connexions par dix
+  // minutes, quinze inscriptions par heure et par IP.
   tooManyAttempts: "Trop de tentatives. Réessayez dans quelques minutes.",
-  rateLimited: "Trop de demandes. Réessayez dans quelques minutes.",
+  // CELUI-CI EST LE PLAFOND D'ENVOI DE SUPABASE, compté à l'heure. Dire
+  // « quelques minutes » fait réessayer pour rien — et chaque essai consomme
+  // un jeton de plus, ce qui repousse d'autant le moment où ça repassera.
+  rateLimited:
+    "Trop d’e-mails ont été envoyés depuis cet espace. Réessayez dans une heure, ou écrivez-nous si c’est urgent.",
   passwordTooWeak: "Choisissez un mot de passe plus robuste.",
   resetLinkExpired:
     "Ce lien n’est plus valide. Demandez un nouveau lien de réinitialisation.",
