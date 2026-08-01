@@ -111,7 +111,35 @@ niveaux, mêmes badges qu'avant. Ajouter une exigence à la main : elle apparaî
 
 ---
 
-## LOT C — 🟠 Niveau 1 → 3 · Les quatre modificateurs qui n'attendent personne
+## LOT C — ✅ Niveau 1 → 3 · Les modificateurs qui n'attendaient personne
+
+**Livré le 1er août** — `14340cc` et `a3d8f89`. Trois axes sur quatre : la
+forme juridique, le pays et le stade. Le quatrième est tombé à l'épreuve des
+faits, voir « L'échéance » plus bas.
+
+| Mesure sur la recette | Résultat |
+|---|---|
+| Différences entre une SA ivoirienne et une SARL sénégalaise | **5** |
+| Exigences pour une entreprise individuelle | **17** au lieu de 22 |
+| Doublons après changement de forme juridique | **0** |
+| Intitulé réécrit à la main après réapplication | **intact** |
+
+### L'échéance — modificateur abandonné, et pourquoi
+
+`startups.horizon` contient une **date** — « 30 novembre 2026 » — pas une durée.
+Or les exigences n'ont pas d'échéance individuelle : **une date unique ne peut
+pas ordonner une liste**. Le modificateur, tel qu'il était écrit, n'avait aucun
+comportement définissable.
+
+Ce qui serait réellement utile est autre chose, et plus grand : croiser
+`freshness_days` avec la date d'échéance pour signaler les pièces qui auront
+expiré le jour venu — « Extrait RCCM, 90 jours, à redemander avant le 30
+novembre ». C'est une fonctionnalité à part entière, pas un tri. Reportée au
+lot K.
+
+---
+
+## ~~LOT C — les quatre modificateurs~~ *(rédaction d'origine, conservée)*
 
 Ce lot produit la **première adaptation réelle** du produit, sans dépendre de
 votre travail éditorial. Il utilise des données déjà collectées à l'onboarding.
@@ -296,6 +324,7 @@ autorisez-moi à en créer un par l'API d'administration.
 
 | Chantier | État | Note |
 |---|---|---|
+| **Péremption avant l'échéance** | 🔴 | Croiser `freshness_days` et la date d'échéance : « ce RCCM aura expiré le 30 novembre ». La vraie version du modificateur abandonné au lot C |
 | Badges du rail (Partage, Investisseurs, Lever) | 🔴 | Petit |
 | Usage des fonds | 🔴 | La colonne existe, la vue l'affiche, **aucun champ ne le saisit** |
 | Consultations des mises à jour | 🟡 | `seen_raise_update()` existe, **rien ne l'appelle** |
