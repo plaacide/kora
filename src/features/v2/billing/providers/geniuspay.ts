@@ -37,6 +37,24 @@ const MONTANT_MINIMUM_XOF = 200;
 /** Fenêtre anti-rejeu du webhook, en secondes — la valeur de leur documentation. */
 const FENETRE_SIGNATURE = 300;
 
+/**
+ * L'adresse publique où le payeur doit revenir.
+ *
+ * Rend `null` quand on l'ignore — en local, par exemple, où une URL de retour
+ * pointant vers `localhost` renverrait le payeur vers une machine que le
+ * prestataire ne peut pas atteindre. Mieux vaut alors ne rien promettre.
+ */
+function retour(): string | null {
+  const brut =
+    process.env.SANZA_PUBLIC_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+
+  if (!brut) return null;
+
+  const propre = brut.replace(/\/+$/, "");
+  return propre.startsWith("http") ? propre : `https://${propre}`;
+}
+
 interface ReponsePaiement {
   id?: number;
   reference?: string;
@@ -266,6 +284,18 @@ export class GeniusPayProvider implements BillingProvider {
         // mobile money, où imposer Wave à quelqu'un qui a Orange Money est le
         // meilleur moyen de perdre un paiement déjà décidé.
         ...(input.moyen ? { payment_method: input.moyen } : {}),
+        // OÙ REVENIR APRÈS AVOIR PAYÉ. Sans ces deux URL, Genius Pay laisse le
+        // payeur sur SA page : on a réglé, et on reste devant un écran qui
+        // n'est pas le sien, sans savoir si ça a marché. Leur réponse les rend
+        // à `null` quand on ne les fournit pas — le premier paiement réel s'est
+        // terminé ainsi, et c'est ce qui donne l'impression que rien ne s'est
+        // passé alors que tout avait fonctionné.
+        ...(retour()
+          ? {
+              success_url: `${retour()}/v2/abonnement?paiement=ok`,
+              error_url: `${retour()}/v2/abonnement?paiement=echec`,
+            }
+          : {}),
         metadata: {
           workspace_id: input.workspaceId,
           plan_code: input.planCode,
