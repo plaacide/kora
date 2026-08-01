@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 
+import { BoutonEnvoi } from "./BoutonEnvoi";
 import { v2Routes } from "../navigation/routes";
 import { ChipField } from "./ChipField";
 import { Icon, type IconName } from "./Icon";
@@ -199,17 +200,16 @@ export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) 
         ))}
       </div>
       <FormActions backHref={v2Routes.onboarding.company}>
-        <button
+        {/* Deux boutons dans le même formulaire : pas de libellé de
+            progression, `useFormStatus` ne dit pas lequel a été pressé. */}
+        <BoutonEnvoi
           className="v2-onboard-later"
           name="skipObjective"
-          type="submit"
           value="1"
         >
           Je ne sais pas encore
-        </button>
-        <button className="v2-onboard-primary" type="submit">
-          Continuer
-        </button>
+        </BoutonEnvoi>
+        <BoutonEnvoi className="v2-onboard-primary">Continuer</BoutonEnvoi>
       </FormActions>
       <p className="v2-onboard-disclaimer">
         « Je ne sais pas encore » crée un plan de base ; vous préciserez la cible plus tard.

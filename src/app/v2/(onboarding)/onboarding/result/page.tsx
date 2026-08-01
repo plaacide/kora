@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { Icon } from "@/features/v2/ui/Icon";
 import {
@@ -107,15 +108,15 @@ export default async function OnboardingResultPage({
       <div className="v2-result-actions">
         <form action={completeV2Onboarding}>
           <input name="destination" type="hidden" value="preparation" />
-          <button className="v2-onboard-primary" type="submit">
+          <BoutonEnvoi className="v2-onboard-primary" enCours="Création…">
             Commencer par les pièces prioritaires
-          </button>
+          </BoutonEnvoi>
         </form>
         <form action={completeV2Onboarding}>
           <input name="destination" type="hidden" value="overview" />
-          <button className="v2-onboard-secondary" type="submit">
+          <BoutonEnvoi className="v2-onboard-secondary" enCours="Création…">
             Voir mon espace
-          </button>
+          </BoutonEnvoi>
         </form>
       </div>
     </div>

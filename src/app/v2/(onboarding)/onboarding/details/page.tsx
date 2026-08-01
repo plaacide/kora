@@ -6,6 +6,7 @@ import {
   SelectField,
   Stepper,
 } from "@/features/v2/ui/Onboarding";
+import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { saveV2Details } from "../actions";
 
@@ -58,17 +59,18 @@ export default async function OperationDetailsOnboardingPage({
         <InvestorTypePicker />
 
         <FormActions backHref={v2Routes.onboarding.operation}>
-          <button
+          {/* Deux boutons dans le même formulaire : pas de libellé de
+              progression, `useFormStatus` ne dit pas lequel a été pressé. */}
+          <BoutonEnvoi
             className="v2-onboard-later"
             name="skipDetails"
-            type="submit"
             value="1"
           >
             Remplir plus tard
-          </button>
-          <button className="v2-onboard-primary" type="submit">
+          </BoutonEnvoi>
+          <BoutonEnvoi className="v2-onboard-primary">
             Générer mon plan
-          </button>
+          </BoutonEnvoi>
         </FormActions>
       </form>
     </div>

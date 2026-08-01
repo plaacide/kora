@@ -5,6 +5,7 @@ import {
   SelectField,
   Stepper,
 } from "@/features/v2/ui/Onboarding";
+import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { saveV2Company } from "../actions";
 
@@ -90,9 +91,9 @@ export default async function CompanyOnboardingPage({
         />
 
         <FormActions backHref={v2Routes.root}>
-          <button className="v2-onboard-primary" type="submit">
+          <BoutonEnvoi className="v2-onboard-primary" enCours="Enregistrement…">
             Continuer
-          </button>
+          </BoutonEnvoi>
         </FormActions>
       </form>
 

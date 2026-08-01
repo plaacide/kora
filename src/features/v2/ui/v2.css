@@ -1693,3 +1693,12 @@ html[data-nav="back"]::view-transition-old(root){z-index:1}
    la cible peut être un document, un dossier, un accord ou une personne, et
    rien ne les distingue encore dans les données de démonstration. */
 .v2-journal-target{color:var(--orange-text)}
+
+/* Les deux libellés d'un bouton d'envoi occupent LA MÊME cellule : le bouton
+   naît à la largeur du plus long, et ne saute donc pas quand « Continuer »
+   devient « Enregistrement… ». */
+.v2-envoi-labels{display:grid;place-items:center}
+.v2-envoi-labels>span{grid-area:1/1}
+.v2-envoi-labels>span:last-child{visibility:hidden}
+.v2-envoi-labels[data-pending=true]>span:first-child{visibility:hidden}
+.v2-envoi-labels[data-pending=true]>span:last-child{visibility:visible}
