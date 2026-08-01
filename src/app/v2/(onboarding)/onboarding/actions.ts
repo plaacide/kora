@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { intentObjective } from "@/features/v2/domain/operation";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -52,19 +53,15 @@ export async function saveV2Company(formData: FormData) {
  * Un objectif inconnu retombe sur `levee`, comme le garde-fou de
  * `save_startup` : mieux vaut la valeur par défaut qu'un enregistrement refusé.
  */
-const OBJECTIVES: Record<string, string> = {
-  equity: "levee",
-  debt: "dette",
-  dfi: "dfi",
-  diligence: "diligence",
-};
-
 export async function saveV2Objective(formData: FormData) {
   const selected = value(formData, "objective");
   const objective =
     formData.get("skipObjective") === "1"
       ? null
-      : (selected ? OBJECTIVES[selected] : undefined) ?? "levee";
+      // TROISIÈME copie de la correspondance intention → objectif, elle aussi
+      // limitée à quatre entrées : « audit » et « autre » y retombaient sur
+      // « levee ». Elle vient maintenant du domaine, comme les deux autres.
+      : intentObjective(selected ?? "equity");
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("save_startup", {

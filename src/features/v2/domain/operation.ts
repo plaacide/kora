@@ -113,18 +113,88 @@ export function intentCanCarryRaise(intent: string): boolean {
 }
 
 /**
- * Les comptes créés avant l'élargissement de `objectif` portent tous `levee`.
- * Les intentions sans correspondance en base y retombent aussi : mieux vaut
- * l'objectif par défaut qu'un enregistrement refusé.
+ * LES SIX INTENTIONS, ET RIEN D'AUTRE.
+ *
+ * Cette liste était écrite DEUX FOIS : six entrées dans « Nouvelle opération »,
+ * quatre dans l'onboarding, avec des descriptions différentes pour les quatre
+ * communes. Les deux écrans posent pourtant la même question — celui qui
+ * répondait « Préparer un audit » à la création ne pouvait pas le dire à
+ * l'inscription.
+ *
+ * Les libellés retenus sont les plus courts, ceux de « Nouvelle opération ».
+ * Un choix se lit en diagonale ; une énumération de cas se lit deux fois.
  */
-const OBJECTIVES_BY_INTENT: Record<string, string> = {
-  equity: "levee",
-  debt: "dette",
-  dfi: "dfi",
-  diligence: "diligence",
-  audit: "levee",
-  other: "levee",
-};
+export interface Intention {
+  /** Le vocabulaire de l'écran. */
+  valeur: string;
+  /** Ce que la base enregistre. */
+  objectif: string;
+  titre: string;
+  description: string;
+  icone: string;
+}
+
+export const INTENTIONS: readonly Intention[] = [
+  {
+    valeur: "equity",
+    objectif: "levee",
+    titre: "Lever en capital",
+    description: "Ouvrez votre capital à des investisseurs.",
+    icone: "pulse",
+  },
+  {
+    valeur: "debt",
+    objectif: "dette",
+    titre: "Obtenir un financement bancaire",
+    description: "Préparez un dossier de dette ou de prêt.",
+    icone: "landmark",
+  },
+  {
+    valeur: "dfi",
+    objectif: "dfi",
+    titre: "Répondre à une institution ou un bailleur",
+    description: "Subventions, DFI et bailleurs internationaux.",
+    icone: "globe",
+  },
+  {
+    valeur: "diligence",
+    objectif: "diligence",
+    titre: "Répondre à une diligence",
+    description: "Un tiers examine votre entreprise.",
+    icone: "file",
+  },
+  {
+    valeur: "audit",
+    objectif: "audit",
+    titre: "Préparer un audit",
+    description: "Audit légal, financier ou d’impact.",
+    icone: "shield-check",
+  },
+  {
+    valeur: "autre",
+    objectif: "autre",
+    titre: "Autre demande documentaire",
+    description: "Toute autre transmission structurée de pièces.",
+    icone: "folder",
+  },
+];
+
+/**
+ * L'intention vers l'objectif enregistré.
+ *
+ * `audit` et `autre` VALAIENT `levee` : la base ne connaissait que quatre
+ * valeurs, et ces deux-là y retombaient. Le rail annonçait donc « Levée en
+ * capital » sur une opération d'audit, à laquelle `complete_onboarding` ouvrait
+ * en prime une ligne dans `raises` — puisque `levee` compte parmi les objectifs
+ * de financement. La migration `20260801180000` les a rendues légitimes ; la
+ * correspondance est désormais l'identité.
+ *
+ * Une intention inconnue retombe sur `levee` : mieux vaut l'objectif par défaut
+ * qu'un enregistrement refusé.
+ */
+const OBJECTIVES_BY_INTENT: Record<string, string> = Object.fromEntries(
+  INTENTIONS.map((i) => [i.valeur, i.objectif]),
+);
 
 export function intentObjective(intent: string): string {
   return OBJECTIVES_BY_INTENT[intent] ?? "levee";
@@ -133,13 +203,12 @@ export function intentObjective(intent: string): string {
 /**
  * Ce que l'opération cherche, dit en toutes lettres.
  *
- * La base porte quatre valeurs — `levee`, `dette`, `dfi`, `diligence` — et le
- * rail affichait « Levée en capital » quelle que soit l'opération, y compris
+ * Le rail affichait « Levée en capital » quelle que soit l'opération, y compris
  * un dossier bancaire. Une étiquette fausse sur l'écran qu'on regarde toute la
  * journée finit par être crue.
  *
  * Une valeur inconnue est rendue telle quelle plutôt que remplacée : elle reste
- * lisible, et le jour où un cinquième objectif apparaît, l'écran ne ment pas en
+ * lisible, et le jour où un septième objectif apparaît, l'écran ne ment pas en
  * attendant qu'on le nomme.
  */
 const OBJECTIFS: Record<string, string> = {
@@ -147,6 +216,8 @@ const OBJECTIFS: Record<string, string> = {
   dette: "Financement bancaire",
   dfi: "Financement DFI ou impact",
   diligence: "Diligence",
+  audit: "Audit",
+  autre: "Demande documentaire",
 };
 
 export function libelleObjectif(objectif: string | null): string | null {

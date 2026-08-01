@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { createOperation } from "@/app/v2/operations/nouvelle/actions";
 import { messageDErreur } from "../domain/erreurs";
+import { INTENTIONS } from "../domain/operation";
 import { BoutonEnvoiExterne } from "./BoutonEnvoi";
 import { intentCanCarryRaise } from "../domain/operation";
 import { Icon, type IconName } from "./Icon";
@@ -55,14 +56,14 @@ const STEPS: Array<[Step, string]> = [
  * `value` est le vocabulaire de l'écran, pas celui de la base : la Server
  * Action (`actions.ts`) le fait correspondre aux quatre `objectif` réels.
  */
-const TYPES: Choice[] = [
-  { value: "equity", title: "Lever en capital", body: "Ouvrez votre capital à des investisseurs.", icon: "pulse" },
-  { value: "debt", title: "Obtenir un financement bancaire", body: "Préparez un dossier de dette ou de prêt.", icon: "landmark" },
-  { value: "dfi", title: "Répondre à une institution ou un bailleur", body: "Subventions, DFI et bailleurs internationaux.", icon: "globe" },
-  { value: "diligence", title: "Répondre à une diligence", body: "Un tiers examine votre entreprise.", icon: "file" },
-  { value: "audit", title: "Préparer un audit", body: "Audit légal, financier ou d’impact.", icon: "shield-check" },
-  { value: "other", title: "Autre demande documentaire", body: "Toute autre transmission structurée de pièces.", icon: "folder" },
-];
+// La liste vivait ici ET dans l'onboarding, avec six entrées d'un côté et
+// quatre de l'autre. Elle vient désormais du domaine, seule source.
+const TYPES: Choice[] = INTENTIONS.map((i) => ({
+  value: i.valeur,
+  title: i.titre,
+  body: i.description,
+  icon: i.icone as IconName,
+}));
 
 /**
  * « Reprendre la structure d'une opération existante » n'a pas d'équivalent

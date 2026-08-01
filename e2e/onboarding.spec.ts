@@ -22,7 +22,9 @@ test.describe("Onboarding — choix de l’objectif", () => {
 
   test("le clic change ce que l’écran montre", async ({ page }) => {
     const cartes = page.locator(".v2-objective");
-    await expect(cartes).toHaveCount(4);
+    // Six, comme l'écran « Nouvelle opération » : les deux listes ont été
+    // réunies dans le domaine.
+    await expect(cartes).toHaveCount(6);
 
     const premiere = cartes.nth(0);
     const seconde = cartes.nth(1);

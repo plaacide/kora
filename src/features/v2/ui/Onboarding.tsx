@@ -6,6 +6,7 @@ import type { InputHTMLAttributes, ReactNode } from "react";
 import { logoutV2 } from "@/app/v2/actions";
 
 import { BoutonEnvoi } from "./BoutonEnvoi";
+import { INTENTIONS } from "../domain/operation";
 import { v2Routes } from "../navigation/routes";
 import { ChipField } from "./ChipField";
 import { Icon, type IconName } from "./Icon";
@@ -162,37 +163,6 @@ export function FormActions({
   );
 }
 
-const objectives: Array<{
-  id: string;
-  title: string;
-  description: string;
-  icon: IconName;
-}> = [
-  {
-    id: "equity",
-    title: "Lever en capital",
-    description: "Business angels, fonds de capital-risque ou investisseur stratégique.",
-    icon: "pulse",
-  },
-  {
-    id: "debt",
-    title: "Obtenir un financement bancaire",
-    description: "Crédit, ligne de financement, financement d’équipement ou besoin de trésorerie.",
-    icon: "landmark",
-  },
-  {
-    id: "dfi",
-    title: "Répondre à une institution ou un bailleur",
-    description: "DFI, subvention, programme d’investissement ou financement à impact.",
-    icon: "globe",
-  },
-  {
-    id: "diligence",
-    title: "Répondre à une diligence",
-    description: "Une organisation vous a transmis une demande de pièces ou souhaite examiner votre entreprise.",
-    icon: "file",
-  },
-];
 
 /**
  * Le choix d'objectif — étape 3.
@@ -228,8 +198,8 @@ export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) 
       )}
       <fieldset className="v2-objective-grid">
         <legend className="v2-sr-only">Objectif de financement</legend>
-        {objectives.map((objective, index) => (
-          <label className="v2-objective" key={objective.id}>
+        {INTENTIONS.map((objective, index) => (
+          <label className="v2-objective" key={objective.valeur}>
             {/* Le premier est coché par défaut : un groupe radio sans choix
                 initial laisse partir le formulaire sans objectif, et la base
                 retombe alors sur « levee » sans que personne l'ait décidé. */}
@@ -237,11 +207,11 @@ export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) 
               defaultChecked={index === 0}
               name="objective"
               type="radio"
-              value={objective.id}
+              value={objective.valeur}
             />
-            <span className="v2-objective-icon"><Icon name={objective.icon} /></span>
+            <span className="v2-objective-icon"><Icon name={objective.icone as IconName} /></span>
             <span>
-              <strong>{objective.title}</strong>
+              <strong>{objective.titre}</strong>
               <small>{objective.description}</small>
             </span>
             <span className="v2-objective-check" aria-hidden="true">✓</span>

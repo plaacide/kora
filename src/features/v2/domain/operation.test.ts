@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   intentCanCarryRaise,
+  INTENTIONS,
   intentObjective,
+  libelleObjectif,
   operationLifecycle,
   operationSupportsInvestorTracking,
   operationType,
@@ -75,12 +77,17 @@ describe("intentObjective", () => {
     expect(intentObjective("diligence")).toBe("diligence");
   });
 
-  it("replie sur levee les intentions sans objectif dédié", () => {
-    // `audit` et `other` n'ont pas de valeur en base : la contrainte CHECK de
-    // `deals.objectif` n'en accepte que quatre.
-    expect(intentObjective("audit")).toBe("levee");
-    expect(intentObjective("other")).toBe("levee");
+  it("replie sur levee ce qu’il ne connaît pas", () => {
+    // CE TEST CONSACRAIT UN DÉFAUT. Il affirmait que « audit » devait valoir
+    // « levee », parce que la contrainte CHECK n'acceptait que quatre valeurs —
+    // et documentait ainsi comme voulu le fait que le rail annonce « Levée en
+    // capital » sur une opération d'audit. La migration `20260801180000` a
+    // rendu les six valeurs légitimes ; seul l'inconnu se replie désormais.
     expect(intentObjective("valeur-jamais-vue")).toBe("levee");
+    // « other » était l'ancien nom de « autre » : il n'est plus reconnu, et
+    // c'est sans conséquence — cette valeur ne vit que le temps d'un envoi de
+    // formulaire, jamais en base.
+    expect(intentObjective("other")).toBe("levee");
   });
 });
 
@@ -108,5 +115,50 @@ describe("operationSupportsInvestorTracking", () => {
         tracksMultipleFunders: true,
       }),
     ).toBe(true);
+  });
+});
+
+describe("les six intentions", () => {
+  it("proposent partout la même liste", () => {
+    expect(INTENTIONS).toHaveLength(6);
+    expect(INTENTIONS.map((i) => i.valeur)).toEqual([
+      "equity", "debt", "dfi", "diligence", "audit", "autre",
+    ]);
+  });
+
+  it("n’enregistrent plus « audit » et « autre » comme une levée", () => {
+    // C'était le défaut : la base ne connaissait que quatre valeurs, ces deux
+    // intentions y retombaient, et le rail annonçait « Levée en capital » sur
+    // une opération d'audit — à laquelle une levée était ouverte en prime.
+    expect(intentObjective("audit")).toBe("audit");
+    expect(intentObjective("autre")).toBe("autre");
+  });
+
+  it("gardent la correspondance des quatre premières", () => {
+    expect(intentObjective("equity")).toBe("levee");
+    expect(intentObjective("debt")).toBe("dette");
+    expect(intentObjective("dfi")).toBe("dfi");
+    expect(intentObjective("diligence")).toBe("diligence");
+  });
+
+  it("retombent sur « levee » pour une intention inconnue", () => {
+    // Mieux vaut l'objectif par défaut qu'un enregistrement refusé.
+    expect(intentObjective("nimportequoi")).toBe("levee");
+  });
+
+  it("donnent un libellé à chacun des six objectifs", () => {
+    for (const intention of INTENTIONS) {
+      const libelle = libelleObjectif(intention.objectif);
+      expect(libelle, intention.valeur).toBeTruthy();
+      // Le libellé ne doit pas être le code brut : c'est le repli, pas le but.
+      expect(libelle, intention.valeur).not.toBe(intention.objectif);
+    }
+  });
+
+  it("n’ouvrent une levée que pour les trois objectifs de financement", () => {
+    // `complete_onboarding` ouvre une ligne dans `raises` pour levee, dette et
+    // dfi. Audit, diligence et autre n'ont pas de levée à ouvrir.
+    const porteuses = INTENTIONS.filter((i) => intentCanCarryRaise(i.valeur));
+    expect(porteuses.map((i) => i.valeur)).toEqual(["equity", "debt", "dfi"]);
   });
 });
