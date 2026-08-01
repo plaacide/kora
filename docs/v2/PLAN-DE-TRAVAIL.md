@@ -7,11 +7,15 @@
 arbitrage, ce qui a été retenu, ce qui a été rejeté et pourquoi.
 
 ```text
-Référentiel   niveau 1   la bibliothèque interne        → LOT B
-Modèle        niveau 2   une sélection pour un besoin   → LOT D
+Référentiel   niveau 1   la bibliothèque interne        → LOT B ✅ table
+Modèle        niveau 2   une sélection pour un besoin   → LOT D    table
 Plan          niveau 3   la version d'une opération     → existe déjà
-                         (le seul niveau que le fondateur voit)
 ```
+
+Le fondateur travaille dans le **Plan**. Il ne manipule jamais le Référentiel ;
+il voit en revanche le **nom et la finalité du Modèle** appliqué, et peut en
+changer. Les deux premiers niveaux sont des tables, et non du code, parce que
+**investisseurs et accélérateurs les alimenteront** — voir `DECISIONS.md` §17.
 
 Les lots C, E, F et G enrichissent le passage du niveau 1 au niveau 3 :
 modificateurs, exigences manquantes, extensions sectorielles, structure de la
@@ -47,7 +51,7 @@ n'est pas commencé.
 
 | # | Décision | Lot bloqué | Ma recommandation |
 |---|---|---|---|
-| D1 | Modèles de préparation : **table** ou **constante TypeScript** ? | D | Constante — tant que vous êtes seul à les écrire, une table vous oblige à construire une administration pour vous-même. |
+| ~~D1~~ | ~~Modèles : table ou constante TypeScript ?~~ | — | **Tranchée : table.** J'avais recommandé la constante, sur l'hypothèse d'un auteur unique. Investisseurs et accélérateurs alimenteront le Référentiel : aucun d'eux ne peut attendre un déploiement pour corriger sa liste. Voir `DECISIONS.md` §17. |
 | D2 | Correspondance `audit →` et `diligence →` | D | À trancher avec V3, c'est le même travail. |
 | D3 | Voies fintech : 4 exigences alternatives, ou 1 exigence qui les énumère ? | F | Une seule, qui énumère. |
 | D4 | `complete_onboarding(p_create_room: true)` — le brief dit l'inverse (B-05) | C | Garder la création : un onboarding qui ne produit rien est pire. |
@@ -83,29 +87,27 @@ Si le point 2 échoue, le crochet n'est pas branché : voir `KNOWN-ISSUES.md` B-
 `checklist_catalog`. Équivalence prouvée par empreinte md5 : voir l'en-tête
 de `supabase/migrations/20260804120000_catalogue_des_exigences.sql`.
 
-Les 22 exigences sont un littéral JSONB dans `apply_checklist_template`. Tant
-que c'est le cas : aucun versionnement, aucune administration, et chaque mot
-corrigé est une migration.
+Les 22 exigences vivaient éclatées sur trois objets joints par la chaîne de
+l'intitulé. Elles sont désormais une table : interrogeable, modifiable sans
+redéploiement, et prête à recevoir un jour les contributions d'un accélérateur.
 
-**Ce lot ne change strictement rien à l'écran.** C'est sa qualité : il est
-vérifiable par l'absence de différence.
+Les deux fonctions auxiliaires et l'enum mort `checklist_category` ont disparu.
 
-### Ce que je fais
+**Ce lot n'a rien changé à l'écran** — c'était sa qualité, et c'est ce qui a été
+vérifié :
 
-1. Table `checklist_catalog` — les 22 exigences, avec `domain`, `level`,
-   `sources`, `freshness_days`, `expected_period`, `accepted_formats`.
-2. `apply_checklist_template` lit la table au lieu du littéral.
-3. Supprimer l'enum `checklist_category`, mort : aucune colonne ne l'utilise,
-   zéro occurrence dans `src/`.
-4. Un test qui compare le plan produit avant et après.
+| Contrôle | Résultat |
+|---|---|
+| Empreinte du catalogue, avant → après | `f367704828…` = `f367704828…` |
+| Plan d'une opération créée avant vs après | `d2a321f624…` = `d2a321f624…` |
+| Second appel sur la même opération | 0 exigence créée |
+| Rattachement aux dossiers | 22 sur 22 |
+| Tests · `tsc` | 346 passent · aucune erreur |
 
 ### Votre test
 
-1. Créer une opération **avant** que je livre → noter les exigences.
-2. Après livraison, créer une opération identique.
-3. **Les deux plans doivent être rigoureusement identiques.** Même nombre, mêmes
-   intitulés, mêmes domaines, mêmes niveaux.
-4. Ajouter une exigence à la main : elle apparaît toujours.
+Créer une opération : 22 exigences, mêmes intitulés, mêmes domaines, mêmes
+niveaux, mêmes badges qu'avant. Ajouter une exigence à la main : elle apparaît.
 
 ---
 
@@ -129,6 +131,22 @@ Et : **OHADA quitte `sources`** pour devenir le socle appliqué à toute
 opération. Un régime juridique n'est pas un financeur, et l'écran le présentait
 en badge à côté de « Banque » et « DFI ».
 
+**Le panneau « Basé sur ».** Dès que le plan varie, il doit dire pourquoi —
+c'est la contrepartie honnête des huit promesses retirées (`DECISIONS.md` §15) :
+
+```text
+Plan de préparation · 22 exigences
+
+Basé sur :
+  le socle juridique OHADA
+  votre forme juridique — SARL
+  votre stade — Pré-amorçage
+  votre échéance — 3 mois
+```
+
+Aucun chiffre annoncé avant que le plan existe : le compte est calculé, jamais
+promis.
+
 ### Votre test
 
 1. Onboarding avec **SARL / Sénégal / Pré-amorçage** → ouvrir la Préparation.
@@ -148,7 +166,7 @@ deux plans différents.**
 
 ---
 
-## LOT D — 🟠 Niveau 2 · Les modèles de préparation *(attend D1, D2)*
+## LOT D — 🟠 Niveau 2 · Les modèles de préparation *(attend D2)*
 
 `objectif → modèle`, et le catalogue filtré en conséquence.
 
@@ -159,11 +177,24 @@ fausse*. **Le Lot D se livre avec le Lot E, ou pas du tout.**
 
 ### Ce que je fais
 
-- Les 6 modèles, selon D1.
+**Les 6 modèles en table**, pas en constante — décision inversée, voir §1. Un
+modèle porte un nom, une finalité, une version, et la liste des exigences qu'il
+retient. La table est prête pour un propriétaire le jour où un accélérateur
+contribuera ; **la colonne n'est pas ajoutée aujourd'hui**, ajouter une colonne
+reste bon marché, réécrire la logique de sélection ne l'est pas.
+
 - `apply_checklist_template(p_deal, p_objectif)` filtre sur `sources`.
-- Pas d'écran de recommandation : le fondateur vient de répondre « un financement
-  bancaire », lui afficher « nous recommandons le modèle Financement bancaire »
-  est une mise en scène. Le plan s'applique, avec un lien **Changer de modèle**.
+- **Pas d'écran de recommandation.** Le fondateur vient de répondre « un
+  financement bancaire » ; lui afficher « nous recommandons le modèle Financement
+  bancaire » lui renvoie sa propre réponse. Le plan s'applique directement.
+- **Mais le modèle n'est pas caché** : son nom, sa finalité, le nombre
+  d'exigences et un lien **Changer de modèle** sont visibles. Ce sont les
+  *règles internes* qui restent invisibles, pas le modèle lui-même.
+- **La question contextuelle du financeur, pour la levée seule.** Le type est
+  déductible pour `dette`, `dfi`, `audit`, `diligence` — pas pour une levée, où
+  fonds, investisseurs individuels et institution de développement n'attendent
+  pas les mêmes pièces. Une question posée **là où l'ambiguïté existe**, et
+  nulle part ailleurs.
 - Changer de modèle **ne supprime jamais rien** : les exigences retirées passent
   en « non prioritaire », les pièces déposées restent.
 
@@ -306,3 +337,37 @@ travail (V3, V4), soit un compte d'essai (J).
 - Le **renouvellement d'abonnement réel**, qui dépend d'un tiers.
 - La **relecture juridique** des exigences sectorielles, qui devrait être faite
   par un cabinet local et non par moi.
+
+---
+
+## LOT L — ⚪ Le Référentiel contributif *(après la bêta)*
+
+Investisseurs et accélérateurs pourront apporter, modifier et ajouter des
+exigences. **Rien n'est construit maintenant**, mais deux choix sont déjà pris
+pour ne pas avoir à les défaire :
+
+- le Référentiel est une **table** (lot B, livré) ;
+- les Modèles seront une **table** (lot D) — c'est ce qui a fait renoncer à la
+  constante TypeScript.
+
+### Ce que ce lot ajoutera
+
+| | Chantier |
+|---|---|
+| 1 | Un **propriétaire** sur le catalogue et les modèles — `NULL` = Sanza |
+| 2 | Des politiques RLS par organisation — le référentiel d'un accélérateur ne fuite pas chez les autres |
+| 3 | La **provenance nominative** sur l'exigence matérialisée : « demandé par votre programme », et non « demandé par Sanza » |
+| 4 | Un écran d'administration pour le contributeur |
+| 5 | Le retrait propre des exigences d'un contributeur quand la relation prend fin |
+
+### Les quatre questions à trancher avant de commencer
+
+1. Un accélérateur **modifie-t-il** le référentiel Sanza, ou en **superpose-t-il**
+   un ? *(La superposition évite qu'un contributeur en dégrade un autre.)*
+2. Une exigence ajoutée par un investisseur s'applique-t-elle à **toutes** ses
+   opérations, ou seulement à celle qu'il examine ?
+3. Le fondateur peut-il **refuser** une exigence imposée par son programme ?
+4. Qui arbitre quand deux contributeurs demandent **la même pièce sous deux
+   noms** ?
+
+Aucune n'est technique. Toutes changent le produit.
