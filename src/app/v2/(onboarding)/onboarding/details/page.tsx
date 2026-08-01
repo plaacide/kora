@@ -46,13 +46,14 @@ export default async function OperationDetailsOnboardingPage({
           />
           <SelectField
             label="Devise"
+            defaultValue={saisie.devise}
             name="currency"
             options={["XOF", "EUR", "USD", "GHS"]}
           />
         </div>
         <SelectField
           label="Stade de la levée"
-          defaultValue={saisie.stade}
+          defaultValue={saisie.stadeLevee}
           name="roundStage"
           options={["Pré-amorçage", "Amorçage", "Série A", "Série B", "Série C et plus"]}
         />

@@ -91,9 +91,15 @@ export async function saveV2Details(formData: FormData) {
       p_name: null,
       p_country: null,
       p_sector: null,
-      p_stage: value(formData, "roundStage"),
+      // `p_stage` PORTE LA MATURITÉ DE L'ENTREPRISE, pas le stade du tour. Les
+      // deux écrivaient ici la même colonne : le dernier enregistré écrasait
+      // l'autre, et leurs listes ne coïncidaient même pas.
+      p_stage: null,
+      p_stade_levee: value(formData, "roundStage"),
       p_one_liner: null,
       p_amount: amount(value(formData, "targetAmount")),
+      // La devise était saisie puis jetée : aucun paramètre ne la portait.
+      p_devise: value(formData, "currency"),
       p_arr: null,
       p_objectif: null,
       p_horizon: value(formData, "targetDate"),

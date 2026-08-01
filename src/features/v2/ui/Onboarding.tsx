@@ -155,6 +155,20 @@ export function SelectField({
   groupes?: Array<{ titre: string; options: string[] }>;
   helper?: string;
 }) {
+  // UNE VALEUR ENREGISTRÉE HORS LISTE RESTE AFFICHÉE. Sans cela, elle
+  // disparaîtrait à l'écran tout en survivant en base : le champ paraîtrait
+  // vide, on le remplirait autrement, et la vraie valeur serait écrasée sans
+  // que personne ait vu ce qu'il perdait. Le cas est réel — un secteur
+  // « Fintech » enregistré sous une liste plus longue, puis absent de la liste
+  // raccourcie ; et « Série B », valide pour une levée, absent des choix de
+  // maturité d'entreprise.
+  const connues = groupes
+    ? groupes.flatMap((g) => g.options)
+    : (options ?? []);
+  const orpheline = defaultValue && !connues.includes(defaultValue)
+    ? defaultValue
+    : null;
+
   return (
     <label className="v2-field">
       <span>{label}</span>
@@ -173,6 +187,11 @@ export function SelectField({
           <option disabled value="">
             Choisissez…
           </option>
+          {orpheline && (
+            <option key={orpheline} value={orpheline}>
+              {orpheline}
+            </option>
+          )}
           {groupes
             ? groupes.map((groupe) => (
                 <optgroup key={groupe.titre} label={groupe.titre}>

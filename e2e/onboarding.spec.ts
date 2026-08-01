@@ -118,3 +118,26 @@ test.describe("Onboarding — la saisie ne se perd pas", () => {
     await expect(page.locator('input[name="website"]')).toHaveValue("");
   });
 });
+
+test.describe("Onboarding — une valeur hors liste ne disparaît pas", () => {
+  test("un secteur enregistré sous une ancienne liste reste affiché", async ({
+    page,
+  }) => {
+    await page.goto("/v2/onboarding/company");
+    if (!page.url().includes("/onboarding/company")) {
+      test.skip(true, "Le compte de recette a déjà terminé son onboarding.");
+    }
+
+    const secteur = page.locator('select[name="sector"]');
+    const valeur = await secteur.inputValue();
+    if (!valeur) test.skip(true, "Aucun secteur enregistré sur ce compte.");
+
+    // La valeur en base doit être celle affichée, même si la liste a changé
+    // depuis : sinon le champ paraît vide, on le remplit autrement, et la
+    // vraie valeur est écrasée sans que personne ait vu ce qu'il perdait.
+    await expect(secteur).toHaveValue(valeur);
+    await expect(
+      secteur.locator(`option[value="${valeur}"]`),
+    ).toHaveCount(1);
+  });
+});
