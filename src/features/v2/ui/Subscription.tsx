@@ -1,11 +1,12 @@
 import Link from "next/link";
 
 import {
-  joursRestants,
-  libelleStatut,
-  prixAffiche,
-  quantite,
-} from "@/features/v2/billing/format";
+  badgeEtat,
+  bandeauEtat,
+  etatAbonnement,
+  limiteLaPlusTendue,
+} from "@/features/v2/billing/etat";
+import { joursRestants, prixAffiche, quantite } from "@/features/v2/billing/format";
 import type {
   Abonnement,
   Consommation,
@@ -73,12 +74,12 @@ export function SubscriptionScreen({
   /** Ce qu'a donné la vérification au retour du prestataire, s'il y en a eu. */
   retourDePaiement?: string | null;
 }) {
-  const statut = abonnement
-    ? libelleStatut(abonnement.statut)
-    : { label: "Plan gratuit", tone: "neutral" };
+  const etat = etatAbonnement(abonnement);
+  const statut = badgeEtat(etat, abonnement?.finPeriode ?? null, dateJournal);
+  const bandeau = bandeauEtat(etat);
+  const tendue = limiteLaPlusTendue(consommation);
   const restant = joursRestants(abonnement?.finEssai ?? null, new Date());
-  const prix = prixAffiche(plan, "month");
-  const depassements = consommation.filter((c) => c.depasse);
+  const prix = prixAffiche(plan, abonnement?.intervalle === "year" ? "year" : "month");
 
   // Le document interdit d'afficher les neuf plans ensemble : on ne montre que
   // le segment de l'organisation.
@@ -119,6 +120,21 @@ export function SubscriptionScreen({
     <div className="v2-narrow-page">
       {retour?.texte && (
         <MessageTemporaire bon={retour.bon} texte={retour.texte} />
+      )}
+
+      {/* L'état de l'abonnement, quand il demande quelque chose. Ce bandeau ne
+          s'efface pas tout seul, contrairement au message de retour : il ne
+          raconte pas un événement passé, il décrit une situation en cours. */}
+      {bandeau && (
+        <div className="v2-plan-bandeau" data-ton={bandeau.ton} role="status">
+          <b>{bandeau.titre}</b>
+          <p>{bandeau.explication}</p>
+          {/* PAS DE BOUTON ICI, volontairement. Le geste que ce bandeau appelle
+              existe déjà dans sa propre carte, plus bas : reprendre dans la
+              carte Résiliation, souscrire dans « Changer de plan ». Deux
+              boutons qui font la même chose finissent par diverger, et l'un
+              des deux cesse de marcher sans que personne s'en aperçoive. */}
+        </div>
       )}
 
       {/* Le plan actuel — écran 76. Le nom porte le badge d'état à côté de lui
@@ -181,15 +197,23 @@ export function SubscriptionScreen({
 
       </section>
 
-      {depassements.length > 0 && (
+      {/* Limite atteinte — §5 du handoff. On NOMME la limite : « vous avez
+          atteint une limite » oblige à chercher laquelle, et personne ne
+          cherche. Rien n'est bloqué rétroactivement : ce qui est ouvert le
+          reste, seules les créations suivantes sont refusées. */}
+      {tendue && (
         <section className="v2-plan-card">
           <p className="v2-panel-note">
             <Icon name="shield" />
-            {depassements.length === 1
-              ? `Vous dépassez la limite « ${depassements[0].nom} » de votre plan.`
-              : `Vous dépassez ${depassements.length} limites de votre plan.`}{" "}
-            Rien n’est bloqué : c’est signalé pour que vous choisissiez — passer
-            à un plan supérieur, ou ramener l’usage sous la limite.
+            Vous avez atteint la limite « {tendue.nom} » de votre plan
+            {tendue.limite !== null
+              ? ` — ${quantite(tendue.code, tendue.utilise)} sur ${quantite(
+                  tendue.code,
+                  tendue.limite,
+                )}`
+              : ""}
+            . Ce qui existe déjà reste intact ; seules les créations suivantes
+            sont refusées. Libérez de la place, ou passez à un plan supérieur.
           </p>
         </section>
       )}

@@ -240,13 +240,18 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │                                répondront — pas avant.
    ├─ 🟢 Essayé pour de vrai      1er août : paiement Wave 21 750 XOF, webhook
    │                                signé reçu 11 s après, plan ouvert seul.
-   ├─ 🟡 Conforme aux écrans 75-77 la FORME l'est : les deux modales, le
-   │                                récapitulatif « À régler aujourd'hui »,
-   │                                « Choisir » en gris, la résiliation en
-   │                                ROUGE, la bascule qui porte sa remise.
-   │                                Restent les états — payment_pending,
-   │                                payment_failed, read_only, limit_reached,
-   │                                loading — et les factures.
+   ├─ 🟡 Conforme aux écrans 75-77 forme ET états. Les six états vivent dans
+   │                                `billing/etat.ts`, en logique pure : un
+   │                                seul endroit décide, dix-sept tests disent
+   │                                quoi. Reste le tableau des factures, qui
+   │                                attend la première facture réelle.
+   │                                DIVERGENCE ASSUMÉE : le handoff parle d'un
+   │                                seul état « lecture seule après échéance ».
+   │                                Notre modèle en distingue deux — l'impayé,
+   │                                qui doit de l'argent, et le résilié, qui ne
+   │                                doit rien et retombe au plan gratuit. Les
+   │                                confondre traiterait un client parti
+   │                                proprement comme un mauvais payeur.
    ├─ 🟢 Reprendre un abonnement  resume_workspace_subscription() : lève la
    │                                résiliation sans recalculer la période,
    │                                sinon résilier puis se raviser offrirait

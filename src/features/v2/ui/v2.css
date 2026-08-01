@@ -400,7 +400,11 @@
 .v2-usage-list>div>div:first-child span{color:var(--text-3);font-size:12px}
 .v2-usage-bar{height:5px;overflow:hidden;border-radius:999px;background:var(--line-soft)}
 .v2-usage-bar>span{display:block;height:100%;border-radius:999px;background:var(--orange)}
-.v2-usage-list>div[data-depasse=true] .v2-usage-bar>span{background:#b42318}
+/* AMBRE ET NON ROUGE. Une limite atteinte n'est pas une faute : c'est le plan
+   qui fait ce pour quoi il a été choisi. Le rouge est réservé à ce qui a
+   échoué — un paiement refusé. Crier pour un plafond normal apprend à ignorer
+   la couleur le jour où elle signale vraiment un problème. */
+.v2-usage-list>div[data-depasse=true] .v2-usage-bar>span{background:var(--amber)}
 .v2-usage-list>div[data-depasse=true] strong{color:#b42318}
 
 .v2-counted-list>div{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line-soft)}
@@ -467,6 +471,26 @@
 .v2-check-list li{display:flex;align-items:flex-start;gap:10px;color:var(--text-2);font-size:13.5px}
 .v2-check-list svg{width:15px;height:15px;flex-shrink:0;margin-top:2px;color:var(--green)}
 ul.v2-check-list{margin:0;padding:0;list-style:none}
+
+/* Les blocs d'attente. Le balayage reste LENT et discret : une animation
+   pressée donne l'impression que l'application s'agite sans avancer. Elle
+   s'efface pour qui a demandé moins de mouvement — un scintillement permanent
+   est pénible, et pour certaines personnes, davantage. */
+.v2-skel{border-radius:6px;background:linear-gradient(90deg,var(--line-soft) 25%,#f7f6f3 37%,var(--line-soft) 63%);background-size:400% 100%;animation:v2-skel-pass 1.4s ease-in-out infinite}
+@keyframes v2-skel-pass{0%{background-position:100% 50%}100%{background-position:0 50%}}
+@media(prefers-reduced-motion:reduce){.v2-skel{animation:none}}
+
+/* Le bandeau d'état. Il ne s'efface pas tout seul, contrairement au message de
+   retour de paiement : il ne raconte pas un événement passé, il décrit une
+   situation en cours. */
+.v2-plan-bandeau{border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.v2-plan-bandeau b{display:block;font:600 13.5px var(--font-v2-head),sans-serif}
+.v2-plan-bandeau p{margin:4px 0 0;color:var(--text-2);font-size:13px}
+.v2-plan-bandeau[data-ton=amber]{border-color:#fbd9a5;background:var(--amber-soft)}
+.v2-plan-bandeau[data-ton=amber] b{color:var(--amber)}
+.v2-plan-bandeau[data-ton=red]{border-color:#fbc9c4;background:var(--red-soft)}
+.v2-plan-bandeau[data-ton=red] b{color:var(--red)}
+.v2-plan-bandeau[data-ton=neutral]{background:var(--band)}
 
 /* La résiliation : une carte compacte, texte à gauche, bouton à droite.
    Jamais un lien flottant seul — le handoff l'interdit, et pour cause : un
