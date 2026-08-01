@@ -91,18 +91,31 @@ Trois valeurs, pour six intentions. Un audit légal, une diligence acheteur, une
 demande documentaire quelconque n'ont pas de case. Le rangement se fait donc
 au jugé, et les compteurs de préparation comptent des choses hétérogènes.
 
-### 3.2 Une exigence ne peut pas dire d'où elle vient
+### 3.2 ~~Une exigence ne peut pas dire d'où elle vient~~ — CORRIGÉ, J'AVAIS TORT
 
-`checklist_items` n'a aucune colonne de provenance. Conséquence directe :
-l'écran d'import de liste reçue (« Demandé par Banque Atlantique ») **est resté
-une maquette** — non par oubli, mais parce que le modèle ne sait pas porter
-l'information. Sans elle, une exigence importée devient indiscernable d'une
-exigence standard, et l'on ne peut plus répondre à « qu'est-ce que la banque m'a
-demandé, précisément ? ».
+**La première version de ce document affirmait que `checklist_items` n'avait
+aucune colonne de provenance, et en faisait sa recommandation numéro un.
+C'est faux.**
 
-C'est aussi ce qui bloque le cas **plusieurs financeurs en parallèle** — une
-levée et un prêt sur la même entreprise, avec deux listes qui se recoupent
-partiellement.
+La colonne existe : `sources text[]`. Elle est remplie, affichée en badges dans
+l'écran Préparation, filtrable, et le domaine sait même écrire « réclamée par la
+banque et le DFI ». Sur les vingt-trois exigences du modèle :
+
+| `sources` | Exemple |
+|---|---|
+| `{ohada, capital}` | PV des assemblées des 3 derniers exercices |
+| `{bank, dfi, capital}` | États financiers SYSCOHADA — 3 exercices |
+| `{dfi}` | Plan d'action E&S |
+| `{bank}` | Assurances en cours de validité |
+
+Un tableau est donc DÉJÀ le modèle cumulatif que la §5 proposait de concevoir —
+en mieux : porté par l'exigence elle-même, sans jointure, et sans risque de
+doublon puisqu'une ligne = une exigence.
+
+**Ce qui reste vrai** : le cas « plusieurs financeurs » n'est pas résolu pour
+autant, mais pour une autre raison. `sources` porte des CATÉGORIES de financeur
+— `bank`, `dfi` — pas des financeurs nommés. « Demandé par Banque Atlantique »
+reste impossible, et c'est ce qui bloque l'import de liste reçue.
 
 ### 3.3 Le stade est demandé deux fois, l'un écrasait l'autre
 
@@ -140,106 +153,80 @@ rien ne les ferme.
 
 ---
 
-## 5. Le système de référentiels
+## 5. Le système de référentiels — proposition révisée
 
-### 5.1 Ce qui existe déjà et qu'on ne refait pas
+### 5.1 L'écart réel, une fois l'erreur corrigée
 
-Trois affordances sont **posées et fonctionnelles** — il ne manque que le modèle
-derrière :
+Le modèle existe. Ce qui manque tient en une phrase :
 
-- `applyTemplateAction` — « Poser le référentiel sur une opération qui n'a pas
-  encore d'exigences ». Le bouton existe, il applique LE référentiel unique.
-- `create_data_room(p_template)` — le point d'entrée à la création.
-- `addRequirementAction` — l'ajout à la main, avec domaine et niveau.
+> `apply_checklist_template` insère les vingt-trois exigences **sans jamais
+> regarder `sources`**, alors que chacune sait déjà à qui elle s'adresse.
 
-**Le travail n'est donc pas d'inventer un parcours, mais de remplacer un
-booléen par un choix.**
+Le compte, mesuré sur la base :
 
-### 5.2 Le modèle proposé
+| Objectif | Exigences pertinentes | Sur 23 |
+|---|---:|---:|
+| Levée en capital | 8 + socle OHADA 7 | 15 |
+| Dette bancaire | 12 + socle OHADA 7 | 19 |
+| DFI / bailleur | 10 + socle OHADA 7 | 17 |
+
+Un fondateur préparant un prêt voit aujourd'hui « Marques OAPI enregistrées »,
+qui ne concerne qu'une levée en capital. Il ne s'agit pas de construire un
+système : il s'agit de **filtrer sur une colonne déjà remplie**.
+
+### 5.2 Ce qu'il faut, et rien de plus
+
+**1. Une correspondance objectif → financeur.** Quatre valeurs existent dans
+`sources` — `ohada`, `capital`, `bank`, `dfi` — pour six objectifs :
 
 ```text
-referentiels
-  id, nom, description
-  objectif          levee | dette | dfi | diligence | audit | autre | NULL
-  pays              code ou NULL
-  secteur           libellé ou NULL
-  actif
-
-referentiel_items
-  referentiel_id
-  domaine, intitule, description, niveau (requis | recommande)
-  ordre
-
-referentiel_dossiers
-  referentiel_id
-  chemin, ordre
+levee      → capital + ohada
+dette      → bank    + ohada
+dfi        → dfi     + ohada
+diligence  → ohada   + capital     (un acheteur regarde ce qu'un investisseur regarde)
+audit      → ohada                 (à valider : un auditeur demande-t-il autre chose ?)
+autre      → ohada                 (le socle, et rien de plus)
 ```
 
-`NULL` signifie **« s'applique à tout »**. Un référentiel OHADA porte
-`objectif = NULL, pays = NULL` et vaut partout en zone OHADA ; un référentiel
-« Prêt bancaire UEMOA » porte `objectif = 'dette', pays = NULL`. La sélection
-retient tous ceux qui correspondent, et **cumule** — c'est ce qui permet à une
-entreprise ivoirienne demandant un prêt de recevoir le socle OHADA *plus* les
-pièces bancaires, sans dupliquer le socle dans chaque référentiel.
+C'est le seul vrai arbitrage produit, et il tient en six lignes.
 
-Deux règles à ne pas manquer :
+**2. `apply_checklist_template` prend l'objectif** et n'insère que les exigences
+dont `sources` recoupe la liste. Une fonction, une signature.
 
-- **La déduplication se fait sur l'intitulé normalisé.** Deux référentiels
-  demandent « Statuts à jour » ; l'exigence doit apparaître une fois, en
-  portant ses deux provenances.
-- **Le référentiel appliqué est enregistré sur l'opération.** Sans cela, on ne
-  saura jamais pourquoi telle exigence est là, ni quoi faire quand le
-  référentiel évolue.
+**3. L'écran le dit.** Les badges de provenance existent déjà mais personne ne
+les remarque. Une phrase en tête de la Préparation — « 19 pièces, parce que vous
+préparez un dossier bancaire » — transforme un champ invisible en la
+démonstration la plus lisible de la promesse.
 
-### 5.3 Où ça se branche, dans l'ordre
+### 5.3 Ce que j'abandonne de ma première version
 
-**À la création — le cas principal.** `create_data_room` reçoit déjà `objectif`.
-Elle a besoin de deux paramètres de plus, `p_pays` et `p_secteur`, qu'elle peut
-d'ailleurs lire seule sur `startups`. C'est le seul changement structurel.
+- **Les tables `referentiels` / `referentiel_items`.** Elles dupliqueraient ce
+  que `sources` fait déjà, avec une jointure de plus et un modèle moins lisible.
+- **Le `NULL` qui vaut « tout ».** Astuce de base de données, pas concept
+  produit : personne — pas même l'équipe Sanza — ne peut prédire de tête ce que
+  produit une combinaison.
+- **La déduplication sur l'intitulé normalisé.** Elle était fragile — « Statuts
+  à jour » et « Statuts certifiés conformes » y auraient échappé. Le problème
+  disparaît : une ligne porte déjà plusieurs sources.
 
-**À l'onboarding — rien à faire.** Le pays, le secteur et l'objectif sont déjà
-collectés aux étapes 2 et 3, avant la création. Le tunnel n'a pas à bouger : ce
-sont les données qu'il récolte depuis toujours qui deviennent enfin utiles.
+### 5.4 Ce qui reste ouvert, et qui est le vrai chantier
 
-**Sur l'écran Préparation — l'ajout visible.** Le bouton « Appliquer un
-référentiel » existe ; il ouvre aujourd'hui une action muette. Il devient un
-choix : les référentiels applicables, ceux déjà appliqués, et un aperçu de ce
-que l'ajout apporterait. C'est là que se règle le cas du second financeur,
-arrivé après coup.
+`sources` porte des **catégories** de financeur, pas des financeurs nommés. Pour
+« la Banque Atlantique m'a envoyé cette liste », il faut une notion de
+**demandeur** distincte de la catégorie. C'est ce qui débloquerait l'import de
+liste reçue — et c'est un chantier réel, contrairement à ce que je proposais.
 
-**Sur l'import de liste — plus tard, et sans l'IA.** Une fois la provenance
-posée, importer devient : coller une liste, la rapprocher des exigences
-existantes, créer les manquantes en les attribuant à ce financeur. L'extraction
-automatique d'un PDF est un autre chantier, et n'est pas nécessaire pour que
-l'écran serve.
+Je ne le lancerais pas en premier : filtrer d'abord, mesurer si le besoin
+remonte ensuite.
 
-### 5.4 Ce que je ferais en premier
+### 5.5 Et l'option la moins chère, que je n'avais pas chiffrée
 
-1. **Poser la provenance sur `checklist_items`.** Une colonne, aucune interface.
-   Elle débloque tout le reste et ne casse rien.
-2. **Créer deux référentiels seulement** — le socle OHADA actuel, et un dossier
-   bancaire. Deux suffisent à prouver que le cumul fonctionne ; six inventés
-   d'un coup ne se valideraient auprès de personne.
-3. **Brancher la sélection à la création**, avec le référentiel enregistré.
-4. **Puis l'écran de choix**, une fois qu'il y a réellement quelque chose à
-   choisir.
+**Supprimer les quatre phrases qui promettent l'adaptation.** Quelques minutes,
+zéro migration. Le produit cesse de mentir immédiatement.
 
-### 5.5 Ce que je ne ferais pas
-
-**Ne pas faire du référentiel un réglage de compte.** Il appartient à
-l'opération : la même entreprise peut préparer une levée et un prêt la même
-semaine, avec deux listes distinctes.
-
-**Ne pas laisser modifier un référentiel appliqué.** Ce qui a été appliqué est
-figé sur l'opération ; faire évoluer le référentiel propose une mise à jour, ne
-l'impose pas. Sans quoi une exigence peut disparaître d'un dossier en cours de
-diligence, et personne ne saura pourquoi.
-
-**Ne pas les rendre modifiables par le client au départ.** Un référentiel est
-une affirmation sur ce qu'un financeur demande — c'est le métier de Sanza. Les
-ouvrir trop tôt produirait des listes fausses portant votre marque.
-
----
+Ce n'est pas ce que je recommande — le filtre coûte peu et vaut mieux — mais
+c'était une faute de ne pas la mettre sur la table. Si le filtre devait attendre
+plus de deux semaines, il faudrait retirer les phrases entre-temps.
 
 ## 6. Deux arbitrages qui vous reviennent
 
