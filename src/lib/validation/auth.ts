@@ -63,5 +63,18 @@ export type AuthState =
       fieldErrors?: Record<string, string[]>;
       /** Demande de réinitialisation acceptée (succès volontairement muet). */
       sent?: boolean;
+      /**
+       * Ce qui avait été saisi, pour le réafficher après un échec.
+       *
+       * React 19 RÉINITIALISE les champs non contrôlés dès qu'une action de
+       * formulaire se termine. Un mot de passe refusé, une adresse déjà prise,
+       * et le nom, l'adresse et la langue étaient à retaper — sur l'écran
+       * d'inscription, c'est là qu'on abandonne.
+       *
+       * LE MOT DE PASSE N'Y FIGURE JAMAIS. Le faire voyager jusqu'au serveur
+       * puis revenir dans un état de rendu le ferait exister dans le HTML
+       * envoyé au navigateur, et dans le cache de qui l'intercepte.
+       */
+      values?: Record<string, string>;
     }
   | undefined;

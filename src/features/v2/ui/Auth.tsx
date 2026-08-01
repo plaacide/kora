@@ -281,8 +281,17 @@ export function SignupForm({
   suivant?: string;
 }) {
   const [state, action, pending] = useActionState(signup, undefined);
-  const [role, setRole] = useState<AccountType>("founder");
-  const [jobTitle, setJobTitle] = useState("");
+
+  // CE QUI AVAIT ÉTÉ SAISI, réaffiché après un échec. React 19 réinitialise
+  // les champs non contrôlés dès qu'une action de formulaire se termine : sur
+  // « cette adresse est déjà prise », le nom, l'adresse et la langue étaient à
+  // retaper. Sur un écran d'inscription, c'est là qu'on abandonne.
+  const saisi = state?.values ?? {};
+
+  const [role, setRole] = useState<AccountType>(
+    (saisi.account_type as AccountType) || "founder",
+  );
+  const [jobTitle, setJobTitle] = useState(saisi.job_title ?? "");
 
   const roles: { value: AccountType; label: string }[] = [
     // Trois boutons côte à côte : « Une entreprise qui se finance » en faisait
@@ -335,6 +344,7 @@ export function SignupForm({
             <input
               aria-invalid={Boolean(state?.fieldErrors?.full_name)}
               autoComplete="name"
+              defaultValue={saisi.full_name ?? ""}
               name="full_name"
               required
             />
@@ -370,7 +380,7 @@ export function SignupForm({
             <input
               aria-invalid={Boolean(state?.fieldErrors?.email)}
               autoComplete="email"
-              defaultValue={email}
+              defaultValue={saisi.email ?? email ?? ""}
               name="email"
               required
               type="email"
@@ -384,7 +394,19 @@ export function SignupForm({
         <label className="v2-auth-field">
           <span>Langue</span>
           <span className="v2-auth-control">
-            <select defaultValue="fr" name="locale">
+            {/* LA CLÉ N'EST PAS DÉCORATIVE. Sur un `<input>`, React remet
+                l'attribut `defaultValue` et la réinitialisation de formulaire
+                le respecte : le nom et l'adresse reviennent seuls. Sur un
+                `<select>`, `defaultValue` n'agit qu'au MONTAGE — un nouveau
+                rendu ne le change plus, et la langue retombait sur « Français »
+                à chaque échec. Changer la clé force le remontage, et seulement
+                quand la valeur retenue a changé. Un `useState` ne marcherait
+                pas davantage : son initialiseur ne s'exécute qu'une fois. */}
+            <select
+              defaultValue={saisi.locale ?? "fr"}
+              key={saisi.locale ?? "fr"}
+              name="locale"
+            >
               <option value="fr">Français</option>
               <option value="en">English</option>
             </select>
@@ -427,6 +449,10 @@ export function LoginForm({
 }) {
   const [state, action, pending] = useActionState(login, undefined);
 
+  // L'adresse survit à un mot de passe refusé : seule la ligne fautive se
+  // retape. Le mot de passe, lui, ne revient jamais du serveur.
+  const saisi = state?.values ?? {};
+
   // Sans cet avis, un lien périmé ramenait à un formulaire de connexion muet :
   // rien n'expliquait pourquoi on se retrouvait là, et la seule sortie — en
   // redemander un — n'était pas proposée.
@@ -458,7 +484,7 @@ export function LoginForm({
             <Icon name="mail" />
             <input
               autoComplete="email"
-              defaultValue={email}
+              defaultValue={saisi.email ?? email ?? ""}
               name="email"
               required
               type="email"

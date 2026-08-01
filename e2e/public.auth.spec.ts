@@ -173,3 +173,50 @@ test.describe("Retours d’un lien d’e-mail", () => {
     await expect(page.locator(".v2-auth-notice")).toHaveCount(0);
   });
 });
+
+test.describe("La saisie survit à un échec d’inscription", () => {
+  /**
+   * React 19 RÉINITIALISE les champs non contrôlés dès qu'une action de
+   * formulaire se termine. Sur « cette adresse est déjà prise », le nom,
+   * l'adresse et la langue étaient à retaper — et c'est sur un écran
+   * d'inscription qu'on abandonne le plus vite.
+   */
+  test("le nom, l’adresse et la langue reviennent", async ({ page }) => {
+    await page.goto("/v2/inscription");
+
+    const nom = "Awa Diallo";
+    const adresse = `zz-test-${Date.now()}@exemple.ci`;
+
+    await page.locator('input[name="full_name"]').fill(nom);
+    await page.locator('input[name="email"]').fill(adresse);
+    await page.locator('input[name="password"]').fill("MotDePasseAssezLong9");
+    await page.locator('select[name="locale"]').selectOption("en");
+
+    // On laisse le poste vide : l'envoi part, le serveur refuse, et c'est ce
+    // retour d'erreur qui vidait tout le formulaire.
+    await page.getByRole("button", { name: /créer mon compte/i }).click();
+
+    await expect(page.locator(".v2-auth-field-error")).toBeVisible();
+
+    await expect(page.locator('input[name="full_name"]')).toHaveValue(nom);
+    await expect(page.locator('input[name="email"]')).toHaveValue(adresse);
+    // Le `<select>` est le cas retors : `defaultValue` n'agit qu'au montage,
+    // et sans clé la langue retombait sur « Français ».
+    await expect(page.locator('select[name="locale"]')).toHaveValue("en");
+  });
+
+  test("le mot de passe, lui, ne revient jamais du serveur", async ({ page }) => {
+    await page.goto("/v2/inscription");
+
+    await page.locator('input[name="full_name"]').fill("Awa Diallo");
+    await page.locator('input[name="email"]').fill(`zz-test-${Date.now()}@exemple.ci`);
+    await page.locator('input[name="password"]').fill("MotDePasseAssezLong9");
+    await page.getByRole("button", { name: /créer mon compte/i }).click();
+
+    await expect(page.locator(".v2-auth-field-error")).toBeVisible();
+
+    // Le faire voyager jusqu'au serveur puis revenir dans un état de rendu le
+    // ferait exister dans le HTML envoyé au navigateur.
+    expect(await page.content()).not.toContain("MotDePasseAssezLong9");
+  });
+});

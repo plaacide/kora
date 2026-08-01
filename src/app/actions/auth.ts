@@ -35,14 +35,26 @@ export async function signup(
     account_type: formData.get("account_type") ?? "founder",
   });
 
-  if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
+  // Ce qu'on rendra à l'écran si l'inscription échoue — sans le mot de passe,
+  // qui ne doit pas revenir dans le HTML.
+  const saisie = (): Record<string, string> => ({
+    full_name: String(formData.get("full_name") ?? ""),
+    job_title: String(formData.get("job_title") ?? ""),
+    email: String(formData.get("email") ?? ""),
+    locale: String(formData.get("locale") ?? "fr"),
+    account_type: String(formData.get("account_type") ?? "founder"),
+  });
+
+  if (!parsed.success) {
+    return { fieldErrors: flattenIssues(parsed.error), values: saisie() };
+  }
 
   // 15 créations de compte / heure / IP. Assez large pour une phase de test
   // intensif depuis une même IP ; l'inondation d'e-mails reste bornée par le
   // plafond horaire de Supabase (côté serveur, qui fait foi).
   const ip = await clientIp();
   if (!rateLimit(`signup:${ip}`, 15, 60 * 60 * 1000).ok) {
-    return { errorKey: "tooManyAttempts" };
+    return { errorKey: "tooManyAttempts", values: saisie() };
   }
 
   const { full_name, job_title, email, password, locale, account_type } = parsed.data;
@@ -81,7 +93,9 @@ export async function signup(
     },
   });
 
-  if (error) return mapError(error.message);
+  // C'EST ICI QUE ÇA COMPTE LE PLUS : « cette adresse est déjà prise », et
+  // tout le formulaire était à retaper.
+  if (error) return { ...mapError(error.message), values: saisie() };
 
   // La langue choisie à l'inscription pilote l'UI immédiatement.
   const store = await cookies();
@@ -108,18 +122,26 @@ export async function login(
     password: formData.get("password"),
   });
 
-  if (!parsed.success) return { fieldErrors: flattenIssues(parsed.error) };
+  if (!parsed.success) {
+    return {
+      fieldErrors: flattenIssues(parsed.error),
+      values: { email: String(formData.get("email") ?? "") },
+    };
+  }
 
   // 10 tentatives / 10 min / IP — anti brute-force naïf (cf. rate-limit.ts).
+  // Sur un mot de passe refusé, seule la ligne fautive doit se retaper.
+  const adresse = { email: String(formData.get("email") ?? "") };
+
   const ip = await clientIp();
   if (!rateLimit(`login:${ip}`, 10, 10 * 60 * 1000).ok) {
-    return { errorKey: "tooManyAttempts" };
+    return { errorKey: "tooManyAttempts", values: adresse };
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
-  if (error) return mapError(error.message);
+  if (error) return { ...mapError(error.message), values: adresse };
 
   // Aligne l'UI sur la langue enregistrée dans le profil.
   const {
