@@ -3,8 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
-import { messageDeRefus } from "@/features/v2/billing/limites";
 import { role } from "@/features/v2/domain/equipe";
+import {
+  type CodeErreur,
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { originFromHeaders } from "@/lib/app-origin";
 import { teamInvitationEmail } from "@/lib/email/templates";
 import { sendEmail } from "@/lib/email/send";
@@ -20,35 +25,17 @@ import { createClient } from "@/lib/supabase/server";
  * trois.
  */
 
-type Resultat = { ok: boolean; error?: string };
-
-/** Les messages de la base, dits en français à qui les lit. */
-const MESSAGES: Record<string, string> = {
-  "dernier propriétaire":
-    "C’est le seul propriétaire. Nommez-en un autre avant de changer celui-ci — sinon plus personne ne pourrait administrer l’organisation.",
-  "retrait de soi-même":
-    "Vous ne pouvez pas vous retirer vous-même depuis cet écran.",
-  "droits insuffisants":
-    "Seuls le propriétaire et les administrateurs gèrent l’équipe.",
-  "seul un propriétaire nomme un propriétaire":
-    "Seul un propriétaire peut nommer un autre propriétaire.",
-  "membre introuvable": "Ce collaborateur n’existe plus.",
-  "déjà dans l’équipe": "Cette personne fait déjà partie de l’équipe.",
-  "déjà dans l'équipe": "Cette personne fait déjà partie de l’équipe.",
-  "adresse invalide": "Cette adresse e-mail n’est pas valide.",
-  "rôle interne attendu": "Ce rôle n’est pas un rôle d’équipe.",
-  "invitation introuvable ou déjà traitée":
-    "Cette invitation a déjà été acceptée ou révoquée.",
-};
-
-function traduire(message: string): string {
-  // Un refus de plan passe en premier : il porte son issue, là où les autres
-  // messages ne font que constater.
-  const limite = messageDeRefus(message);
-  if (limite) return limite;
-
-  const cle = Object.keys(MESSAGES).find((m) => message.includes(m));
-  return cle ? MESSAGES[cle] : message;
+/**
+ * Le dictionnaire local a rejoint le catalogue commun, où il est testé.
+ *
+ * Reste ce que le catalogue ne peut pas savoir : « droits insuffisants » se dit
+ * mieux quand on sait de quel écran il vient. Ici, ce sont le propriétaire et
+ * les administrateurs qui gèrent l'équipe — la formulation générale ne le dirait
+ * pas, et c'est précisément ce que la personne a besoin de savoir.
+ */
+function codeEquipe(message: string): CodeErreur {
+  const code = codeDepuisPostgres(message);
+  return code === "droits.insuffisants" ? "equipe.droits_insuffisants" : code;
 }
 
 export async function setV2MemberRole(input: {
@@ -64,7 +51,7 @@ export async function setV2MemberRole(input: {
 
   if (error) {
     console.error("[v2 équipe] set_member_role échoué :", error);
-    return { ok: false, error: traduire(error.message) };
+    return echec(codeEquipe(error.message));
   }
 
   revalidatePath("/v2/team");
@@ -82,7 +69,7 @@ export async function removeV2Member(input: {
 
   if (error) {
     console.error("[v2 équipe] remove_member échoué :", error);
-    return { ok: false, error: traduire(error.message) };
+    return echec(codeEquipe(error.message));
   }
 
   revalidatePath("/v2/team");
@@ -101,7 +88,7 @@ export async function inviteV2Member(input: {
   organizationId: string;
   email: string;
   role: "owner" | "admin" | "member" | "internal_viewer";
-}): Promise<Resultat & { link?: string; emailError?: string; emailSkipped?: boolean }> {
+}): Promise<Resultat<{ link?: string; emailError?: string; emailSkipped?: boolean }>> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("invite_member", {
@@ -112,7 +99,7 @@ export async function inviteV2Member(input: {
 
   if (error) {
     console.error("[v2 équipe] invite_member échoué :", error);
-    return { ok: false, error: traduire(error.message) };
+    return echec(codeEquipe(error.message));
   }
 
   const ligne = (Array.isArray(data) ? data[0] : data) as {
@@ -120,7 +107,7 @@ export async function inviteV2Member(input: {
   } | null;
 
   if (!ligne?.token) {
-    return { ok: false, error: "L’invitation n’a pas pu être créée." };
+    return echec("equipe.invitation_non_creee");
   }
 
   // Derrière un proxy, `host` porte l'adresse d'écoute du conteneur et non le
@@ -163,7 +150,7 @@ export async function revokeV2Invitation(input: {
 
   if (error) {
     console.error("[v2 équipe] revoke_org_invitation échoué :", error);
-    return { ok: false, error: traduire(error.message) };
+    return echec(codeEquipe(error.message));
   }
 
   revalidatePath("/v2/team");

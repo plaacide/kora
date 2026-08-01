@@ -37,6 +37,7 @@ export type CodeErreur =
   | "operation.introuvable"
   // Équipe
   | "equipe.adresse_invalide"
+  | "equipe.droits_insuffisants"
   | "equipe.role_invalide"
   | "equipe.dernier_proprietaire"
   | "equipe.retrait_de_soi"
@@ -150,6 +151,8 @@ const MESSAGES: Record<CodeErreur, string> = {
     "Cette opération n’existe plus. Elle a peut-être été supprimée depuis un autre onglet.",
 
   "equipe.adresse_invalide": "Cette adresse e-mail n’est pas valide.",
+  "equipe.droits_insuffisants":
+    "Seuls le propriétaire et les administrateurs gèrent l’équipe.",
   "equipe.role_invalide": "Ce rôle n’est pas un rôle d’équipe.",
   "equipe.dernier_proprietaire":
     "C’est le seul propriétaire. Nommez-en un autre avant de changer celui-ci — sinon plus personne ne pourrait administrer l’organisation.",

@@ -16,6 +16,7 @@ import {
   type Membre,
   type RoleInterne,
 } from "@/features/v2/domain/equipe";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { dateJournal } from "@/features/v2/domain/journal";
 import type { InvitationEquipe } from "@/features/v2/server/equipe";
 
@@ -262,7 +263,7 @@ function InvitePanel({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(res.error ?? "L’invitation n’a pas pu être envoyée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -439,7 +440,7 @@ function ManagePanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "Le rôle n’a pas pu être changé.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -455,7 +456,7 @@ function ManagePanel({
 
     setBusy(null);
     if (!res.ok) {
-      setErreur(res.error ?? "Le collaborateur n’a pas pu être retiré.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 

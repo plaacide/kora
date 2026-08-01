@@ -29,6 +29,7 @@ const TOUS = [
   "operation.nom_requis",
   "operation.introuvable",
   "equipe.adresse_invalide",
+  "equipe.droits_insuffisants",
   "equipe.role_invalide",
   "equipe.dernier_proprietaire",
   "equipe.retrait_de_soi",
