@@ -240,6 +240,18 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    │                                répondront — pas avant.
    ├─ 🟢 Essayé pour de vrai      1er août : paiement Wave 21 750 XOF, webhook
    │                                signé reçu 11 s après, plan ouvert seul.
+   ├─ 🟢 Factures                 émises par SANZA, pas par le prestataire :
+   │                                eux encaissent, ils ne vendent rien.
+   │                                Numérotation continue et sans trou par
+   │                                année, sous verrou. Pas de PDF : rien n'en
+   │                                produit, et un lien qui ne télécharge rien
+   │                                est pire qu'une colonne absente.
+   ├─ 🟢 Courriers                 souscription, renouvellement, résiliation.
+   │                                Aucun ne dit « automatique » — un test le
+   │                                vérifie. Celui de résiliation ne retient
+   │                                personne. Un seul point d'envoi pour les
+   │                                deux chemins de paiement, sinon un client
+   │                                recevrait deux confirmations.
    ├─ 🟡 Conforme aux écrans 75-77 forme ET états. Les six états vivent dans
    │                                `billing/etat.ts`, en logique pure : un
    │                                seul endroit décide, dix-sept tests disent
@@ -420,12 +432,28 @@ autorisés — mais staging reste la première étape.
 9. **Cohortes** (31-32) — `cohort_links` n'existe pas.
 10. ~~Sécurité~~ — faite le 2 août. Restent les codes de récupération, qui
    demandent une mécanique de secours propre.
-11. **Abonnement** — socle, entitlements, écran et limites faits le 3 août.
-   Restent deux choses, et la première ne dépend de personne :
-   - **l'écran ne fait rien.** Il montre le plan, l'usage et les droits, mais
-     ne porte aucun bouton : on ne peut ni changer de plan ni résilier depuis
-     l'interface, alors que les trois actions serveur existent et marchent.
-   - ~~Genius Pay~~ — branché le 3 août. **Oui, ils font du récurrent** :
-     cycles, essai gratuit, résiliation en fin de cycle. Restent le téléphone
-     du payeur, que nous ne collectons pas, et la nature réelle du
-     renouvellement, qu'ils ne documentent pas.
+11. ~~Abonnement~~ — complet le 4 août : socle, entitlements, limites, écrans
+   75-77, six états, paiement Genius Pay éprouvé sur une vraie transaction,
+   factures émises, courriers envoyés. Ne restent que des dépendances externes
+   et un choix commercial :
+   - **le PDF des factures** — rien ne le produit. L'écran propose d'écrire
+     plutôt que d'afficher un lien qui ne télécharge rien.
+   - **le prorata** — « À régler aujourd'hui » affiche le tarif plein. La
+     règle est commerciale, pas technique : c'est au fondateur de la poser.
+   - **ce qui dépend de Genius Pay** : aucun événement `subscription.*` dans
+     leur tableau de bord, donc pas de reconduction ; aucune redirection
+     automatique après paiement ; aucune personnalisation de leur page.
+
+## Ce qui reste, tout écran confondu
+
+- **Cohortes** (31-32) — `cohort_links` n'existe pas. Le seul écran majeur des
+  maquettes qui n'a aucune existence.
+- **Pipeline investisseurs dans Vue d'ensemble** (maquette 10).
+- **Consultations des mises à jour** — `seen_raise_update()` existe et n'est
+  appelée nulle part : on ne sait pas qui a lu quoi.
+- **Import d'une liste** (13), **badges du rail**, **codes de récupération**.
+- **Chercher une exigence ou un dossier** — la recherche ne porte que sur les
+  pièces.
+- **Les limites n'ont jamais été éprouvées dans un navigateur** : vérifiées en
+  SQL sous identité authentifiée, jamais sur l'écran, faute d'un compte
+  accessible.
