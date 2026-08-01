@@ -44,11 +44,25 @@ export async function GET(request: NextRequest) {
     ? "/v2/mot-de-passe-oublie"
     : "/mot-de-passe-oublie";
 
+  const supabase = await createClient();
+
   if (!tokenHash || !type) {
+    // SANS JETON, LE LIEN A PEUT-ÊTRE DÉJÀ FAIT SON TRAVAIL.
+    //
+    // Quand le Send Email Hook n'est pas branché, Supabase envoie son gabarit
+    // par défaut, dont `{{ .ConfirmationURL }}` pointe vers SON point d'entrée
+    // `/verify`. Celui-ci consomme le jeton, ouvre la session, puis redirige
+    // ici — sans `token_hash`. On répondait « ce lien n'est plus valide » à
+    // quelqu'un qui venait d'être confirmé ET connecté : constaté le 1er août
+    // sur la recette, adresse confirmée à 14:25:04, message d'échec à l'écran
+    // dans la seconde.
+    //
+    // On regarde donc s'il y a une session avant de conclure à l'échec.
+    const { data } = await supabase.auth.getUser();
+    if (data.user) return NextResponse.redirect(`${origin}${destination}`);
+
     return NextResponse.redirect(`${origin}${connexion}?erreur=lien_invalide`);
   }
-
-  const supabase = await createClient();
 
   // Un jeton préfixé `pkce_` n'est pas un token_hash : c'est un code PKCE, et
   // `verifyOtp` le rejette. Les liens émis avant le passage au flux implicite
@@ -59,6 +73,14 @@ export async function GET(request: NextRequest) {
     : await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
 
   if (error) {
+    // MÊME RAISONNEMENT : un jeton à usage unique cliqué deux fois échoue la
+    // seconde fois, alors que la première a ouvert la session. Renvoyer
+    // redemander un lien à quelqu'un déjà connecté n'a aucun sens — et c'est
+    // fréquent, un client mail qui préaffiche les liens brûle le jeton avant
+    // même que la personne ne clique.
+    const { data } = await supabase.auth.getUser();
+    if (data.user) return NextResponse.redirect(`${origin}${destination}`);
+
     // Lien expiré ou déjà utilisé : on renvoie vers la demande, pas vers une
     // page d'erreur muette — l'utilisateur doit pouvoir en redemander un.
     return NextResponse.redirect(
