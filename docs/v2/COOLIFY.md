@@ -8,15 +8,14 @@ parce qu'on utilisera ce que tu as avec la V2 », puis « la V2 deviendra la
 production ». Le projet `bileqzpguyynkktndazs` est abandonné et n'a aucune
 donnée à reprendre : Sanza est en pré-lancement.
 
-**Conséquence à ne pas manquer.** Ce qu'on écrit aujourd'hui dans
-`jourzsgjnutktsrgxkoo` — comptes d'essai, organisations, documents — sera là au
-lancement si personne ne le retire. Le mot « recette » employé plus bas dans ce
-document est donc trompeur : il décrit un environnement séparé de l'ancienne
-production, pas une base jetable.
+**Sa base sera vidée avant l'ouverture** — « oublie ces données, le moment venu
+nous commencerons de zéro ». Écrire librement dedans est donc autorisé : comptes
+d'essai, organisations, documents, suite de tests, franchissement de limites de
+plan. Il n'y a rien à préserver.
 
-Toute écriture de test doit être identifiable. La suite Playwright préfixe ce
-qu'elle crée par `ZZ-TEST` ; la purge tient en une requête plutôt qu'en un tri
-à l'œil de noms plausibles.
+La suite Playwright préfixe malgré tout ce qu'elle crée par `ZZ-TEST` — par
+hygiène, pour qu'on distingue à tout moment un essai d'une saisie manuelle, pas
+parce qu'une purge sélective serait nécessaire.
 
 Créer une application Coolify distincte de la production :
 
