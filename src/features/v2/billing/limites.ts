@@ -69,20 +69,38 @@ export function refusDeLimite(message: string): RefusDeLimite | null {
   const trouve = message.match(/limite atteinte\s*:\s*([a-z_]+)/i);
   if (!trouve) return null;
 
-  const code = trouve[1];
-  const connu = REFUS[code];
+  return refusPourCle(trouve[1]);
+}
+
+/**
+ * Le refus correspondant à une clé de limite, sans passer par un message brut.
+ *
+ * Extrait de `refusDeLimite` pour que le catalogue d'erreurs — qui raisonne en
+ * codes et jamais en texte de base — puisse réutiliser ces mots plutôt que d'en
+ * écrire une seconde version qui divergerait au premier ajustement.
+ */
+export function refusPourCle(cle: string): RefusDeLimite {
+  const connu = REFUS[cle];
 
   if (!connu) {
     // Une limite qu'on n'a pas encore mise en mots : on le dit sans broder.
     return {
-      code,
+      code: cle,
       titre: "Votre plan ne permet pas ce geste",
       explication: "Une limite de votre abonnement a été atteinte.",
       issue: null,
     };
   }
 
-  return { code, ...connu };
+  return { code: cle, ...connu };
+}
+
+/** Les mêmes mots, d'un seul tenant, à partir de la clé. */
+export function texteDeRefus(cle: string): string {
+  const refus = refusPourCle(cle);
+  return [refus.titre + ".", refus.explication, refus.issue]
+    .filter(Boolean)
+    .join(" ");
 }
 
 /** Le message complet, d'un seul tenant, pour un bandeau d'erreur. */
