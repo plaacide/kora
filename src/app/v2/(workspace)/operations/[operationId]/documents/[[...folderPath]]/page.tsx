@@ -381,19 +381,18 @@ export default async function DocumentsPage({
         />
 
         {documents.length === 0 ? (
-          <section className="v2-drop-empty">
+          <section className="v2-drop-empty" data-compact="true">
             <EmptyArt name="files" />
             <h2>Ce dossier est vide</h2>
-            <p>Déposez-y vos pièces, ou choisissez un autre dossier.</p>
-            <div>
-              <DocumentUpload
-                folderId={folder.id}
-                operationId={operationId}
-                organizationId={organization.id}
-              >
-                Choisir des fichiers
-              </DocumentUpload>
-            </div>
+            {/* PAS DE SECOND BOUTON ORANGE. « Ajouter du contenu » est juste
+                au-dessus, dans la barre d'actions : le répéter trente pixels
+                plus bas ne pousse pas davantage à déposer, cela fait douter
+                qu'il s'agisse du même geste. La zone reste une cible de
+                glisser-déposer, ce que la phrase dit. */}
+            <p>
+              Glissez-déposez vos fichiers ici, ou utilisez « Ajouter du
+              contenu ».
+            </p>
           </section>
         ) : (
           <>

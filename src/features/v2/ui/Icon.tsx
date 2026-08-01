@@ -1,4 +1,4 @@
-export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus";
+export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize";
 
 const paths:Record<string,string[]>={
 // Rail — tracés repris à l'identique des maquettes du handoff.
@@ -34,7 +34,13 @@ move:["m15 14 5-5-5-5","M4 20v-7a4 4 0 0 1 4-4h12"],
 history:["M3 12a9 9 0 1 0 3-6.7L3 8","M3 3v5h5","M12 7v5l3.5 2"],
 star:["m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"],
 "eye-off":["M9.9 4.2A11 11 0 0 1 12 4c7 0 10 7 10 7a18 18 0 0 1-2.2 3.2M6.7 6.7A18 18 0 0 0 2 11s3 7 10 7a11 11 0 0 0 5.3-1.3","m2 2 20 20","M14.1 14.1a3 3 0 1 1-4.2-4.2"],
-"folder-plus":["M3 6h7l2 2h9v11H3z","M12 12v5","M9.5 14.5h5"]};
+"folder-plus":["M3 6h7l2 2h9v11H3z","M12 12v5","M9.5 14.5h5"],
+// Quatre coins qui s'écartent : le plein écran. J'avais pris « grid » et
+// « columns » — des icônes de MISE EN PAGE, qui promettent de changer la
+// disposition, pas d'agrandir. Une icône qui ment sur ce qu'elle fait est un
+// bouton qu'on n'ose plus cliquer.
+maximize:["M8 3H5a2 2 0 0 0-2 2v3","M21 8V5a2 2 0 0 0-2-2h-3","M3 16v3a2 2 0 0 0 2 2h3","M16 21h3a2 2 0 0 0 2-2v-3"],
+minimize:["M8 3v3a2 2 0 0 1-2 2H3","M21 8h-3a2 2 0 0 1-2-2V3","M3 16h3a2 2 0 0 1 2 2v3","M16 21v-3a2 2 0 0 1 2-2h3"]};
 
 /** Cercles des maquettes : `<circle>`, pas un chemin approché. */
 const circles:Record<string,Array<[number,number,number]>>={

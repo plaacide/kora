@@ -6,6 +6,7 @@ import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { PageImage } from "@/components/viewer/PageImage";
+import { SheetView } from "@/components/viewer/SheetView";
 import type { ViewerDocument } from "@/features/v2/server/viewer";
 import { Icon } from "./Icon";
 
@@ -83,6 +84,26 @@ export function SecureViewer({
     };
   }, [reveiller]);
 
+  /**
+   * En surcouche, la page dessous ne doit PAS défiler.
+   *
+   * `overscroll-behavior` empêche le défilement de se propager quand on atteint
+   * le bord du lecteur, mais il ne fait rien si le pointeur est sur les côtés
+   * translucides — là, la molette s'applique directement à la page derrière.
+   * On la fige donc le temps de la lecture, et on la rend telle qu'on l'a
+   * trouvée : écraser `overflow` sans le restaurer laisserait un écran bloqué
+   * après la fermeture.
+   */
+  useEffect(() => {
+    if (!enSurcouche) return;
+    const corps = window.document.body;
+    const avant = corps.style.overflow;
+    corps.style.overflow = "hidden";
+    return () => {
+      corps.style.overflow = avant;
+    };
+  }, [enSurcouche]);
+
   // Le navigateur peut sortir du plein écran sans nous prévenir — touche Échap,
   // geste système. Sans cette écoute, le bouton resterait à « quitter » alors
   // qu'on en est déjà sorti.
@@ -135,7 +156,9 @@ export function SecureViewer({
                 c'est ce qu'on cherche avant de commencer — « est-ce que j'ai
                 dix minutes ou une heure ». Il n'apparaît qu'une fois connu :
                 l'annoncer à zéro pendant le chargement serait faux. */}
-            {pageCount > 0 && ` · ${pageCount} page${pageCount > 1 ? "s" : ""}`}
+            {document.kind !== "sheet" &&
+              pageCount > 0 &&
+              ` · ${pageCount} page${pageCount > 1 ? "s" : ""}`}
             {document.folderName ? ` · ${document.folderName}` : " · Racine"} ·{" "}
             {document.operationName}
           </div>
@@ -174,7 +197,7 @@ export function SecureViewer({
           onClick={basculerPleinEcran}
           type="button"
         >
-          <Icon name={pleinEcran ? "columns" : "grid"} />
+          <Icon name={pleinEcran ? "minimize" : "maximize"} />
         </button>
 
         <span className="v2-viewer-flag">
@@ -220,6 +243,22 @@ export function SecureViewer({
             : undefined
         }
       >
+        {/* UN TABLEUR SE LIT EN GRILLE, PAS EN IMAGE — et c'est une décision
+            de fond, pas un raccourci. Un modèle financier rendu en PNG perd
+            ses colonnes au-delà de la largeur de page, ses formules, et tout
+            défilement horizontal : on voit un tableau sans pouvoir le lire.
+            `SheetView` existait déjà, écrit pour la V1 ; il n'était pas
+            branché ici, et le lecteur affichait donc une erreur là où il
+            suffisait de changer de vue. */}
+        {document.kind === "sheet" ? (
+          <SheetView
+            docIndex=""
+            docName={document.documentName}
+            key={document.versionId}
+            versionId={document.versionId}
+          />
+        ) : (
+          <>
         {/* `PageImage` porte son propre état d'échec : un format non rendable
             (tableur, archive) affiche sa propre explication à la place de
             l'image, sans faire tomber la visionneuse entière. */}
@@ -235,11 +274,17 @@ export function SecureViewer({
             versionId={document.versionId}
           />
         ))}
+          </>
+        )}
       </div>
 
       <footer className="v2-viewer-foot">
         <span>
-          {pageCount > 0 ? `Page ${current} sur ${pageCount}` : "Chargement…"}
+          {document.kind === "sheet"
+            ? "Tableur — lecture en grille"
+            : pageCount > 0
+              ? `Page ${current} sur ${pageCount}`
+              : "Chargement…"}
         </span>
         <span>·</span>
         <span>Chaque consultation est journalisée</span>
