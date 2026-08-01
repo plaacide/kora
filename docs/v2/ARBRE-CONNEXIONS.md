@@ -3,7 +3,7 @@
 La boussole du branchement : ce qui lit vraiment la base, ce qui affiche encore
 des données écrites en dur, et ce qui manque côté serveur pour finir.
 
-**Dernière vérification : 2 août 2026**, branche `v2/rebuild`. Établie en
+**Dernière vérification : 4 août 2026**, branche `v2/rebuild`. Établie en
 re-dérivant depuis le code — quels écrans importent `features/v2/server/*` — et
 en interrogeant la base de staging pour l'état réel des migrations. Ce document
 se périme : le relire avant de s'y fier.
@@ -101,7 +101,28 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 
 🟢 Data room                      listFolders(), listDocuments(), resolveFolderPath()
    ├─ 🟢 Arborescence             → folders (+ compte de pièces, accès invités)
+   ├─ 🟢 Pièces HORS DOSSIER      lues depuis le 1er août. Le dépôt les
+   │                                acceptait depuis toujours — c'est même le
+   │                                seul endroit possible sans structure — mais
+   │                                l'écran ne listait que les dossiers.
+   │                                38 fichiers étaient invisibles sur une
+   │                                seule opération.
    ├─ 🟢 Table des pièces         → documents + versions + exigences
+   ├─ 🟢 Consultations            guestViewsByDocument() — EXTERNES SEULEMENT.
+   │                                « 12 vues » ne dit rien si onze viennent de
+   │                                l'équipe qui a déposé le fichier.
+   ├─ 🟢 Menu « ⋯ » d'une pièce   ouvrir, renommer, déplacer, pièce clé,
+   │                                masquer, supprimer. Les six options
+   │                                affichées n'agissaient AUCUNE, « Supprimer »
+   │                                comprise — le pire cas : on la croit faite.
+   ├─ 🟢 Menu « ⋯ » d'un dossier  ouvrir, renommer, sous-dossier, supprimer.
+   │                                La suppression refuse un dossier non vide :
+   │                                un rangement n'emporte pas ce qu'il range.
+   ├─ 🟢 Renommer sur place       le nom devient le champ ; le clic ailleurs
+   │                                enregistre. Même geste depuis le menu.
+   ├─ 🟢 Trois actions            ajouter, partager, créer un dossier.
+   │                                « Request files » écartée : réclamer un
+   │                                document est une fonctionnalité entière.
    ├─ 🟢 Détail, versions, journal → restaurer, remplacer, masquer
    ├─ 🟢 Dépôt (écran 16)         → Storage direct + register_document, % réel
    └─ 🟢 Associations (écran 17)  → suggestions écrites non confirmées
@@ -115,11 +136,26 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
    ├─ 🟢 Aperçu invité (écran 25) → ce que l'invité verra vraiment
    └─ 🟢 Révocation               revoke_invitation()
 
-🟡 Lever                          activeRaise(), closedRaises()
+🟢 Lever                          activeRaise(), closedRaises()
    ├─ 🟢 Non configurée (35)      create_raise()
    ├─ 🟢 Configurer (36)          save_raise() — nom, stade, montant, devise,
-   │                                instrument, valorisation, échéance, audience
+   │                                instrument, valorisation, échéance, audience,
+   │                                et depuis le 4 août : ticket min/max,
+   │                                investisseur principal, part de capital,
+   │                                usage des fonds. L'écran l'avouait :
+   │                                « aucune colonne ne les porte ».
    ├─ 🟢 Vue de la levée (37)     → montants réels, progression calculée
+   ├─ 🟢 Paramètres essentiels    ÉTAIENT ÉCRITS EN DUR : « Série A · Prise de
+   │                                participation · 25 – 150 M XOF » s'affichait
+   │                                sur toutes les levées, y compris une levée
+   │                                vide. Un écran de synthèse qui invente ses
+   │                                chiffres est pire qu'un écran vide.
+   ├─ 🟢 Prochaines actions       prochainesActions() — dérivées du pipeline,
+   │                                PAS d'une table de tâches : « relancer
+   │                                Baobab » n'existe pas sans Baobab, et une
+   │                                table séparée créerait des orphelines.
+   ├─ 🟢 Activité récente         activiteRecenteLevee() → audit_log. Quatre
+   │                                lignes inventées s'y affichaient.
    ├─ 🟢 Clôturer (45)            close_raise()
    ├─ 🟢 Pipeline (38-40)         → voir Investisseurs ci-dessous
    ├─ 🟢 Engagements (43-44)      commitments(), commitmentHistory()
@@ -164,6 +200,24 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
       └─ 🟢 Notes internes        jamais visibles par l'investisseur
 🟢 Activité (journal)             operationJournal()    → audit_log de l'opération
 🟢 Visionneuse                    → /api/viewer, filigrane incrusté, audit par page
+   ├─ 🟢 En surcouche             posée SUR la data room, fond translucide,
+   │                                clic à côté pour refermer. Consulter une
+   │                                pièce n'est pas quitter la data room.
+   ├─ 🟢 PDF et bureautique       rendus page par page, filigrane dans les
+   │                                pixels — jamais en CSS, qui se retire.
+   ├─ 🟢 Images                   passent par le même canvas : servir un JPEG
+   │                                tel quel le rendrait récupérable d'un clic
+   │                                droit. Plafonnées à 1800 px de large.
+   ├─ 🟢 Tableurs                 SheetView, en grille. Il existait déjà pour
+   │                                la V1 et n'était pas branché ici. Un modèle
+   │                                financier en image perd ses colonnes.
+   ├─ 🟢 Zoom, plein écran        le zoom agit sur la largeur affichée, pas sur
+   │                                l'échelle de rendu : redemander chaque page
+   │                                relancerait autant de conversions.
+   ├─ 🟢 Barre effaçable          après 2,6 s d'immobilité — elle mange un
+   │                                cinquième de la page sur un portable.
+   └─ ⚪ Vidéos                    sans aperçu : un flux relève d'un autre
+                                    modèle, et le filigrane ne s'y applique pas.
 ```
 
 ## Le reste du produit
@@ -284,11 +338,37 @@ la demande du fondateur — à rouvrir quand tout sera connecté.
 ## Ce que le rail affiche
 
 ```
+🟢 Nom de l'opération       le rail affichait « Série A 2026 · Levée en
+                            capital » sur TOUTES les opérations, dossier
+                            bancaire compris.
+🟢 Sélecteur d'opérations   listOperationNames() — trois noms de maquette s'y
+                            affichaient, et chacun renvoyait à la liste au lieu
+                            d'ouvrir l'opération. Un sélecteur qui ne
+                            sélectionne rien. Les archivées viennent avec,
+                            signalées.
+🟢 Badge Privée/Partagée    suit un accès ouvert, non l'écran regardé
 🟢 Préparation  1/16        preparationProgress() — requis seul, comme l'écran
 🟢 Bandeau      « Partagée — 1 accès actif »  countActiveAccesses()
 🔴 Partage et accès         la maquette 24 montre un badge, pas encore branché
 🔴 Investisseurs, Lever     pas de badge
 ```
+
+## Largeur des écrans
+
+Neuf écrans s'arrêtaient entre 820 et 1130 px quand le conteneur global en
+offre 1380 : leurs colonnes se serraient pendant qu'un tiers de l'écran restait
+blanc. Portés à 1380 le 4 août — data room, préparation, journal, vue
+d'ensemble, accueil, opérations (860 auparavant, le plus étranglé), recherche,
+équipe.
+
+Restent étroits, et ce n'est pas un oubli : **abonnement, sécurité, invitations
+et les assistants** portent du texte de décision. Une ligne à 1380 px se lit
+mal, et la maquette 76 fixe 820 pour l'abonnement.
+
+Deux questions ouvertes, qui pèsent plus que ces neuf nombres : relever le
+plafond global au-delà de 1380 sur les très grands écrans, et rendre la colonne
+contextuelle repliable — ses 240 px permanents coûtent plus que tout ce qui a
+été gagné.
 
 ---
 
@@ -454,9 +534,11 @@ l'archiver, ni de la clôturer, ni de la supprimer. Le dossier de l'opération
 contient `overview`, `preparation`, `documents`, `access`, `lever`,
 `investors`, `activity` — et aucun `settings`.
 
-C'est ce trou qui rend mortes trois options du menu « ⋯ » : « Modifier » ne
-mène nulle part, et `OperationDialog` (clôture, archivage) est entièrement
-décoratif — ses boutons n'ont aucun gestionnaire.
+C'est ce trou qui a fait retirer trois options du menu « ⋯ » le 4 août —
+« Modifier », « Dupliquer la structure », « Exporter l'index » — plutôt que de
+les laisser ne rien faire. `OperationDialog` (clôture, archivage) reste
+entièrement décoratif : ses boutons de confirmation n'ont aucun gestionnaire.
+**Il s'affiche et ne fait rien** — à retirer du menu tant qu'il ne sert pas.
 
 **Tout est prêt en base**, rien n'est à écrire côté SQL :
 
@@ -487,6 +569,12 @@ alors que les fichiers restent.
 - **Consultations des mises à jour** — `seen_raise_update()` existe et n'est
   appelée nulle part : on ne sait pas qui a lu quoi.
 - **Import d'une liste** (13), **badges du rail**, **codes de récupération**.
+- **Usage des fonds** — la colonne existe et la vue de levée l'affiche, mais
+  aucun champ ne permet encore de le saisir : il faudrait une petite liste de
+  postes avec leurs parts.
+- **Vidéos dans la visionneuse** — sans aperçu. Un flux relève d'un autre
+  modèle de lecture, et le filigrane ne s'y applique pas de la même façon.
+- **Le PDF des factures** — rien ne le produit ; l'écran propose d'écrire.
 - **Chercher une exigence ou un dossier** — la recherche ne porte que sur les
   pièces.
 - **Les limites n'ont jamais été éprouvées dans un navigateur** : vérifiées en
