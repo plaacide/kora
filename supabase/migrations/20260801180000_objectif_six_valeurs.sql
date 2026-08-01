@@ -40,9 +40,14 @@ comment on column public.deals.objectif is
 -- ---------------------------------------------------------------------------
 -- save_startup — le garde-fou accepte les deux nouvelles valeurs.
 --
--- Seule cette ligne change : le reste du corps est repris à l'identique de
--- `20260731200000_objectif_quatre_valeurs.sql`, `create or replace` exigeant
--- la fonction entière.
+-- ⚠️ NE PAS RECOPIER `20260731200000` À L'AVEUGLE. Ce fichier-là appelle
+-- `public.startup_readiness(uuid)` et écrit dans `startups.readiness_score` :
+-- NI L'UNE NI L'AUTRE N'EXISTE. La base portait donc une version différente du
+-- fichier, et l'avoir repris tel quel a cassé tout l'onboarding pendant une
+-- heure — « function public.startup_readiness(uuid) does not exist ».
+--
+-- Leçon : avant tout `create or replace`, lire le corps réel avec
+-- `pg_get_functiondef`, jamais le fichier de migration supposé l'avoir posé.
 -- ---------------------------------------------------------------------------
 create or replace function public.save_startup(
   p_name text default null,
@@ -57,8 +62,6 @@ create or replace function public.save_startup(
 )
 returns void
 language plpgsql security definer set search_path = public as $$
-declare
-  v_readiness int;
 begin
   if auth.uid() is null then raise exception 'non authentifié'; end if;
 
@@ -87,9 +90,6 @@ begin
     objectif          = coalesce(p_objectif, s.objectif),
     horizon           = coalesce(excluded.horizon, s.horizon),
     updated_at        = now();
-
-  select public.startup_readiness(auth.uid()) into v_readiness;
-  update public.startups set readiness_score = v_readiness where owner_id = auth.uid();
 end;
 $$;
 

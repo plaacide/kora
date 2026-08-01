@@ -22,8 +22,12 @@
  */
 
 export const ZONES = [
-  "Afrique de l’Ouest",
+  // L'UEMOA d'abord : huit pays, une monnaie, un droit des sociétés commun
+  // (OHADA) et les mêmes pièces d'immatriculation. C'est le premier marché de
+  // Sanza, et le fondateur qui le cherche ne doit pas défiler pour le trouver.
+  "UEMOA",
   "Afrique Centrale",
+  "Afrique de l’Ouest (hors UEMOA)",
   "Afrique de l’Est",
   "Afrique Australe",
   "Afrique du Nord",
@@ -41,23 +45,15 @@ export type Zone = (typeof ZONES)[number];
 
 /** Pays d'exercice, rangés par zone. Le libellé fait foi : c'est lui qu'on stocke. */
 export const PAYS: Array<[string, Zone]> = [
-  // Afrique de l'Ouest
-  ["Bénin", "Afrique de l’Ouest"],
-  ["Burkina Faso", "Afrique de l’Ouest"],
-  ["Cap-Vert", "Afrique de l’Ouest"],
-  ["Côte d’Ivoire", "Afrique de l’Ouest"],
-  ["Gambie", "Afrique de l’Ouest"],
-  ["Ghana", "Afrique de l’Ouest"],
-  ["Guinée", "Afrique de l’Ouest"],
-  ["Guinée-Bissau", "Afrique de l’Ouest"],
-  ["Liberia", "Afrique de l’Ouest"],
-  ["Mali", "Afrique de l’Ouest"],
-  ["Mauritanie", "Afrique de l’Ouest"],
-  ["Niger", "Afrique de l’Ouest"],
-  ["Nigeria", "Afrique de l’Ouest"],
-  ["Sénégal", "Afrique de l’Ouest"],
-  ["Sierra Leone", "Afrique de l’Ouest"],
-  ["Togo", "Afrique de l’Ouest"],
+  // UEMOA
+  ["Burkina Faso", "UEMOA"],
+  ["Bénin", "UEMOA"],
+  ["Côte d’Ivoire", "UEMOA"],
+  ["Guinée-Bissau", "UEMOA"],
+  ["Mali", "UEMOA"],
+  ["Niger", "UEMOA"],
+  ["Sénégal", "UEMOA"],
+  ["Togo", "UEMOA"],
 
   // Afrique Centrale
   ["Cameroun", "Afrique Centrale"],
@@ -68,10 +64,19 @@ export const PAYS: Array<[string, Zone]> = [
   ["République démocratique du Congo", "Afrique Centrale"],
   ["Tchad", "Afrique Centrale"],
 
-  // Afrique de l'Est
+  // Afrique de l’Ouest (hors UEMOA)
+  ["Cap-Vert", "Afrique de l’Ouest (hors UEMOA)"],
+  ["Gambie", "Afrique de l’Ouest (hors UEMOA)"],
+  ["Ghana", "Afrique de l’Ouest (hors UEMOA)"],
+  ["Guinée", "Afrique de l’Ouest (hors UEMOA)"],
+  ["Liberia", "Afrique de l’Ouest (hors UEMOA)"],
+  ["Mauritanie", "Afrique de l’Ouest (hors UEMOA)"],
+  ["Nigeria", "Afrique de l’Ouest (hors UEMOA)"],
+  ["Sierra Leone", "Afrique de l’Ouest (hors UEMOA)"],
+
+  // Afrique de l’Est
   ["Burundi", "Afrique de l’Est"],
   ["Djibouti", "Afrique de l’Est"],
-  ["Éthiopie", "Afrique de l’Est"],
   ["Kenya", "Afrique de l’Est"],
   ["Madagascar", "Afrique de l’Est"],
   ["Maurice", "Afrique de l’Est"],
@@ -80,6 +85,7 @@ export const PAYS: Array<[string, Zone]> = [
   ["Somalie", "Afrique de l’Est"],
   ["Soudan", "Afrique de l’Est"],
   ["Tanzanie", "Afrique de l’Est"],
+  ["Éthiopie", "Afrique de l’Est"],
 
   // Afrique Australe
   ["Afrique du Sud", "Afrique Australe"],
@@ -92,10 +98,10 @@ export const PAYS: Array<[string, Zone]> = [
 
   // Afrique du Nord
   ["Algérie", "Afrique du Nord"],
-  ["Égypte", "Afrique du Nord"],
   ["Libye", "Afrique du Nord"],
   ["Maroc", "Afrique du Nord"],
   ["Tunisie", "Afrique du Nord"],
+  ["Égypte", "Afrique du Nord"],
 
   // Europe
   ["Albanie", "Europe"],
@@ -248,6 +254,7 @@ export const PAYS: Array<[string, Zone]> = [
   ["Îles Marshall", "Océanie"],
   ["Îles Salomon", "Océanie"],
 
+  // International
   ["Autre pays", "International"],
 ];
 
