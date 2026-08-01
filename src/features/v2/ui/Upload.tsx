@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { useState } from "react";
 
 import { Icon } from "./Icon";
@@ -11,6 +12,14 @@ import { Icon } from "./Icon";
  * Carte flottante en bas à droite, 420 px : le dépôt n'interrompt pas la
  * lecture de la data room derrière. Chevron pour la réduire, croix pour la
  * masquer, « Tout annuler » pour interrompre ce qui reste.
+ *
+ * RENDUE DANS UN PORTAIL, ET C'EST INDISPENSABLE. Elle est en `position:fixed`,
+ * donc censée se caler sur la fenêtre — mais `.v2-documents-page` porte
+ * `animation:v2-view … both`, dont l'état final conserve un `transform`. Un
+ * `transform`, même nul, fait de l'élément le référentiel de ses descendants
+ * fixes : la carte se posait alors au milieu de la page au lieu du bas de
+ * l'écran. Le portail vers `document.body` s'affranchit de cet ancêtre, et de
+ * tous ceux qu'une animation future pourrait rendre positionnants.
  *
  * Le pourcentage est mesuré, pas estimé — voir `DocumentUpload`, qui téléverse
  * en XHR précisément pour obtenir l'avancement que la maquette affiche.
@@ -55,14 +64,17 @@ export function UploadProgress({
 }) {
   const [reduite, setReduite] = useState(false);
 
-  if (uploads.length === 0) return null;
+  // Le rendu serveur n'a jamais de dépôt en cours — un dépôt naît d'un geste.
+  // La carte n'existe donc que côté navigateur, et le portail n'a pas de
+  // désaccord d'hydratation à craindre.
+  if (uploads.length === 0 || typeof document === "undefined") return null;
 
   const done = uploads.filter((row) => row.state === "done").length;
   const encours = uploads.some(
     (row) => row.state === "uploading" || row.state === "pending",
   );
 
-  return (
+  return createPortal(
     <section className="v2-upload-card" data-reduced={reduite}>
       <header>
         <b>
@@ -132,6 +144,7 @@ export function UploadProgress({
           </footer>
         </div>
       )}
-    </section>
+    </section>,
+    document.body,
   );
 }
