@@ -1,5 +1,6 @@
 import {
   attachableDocuments,
+  baseDuPlan,
   listRequirementsFull,
   requirementDetail,
   requirementHistory,
@@ -23,7 +24,10 @@ export default async function PreparationPage({
 }) {
   const [{ operationId }, query] = await Promise.all([params, searchParams]);
 
-  const requirements = await listRequirementsFull(operationId);
+  const [requirements, base] = await Promise.all([
+    listRequirementsFull(operationId),
+    baseDuPlan(operationId),
+  ]);
 
   const detail = query.exigence
     ? await requirementDetail(operationId, query.exigence)
@@ -40,6 +44,7 @@ export default async function PreparationPage({
     <>
       <PreparationPlan
         ajout={query.new === "1"}
+        base={base}
         operationId={operationId}
         requirements={requirements}
       />

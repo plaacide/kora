@@ -28,7 +28,12 @@ import {
   grouper,
   niveauLabel,
   requises,
+  baseSur,
+  financeurs,
+  relevesDuSocle,
+  SOCLE,
   sourceLabel,
+  type BaseDuPlan,
   type ExigenceBrute,
   type FiltreExigences,
   type GroupePieces,
@@ -65,11 +70,14 @@ export function PreparationPlan({
   operationId,
   requirements,
   ajout,
+  base,
 }: {
   operationId: string;
   requirements: readonly ExigenceBrute[];
   /** Ouvert par `?new=1` — le bouton de l'en-tête pointe déjà là. */
   ajout: boolean;
+  /** Ce qui a réellement fait varier ce plan. Voir `baseSur`. */
+  base: BaseDuPlan;
 }) {
   const router = useRouter();
   const [filtre, setFiltre] = useState<FiltreExigences>("toutes");
@@ -104,9 +112,9 @@ export function PreparationPlan({
         <EmptyMedallion icon="check" />
         <h2>Aucune exigence pour cette opération</h2>
         <p>
-          Le référentiel OHADA pose vingt-deux exigences réparties en trois
-          domaines, chacune rattachée au dossier où sa pièce se dépose. Vous
-          pourrez en ajouter, en retirer, et suivre ce qui manque.
+          Le référentiel pose vingt-deux exigences réparties en huit domaines,
+          chacune rattachée au dossier où sa pièce se dépose. Vous pourrez en
+          ajouter, en retirer, et suivre ce qui manque.
         </p>
         <div>
           <button
@@ -124,6 +132,15 @@ export function PreparationPlan({
 
   return (
     <>
+      {/* CE QUI A FAIT VARIER CE PLAN, et rien d'autre. Le serveur ne remonte
+          que les axes ayant produit une variante : une entreprise ivoirienne
+          ne verra pas son pays cité, parce qu'il n'a rien changé. Annoncer un
+          facteur sans effet serait la neuvième fausse promesse du produit. */}
+      <p className="v2-plan-basis">
+        <strong>{requirements.length} exigences</strong>, d’après{" "}
+        {baseSur(base).join(", ")}.
+      </p>
+
       {/* Deux lignes : les filtres, puis le compte. Le bouton « Ajouter une
           exigence » n'est plus ici — il faisait doublon avec celui de
           l'en-tête, qui ouvre le même panneau. */}
@@ -146,11 +163,14 @@ export function PreparationPlan({
           value={financeur}
         >
           <option value="">Par financeur</option>
-          {["ohada", "bank", "dfi", "capital"].map((source) => (
+          {["bank", "dfi", "capital"].map((source) => (
             <option key={source} value={source}>
               {sourceLabel(source)}
             </option>
           ))}
+          {/* Le socle n'est pas un financeur, mais on peut vouloir isoler ce
+              qui en découle : il figure à part, sous son propre intitulé. */}
+          <option value={SOCLE}>{sourceLabel(SOCLE)}</option>
         </select>
       </div>
 
@@ -189,9 +209,15 @@ export function PreparationPlan({
                       >
                         {niveauLabel(item.level)}
                       </span>
-                      {/* Qui réclame la pièce — plusieurs financeurs possibles,
-                          ce que l'ancienne catégorie unique interdisait. */}
-                      {item.sources.map((source) => (
+                      {/* Le socle juridique d'abord, distinct : il s'applique,
+                          il ne réclame pas. Puis les financeurs, plusieurs
+                          possibles — ce que l'ancienne catégorie interdisait. */}
+                      {relevesDuSocle(item.sources) && (
+                        <span className="v2-tag" data-socle="">
+                          {sourceLabel(SOCLE)}
+                        </span>
+                      )}
+                      {financeurs(item.sources).map((source) => (
                         <span className="v2-tag" key={source}>
                           {sourceLabel(source)}
                         </span>
@@ -446,7 +472,12 @@ export function RequirementPanel({
               >
                 {niveauLabel(requirement.level)}
               </span>
-              {requirement.sources.map((source) => (
+              {relevesDuSocle(requirement.sources) && (
+                <span className="v2-tag" data-socle="">
+                  {sourceLabel(SOCLE)}
+                </span>
+              )}
+              {financeurs(requirement.sources).map((source) => (
                 <span className="v2-tag" key={source}>
                   {sourceLabel(source)}
                 </span>

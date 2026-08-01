@@ -177,6 +177,13 @@
 .v2-result-cell>strong{font-size:14px;font-weight:500}
 .v2-result-folders{grid-column:1/-1;padding:18px 22px}
 .v2-result-folders>div{display:flex;margin-top:4px;flex-wrap:wrap;gap:6px}
+/* Le socle juridique n'est pas un financeur : il se distingue des pastilles
+   « Banque » et « DFI » au lieu de s'aligner avec elles. */
+.v2-tag[data-socle]{border-color:var(--line-soft);background:var(--band);color:var(--text-3)}
+/* Ce sur quoi le plan repose, en tête. Discret : c'est une explication, pas un
+   argument de vente — le produit a assez menti là-dessus. */
+.v2-plan-basis{margin:-14px 0 18px;color:var(--text-3);font-size:13px}
+.v2-plan-basis strong{color:var(--text-2);font-weight:600}
 .v2-tag{display:inline-flex;height:20px;align-items:center;border:1px solid var(--line);border-radius:4px;padding:0 7px;color:var(--text-2);font-size:11px;font-weight:500}
 .v2-private-note{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;background:var(--band);padding:14px 16px}
 .v2-private-note .v2-icon{width:20px;height:20px;color:var(--green)}

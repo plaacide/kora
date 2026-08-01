@@ -33,16 +33,37 @@ export function domaineLabel(domaine: string): string {
   return NOMS_DOMAINE.get(domaine) ?? domaine;
 }
 
-/** Qui réclame la pièce. Plusieurs par exigence. */
+/**
+ * Qui réclame la pièce. Plusieurs par exigence.
+ *
+ * `ohada` N'EST PAS DANS CETTE LISTE, et c'est le fond du sujet. L'écran
+ * l'affichait en pastille à côté de « Banque » et « DFI », présentant un
+ * RÉGIME JURIDIQUE comme s'il était un prêteur. L'OHADA ne réclame rien : il
+ * s'applique. Il constitue le socle commun aux quatorze pays proposés, et il
+ * se dit autrement — voir `SOCLE` et `relevesDuSocle`.
+ */
 const SOURCES: Record<string, string> = {
-  ohada: "OHADA",
   bank: "Banque",
   dfi: "DFI",
   capital: "Capital",
 };
 
+/** Le régime juridique commun, distinct de tout financeur. */
+export const SOCLE = "ohada";
+const SOCLE_LABEL = "Socle OHADA";
+
 export function sourceLabel(source: string): string {
-  return SOURCES[source] ?? source;
+  return source === SOCLE ? SOCLE_LABEL : (SOURCES[source] ?? source);
+}
+
+/** Les financeurs seuls — le socle en est retiré. */
+export function financeurs(sources: readonly string[]): string[] {
+  return sources.filter((s) => s !== SOCLE);
+}
+
+/** L'exigence découle-t-elle du socle juridique commun ? */
+export function relevesDuSocle(sources: readonly string[]): boolean {
+  return sources.includes(SOCLE);
 }
 
 /** Requis, Recommandé, Optionnel — ce qui décide de l'ordre de traitement. */
@@ -504,8 +525,11 @@ export function texteProchaineAction(action: ProchaineAction): {
         explication: `${
           action.exigence.level === "required" ? "Exigence requise" : "Exigence recommandée"
         } du domaine ${domaineLabel(action.exigence.domain)}${
-          action.exigence.sources.length
-            ? `, réclamée par ${action.exigence.sources.map(sourceLabel).join(" et ")}`
+          // Le socle s'applique, il ne réclame pas : la tournure change avec lui.
+          relevesDuSocle(action.exigence.sources) ? ", relevant du socle OHADA" : ""
+        }${
+          financeurs(action.exigence.sources).length
+            ? `, réclamée par ${financeurs(action.exigence.sources).map(sourceLabel).join(" et ")}`
             : ""
         }. ${action.exigence.description}`,
       };
@@ -528,4 +552,30 @@ export function texteProchaineAction(action: ProchaineAction): {
           "Les exigences requises sont prêtes et votre data room est partagée. Suivez l'activité de vos invités pour savoir quand relancer.",
       };
   }
+}
+
+/**
+ * Ce sur quoi le plan a réellement été construit.
+ *
+ * POURQUOI CE N'EST PAS UNE SIMPLE LISTE DES RÉPONSES. Annoncer « basé sur
+ * votre pays » à quelqu'un dont le pays n'a rien changé serait la neuvième
+ * fausse promesse du produit, après les huit retirées le 1er août. Le serveur
+ * ne remonte donc que les axes ayant EFFECTIVEMENT produit une variante sur ce
+ * plan — le reste n'est pas mentionné.
+ *
+ * Le socle OHADA figure toujours : il s'applique aux quatorze pays proposés,
+ * et c'est vrai de toute opération.
+ */
+export interface BaseDuPlan {
+  formeJuridique: string | null;
+  pays: string | null;
+  stade: string | null;
+}
+
+export function baseSur(base: BaseDuPlan): string[] {
+  const lignes = ["le socle juridique OHADA"];
+  if (base.formeJuridique) lignes.push(`votre forme juridique — ${base.formeJuridique}`);
+  if (base.pays) lignes.push(`votre pays d’immatriculation — ${base.pays}`);
+  if (base.stade) lignes.push(`votre stade — ${base.stade}`);
+  return lignes;
 }

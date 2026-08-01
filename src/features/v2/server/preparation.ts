@@ -6,6 +6,7 @@ import {
   compter,
   requises,
   grouperParDossier,
+  type BaseDuPlan,
   type DossierArbre,
   type ExigenceBrute,
   type GroupePieces,
@@ -487,5 +488,31 @@ export async function preparationProgress(
   return {
     ready: compte.pretes,
     due: compte.pretes + compte.aFournir + compte.aActualiser,
+  };
+}
+
+/**
+ * Les axes qui ont RÉELLEMENT fait varier ce plan.
+ *
+ * On interroge les variantes, pas les réponses : une entreprise ivoirienne a
+ * bien un pays, mais aucune variante ne s'y rattache aujourd'hui — l'annoncer
+ * comme un facteur serait faux. Voir `baseSur` dans le domaine.
+ */
+export async function baseDuPlan(operationId: string): Promise<BaseDuPlan> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .rpc("plan_basis", { p_deal: operationId })
+    .maybeSingle();
+
+  const ligne = data as {
+    forme_juridique?: string | null;
+    country?: string | null;
+    stage?: string | null;
+  } | null;
+
+  return {
+    formeJuridique: ligne?.forme_juridique ?? null,
+    pays: ligne?.country ?? null,
+    stade: ligne?.stage ?? null,
   };
 }
