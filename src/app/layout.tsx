@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, IBM_Plex_Mono, Instrument_Sans, Inter, Source_Serif_4, Space_Grotesk } from "next/font/google";
+import { IBM_Plex_Mono, Instrument_Sans, Inter, Space_Grotesk } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import "./globals.css";
@@ -29,9 +29,13 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
   display: "swap",
 });
+// UNE SEULE FAMILLE POUR TOUTE LA V2. Archivo servait aux titres et Source
+// Serif 4 à rien du tout — chargée sur chaque page, utilisée nulle part.
+// Archivo et Inter sont deux grotesques néo-modernes très proches : le titre
+// ne gagnait presque rien à changer de famille, et on payait deux
+// téléchargements pour un écart que personne ne voyait. Inter couvre les neuf
+// graisses ; la hiérarchie se fait au poids et à l'approche.
 const v2Sans=Inter({variable:"--font-v2-sans",subsets:["latin"],display:"swap"});
-const v2Head=Archivo({variable:"--font-v2-head",subsets:["latin"],weight:["500","600","700"],display:"swap"});
-const v2Serif=Source_Serif_4({variable:"--font-v2-serif",subsets:["latin"],display:"swap"});
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");
@@ -49,7 +53,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${plexMono.variable} ${instrument.variable} ${space.variable} ${v2Sans.variable} ${v2Head.variable} ${v2Serif.variable} h-full`}
+      className={`${plexMono.variable} ${instrument.variable} ${space.variable} ${v2Sans.variable} h-full`}
     >
       <body className="min-h-full antialiased" suppressHydrationWarning>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>

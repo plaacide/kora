@@ -17,10 +17,18 @@
      destructif, il porte le rouge. Une limite atteinte n'est pas une erreur :
      elle porte l'ambre. Les confondre revient à crier tout le temps. */
   --red:#b42318;--red-soft:#fef3f2;--amber:#b54708;--amber-soft:#fffaeb;
+  /* Les titres gardent leur variable — 46 déclarations s'y réfèrent, et le
+     nom dit toujours l'intention. Elle pointe simplement sur la même
+     famille : changer de police de titre reste une ligne à modifier. */
+  --font-v2-head:var(--font-v2-sans);
   min-height:100vh;background:#fff;color:var(--text);font:14px/1.5 var(--font-v2-sans),var(--font-instrument),sans-serif
 }
 .v2 *,.v2 *::before,.v2 *::after{box-sizing:border-box}.v2 a{color:inherit;text-decoration:none}
-.v2 h1,.v2 h2,.v2 h3{margin:0;font-family:var(--font-v2-head),var(--font-space),sans-serif;letter-spacing:-.015em}
+/* Avec une seule famille, le titre ne se distingue plus par son dessin. Il se
+   distingue par le poids et par une approche resserrée — Inter se crénant
+   large par défaut, un titre non resserré ressemble à du texte en gras. */
+.v2 h1,.v2 h2,.v2 h3{margin:0;font-family:var(--font-v2-head),sans-serif;font-weight:600;letter-spacing:-.022em}
+.v2 h1{letter-spacing:-.028em}
 .v2 :where(button,a,input,select,textarea):focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .v2-shell{display:flex;min-height:100vh}.v2-rail{position:sticky;top:0;z-index:30;display:flex;width:60px;height:100vh;flex:0 0 60px;flex-direction:column;align-items:center;gap:5px;border-right:1px solid var(--line);background:#fff;padding:14px 0}
 /* Le carré orange à lettre « S » n'était pas le logo. L'icône officielle porte
