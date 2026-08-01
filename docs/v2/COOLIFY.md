@@ -31,9 +31,41 @@ SANZA_V2_ENABLED=true
 SUPABASE_SERVICE_ROLE_KEY=<secret-du-projet-v2>
 RESEND_API_KEY=<secret-de-test>
 EMAIL_FROM=Sanza <noreply@sanza.africa>
+SEND_EMAIL_HOOK_SECRET=<v1,whsec_… généré par Supabase>
 ```
 
 Les secrets runtime ne doivent jamais porter le préfixe `NEXT_PUBLIC_`.
+
+### `SEND_EMAIL_HOOK_SECRET` — l'oubli qui coûte cher
+
+Cette variable manquait à ce document, et elle n'a donc jamais été posée en
+recette. Symptôme constaté le 1er août : Supabase, faute de crochet, expédiait
+ses gabarits par défaut — en anglais, depuis `noreply@mail.app.supabase.io` —
+dont le lien passe par SON point d'entrée `/verify` et n'atteint jamais
+`/auth/confirm` avec un `token_hash`.
+
+Elle se génère dans **Authentication → Hooks → Send Email Hook**, en déclarant :
+
+```text
+https://<domaine-de-cet-environnement>/api/auth/email-hook
+```
+
+L'ORDRE COMPTE. Dès que le crochet est activé, Supabase cesse d'envoyer
+lui-même : tant que le secret n'est pas déployé ici, la route répond 500 et
+AUCUN e-mail ne part. Créer le crochet, copier le secret, redéployer — sans
+s'interrompre entre les trois.
+
+Pour vérifier après déploiement :
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" -X POST \
+  https://<domaine>/api/auth/email-hook \
+  -H "content-type: application/json" -d '{}'
+```
+
+`401` est le bon résultat — signature refusée, donc le secret est lu. `500`
+signifie que la variable manque encore, et `404` que la route n'est pas
+déployée.
 
 ### Paiement — Genius Pay
 
@@ -100,6 +132,9 @@ d'accès, et elle suffit.
    sur un domaine de recette encaisse pour de vrai.
 9. Le webhook déclaré chez Genius Pay pointe vers CE domaine, et son `whsec_`
    est celui de CET environnement.
+10. Le Send Email Hook est déclaré dans Supabase et pointe vers CE domaine, et
+    `SEND_EMAIL_HOOK_SECRET` porte le secret de CE crochet. La sonde `curl`
+    ci-dessus renvoie `401`, jamais `500`.
 
 ## Migrations
 
