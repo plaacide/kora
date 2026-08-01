@@ -24,9 +24,23 @@ function manquants(): string[] {
     ["SEND_EMAIL_HOOK_SECRET", "courriel-crochet"],
   ];
 
-  return requis
+  const absents = requis
     .filter(([variable]) => !process.env[variable])
     .map(([, nom]) => nom);
+
+  // PRÉSENT NE VEUT PAS DIRE VALIDE. Le 1er août, la sonde annonçait
+  // `configuration_manquante: []` pendant que TOUTE inscription échouait :
+  // `EMAIL_FROM` valait « Sanza <onboarding@resend.dev> », l'adresse de test
+  // partagée de Resend. Avec elle, Resend refuse par 403 tout destinataire
+  // autre que le titulaire du compte — alors même que `sanza.africa` est
+  // vérifié. Une variable posée à une valeur qui garantit l'échec est pire
+  // qu'une variable absente : elle rassure.
+  const expediteur = process.env.EMAIL_FROM;
+  if (expediteur?.includes("resend.dev")) {
+    absents.push("courriel-expediteur-de-test");
+  }
+
+  return absents;
 }
 
 export function GET() {
