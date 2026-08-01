@@ -20,6 +20,15 @@ export interface InviteResult {
   emailSkipped?: boolean;
   emailError?: string;
   error?: string;
+  /**
+   * Le message de la base, non traduit.
+   *
+   * La V1 affiche `error`, déjà mis en français ici. La V2 raisonne en codes et
+   * traduit chez elle : elle a besoin de la matière première, que `error` a
+   * justement perdue en devenant lisible. Deux lecteurs, deux besoins — plutôt
+   * que de faire remonter à la V1 une frontière qu'elle n'a pas.
+   */
+  brut?: string;
 }
 
 export async function createInvitation(input: {
@@ -49,7 +58,13 @@ export async function createInvitation(input: {
 
   // Un refus de plan se dit avec son issue : « révoquez un accès, ou passez au
   // plan Raise » plutôt que « limite atteinte : external_visitors ».
-  if (error) return { ok: false, error: messageDeRefus(error.message) ?? error.message };
+  if (error) {
+    return {
+      ok: false,
+      error: messageDeRefus(error.message) ?? error.message,
+      brut: error.message,
+    };
+  }
 
   const invitation = data as { token: string; deal_id: string };
   const token = invitation.token;

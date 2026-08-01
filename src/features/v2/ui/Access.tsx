@@ -16,6 +16,7 @@ import {
   type FiltreAcces,
 } from "@/features/v2/domain/access";
 import { accessLevelLabel, initials } from "@/features/v2/domain/activity";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import type { AccessRow, ShareFolder } from "@/features/v2/server/access";
 import { EmptyMedallion } from "./EmptyArt";
 import { Icon } from "./Icon";
@@ -481,7 +482,7 @@ function ReviewStep({
 
     setBusy(false);
     if (!res.ok) {
-      setErreur(res.error ?? "L’accès n’a pas pu être créé.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 
@@ -765,7 +766,7 @@ function RevokeButton({
     setArme(false);
 
     if (!res.ok) {
-      setErreur(res.error ?? "L’accès n’a pas pu être fermé.");
+      setErreur(messageDErreur(res.code));
       return;
     }
     router.refresh();

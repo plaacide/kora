@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 
 import { createInvitation } from "@/app/actions/invitations";
+import {
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import type { Level } from "@/lib/permissions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -24,9 +29,9 @@ export async function createV2Access(input: {
   expiresAt: string | null;
   /** Dossiers choisis. `null` = toute la data room, présente et à venir. */
   folderIds: string[] | null;
-}): Promise<{ ok: boolean; error?: string; link?: string; emailFailed?: boolean }> {
+}): Promise<Resultat<{ link?: string; emailFailed?: boolean }>> {
   const email = input.email.trim().toLowerCase();
-  if (!email) return { ok: false, error: "Indiquez l’adresse du destinataire." };
+  if (!email) return echec("acces.destinataire_requis");
 
   // On délègue à l'action V1 : créer la ligne ne suffit pas, il faut fabriquer
   // le lien nominatif et l'envoyer. Un accès qui existe en base mais dont
@@ -42,7 +47,9 @@ export async function createV2Access(input: {
 
   if (!result.ok) {
     console.error("[v2 access] create_invitation échoué :", result.error);
-    return { ok: false, error: result.error };
+    // `brut` porte le message de la base ; `error` a déjà été mis en français
+    // pour la V1 et ne se laisse plus reconnaître.
+    return echec(codeDepuisPostgres(result.brut ?? ""));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
@@ -68,7 +75,7 @@ export async function createV2Access(input: {
 export async function revokeV2Access(input: {
   operationId: string;
   invitationId: string;
-}): Promise<{ ok: boolean; error?: string; removed?: number }> {
+}): Promise<Resultat<{ removed?: number }>> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("revoke_invitation", {
@@ -77,7 +84,7 @@ export async function revokeV2Access(input: {
 
   if (error) {
     console.error("[v2 access] revoke_invitation échoué :", error);
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
