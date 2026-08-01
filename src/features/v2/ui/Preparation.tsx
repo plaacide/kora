@@ -33,6 +33,7 @@ import {
   type FiltreExigences,
   type GroupePieces,
 } from "@/features/v2/domain/preparation";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 import { dateJournal } from "@/features/v2/domain/journal";
 import type { RequirementDetail } from "@/features/v2/server/preparation";
 import { EmptyMedallion } from "./EmptyArt";
@@ -258,7 +259,7 @@ function AddRequirement({ operationId }: { operationId: string }) {
     setBusy(false);
 
     if (!res.ok) {
-      setErreur(res.error ?? "L’exigence n’a pas pu être ajoutée.");
+      setErreur(messageDErreur(res.code));
       return;
     }
 

@@ -2,6 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -12,8 +17,6 @@ import { createClient } from "@/lib/supabase/server";
  * écrivent au journal. Une écriture directe sur `checklist_items` ferait
  * l'une des trois et oublierait les deux autres.
  */
-
-type Resultat = { ok: boolean; error?: string };
 
 function revalider(operationId: string): void {
   revalidatePath(`/v2/operations/${operationId}`, "layout");
@@ -27,7 +30,7 @@ export async function applyTemplateAction(operationId: string): Promise<Resultat
     p_deal: operationId,
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return echec(codeDepuisPostgres(error.message));
 
   revalider(operationId);
   return { ok: true };
@@ -49,7 +52,7 @@ export async function addRequirementAction(input: {
   description: string;
 }): Promise<Resultat> {
   const label = input.label.trim();
-  if (label.length < 2) return { ok: false, error: "Intitulé trop court." };
+  if (label.length < 2) return echec("exigence.intitule_trop_court");
 
   const supabase = await createClient();
 
@@ -64,7 +67,7 @@ export async function addRequirementAction(input: {
 
   if (error) {
     // La contrainte unique (deal, category, label) remonte en clair.
-    return { ok: false, error: error.message };
+    return echec(codeDepuisPostgres(error.message));
   }
 
   revalider(input.operationId);
@@ -83,7 +86,7 @@ export async function setRequirementStatusAction(input: {
   status: string;
 }): Promise<Resultat> {
   if (!["todo", "in_progress", "done", "not_applicable"].includes(input.status)) {
-    return { ok: false, error: "Statut inconnu." };
+    return echec("exigence.statut_inconnu");
   }
 
   const supabase = await createClient();
@@ -93,7 +96,7 @@ export async function setRequirementStatusAction(input: {
     p_status: input.status,
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return echec(codeDepuisPostgres(error.message));
 
   revalider(input.operationId);
   return { ok: true };
@@ -118,7 +121,7 @@ export async function attachProofAction(input: {
     p_confirmed: true,
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return echec(codeDepuisPostgres(error.message));
 
   revalider(input.operationId);
   return { ok: true };
@@ -137,7 +140,7 @@ export async function detachProofAction(input: {
     p_doc: input.documentId,
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return echec(codeDepuisPostgres(error.message));
 
   revalider(input.operationId);
   return { ok: true };
