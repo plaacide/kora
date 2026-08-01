@@ -7,9 +7,11 @@ export default async function V2SignupPage({
 }) {
   const { email, suivant } = await searchParams;
 
+  // `?suivant=` VIDE n'est pas `undefined` : le paramètre par défaut du
+  // composant ne s'appliquerait pas, et la destination retomberait sur la V1.
   return (
     <AuthFrame>
-      <SignupForm email={email} suivant={suivant} />
+      <SignupForm email={email} suivant={suivant || undefined} />
     </AuthFrame>
   );
 }

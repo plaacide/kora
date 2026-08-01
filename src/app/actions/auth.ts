@@ -61,9 +61,16 @@ export async function signup(
 
   // Où reprendre après l'inscription. Lu brut, validé par `cheminInterne` —
   // il n'entre pas dans `signupSchema` : ce n'est pas une donnée de compte.
+  //
+  // LE REPLI SUIT LA SURFACE. Il était écrit en dur sur `/onboarding`, celui de
+  // la V1 : dès que `suivant` manquait ou arrivait vide, le lien de
+  // confirmation portait `next=%2Fonboarding` et le fondateur qui venait de
+  // s'inscrire sur la V2 atterrissait dans l'autre produit. Le formulaire dit
+  // pourtant d'où il vient — `auth_surface` — et cette information était là,
+  // inutilisée, deux lignes plus haut.
   const dest = cheminInterne(
     formData.get("suivant") as string | null,
-    "/onboarding",
+    isV2 ? "/v2/onboarding" : "/onboarding",
   );
 
   // Flux implicite : le lien de confirmation doit s'ouvrir depuis n'importe
@@ -165,9 +172,11 @@ export async function login(
   // Où reprendre. Lu BRUT du formulaire — `loginSchema` ne le valide pas, et
   // ne doit pas : ce n'est pas une donnée de compte mais une destination, et
   // `cheminInterne` est sa seule validation légitime.
+  // Même correction qu'à l'inscription : sans destination, une connexion V2
+  // renvoyait vers le tableau de bord de la V1.
   const dest = cheminInterne(
     formData.get("suivant") as string | null,
-    "/dashboard",
+    isV2 ? "/v2" : "/dashboard",
   );
 
   const { data: aal } =

@@ -220,3 +220,35 @@ test.describe("La saisie survit à un échec d’inscription", () => {
     expect(await page.content()).not.toContain("MotDePasseAssezLong9");
   });
 });
+
+test.describe("Les destinations restent dans la V2", () => {
+  /**
+   * Le repli était écrit en dur sur `/onboarding` et `/dashboard`, ceux de la
+   * V1. Sans `?suivant=`, le lien de confirmation portait `next=%2Fonboarding`
+   * et le fondateur qui venait de s'inscrire sur la V2 atterrissait dans
+   * l'autre produit — après avoir cliqué un lien reçu par courriel, au moment
+   * précis où il découvre le produit.
+   */
+  test("le formulaire d’inscription vise l’onboarding V2", async ({ page }) => {
+    await page.goto("/v2/inscription");
+    await expect(page.locator('input[name="suivant"]')).toHaveValue(
+      "/v2/onboarding",
+    );
+  });
+
+  test("un ?suivant= vide ne fait pas retomber sur la V1", async ({ page }) => {
+    // Une chaîne vide n'est pas `undefined` : le paramètre par défaut du
+    // composant ne s'appliquerait pas.
+    await page.goto("/v2/inscription?suivant=");
+    await expect(page.locator('input[name="suivant"]')).toHaveValue(
+      "/v2/onboarding",
+    );
+  });
+
+  test("une destination fournie est respectée", async ({ page }) => {
+    await page.goto("/v2/inscription?suivant=%2Fv2%2Foperations");
+    await expect(page.locator('input[name="suivant"]')).toHaveValue(
+      "/v2/operations",
+    );
+  });
+});
