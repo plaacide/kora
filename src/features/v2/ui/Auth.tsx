@@ -285,7 +285,10 @@ export function SignupForm({
   const [jobTitle, setJobTitle] = useState("");
 
   const roles: { value: AccountType; label: string }[] = [
-    { value: "founder", label: "Une entreprise qui se finance" },
+    // Trois boutons côte à côte : « Une entreprise qui se finance » en faisait
+    // deux fois et demie la largeur des autres, et la ligne se cassait.
+    // L'écran dit déjà « Préparez votre financement » juste au-dessus.
+    { value: "founder", label: "Une entreprise" },
     { value: "investor", label: "Un investisseur" },
     { value: "sae", label: "Un programme" },
   ];

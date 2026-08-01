@@ -67,6 +67,7 @@ export default async function CompanyOnboardingPage({
           />
           <SelectField
             label="Forme juridique"
+            defaultValue={saisie.formeJuridique}
             name="legalForm"
             options={["SAS", "SA", "SARL", "Entreprise individuelle"]}
           />
@@ -75,6 +76,7 @@ export default async function CompanyOnboardingPage({
         <Field
           label="Numéro d’immatriculation"
           optional
+          defaultValue={saisie.immatriculation}
           name="registrationNumber"
           placeholder="SN-DKR-2021-B-12345"
         />
@@ -100,6 +102,7 @@ export default async function CompanyOnboardingPage({
         <Field
           label="Site internet"
           optional
+          defaultValue={saisie.siteWeb}
           name="website"
           placeholder="votreentreprise.com"
         />

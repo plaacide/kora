@@ -37,12 +37,15 @@ export interface SaisieOnboarding {
   /** Le « comment » du financement — son vocabulaire dépend de l'objectif. */
   modalite: string;
   horizon: string;
+  formeJuridique: string;
+  immatriculation: string;
+  siteWeb: string;
 }
 
 const VIDE: SaisieOnboarding = {
   nom: "", pays: "", secteur: "", stade: "",
   description: "", objectif: "", montant: "", devise: "", modalite: "",
-  horizon: "",
+  horizon: "", formeJuridique: "", immatriculation: "", siteWeb: "",
 };
 
 export async function saisieOnboarding(): Promise<SaisieOnboarding> {
@@ -55,7 +58,7 @@ export async function saisieOnboarding(): Promise<SaisieOnboarding> {
 
   const { data } = await supabase
     .from("startups")
-    .select("name, country, sector, stage, one_liner, objectif, amount_sought_usd, devise, modalite_financement, horizon")
+    .select("name, country, sector, stage, one_liner, objectif, amount_sought_usd, devise, modalite_financement, horizon, forme_juridique, numero_immatriculation, site_web")
     .eq("owner_id", user.id)
     .maybeSingle();
 
@@ -70,6 +73,9 @@ export async function saisieOnboarding(): Promise<SaisieOnboarding> {
     devise: string | null;
     modalite_financement: string | null;
     horizon: string | null;
+    forme_juridique: string | null;
+    numero_immatriculation: string | null;
+    site_web: string | null;
   } | null;
 
   return {
@@ -85,6 +91,9 @@ export async function saisieOnboarding(): Promise<SaisieOnboarding> {
     devise: ligne?.devise ?? "",
     modalite: ligne?.modalite_financement ?? "",
     horizon: ligne?.horizon ?? "",
+    formeJuridique: ligne?.forme_juridique ?? "",
+    immatriculation: ligne?.numero_immatriculation ?? "",
+    siteWeb: ligne?.site_web ?? "",
   };
 }
 

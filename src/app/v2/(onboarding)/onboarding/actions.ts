@@ -40,6 +40,12 @@ export async function saveV2Company(formData: FormData) {
     p_sector: value(formData, "sector"),
     p_stage: value(formData, "stage"),
     p_one_liner: value(formData, "description"),
+    // CES TROIS-LÀ ÉTAIENT SAISIS PUIS JETÉS : le formulaire les demandait,
+    // aucun paramètre ne les portait. On posait trois questions pour n'en
+    // garder aucune réponse.
+    p_forme_juridique: value(formData, "legalForm"),
+    p_numero_immatriculation: value(formData, "registrationNumber"),
+    p_site_web: value(formData, "website"),
     p_amount: null,
     p_arr: null,
     p_objectif: null,
