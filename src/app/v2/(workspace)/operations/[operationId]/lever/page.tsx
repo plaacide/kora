@@ -4,8 +4,10 @@ import {
 } from "@/features/v2/server/commitments";
 import {
   activeRaise,
+  activiteRecenteLevee,
   pipelineInteractions,
   pipelineInvestors,
+  prochainesActions,
 } from "@/features/v2/server/raise";
 import { listAccesses } from "@/features/v2/server/access";
 import { documentarySignals } from "@/features/v2/server/fiche";
@@ -37,6 +39,8 @@ export default async function LeverPage({
     historique,
     majListe,
     acces,
+    prochaines,
+    activite,
   ] = await Promise.all([
     activeRaise(operationId),
     pipelineInvestors(operationId),
@@ -45,6 +49,11 @@ export default async function LeverPage({
     commitmentHistory(operationId),
     updates(operationId),
     listAccesses(operationId),
+    // « Prochaines actions » et « Activité récente » affichaient quatre lignes
+    // inventées chacune, sur toutes les levées. Un écran qui dit quoi faire
+    // aujourd'hui doit dire ce qu'il y a à faire.
+    prochainesActions(operationId),
+    activiteRecenteLevee(operationId),
   ]);
 
   // Le détail d'une mise à jour ne se charge que si l'URL en désigne une :
@@ -64,6 +73,8 @@ export default async function LeverPage({
   return (
     <Lever
       acces={acces}
+      activite={activite}
+      prochaines={prochaines}
       engagements={engagements}
       historique={historique}
       interactions={interactions}

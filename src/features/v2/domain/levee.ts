@@ -115,3 +115,64 @@ export function ecartDeRepartition(usages: readonly UsageDesFonds[]): number | n
   const somme = retenus.reduce((total, u) => total + u.part, 0);
   return somme === 100 ? null : somme - 100;
 }
+
+/**
+ * Ce qu'une ligne de journal raconte, en français.
+ *
+ * LE JOURNAL PORTE DES CODES — `commitment.recorded`, `raise_investor.saved` —
+ * et l'écran affichait des phrases inventées : « Engagement confirmé enregistré
+ * — Sahel Growth Fund, 120 M XOF » sur toutes les levées, y compris celles qui
+ * n'avaient jamais rien enregistré. On traduit ce qui s'est réellement passé.
+ *
+ * Une action inconnue rend son code plutôt qu'une phrase vague : le jour où une
+ * action est ajoutée sans être traduite, l'écran le montre au lieu de la taire.
+ */
+const ACTIONS_JOURNAL: Record<string, string> = {
+  "raise.opened": "Levée ouverte",
+  "raise.updated": "Levée modifiée",
+  "raise.closed": "Levée clôturée",
+  "raise_investor.saved": "Investisseur enregistré",
+  "raise_investor.deleted": "Investisseur retiré",
+  "commitment.recorded": "Engagement enregistré",
+  "commitment.requalified": "Engagement requalifié",
+  "interaction.logged": "Interaction consignée",
+  "update.published": "Mise à jour publiée",
+};
+
+export function libelleActionJournal(action: string): string {
+  return ACTIONS_JOURNAL[action] ?? action;
+}
+
+/**
+ * Une échéance dite comme on la dit — « demain », « en retard · 26 juil. ».
+ *
+ * Les trois jours qui viennent portent un mot plutôt qu'une date : « demain »
+ * se comprend sans compter, « 2 août » demande de savoir quel jour on est.
+ */
+export function libelleEcheance(
+  iso: string | null,
+  maintenant: Date = new Date(),
+): { texte: string; enRetard: boolean } {
+  if (!iso) return { texte: "sans échéance", enRetard: false };
+
+  const jour = new Date(iso);
+  const zero = (d: Date) => {
+    const c = new Date(d);
+    c.setHours(0, 0, 0, 0);
+    return c.getTime();
+  };
+
+  const ecart = Math.round((zero(jour) - zero(maintenant)) / 86_400_000);
+
+  if (ecart < 0) {
+    const date = jour.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+    return { texte: `en retard · ${date}`, enRetard: true };
+  }
+  if (ecart === 0) return { texte: "aujourd’hui", enRetard: false };
+  if (ecart === 1) return { texte: "demain", enRetard: false };
+
+  return {
+    texte: jour.toLocaleDateString("fr-FR", { day: "numeric", month: "short" }),
+    enRetard: false,
+  };
+}

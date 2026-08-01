@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   ecartDeRepartition,
   fourchetteTicket,
+  libelleActionJournal,
+  libelleEcheance,
   libelleInstrumentLevee,
   libelleLead,
   libelleStade,
@@ -120,5 +122,56 @@ describe("ecartDeRepartition", () => {
 
   it("rend null quand aucun poste n’est nommé", () => {
     expect(ecartDeRepartition([])).toBeNull();
+  });
+});
+
+describe("libelleActionJournal", () => {
+  it("traduit les codes du journal", () => {
+    expect(libelleActionJournal("commitment.recorded")).toBe("Engagement enregistré");
+    expect(libelleActionJournal("update.published")).toBe("Mise à jour publiée");
+  });
+
+  it("montre le code d’une action non traduite plutôt que de la taire", () => {
+    // Le jour où une action est ajoutée sans libellé, l'écran doit le dire —
+    // une phrase vague ferait croire qu'on sait de quoi il s'agit.
+    expect(libelleActionJournal("raise.exported")).toBe("raise.exported");
+  });
+});
+
+describe("libelleEcheance", () => {
+  const aujourdhui = new Date("2026-08-01T10:00:00Z");
+
+  it("dit les trois prochains jours avec des mots", () => {
+    // « demain » se comprend sans compter ; « 2 août » demande de savoir quel
+    // jour on est.
+    expect(libelleEcheance("2026-08-01", aujourdhui).texte).toBe("aujourd’hui");
+    expect(libelleEcheance("2026-08-02", aujourdhui).texte).toBe("demain");
+  });
+
+  it("signale le retard et le date", () => {
+    const passe = libelleEcheance("2026-07-26", aujourdhui);
+    expect(passe.enRetard).toBe(true);
+    expect(passe.texte).toContain("en retard");
+    expect(passe.texte).toContain("26");
+  });
+
+  it("date simplement ce qui est plus loin", () => {
+    const plusTard = libelleEcheance("2026-08-20", aujourdhui);
+    expect(plusTard.enRetard).toBe(false);
+    expect(plusTard.texte).toContain("20");
+  });
+
+  it("ne prétend pas qu’une action sans date est en retard", () => {
+    expect(libelleEcheance(null, aujourdhui)).toEqual({
+      texte: "sans échéance",
+      enRetard: false,
+    });
+  });
+
+  it("compare des JOURS, pas des instants", () => {
+    // Une échéance à ce matin ne doit pas passer « en retard » à midi : on
+    // compare des journées, sinon une tâche du jour bascule en rouge à l'heure
+    // du déjeuner.
+    expect(libelleEcheance("2026-08-01T06:00:00Z", aujourdhui).enRetard).toBe(false);
   });
 });

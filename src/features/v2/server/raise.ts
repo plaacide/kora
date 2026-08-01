@@ -251,3 +251,148 @@ export async function pipelineInteractions(
     dateRelance: row.date_relance,
   }));
 }
+
+export interface ActionAVenir {
+  investisseurId: string;
+  organisation: string;
+  action: string;
+  responsable: string | null;
+  echeance: string | null;
+  /** L'échéance est-elle dépassée ? Calculé au serveur, pas à l'affichage. */
+  enRetard: boolean;
+}
+
+/**
+ * Ce qu'il reste à faire, dérivé du pipeline.
+ *
+ * PAS DE TABLE DE TÂCHES, et c'est délibéré : une prochaine action appartient à
+ * une relation — « relancer Baobab » n'existe pas sans Baobab. La colonne vit
+ * donc sur l'investisseur, et cet écran ne fait que rassembler celles qui sont
+ * renseignées. Une table séparée aurait créé des tâches orphelines dès la
+ * première suppression d'investisseur.
+ *
+ * Les échéances passées d'abord, puis les plus proches : on ouvre cet écran
+ * pour savoir quoi faire aujourd'hui, pas pour lire un inventaire.
+ */
+export async function prochainesActions(
+  operationId: string,
+  limite = 6,
+): Promise<ActionAVenir[]> {
+  const supabase = await createClient();
+
+  const { data: raise } = await supabase
+    .from("raises")
+    .select("id")
+    .eq("deal_id", operationId)
+    .eq("statut", "en_cours")
+    .maybeSingle();
+
+  const raiseId = (raise as { id: string } | null)?.id;
+  if (!raiseId) return [];
+
+  const { data, error } = await supabase
+    .from("raise_investors")
+    .select("id, nom, organisation, responsable, prochaine_action, date_relance")
+    .eq("raise_id", raiseId)
+    .not("prochaine_action", "is", null);
+
+  if (error) {
+    console.error("[v2 lever] prochaines actions :", error);
+    return [];
+  }
+
+  const aujourdhui = new Date();
+  aujourdhui.setHours(0, 0, 0, 0);
+
+  return ((data ?? []) as Array<{
+    id: string;
+    nom: string;
+    organisation: string | null;
+    responsable: string | null;
+    prochaine_action: string | null;
+    date_relance: string | null;
+  }>)
+    .filter((row) => row.prochaine_action?.trim())
+    .map((row) => ({
+      investisseurId: row.id,
+      organisation: row.organisation?.trim() || row.nom,
+      action: row.prochaine_action as string,
+      responsable: row.responsable,
+      echeance: row.date_relance,
+      enRetard: Boolean(row.date_relance && new Date(row.date_relance) < aujourdhui),
+    }))
+    .sort((a, b) => {
+      // Sans échéance, l'action passe en dernier : elle n'est due nulle part.
+      if (!a.echeance) return 1;
+      if (!b.echeance) return -1;
+      return a.echeance.localeCompare(b.echeance);
+    })
+    .slice(0, limite);
+}
+
+export interface LigneActivite {
+  id: string;
+  action: string;
+  cible: string | null;
+  at: string;
+  auteur: string | null;
+}
+
+/** Les actions du journal qui concernent la levée, les plus récentes d'abord. */
+const ACTIONS_LEVEE = [
+  "raise.opened",
+  "raise.updated",
+  "raise.closed",
+  "raise_investor.saved",
+  "commitment.recorded",
+  "commitment.requalified",
+  "interaction.logged",
+  "update.published",
+];
+
+/**
+ * L'activité récente de la levée.
+ *
+ * ELLE VIENT DU JOURNAL, pas d'une table dédiée : tout ce qui compte y est déjà
+ * écrit, et une seconde source finirait par diverger de la première — celle qui
+ * fait foi. On y lit donc, en filtrant sur les actions qui parlent de la levée.
+ */
+export async function activiteRecenteLevee(
+  operationId: string,
+  limite = 6,
+): Promise<LigneActivite[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("audit_log")
+    .select("id, action, metadata, created_at, actor_email")
+    .eq("deal_id", operationId)
+    .in("action", ACTIONS_LEVEE)
+    .order("created_at", { ascending: false })
+    .limit(limite);
+
+  if (error) {
+    console.error("[v2 lever] activité récente :", error);
+    return [];
+  }
+
+  return ((data ?? []) as Array<{
+    id: string;
+    action: string;
+    metadata: Record<string, unknown> | null;
+    created_at: string;
+    actor_email: string | null;
+  }>).map((row) => ({
+    id: row.id,
+    action: row.action,
+    // Le journal porte ce qui a changé : on en tire de quoi nommer la ligne —
+    // un investisseur, un montant — plutôt que de répéter le type d'action.
+    cible:
+      (row.metadata?.organisation as string) ??
+      (row.metadata?.nom as string) ??
+      (row.metadata?.titre as string) ??
+      null,
+    at: row.created_at,
+    auteur: row.actor_email,
+  }));
+}

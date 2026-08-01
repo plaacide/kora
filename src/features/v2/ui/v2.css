@@ -1109,6 +1109,26 @@ ul.v2-check-list{margin:0;list-style:none}
   .v2-viewer-bar,.v2-viewer-foot{transition:none}
 }
 
+/* UN TABLEUR PREND TOUTE LA LARGEUR. Un compte de résultat tient en cinq
+   colonnes, mais un grand livre en a trente : le contraindre à la largeur
+   d'une page A4 obligerait à défiler horizontalement pour lire ce qui tient
+   à l'écran. On plafonne quand même, sinon les colonnes s'étirent au point
+   qu'on perd la ligne en la suivant du regard. */
+.v2-viewer-sheet{width:100%;max-width:1500px}
+
+/* SON EN-TÊTE EST MASQUÉ : la barre du lecteur porte déjà le nom du fichier,
+   le niveau d'accès et le téléchargement. Deux bandeaux qui disent la même
+   chose l'un sous l'autre font douter qu'il s'agisse du même document.
+   Le sélecteur est structurel faute de classe dans le composant partagé —
+   borné à ce conteneur pour ne pas déborder sur la V1, qui l'affiche seul. */
+.v2-viewer-sheet > section > div:first-child{display:none}
+.v2-viewer-sheet > section{border:0;border-radius:10px}
+
+/* Un écran de suivi vide DIT COMMENT LE REMPLIR. « Aucune action » tout court
+   laisse croire à une panne ; la phrase indique le geste qui fera apparaître
+   quelque chose. */
+.v2-lever-vide{margin:6px 0 0;color:var(--text-3);font-size:13px;line-height:1.5}
+
 /* Le pourcentage est cliquable : il ramène à cent. */
 button.v2-viewer-zoom{border:0;background:transparent;cursor:pointer}
 button.v2-viewer-zoom:hover{color:#fff}

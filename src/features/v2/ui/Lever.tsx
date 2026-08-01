@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { dateJournal } from "@/features/v2/domain/journal";
+
 import {
   ventilation,
   type Engagement,
@@ -18,7 +20,15 @@ import {
   libelleStade,
   repartition,
 } from "@/features/v2/domain/levee";
-import type { Raise } from "@/features/v2/server/raise";
+import {
+  libelleActionJournal,
+  libelleEcheance,
+} from "@/features/v2/domain/levee";
+import type {
+  ActionAVenir,
+  LigneActivite,
+  Raise,
+} from "@/features/v2/server/raise";
 import type { MiseAJour, MiseAJourResume } from "@/features/v2/server/updates";
 import { CommitmentsScreen } from "./Commitments";
 import { InvestorsScreen } from "./Investors";
@@ -99,6 +109,7 @@ function LeverFrame({
 
 export function Lever({
   acces,
+  activite,
   engagements,
   historique,
   interactions,
@@ -109,7 +120,12 @@ export function Lever({
   operationId,
   query,
   raise,
+  prochaines,
 }: {
+  /** Le journal de la levée, le plus récent d'abord. */
+  activite: readonly LigneActivite[];
+  /** Ce qu'il reste à faire, dérivé des relations du pipeline. */
+  prochaines: readonly ActionAVenir[];
   /** Les engagements déclarés, un par investisseur — écrans 43 et 44. */
   engagements: readonly Engagement[];
   historique: readonly Requalification[];
@@ -241,9 +257,11 @@ export function Lever({
 
   return (
     <RaiseOverview
+      activite={activite}
       configured={query.configured === "1"}
       engagements={engagements}
       pipeline={investisseurs.length}
+      prochaines={prochaines}
       raise={raise as Raise}
     />
   );
@@ -286,14 +304,20 @@ function LeverEmpty({
 
 /** Écran 37 — la levée en cours, sur ses montants réels. */
 function RaiseOverview({
+  activite,
   configured,
   engagements,
   pipeline,
+  prochaines,
   raise,
 }: {
+  /** Le journal de la levée — il fait foi, on l'affiche tel quel. */
+  activite: readonly LigneActivite[];
   configured: boolean;
   engagements: readonly Engagement[];
   pipeline: number;
+  /** Ce qu'il reste à faire, dérivé des relations du pipeline. */
+  prochaines: readonly ActionAVenir[];
   raise: Raise;
 }) {
   const devise = raise.currency;
@@ -405,18 +429,51 @@ function RaiseOverview({
             <h2>Prochaines actions</h2>
             <Link href={queryHref("pipeline")}>Voir toutes les actions →</Link>
           </header>
-          <ActionRow title="Relancer David Mensima" organisation="Baobab Ventures" owner="Amara" date="demain" />
-          <ActionRow title="Envoyer la table de capitalisation" organisation="Horizon Ventures" owner="Ibrahima" date="aujourd’hui" />
-          <ActionRow title="Préparer le Q&A de diligence" organisation="Sahel Growth Fund" owner="Amara" date="5 août" />
-          <ActionRow title="Confirmer le call de cadrage" organisation="Impact Capital Africa" owner="Amara" date="26 juil." late />
+          {/* QUATRE ACTIONS INVENTÉES s'affichaient sur toutes les levées —
+              David Mensima, Baobab Ventures, Amara. Un écran qui dit quoi
+              faire aujourd'hui doit dire ce qu'IL Y A à faire, sinon on cesse
+              de le regarder. */}
+          {prochaines.length === 0 ? (
+            <p className="v2-lever-vide">
+              Aucune action en attente. Notez une prochaine étape sur une
+              relation du pipeline pour la voir apparaître ici.
+            </p>
+          ) : (
+            prochaines.map((a) => {
+              const echeance = libelleEcheance(a.echeance);
+              return (
+                <ActionRow
+                  date={echeance.texte}
+                  key={a.investisseurId}
+                  late={echeance.enRetard}
+                  organisation={a.organisation}
+                  owner={a.responsable ?? "—"}
+                  title={a.action}
+                />
+              );
+            })
+          )}
         </section>
 
         <section className="v2-lever-card">
           <header><h2>Activité récente</h2></header>
-          <ActivityRow title="Engagement confirmé enregistré" detail="Sahel Growth Fund, 120 M XOF" date="hier 17:30 · par Amara" />
-          <ActivityRow title="Soft-commit déclaré" detail="Horizon Ventures, 80 M XOF" date="hier 11:05 · par Amara" />
-          <ActivityRow title="NDA signé" detail="Kwame Mensah" date="hier 16:40" />
-          <ActivityRow title="Réunion consignée" detail="Impact Capital Africa" date="25-07 · par Fatou" />
+          {/* Le journal fait foi : on l'affiche plutôt que d'écrire à côté une
+              seconde histoire, qui finirait par diverger de la première. */}
+          {activite.length === 0 ? (
+            <p className="v2-lever-vide">
+              Rien encore. Chaque engagement, interaction et mise à jour
+              apparaîtra ici.
+            </p>
+          ) : (
+            activite.map((ligne) => (
+              <ActivityRow
+                date={`${dateJournal(ligne.at)}${ligne.auteur ? ` · ${ligne.auteur}` : ""}`}
+                detail={ligne.cible ?? "—"}
+                key={ligne.id}
+                title={libelleActionJournal(ligne.action)}
+              />
+            ))
+          )}
         </section>
       </div>
 

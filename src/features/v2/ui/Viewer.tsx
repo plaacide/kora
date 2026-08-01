@@ -251,12 +251,14 @@ export function SecureViewer({
             branché ici, et le lecteur affichait donc une erreur là où il
             suffisait de changer de vue. */}
         {document.kind === "sheet" ? (
+          <div className="v2-viewer-sheet">
           <SheetView
             docIndex=""
             docName={document.documentName}
             key={document.versionId}
             versionId={document.versionId}
           />
+          </div>
         ) : (
           <>
         {/* `PageImage` porte son propre état d'échec : un format non rendable
