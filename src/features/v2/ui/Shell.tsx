@@ -274,7 +274,11 @@ export function OperationShell({
     currentSection === "overview"
       ? { label: "Commencer la préparation", href: `${root}/preparation` }
       : currentSection === "documents"
-        ? { label: "Ajouter du contenu", href: `${path}?upload=1` }
+        ? // La data room porte ses propres actions au-dessus du contenu —
+          // ajouter, partager, créer un dossier. Un second « Ajouter du
+          // contenu » dans l'en-tête faisait doublon, et celui du haut était
+          // rogné par le bord de l'écran sur une fenêtre étroite.
+          null
         : currentSection === "preparation"
           ? { label: "Ajouter une exigence", href: `${path}?new=1` }
           : currentSection === "access"

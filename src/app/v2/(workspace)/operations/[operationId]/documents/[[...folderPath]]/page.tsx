@@ -292,11 +292,6 @@ export default async function DocumentsPage({
               valable, pas un oubli — elles restent privées à l'équipe. */}
           {racine.length > 0 && (
             <>
-              {folders.length > 0 && (
-                <div className="v2-folder-sous-titre">
-                  Hors dossier — visibles de votre équipe seule
-                </div>
-              )}
               {racine.map((row) => (
                 <div className="v2-folder-row" key={row.id}>
                   <Link className="v2-folder-link" href={`?document=${row.id}`}>

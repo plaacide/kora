@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import type { CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { PageImage } from "@/components/viewer/PageImage";
 import type { ViewerDocument } from "@/features/v2/server/viewer";
@@ -51,6 +52,59 @@ export function SecureViewer({
   const [pageCount, setPageCount] = useState(0);
   const [current, setCurrent] = useState(1);
 
+  // Le zoom agit sur la LARGEUR de la page, pas sur l'échelle de rendu : les
+  // images arrivent déjà rendues côté serveur, et redemander chaque page à
+  // chaque cran de zoom relancerait autant de conversions. Agrandir l'affiché
+  // est instantané et suffit à lire une petite écriture.
+  const [zoom, setZoom] = useState(1);
+  const [pleinEcran, setPleinEcran] = useState(false);
+  const [barreVisible, setBarreVisible] = useState(true);
+  const cadre = useRef<HTMLDivElement>(null);
+  const minuterie = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /**
+   * La barre s'efface pendant la lecture, et revient au moindre mouvement.
+   *
+   * Une barre permanente mange soixante pixels en haut et quarante-quatre en
+   * bas — sur un portable, c'est un cinquième de la page. Elle ne disparaît
+   * qu'après une vraie pause : la faire fuir dès le premier défilement
+   * obligerait à la rappeler sans cesse.
+   */
+  const reveiller = useCallback(() => {
+    setBarreVisible(true);
+    if (minuterie.current) clearTimeout(minuterie.current);
+    minuterie.current = setTimeout(() => setBarreVisible(false), 2600);
+  }, []);
+
+  useEffect(() => {
+    reveiller();
+    return () => {
+      if (minuterie.current) clearTimeout(minuterie.current);
+    };
+  }, [reveiller]);
+
+  // Le navigateur peut sortir du plein écran sans nous prévenir — touche Échap,
+  // geste système. Sans cette écoute, le bouton resterait à « quitter » alors
+  // qu'on en est déjà sorti.
+  useEffect(() => {
+    const suivre = () => setPleinEcran(Boolean(window.document.fullscreenElement));
+    window.document.addEventListener("fullscreenchange", suivre);
+    return () => window.document.removeEventListener("fullscreenchange", suivre);
+  }, []);
+
+  async function basculerPleinEcran() {
+    try {
+      if (window.document.fullscreenElement) {
+        await window.document.exitFullscreen();
+      } else {
+        await cadre.current?.requestFullscreen();
+      }
+    } catch {
+      // Refusé par le navigateur ou la politique de la page : on n'insiste
+      // pas, la lecture continue dans la fenêtre.
+    }
+  }
+
   const onPageCount = useCallback((n: number) => setPageCount(n), []);
   const onVisible = useCallback((page: number) => setCurrent(page), []);
 
@@ -58,7 +112,13 @@ export function SecureViewer({
   const pages = pageCount > 0 ? pageCount : 1;
 
   return (
-    <div className="v2-viewer" data-surcouche={enSurcouche}>
+    <div
+      className="v2-viewer"
+      data-barre={barreVisible}
+      data-surcouche={enSurcouche}
+      onMouseMove={reveiller}
+      ref={cadre}
+    >
       <header className="v2-viewer-bar">
         <Link
           aria-label="Fermer la visionneuse"
@@ -71,10 +131,52 @@ export function SecureViewer({
           <div>{document.documentName}</div>
           <div>
             Version active v{document.versionNo}
+            {/* Le nombre de pages se lit AVEC le nom, pas seulement en pied :
+                c'est ce qu'on cherche avant de commencer — « est-ce que j'ai
+                dix minutes ou une heure ». Il n'apparaît qu'une fois connu :
+                l'annoncer à zéro pendant le chargement serait faux. */}
+            {pageCount > 0 && ` · ${pageCount} page${pageCount > 1 ? "s" : ""}`}
             {document.folderName ? ` · ${document.folderName}` : " · Racine"} ·{" "}
             {document.operationName}
           </div>
         </div>
+        <button
+          aria-label="Réduire"
+          className="v2-viewer-icon"
+          disabled={zoom <= 0.6}
+          onClick={() => setZoom((z) => Math.max(0.6, Math.round((z - 0.2) * 10) / 10))}
+          type="button"
+        >
+          −
+        </button>
+        {/* Le pourcentage se clique pour revenir à cent : c'est le geste qu'on
+            cherche après avoir trop zoomé, et il évite un bouton de plus. */}
+        <button
+          aria-label="Revenir à la taille normale"
+          className="v2-viewer-zoom"
+          onClick={() => setZoom(1)}
+          type="button"
+        >
+          {Math.round(zoom * 100)} %
+        </button>
+        <button
+          aria-label="Agrandir"
+          className="v2-viewer-icon"
+          disabled={zoom >= 2.4}
+          onClick={() => setZoom((z) => Math.min(2.4, Math.round((z + 0.2) * 10) / 10))}
+          type="button"
+        >
+          +
+        </button>
+        <button
+          aria-label={pleinEcran ? "Quitter le plein écran" : "Plein écran"}
+          className="v2-viewer-icon"
+          onClick={basculerPleinEcran}
+          type="button"
+        >
+          <Icon name={pleinEcran ? "columns" : "grid"} />
+        </button>
+
         <span className="v2-viewer-flag">
           <Icon name="eye" />
           {LEVEL_NOTE[document.level] ?? "Lecture"}
@@ -106,6 +208,7 @@ export function SecureViewer({
           faire défiler les pages. */}
       <div
         className="v2-viewer-stage"
+        style={{ "--zoom": zoom } as CSSProperties}
         onClick={
           enSurcouche
             ? (event) => {
