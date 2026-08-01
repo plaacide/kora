@@ -731,6 +731,11 @@ ul.v2-check-list{margin:0;list-style:none}
 .v2-commitment-table th:nth-child(3),.v2-commitment-table td:nth-child(3){text-align:right}
 .v2-commitment-table td:nth-child(3){color:var(--text);font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums}
 .v2-history-card{overflow:hidden}.v2-history-card .v2-activity-row{min-height:52px}.v2-history-card>p{margin:0;border-top:1px solid var(--line-soft);background:var(--band);padding:11px 16px;color:var(--text-3);font-size:11.5px}
+/* Le repère « sur 150 000 USD recherchés » appartient au champ qu'il commente :
+   il prend donc SON retrait. Sans marge horizontale, il partait se coller au
+   bord de la carte, à vingt-huit pixels à gauche de la ligne qu'il explique. */
+.v2-close-hint{display:block;margin:-14px 28px 20px;color:var(--text-4);font-size:12px}
+.v2-commitment-barre{display:flex;justify-content:flex-end;margin:16px 0 12px}
 .v2-close-summary{display:grid;grid-template-columns:1fr 1fr;margin:0 28px 20px;border:1px solid var(--line);border-radius:8px}.v2-close-summary>div{display:flex;min-height:88px;flex-direction:column;border-bottom:1px solid var(--line-soft);padding:14px}.v2-close-summary>div:nth-child(odd){border-right:1px solid var(--line-soft)}.v2-close-summary>div:nth-child(n+3){border-bottom:0}.v2-close-summary span{color:var(--text-3);font-size:11px}.v2-close-summary strong{font-size:13px;font-weight:550}.v2-close-summary small{color:var(--text-4);font-size:10.5px}.v2-close-card>.v2-field,.v2-close-card>.v2-level-choice,.v2-close-card>.v2-panel-callout{margin:0 28px 20px}.v2-danger-button{border-color:#b42318!important;background:#b42318!important}
 
 /* Investor updates */
@@ -925,9 +930,6 @@ ul.v2-check-list{margin:0;list-style:none}
 .v2-chip-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .v2-chip-row button{height:32px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12.5px;cursor:pointer}
 .v2-chip-row button[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text);font-weight:500}
-.v2-close-hint{display:block;margin:-8px 0 4px;color:var(--text-4);font-size:12px}
-.v2-configure-card>footer,.v2-close-card>footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line-soft);padding:16px 0 0;margin-top:4px}
-.v2-configure-card>footer>a,.v2-close-card>footer>a{color:var(--text-2);font-size:13px}
 .v2-search-page{display:flex;max-width:1180px;flex-direction:column;gap:16px}
 .v2-search-field{height:52px;gap:10px;padding:0 16px}
 .v2-search-field input{flex:1;border:0;background:none;font-size:14px;outline:none}
@@ -1493,9 +1495,6 @@ label.v2-btn[data-busy=true]{opacity:.6;pointer-events:none}
 .v2-chip-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .v2-chip-row button{height:32px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:0 13px;color:var(--text-2);font-size:12.5px;cursor:pointer}
 .v2-chip-row button[data-active=true]{border:1.5px solid var(--orange);background:var(--orange-soft);color:var(--orange-text);font-weight:500}
-.v2-close-hint{display:block;margin:-8px 0 4px;color:var(--text-4);font-size:12px}
-.v2-configure-card>footer,.v2-close-card>footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line-soft);padding:16px 0 0;margin-top:4px}
-.v2-configure-card>footer>a,.v2-close-card>footer>a{color:var(--text-2);font-size:13px}
 .v2-search-count{margin:0;color:var(--text-3);font-size:12.5px}
 .v2-result-row{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line-soft);padding:13px 18px}
 .v2-result-row:last-child{border-bottom:0}

@@ -93,11 +93,22 @@ export function CommitmentsScreen({
               lignes ci-dessous.
             </p>
           )}
-          {investisseurs.length === 0 && (
+          {/* UN ÉCRAN VIDE QUI N'OFFRE AUCUN GESTE est une impasse : il
+              explique quoi faire et laisse chercher où. Le bouton n'apparaît
+              que s'il y a une relation à qui rattacher l'engagement — sinon
+              c'est le pipeline qu'il faut remplir d'abord, et on le dit. */}
+          {investisseurs.length === 0 ? (
             <p className="v2-field-helper">
               Ajoutez d’abord un investisseur au pipeline : un engagement se
               rattache toujours à une relation.
             </p>
+          ) : (
+            <div>
+              <Link className="v2-btn" href="?view=commitments&panel=commitment">
+                <Icon name="plus" />
+                Enregistrer un engagement
+              </Link>
+            </div>
           )}
         </section>
       ) : (
@@ -127,6 +138,17 @@ export function CommitmentsScreen({
                 {cible ? ` sur ${somme(cible)}` : " · objectif non fixé"}
               </small>
             </section>
+          </div>
+
+          {/* Le geste reste offert QUAND la liste est déjà remplie : sans lui,
+              on pouvait enregistrer le premier engagement et plus jamais le
+              second — il fallait passer par la fiche d'un investisseur pour
+              retrouver le chemin. */}
+          <div className="v2-commitment-barre">
+            <Link className="v2-btn" href="?view=commitments&panel=commitment">
+              <Icon name="plus" />
+              Enregistrer un engagement
+            </Link>
           </div>
 
           <div className="v2-commitment-table-wrap">
