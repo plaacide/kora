@@ -26,29 +26,40 @@ export const dynamic = "force-dynamic";
  * le signale, plutôt que de laisser l'utilisateur attendre un e-mail fantôme.
  */
 
-/** Actions Supabase → gabarit, type de jeton et destination après vérification. */
+/**
+ * Actions Supabase → gabarit, type de jeton et destination après vérification.
+ *
+ * LES DÉFAUTS POINTENT VERS LA V2. Ils visaient la V1 jusqu'au 1er août, si
+ * bien qu'une confirmation sans `next` explicite déposait le nouvel inscrit
+ * dans l'autre produit. La V1 est abandonnée et la V2 devient la production :
+ * un e-mail d'authentification émis aujourd'hui n'a aucune raison d'y mener.
+ */
 const ACTIONS: Record<
   string,
   { kind: AuthEmailKind; otpType: string; next: string }
 > = {
-  signup: { kind: "signup", otpType: "signup", next: "/onboarding" },
-  invite: { kind: "invite", otpType: "invite", next: "/onboarding" },
-  magiclink: { kind: "magiclink", otpType: "magiclink", next: "/dashboard" },
-  recovery: { kind: "recovery", otpType: "recovery", next: "/reinitialiser" },
+  signup: { kind: "signup", otpType: "signup", next: "/v2/onboarding" },
+  invite: { kind: "invite", otpType: "invite", next: "/v2/onboarding" },
+  magiclink: { kind: "magiclink", otpType: "magiclink", next: "/v2" },
+  recovery: {
+    kind: "recovery",
+    otpType: "recovery",
+    next: "/v2/reinitialiser",
+  },
   email_change: {
     kind: "email_change",
     otpType: "email_change",
-    next: "/securite",
+    next: "/v2/security",
   },
   email_change_new: {
     kind: "email_change",
     otpType: "email_change",
-    next: "/securite",
+    next: "/v2/security",
   },
   email_change_current: {
     kind: "email_change",
     otpType: "email_change",
-    next: "/securite",
+    next: "/v2/security",
   },
   reauthentication: {
     kind: "reauthentication",
