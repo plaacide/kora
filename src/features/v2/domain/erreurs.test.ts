@@ -85,10 +85,14 @@ const TOUS = [
   "maj.vide",
   "maj.destinataire_requis",
   "abonnement.plan_inconnu",
+  "abonnement.droits_insuffisants",
+  "abonnement.sans_tarif_public",
   "abonnement.aucun",
   "abonnement.aucune_resiliation",
   "abonnement.tarif_illisible",
   "abonnement.expire",
+  "paiement.lenteur_prestataire",
+  "paiement.ouverture_impossible",
   "securite.action_inconnue",
 ] as const satisfies readonly CodeErreur[];
 

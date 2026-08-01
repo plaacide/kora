@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { messageDErreur, type Resultat } from "@/features/v2/domain/erreurs";
+
 /**
  * Renommer sur place — le nom lui-même devient le champ.
  *
@@ -47,7 +49,7 @@ export function NomEditable({
   /** L'identifiant de la ligne — celui que le menu « ⋯ » rappellera. */
   cle: string;
   nom: string;
-  onRenommer: (nom: string) => Promise<{ ok: boolean; error?: string }>;
+  onRenommer: (nom: string) => Promise<Resultat>;
   /** Ce qu'annonce le bouton d'édition aux lecteurs d'écran. */
   titre: string;
 }) {
@@ -107,7 +109,7 @@ export function NomEditable({
     enCours.current = false;
 
     if (!resultat.ok) {
-      setErreur(resultat.error ?? "Le nom n’a pas pu être enregistré.");
+      setErreur(messageDErreur(resultat.code));
       // On NE quitte PAS l'édition sur un échec : la saisie reste là, prête à
       // être corrigée. La perdre obligerait à tout retaper.
       return;

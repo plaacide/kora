@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Abonnement } from "@/features/v2/billing/types";
 import { dateJournal } from "@/features/v2/domain/journal";
 
+import { messageDErreur, type Resultat } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 
 /**
@@ -39,8 +40,8 @@ export function Resilier({
 }: {
   abonnement: Abonnement;
   /** Revenir sur une résiliation annoncée, tant que le terme n'est pas passé. */
-  onReprendre: () => Promise<{ ok: boolean; error?: string }>;
-  onResilier: (motif: string) => Promise<{ ok: boolean; error?: string }>;
+  onReprendre: () => Promise<Resultat>;
+  onResilier: (motif: string) => Promise<Resultat>;
 }) {
   const [ouvert, setOuvert] = useState(false);
   const [motif, setMotif] = useState("");
@@ -70,7 +71,7 @@ export function Resilier({
             setErreur(null);
             const resultat = await onReprendre();
             setEnvoi(false);
-            if (!resultat.ok) setErreur(resultat.error ?? "La reprise a échoué.");
+            if (!resultat.ok) setErreur(messageDErreur(resultat.code));
           }}
           type="button"
         >
@@ -177,7 +178,7 @@ export function Resilier({
                   const resultat = await onResilier(motif);
                   setEnvoi(false);
                   if (!resultat.ok) {
-                    setErreur(resultat.error ?? "La résiliation n’a pas abouti.");
+                    setErreur(messageDErreur(resultat.code));
                     return;
                   }
                   setOuvert(false);

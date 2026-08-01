@@ -99,10 +99,15 @@ export type CodeErreur =
   | "maj.destinataire_requis"
   // Abonnement
   | "abonnement.plan_inconnu"
+  | "abonnement.droits_insuffisants"
+  | "abonnement.sans_tarif_public"
   | "abonnement.aucun"
   | "abonnement.aucune_resiliation"
   | "abonnement.tarif_illisible"
   | "abonnement.expire"
+  // Paiement
+  | "paiement.lenteur_prestataire"
+  | "paiement.ouverture_impossible"
   // Sécurité
   | "securite.action_inconnue";
 
@@ -234,6 +239,10 @@ const MESSAGES: Record<CodeErreur, string> = {
     "Choisissez au moins un destinataire avant de publier.",
 
   "abonnement.plan_inconnu": "Ce plan n’existe pas ou n’est plus proposé.",
+  "abonnement.droits_insuffisants":
+    "Seuls le propriétaire et les administrateurs gèrent l’abonnement.",
+  "abonnement.sans_tarif_public":
+    "Ce plan n’a pas de tarif public. Écrivez-nous pour l’activer.",
   "abonnement.aucun": "Aucun abonnement à résilier.",
   "abonnement.aucune_resiliation":
     "Aucune résiliation en cours — votre abonnement suit son cours.",
@@ -241,6 +250,13 @@ const MESSAGES: Record<CodeErreur, string> = {
     "Le tarif de ce plan n’a pas pu être lu. Réessayez dans un instant.",
   "abonnement.expire":
     "Votre abonnement a expiré. Reprenez un plan pour retrouver cette action.",
+
+  // « Rien ne vous a été débité » avant tout le reste : c.est la seule question
+  // que se pose quelqu.un dont le paiement vient d.échouer.
+  "paiement.lenteur_prestataire":
+    "Notre prestataire de paiement met plus de temps que d’habitude à répondre. Rien ne vous a été débité — réessayez dans quelques minutes.",
+  "paiement.ouverture_impossible":
+    "Le paiement n’a pas pu être ouvert et rien ne vous a été débité. Réessayez dans un instant, ou écrivez-nous.",
 
   "securite.action_inconnue": "Cette action de sécurité n’existe pas.",
 };

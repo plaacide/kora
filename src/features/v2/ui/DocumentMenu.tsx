@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { messageDErreur, type Resultat } from "@/features/v2/domain/erreurs";
+
 import { demanderRenommage } from "./NomEditable";
 import { ActionsMenu } from "./RowMenu";
 
@@ -48,10 +50,10 @@ export function DocumentMenu({
   estCle: boolean;
   masquee: boolean;
   nom: string;
-  onDeplacer: (folderId: string | null) => Promise<{ ok: boolean; error?: string }>;
-  onMarquerCle: (key: boolean) => Promise<{ ok: boolean; error?: string }>;
-  onMasquer: (hidden: boolean) => Promise<{ ok: boolean; error?: string }>;
-  onSupprimer: () => Promise<{ ok: boolean; error?: string }>;
+  onDeplacer: (folderId: string | null) => Promise<Resultat>;
+  onMarquerCle: (key: boolean) => Promise<Resultat>;
+  onMasquer: (hidden: boolean) => Promise<Resultat>;
+  onSupprimer: () => Promise<Resultat>;
   urlVisionneuse: string;
 }) {
   const router = useRouter();
@@ -60,13 +62,13 @@ export function DocumentMenu({
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
-  async function agir(action: () => Promise<{ ok: boolean; error?: string }>) {
+  async function agir(action: () => Promise<Resultat>) {
     setEnvoi(true);
     setErreur(null);
     const resultat = await action();
     setEnvoi(false);
     if (!resultat.ok) {
-      setErreur(resultat.error ?? "L’action n’a pas abouti.");
+      setErreur(messageDErreur(resultat.code));
       return;
     }
     setDialogue(null);
@@ -240,8 +242,8 @@ export function FolderMenu({
   /** L'identifiant, pour viser le bon nom lors du renommage sur place. */
   folderId: string;
   nom: string;
-  onCreerSous: (nom: string) => Promise<{ ok: boolean; error?: string }>;
-  onSupprimer: () => Promise<{ ok: boolean; error?: string }>;
+  onCreerSous: (nom: string) => Promise<Resultat>;
+  onSupprimer: () => Promise<Resultat>;
   urlOuvrir: string;
 }) {
   const router = useRouter();
@@ -253,13 +255,13 @@ export function FolderMenu({
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
-  async function agir(action: () => Promise<{ ok: boolean; error?: string }>) {
+  async function agir(action: () => Promise<Resultat>) {
     setEnvoi(true);
     setErreur(null);
     const resultat = await action();
     setEnvoi(false);
     if (!resultat.ok) {
-      setErreur(resultat.error ?? "L’action n’a pas abouti.");
+      setErreur(messageDErreur(resultat.code));
       return;
     }
     setDialogue(null);

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { messageDErreur, type Resultat } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 
 /**
@@ -28,7 +29,7 @@ export function BarreDataRoom({
 }: {
   hrefAjouter: string;
   hrefPartager: string;
-  onCreerDossier: (nom: string) => Promise<{ ok: boolean; error?: string }>;
+  onCreerDossier: (nom: string) => Promise<Resultat>;
 }) {
   const router = useRouter();
   const [ouvert, setOuvert] = useState(false);
@@ -43,7 +44,7 @@ export function BarreDataRoom({
     setEnvoi(false);
 
     if (!resultat.ok) {
-      setErreur(resultat.error ?? "Le dossier n’a pas pu être créé.");
+      setErreur(messageDErreur(resultat.code));
       return;
     }
 

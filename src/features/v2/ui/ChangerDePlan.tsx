@@ -5,6 +5,7 @@ import { useState } from "react";
 import { economieAnnuelle, prixAffiche } from "@/features/v2/billing/format";
 import type { Plan } from "@/features/v2/billing/types";
 
+import { messageDErreur, type Resultat } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 import { PlanCheckout } from "./PlanCheckout";
 
@@ -29,9 +30,9 @@ export function ChangerDePlan({
   onPayer: (choix: {
     planCode: string;
     intervalle: "month" | "year";
-  }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
+  }) => Promise<Resultat<{ url?: string; instruction?: string }>>;
   /** Redescendre vers le plan gratuit : aucun paiement, une annonce. */
-  onRevenirAuGratuit: (planCode: string) => Promise<{ ok: boolean; error?: string }>;
+  onRevenirAuGratuit: (planCode: string) => Promise<Resultat>;
   prochaineEcheance: string | null;
 }) {
   const [ouvert, setOuvert] = useState<string | null>(null);
@@ -104,9 +105,7 @@ export function ChangerDePlan({
                         const resultat = await onRevenirAuGratuit(autre.code);
                         setDescente(null);
                         if (!resultat.ok) {
-                          setErreur(
-                            resultat.error ?? "Le changement de plan n’a pas abouti.",
-                          );
+                          setErreur(messageDErreur(resultat.code));
                         }
                       }}
                       type="button"

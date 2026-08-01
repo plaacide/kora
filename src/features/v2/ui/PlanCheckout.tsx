@@ -6,6 +6,7 @@ import { moisOfferts, prixAffiche } from "@/features/v2/billing/format";
 import type { Plan } from "@/features/v2/billing/types";
 import { dateJournal } from "@/features/v2/domain/journal";
 
+import { messageDErreur, type Resultat } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 
 /**
@@ -36,7 +37,7 @@ export function PlanCheckout({
   onPayer: (choix: {
     planCode: string;
     intervalle: "month" | "year";
-  }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
+  }) => Promise<Resultat<{ url?: string; instruction?: string }>>;
   plan: Plan;
   /** La date de la prochaine échéance, telle que la base la connaîtra. */
   prochaineEcheance: string | null;
@@ -59,7 +60,7 @@ export function PlanCheckout({
 
     if (!resultat.ok) {
       setEnvoi(false);
-      setErreur(resultat.error ?? "Le paiement n’a pas pu être ouvert.");
+      setErreur(messageDErreur(resultat.code));
       return;
     }
 

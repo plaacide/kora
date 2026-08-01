@@ -22,6 +22,7 @@ import type {
 import { dateJournal } from "@/features/v2/domain/journal";
 
 import { ChangerDePlan } from "./ChangerDePlan";
+import { messageDErreur, type Resultat } from "@/features/v2/domain/erreurs";
 import { Icon } from "./Icon";
 import { MessageTemporaire } from "./MessageTemporaire";
 import { Resilier } from "./Resilier";
@@ -70,13 +71,13 @@ export function SubscriptionScreen({
   onPayer: (choix: {
     planCode: string;
     intervalle: "month" | "year";
-  }) => Promise<{ ok: boolean; error?: string; url?: string; instruction?: string }>;
+  }) => Promise<Resultat<{ url?: string; instruction?: string }>>;
   /** L'action serveur qui arrête l'abonnement, en fin de période payée. */
-  onResilier: (motif: string) => Promise<{ ok: boolean; error?: string }>;
+  onResilier: (motif: string) => Promise<Resultat>;
   /** Revenir sur une résiliation annoncée, tant que le terme n'est pas passé. */
-  onReprendre: () => Promise<{ ok: boolean; error?: string }>;
+  onReprendre: () => Promise<Resultat>;
   /** Redescendre vers le plan gratuit : une annonce, pas un paiement. */
-  onRevenirAuGratuit: (planCode: string) => Promise<{ ok: boolean; error?: string }>;
+  onRevenirAuGratuit: (planCode: string) => Promise<Resultat>;
   operations: readonly OperationComptee[];
   plan: Plan;
   /** Ce qu'a donné la vérification au retour du prestataire, s'il y en a eu. */

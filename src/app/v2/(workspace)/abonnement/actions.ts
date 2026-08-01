@@ -3,6 +3,12 @@
 import { revalidatePath } from "next/cache";
 
 import { billingProvider } from "@/features/v2/billing/providers";
+import {
+  type CodeErreur,
+  codeDepuisPostgres,
+  echec,
+  type Resultat,
+} from "@/features/v2/domain/erreurs";
 import { previenirDeLaResiliation } from "@/features/v2/server/courriers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -19,20 +25,18 @@ import { createClient } from "@/lib/supabase/server";
  * leur serrure.
  */
 
-type Resultat = { ok: boolean; error?: string };
-
-const MESSAGES: Record<string, string> = {
-  "droits insuffisants":
-    "Seuls le propriétaire et les administrateurs gèrent l’abonnement.",
-  "plan inconnu": "Ce plan n’existe pas ou n’est plus proposé.",
-  "aucun abonnement en cours": "Aucun abonnement à résilier.",
-  "aucune résiliation à reprendre":
-    "Aucune résiliation en cours — votre abonnement suit son cours.",
-};
-
-function traduire(message: string): string {
-  const cle = Object.keys(MESSAGES).find((m) => message.includes(m));
-  return cle ? MESSAGES[cle] : message;
+/**
+ * Le dictionnaire local a rejoint le catalogue commun.
+ *
+ * Comme pour l.équipe, « droits insuffisants » se dit mieux en sachant d.où il
+ * vient : ici, c.est l.abonnement que seuls le propriétaire et les
+ * administrateurs gèrent.
+ */
+function codeAbonnement(message: string): CodeErreur {
+  const code = codeDepuisPostgres(message);
+  return code === "droits.insuffisants"
+    ? "abonnement.droits_insuffisants"
+    : code;
 }
 
 /**
@@ -69,7 +73,7 @@ export async function requestV2Plan(input: {
 
   if (erreurPrix) {
     console.error("[v2 abonnement] tarif illisible :", erreurPrix);
-    return { ok: false, error: "Le tarif de ce plan n’a pas pu être lu." };
+    return echec("abonnement.tarif_illisible");
   }
 
   const tarif = prix as { unit_amount: number | null; currency: string } | null;
@@ -77,10 +81,7 @@ export async function requestV2Plan(input: {
   if (!tarif?.unit_amount) {
     // Ouvrir un paiement à zéro rendrait une référence que personne ne pourrait
     // honorer — et Genius Pay refuse sous 200 XOF de toute façon.
-    return {
-      ok: false,
-      error: "Ce plan n’a pas de tarif public. Écrivez-nous pour l’activer.",
-    };
+    return echec("abonnement.sans_tarif_public");
   }
 
   try {
@@ -145,19 +146,10 @@ export async function requestV2Plan(input: {
     // dire évite qu'on recommence dix fois — et chaque tentative crée une
     // transaction de plus chez le prestataire.
     if (erreur instanceof Error && erreur.name === "LenteurPrestataire") {
-      return {
-        ok: false,
-        error:
-          "Notre prestataire de paiement met plus de temps que d’habitude à " +
-          "répondre. Rien ne vous a été débité — réessayez dans quelques minutes.",
-      };
+      return echec("paiement.lenteur_prestataire");
     }
 
-    return {
-      ok: false,
-      error:
-        "Le paiement n’a pas pu être ouvert. Réessayez dans un instant, ou écrivez-nous.",
-    };
+    return echec("paiement.ouverture_impossible");
   }
 }
 
@@ -188,7 +180,7 @@ export async function activateV2Plan(input: {
 
   if (error) {
     console.error("[v2 abonnement] set_workspace_plan échoué :", error);
-    return { ok: false, error: traduire(error.message) };
+    return echec(codeAbonnement(error.message));
   }
 
   revalidatePath("/v2/abonnement");
@@ -212,7 +204,7 @@ export async function reprendreV2Subscription(input: {
 
   if (error) {
     console.error("[v2 abonnement] reprise échouée :", error);
-    return { ok: false, error: traduire(error.message) };
+    return echec(codeAbonnement(error.message));
   }
 
   revalidatePath("/v2/abonnement");
@@ -247,7 +239,7 @@ export async function revenirAuPlanGratuit(input: {
 
   if (error) {
     console.error("[v2 abonnement] descente échouée :", error);
-    return { ok: false, error: traduire(error.message) };
+    return echec(codeAbonnement(error.message));
   }
 
   revalidatePath("/v2/abonnement");
@@ -276,7 +268,7 @@ export async function cancelV2Subscription(input: {
 
   if (error) {
     console.error("[v2 abonnement] résiliation échouée :", error);
-    return { ok: false, error: traduire(error.message) };
+    return echec(codeAbonnement(error.message));
   }
 
   // La trace écrite de ce qui a été décidé, et de la date jusqu'à laquelle le
