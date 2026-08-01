@@ -1,6 +1,6 @@
 # ADR-001 : Où traduire les erreurs
 
-**Statut :** Proposé — en attente d'arbitrage
+**Statut :** Accepté — option C appliquée le 1er août 2026
 **Date :** 1er août 2026
 **Branche :** `v2/rebuild`
 **Décideur :** fondateur
@@ -171,22 +171,39 @@ l'objectif, mais cela ralentit l'écriture d'une action nouvelle.
 le sort des erreurs vraiment imprévues — un code `inattendu` volontairement
 unique, jamais une chaîne libre.
 
-## Ce qui reste à trancher
+## Ce qui a été fait
 
-1. **Option A, B, C ou D ?**
-2. **Migration en un bloc ou parcours par parcours ?** Recommandation :
-   parcours par parcours, en commençant par Partage et accès — c'est là que les
-   erreurs de doublon sont les plus fréquentes.
-3. **`ok` ou `success` ?** Recommandation : garder `ok`, déjà employé 57 fois.
+Option C, parcours par parcours, `ok` conservé.
 
-## Suites, si C est retenue
+1. [x] `domain/erreurs.ts` — union `CodeErreur` (81 codes) + catalogue
+2. [x] Catalogue testé : tout code a un texte, aucun ne contient de jargon
+3. [x] `Resultat` basculé ; `tsc` a listé les sites
+4. [x] 11 `actions.ts` migrées, un commit par parcours
+5. [x] 24 replis morts supprimés
+6. [x] **Trois** `traduire()` locaux absorbés — un troisième dormait dans
+       `rejoindre-equipe/`, avec le même repli brut
 
-1. [ ] Écrire `domain/erreurs.ts` — union `CodeErreur` + catalogue, dérivés du §11
-2. [ ] Tester le catalogue : tout code a un texte, aucun texte n'est vide
-3. [ ] Basculer `Resultat` et laisser `tsc` lister les sites
-4. [ ] Migrer les 11 `actions.ts`, un commit par parcours
-5. [ ] Supprimer les 24 replis morts de l'UI
-6. [ ] Absorber les deux `traduire()` locaux dans le catalogue
+### Ce que la migration a révélé en chemin
+
+- **Dix-neuf signatures de props redéclaraient `{ ok: boolean; error?: string }`.**
+  Ce type est plus large que `Resultat` : `Echec` s'y glisse, `error` y vaut
+  toujours `undefined`, et le code se perdait à la frontière. Fermer le serveur
+  ne servait à rien tant que l'écran rouvrait dans sa propre signature. C'est le
+  défaut le moins visible de tout le chantier.
+- **L'écran de publication reniflait le message brut** —
+  `res.error?.includes("aucun destinataire")` — pour reconnaître une cause. Une
+  reformulation en base aurait suffi à faire disparaître le message précis.
+- **Les fuites ne venaient pas toutes de Postgres** : le stockage répondait
+  « Payload too large », le SDK d'authentification « MFA challenge failed », et
+  `errorRaw` s'affichait sans traduction sur l'écran de connexion.
+
+## Reste à trancher
+
+- **`fieldErrors` du §10** : `saveV2Raise` rend un `champ` typé, mais l'écran de
+  configuration n'a ni `<form>` ni attributs `name` — la mise au point sur le
+  champ fautif (§15) attend une reprise de cet écran.
+- **`ok` ou `success`** : `ok` conservé, 57 usages. À rouvrir si le §10 devient
+  une contrainte.
 
 ## Hors périmètre de cet ADR
 
