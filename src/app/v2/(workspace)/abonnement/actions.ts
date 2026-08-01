@@ -104,25 +104,34 @@ export async function requestV2Plan(input: {
     });
 
     // RETENIR L'INTENTION, sinon on ne saura pas quoi vérifier au retour.
-    // Le prestataire, lui, connaît la référence ; nous devons pouvoir la lui
+    // Le prestataire connaît la référence ; nous devons pouvoir la lui
     // rappeler quand le payeur revient — c'est ce qui rend le paiement
     // vérifiable sans dépendre d'une notification qui peut ne jamais venir.
-    const admin = createAdminClient();
-    const { error: erreurTrace } = await admin.from("billing_events").insert({
-      workspace_id: input.organizationId,
-      event_type: "payment.pending",
-      provider: billingProvider().code,
-      external_event_id: session.reference,
-      payload: {
-        plan_code: input.planCode,
-        billing_interval: input.intervalle,
-        moyen: input.moyen,
-      },
-    });
+    //
+    // SON PROPRE `try`, ET C'EST TOUT LE SUJET. La première écriture partageait
+    // le `try` du paiement : une clé de service absente y levait, et le client
+    // voyait « le paiement n'a pas pu être ouvert » alors que la transaction
+    // était DÉJÀ créée chez le prestataire. Prendre une note ne doit jamais
+    // empêcher d'encaisser — au pire on rattrape à la main, au mieux personne
+    // ne s'en aperçoit.
+    try {
+      const admin = createAdminClient();
+      const { error: erreurTrace } = await admin.from("billing_events").insert({
+        workspace_id: input.organizationId,
+        event_type: "payment.pending",
+        provider: billingProvider().code,
+        external_event_id: session.reference,
+        payload: {
+          plan_code: input.planCode,
+          billing_interval: input.intervalle,
+          moyen: input.moyen,
+        },
+      });
 
-    if (erreurTrace) {
-      // On ne bloque PAS le paiement pour autant : mieux vaut un paiement
-      // qu'il faudra rattraper à la main qu'un paiement refusé.
+      if (erreurTrace) {
+        console.error("[v2 abonnement] intention non tracée :", erreurTrace);
+      }
+    } catch (erreurTrace) {
       console.error("[v2 abonnement] intention non tracée :", erreurTrace);
     }
 

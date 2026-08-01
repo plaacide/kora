@@ -47,7 +47,12 @@ export async function GET() {
       api: Boolean(process.env.GENIUSPAY_API_KEY),
       secret: Boolean(process.env.GENIUSPAY_API_SECRET),
       webhook: Boolean(process.env.GENIUSPAY_WEBHOOK_SECRET),
+      // Sans elle, ni le webhook ni la vérification au retour ne peuvent
+      // écrire en base — et son absence se manifestait par un message de
+      // paiement échoué qui n'avait rien à voir.
+      service: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
     },
+    retour: Boolean(process.env.SANZA_PUBLIC_URL),
     // Déduit du préfixe de la clé, comme partout ailleurs : une seule source.
     environnement: process.env.GENIUSPAY_API_KEY?.includes("_live_")
       ? "live"
