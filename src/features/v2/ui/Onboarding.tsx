@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type InputHTMLAttributes, type ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
 
 import { logoutV2 } from "@/app/v2/actions";
 
@@ -194,9 +194,23 @@ const objectives: Array<{
   },
 ];
 
+/**
+ * Le choix d'objectif — étape 3.
+ *
+ * CE QUI ÉTAIT CASSÉ. Les cartes étaient des `<button data-selected>` pilotés
+ * par un `useState`, alors que la feuille de style stylise la sélection avec
+ * `.v2-objective:has(input:checked)` — un `<input>` qui n'existait nulle part.
+ * Résultat : cliquer une carte ne changeait RIEN à l'écran. Ni la bordure, ni
+ * le fond, ni la coche. Et comme le champ caché portait l'état interne, le
+ * formulaire partait toujours avec « Lever en capital », quel que soit le clic.
+ *
+ * On repasse à de vrais boutons radio, ce que la feuille de style attendait
+ * depuis le début. On y gagne trois choses que le `useState` ne donnait pas :
+ * la navigation aux flèches du clavier, l'annonce correcte par les lecteurs
+ * d'écran, et un formulaire qui fonctionne même si le JavaScript n'a pas chargé
+ * — ce qui arrive sur les connexions que Sanza vise.
+ */
 export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) {
-  const [selected, setSelected] = useState("equity");
-
   return (
     <form
       action={saveV2Objective}
@@ -212,27 +226,28 @@ export function ObjectiveSelector({ hasError = false }: { hasError?: boolean }) 
           L’enregistrement a échoué. Sélectionnez votre objectif puis réessayez.
         </p>
       )}
-      <input name="objective" type="hidden" value={selected} />
-      <div className="v2-objective-grid" role="radiogroup" aria-label="Objectif de financement">
-        {objectives.map((objective) => (
-          <button
-            key={objective.id}
-            className="v2-objective"
-            data-selected={selected === objective.id}
-            type="button"
-            role="radio"
-            aria-checked={selected === objective.id}
-            onClick={() => setSelected(objective.id)}
-          >
+      <fieldset className="v2-objective-grid">
+        <legend className="v2-sr-only">Objectif de financement</legend>
+        {objectives.map((objective, index) => (
+          <label className="v2-objective" key={objective.id}>
+            {/* Le premier est coché par défaut : un groupe radio sans choix
+                initial laisse partir le formulaire sans objectif, et la base
+                retombe alors sur « levee » sans que personne l'ait décidé. */}
+            <input
+              defaultChecked={index === 0}
+              name="objective"
+              type="radio"
+              value={objective.id}
+            />
             <span className="v2-objective-icon"><Icon name={objective.icon} /></span>
             <span>
               <strong>{objective.title}</strong>
               <small>{objective.description}</small>
             </span>
             <span className="v2-objective-check" aria-hidden="true">✓</span>
-          </button>
+          </label>
         ))}
-      </div>
+      </fieldset>
       <FormActions backHref={v2Routes.onboarding.company}>
         {/* Deux boutons dans le même formulaire : pas de libellé de
             progression, `useFormStatus` ne dit pas lequel a été pressé. */}
