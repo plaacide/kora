@@ -172,26 +172,40 @@ export function ActionsMenu({
  * suppression, et l'archivage y est présenté comme réversible.
  */
 export function RowMenu({
+  archived,
   href,
   label,
+  operationId,
 }: {
+  /** Archivée : le menu propose alors la remise en activité. */
+  archived: boolean;
   /** Cible de « Ouvrir ». */
   href: string;
   /** Nom de l'opération, pour l'intitulé accessible du bouton. */
   label: string;
+  operationId: string;
 }) {
   return (
     <Menu
       items={[
         { label: "Ouvrir", href, icon: "arrow" },
-        // TROIS OPTIONS SONT RETIRÉES, pas grisées : « Modifier »,
-        // « Dupliquer la structure » et « Exporter l'index » n'avaient aucune
-        // action derrière elles. Une entrée de menu qui ne fait rien est pire
-        // qu'une entrée absente — on la clique, rien ne se passe, et l'on croit
-        // l'application cassée. Elles reviendront avec l'écran de réglages
-        // d'opération, qui est en tête de la roadmap.
-        { label: "Clôturer", href: "?dialogue=cloture", icon: "check" },
-        { label: "Archiver", href: "?dialogue=archivage", icon: "folder" },
+        // QUATRE OPTIONS SONT RETIRÉES, pas grisées : « Modifier »,
+        // « Dupliquer la structure », « Exporter l'index » et « Clôturer »
+        // n'ont aucune action derrière elles. Une entrée de menu qui ne fait
+        // rien est pire qu'une entrée absente — on la clique, rien ne se passe,
+        // et l'on croit l'application cassée.
+        //
+        // « Clôturer » menait jusqu'ici à une fenêtre décorative. Rien en base
+        // ne porte ce geste : `deal_stage` décrit l'avancement d'un dossier
+        // côté investisseur, pas la fin d'une opération de fondateur. La
+        // clôture qui existe est celle d'une levée, et elle a son écran.
+        {
+          label: archived ? "Remettre en activité" : "Archiver",
+          // Chemin absolu : ce menu sert aussi depuis la vue d'ensemble, où un
+          // `?archiver=` relatif n'ouvrirait aucune fenêtre.
+          href: `/v2/operations?archiver=${operationId}`,
+          icon: "folder",
+        },
       ]}
       label={label}
     />

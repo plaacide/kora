@@ -1434,20 +1434,9 @@ label.v2-btn[data-busy=true]{opacity:.6;pointer-events:none}
 .v2-dialog>footer{display:flex;margin-top:20px;gap:10px}
 .v2-dialog>footer .v2-btn{min-height:36px;padding:0 14px;font-size:13px}
 .v2-dialog-note{margin:14px 0 0;color:var(--text-3);font-size:12px}
-.v2-dialog-radios{display:flex;margin-top:16px;flex-direction:column;gap:8px}
-.v2-dialog-radios label{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:6px;padding:11px 12px;color:var(--text-2);font-size:13px;cursor:pointer}
-.v2-dialog-radios label[data-selected=true]{border-color:#f5c6ae;background:var(--orange-soft);color:var(--text)}
-.v2-dialog-radios input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.v2-radio-mark{display:inline-block;width:15px;height:15px;flex:0 0 auto;border:1px solid #d0d5dd;border-radius:50%;background:#fff}
-.v2-dialog-radios input:checked+.v2-radio-mark{border:4.5px solid var(--orange)}
-.v2-dialog-radios input:focus-visible+.v2-radio-mark{outline:2px solid var(--orange);outline-offset:2px}
-.v2-dialog-choices{display:flex;margin-top:16px;flex-direction:column;gap:8px}
-.v2-dialog-choices button{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:11px 12px;text-align:left;cursor:pointer}
-.v2-dialog-choices button[data-selected=true]{border-color:#f5c6ae;background:var(--orange-soft)}
-.v2-dialog-choices button>span{flex:1}
-.v2-dialog-choices b{display:block;font-size:13px;font-weight:500}
-.v2-dialog-choices small{display:block;color:var(--text-3);font-size:11.5px}
-.v2-dialog-choices .v2-icon{color:var(--orange-text)}
+/* Le message d'échec reste DANS la fenêtre : la refermer sur une erreur
+   ferait croire que l'archivage a eu lieu. */
+.v2-dialog-error{margin:14px 0 0;border-left:2px solid var(--red);padding-left:10px;color:var(--red);font-size:12.5px;line-height:1.5}
 
 /* Écrans 66 (recherche) et 68 (abonnement) */
 .v2-panel-note{display:flex;align-items:flex-start;gap:9px}

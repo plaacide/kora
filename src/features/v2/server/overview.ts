@@ -32,6 +32,8 @@ export interface OperationEnTete {
   currency: string | null;
   /** Échéance de la levée, quand il y en a une. */
   deadline: string | null;
+  /** Le menu « ⋯ » propose « Archiver » ou « Remettre en activité ». */
+  archivee: boolean;
 }
 
 export interface PieceRecente {
@@ -101,7 +103,7 @@ export async function operationOverview(
   ] = await Promise.all([
     supabase
       .from("deals")
-      .select("name, objectif, amount, currency")
+      .select("name, objectif, amount, currency, archived_at")
       .eq("id", operationId)
       .maybeSingle(),
     // Les colonnes de `raises` sont en français, celles de `deals` en anglais :
@@ -201,6 +203,7 @@ export async function operationOverview(
     objectif: string | null;
     amount: number | null;
     currency: string | null;
+    archived_at: string | null;
   } | null;
 
   const raiseRow = raise as {
@@ -218,6 +221,7 @@ export async function operationOverview(
       amount: raiseRow?.montant_cible ?? dealRow?.amount ?? null,
       currency: raiseRow?.devise ?? dealRow?.currency ?? null,
       deadline: raiseRow?.date_cloture ?? null,
+      archivee: Boolean(dealRow?.archived_at),
     },
     requirements,
     compte,

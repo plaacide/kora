@@ -72,7 +72,12 @@ function Row({ operation }: { operation: OperationCard }) {
       </div>
       {/* Entrer dans une opération est un changement de contexte : push. */}
       <PushLink className="v2-btn-mini" href={href}>Ouvrir</PushLink>
-      <RowMenu href={href} label={operation.name} />
+      <RowMenu
+        archived={archived}
+        href={href}
+        label={operation.name}
+        operationId={operation.id}
+      />
     </article>
   );
 }

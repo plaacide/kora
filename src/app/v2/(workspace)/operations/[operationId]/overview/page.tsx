@@ -107,8 +107,10 @@ export default async function OperationOverviewPage({
           </p>
         </div>
         <RowMenu
+          archived={vue.operation.archivee}
           href={v2Routes.operations.documents(operationId)}
           label={vue.operation.name}
+          operationId={operationId}
         />
       </div>
 

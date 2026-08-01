@@ -1,120 +1,129 @@
-import { Icon } from "./Icon";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { setV2OperationArchived } from "@/app/v2/(workspace)/operations/actions";
+import { messageDErreur } from "@/features/v2/domain/erreurs";
 
 /**
- * Écrans 59, 60 et 61 — les dialogues de la liste des opérations.
- * Repris de `59-modale-limite-plan.html`, `60-modale-cloture-archivage.html`
- * et `61-modale-choix-dealroom.html`.
+ * L'archivage d'une opération — écran 60.
  *
- * Chaque dialogue dit ce qui est conservé avant ce qui change : sur une
- * clôture ou un archivage, la première question du fondateur est toujours
- * « est-ce que je perds mes documents ? ».
+ * CE QUE CE FICHIER ÉTAIT. Cinq dialogues repris des maquettes 59, 60 et 61,
+ * tous décoratifs : deux boutons `type="button"` sans gestionnaire, et un
+ * contenu écrit en dur qui annonçait « Série A 2026 » sur n'importe quelle
+ * opération. Le menu « ⋯ » de la liste y menait pour de vrai — on confirmait un
+ * archivage, la fenêtre se fermait, rien n'était archivé. Une action
+ * destructrice qui a l'air de marcher est le pire des états.
+ *
+ * CE QUI EN RESTE. L'archivage seul, branché sur `set_deal_archived`, et qui
+ * nomme l'opération qu'il va vraiment archiver.
+ *
+ * CE QUI EST PARTI, ET POURQUOI :
+ *
+ * — « Clôturer une opération » n'a AUCUN support en base. `deal_stage` est une
+ *   énumération héritée de la V1 côté investisseur — sourcing, screening, due
+ *   diligence, ic, signed, passed — qui décrit l'avancement d'un dossier
+ *   d'investissement, pas la fin d'une opération de fondateur. La clôture qui
+ *   existe vraiment est celle d'une LEVÉE (`close_raise`), et elle a déjà son
+ *   écran. Brancher « Clôturer » sur `set_deal_stage` reviendrait à réutiliser
+ *   un concept V1 pour ce qu'il ne dit pas.
+ *
+ * — Les deux dialogues de limite de plan ne sont atteignables par aucun lien.
+ *   Le refus réel passe désormais par le catalogue d'erreurs, qui porte le même
+ *   texte et son issue.
+ *
+ * — Le choix d'opération pour une cohorte attend `cohort_links`, qui n'existe
+ *   pas.
  */
 
-export type DialogKind =
-  | "limite-plan"
-  | "limite-close"
-  | "cloture"
-  | "archivage"
-  | "dealroom";
+export function ArchiveOperationDialog({
+  archived,
+  name,
+  operationId,
+}: {
+  /** L'état actuel : on désarchive aussi bien qu'on archive. */
+  archived: boolean;
+  name: string;
+  operationId: string;
+}) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
 
-const OPERATIONS: Array<[string, string]> = [
-  ["Série A 2026", "Capital · Active · 72 % prête"],
-  ["Prêt Ecobank", "Dette · Active · 45 % prête"],
-];
+  function fermer() {
+    router.push("/v2/operations");
+  }
 
-interface Content {
-  title: string;
-  body: string;
-  confirm: string;
-  cancel: string;
-  choices?: Array<[string, string]>;
-  radios?: string[];
-  note?: string;
-}
+  async function confirmer() {
+    setBusy(true);
+    setErreur(null);
 
-const CONTENT: Record<DialogKind, Content> = {
-  "limite-plan": {
-    title: "Votre plan comprend une opération active",
-    body: "« Série A 2026 » est actuellement active. Archivez-la avant d’en commencer une nouvelle, ou passez au plan Close pour gérer plusieurs opérations simultanément.",
-    confirm: "Découvrir Close",
-    cancel: "Voir l’opération actuelle",
-  },
-  "limite-close": {
-    title: "Vos trois opérations actives sont utilisées",
-    body: "Archivez une opération terminée avant d’en commencer une nouvelle.",
-    confirm: "Archiver une opération",
-    cancel: "Annuler",
-  },
-  cloture: {
-    title: "Clôturer « Série A 2026 » ?",
-    body: "La data room, les accès, les NDA, les consultations et les engagements resteront consultables.",
-    radios: [
-      "Conserver les accès jusqu’à leur expiration",
-      "Révoquer les accès maintenant",
-    ],
-    confirm: "Clôturer l’opération",
-    cancel: "Continuer à travailler",
-  },
-  archivage: {
-    title: "Archiver « Série A 2026 » ?",
-    body: "L’opération passera en lecture seule et ne comptera plus dans votre limite. Aucun document ne sera supprimé.",
-    confirm: "Archiver l’opération",
-    cancel: "Conserver active",
-  },
-  dealroom: {
-    title: "Quelle opération souhaitez-vous présenter ?",
-    body: "Le programme verra les informations autorisées de cette opération. Il ne verra aucun document sans votre accord.",
-    choices: OPERATIONS,
-    confirm: "Présenter cette opération",
-    cancel: "Annuler",
-    note: "Le mandat et le consentement documentaire ne s’appliqueront qu’à cette opération.",
-  },
-};
+    const res = await setV2OperationArchived({
+      operationId,
+      archived: !archived,
+    });
 
-export function OperationDialog({ kind }: { kind: DialogKind }) {
-  const content = CONTENT[kind];
+    setBusy(false);
+    if (!res.ok) {
+      // La fenêtre RESTE ouverte : la refermer ferait croire à un succès.
+      setErreur(messageDErreur(res.code));
+      return;
+    }
+
+    router.push("/v2/operations");
+    router.refresh();
+  }
 
   return (
     <>
-      <div className="v2-scrim" />
+      <div className="v2-scrim" onClick={busy ? undefined : fermer} />
       <div aria-modal="true" className="v2-dialog" role="dialog">
-        <h2>{content.title}</h2>
-        <p>{content.body}</p>
+        <h2>
+          {archived ? "Remettre" : "Archiver"} « {name} » ?
+        </h2>
+        <p>
+          {archived
+            ? "L’opération redeviendra modifiable et comptera de nouveau dans la limite de votre plan."
+            : "L’opération passera en lecture seule et ne comptera plus dans votre limite. Aucun document ne sera supprimé, et les accès en cours restent valables."}
+        </p>
 
-        {content.radios && (
-          <div className="v2-dialog-radios">
-            {content.radios.map((label, index) => (
-              <label data-selected={index === 0} key={label}>
-                <input defaultChecked={index === 0} name="acces" type="radio" />
-                <span className="v2-radio-mark" />
-                {label}
-              </label>
-            ))}
-          </div>
-        )}
-
-        {content.choices && (
-          <div className="v2-dialog-choices">
-            {content.choices.map(([name, meta], index) => (
-              <button data-selected={index === 0} key={name} type="button">
-                <span>
-                  <b>{name}</b>
-                  <small>{meta}</small>
-                </span>
-                {index === 0 && <Icon name="check" />}
-              </button>
-            ))}
-          </div>
+        {erreur && (
+          <p className="v2-dialog-error" role="alert">
+            {erreur}
+          </p>
         )}
 
         <footer>
-          <button className="v2-btn" type="button">{content.confirm}</button>
-          <button className="v2-btn" data-variant="secondary" type="button">
-            {content.cancel}
+          <button
+            className="v2-btn"
+            disabled={busy}
+            onClick={() => void confirmer()}
+            type="button"
+          >
+            {busy
+              ? archived
+                ? "Remise en cours…"
+                : "Archivage en cours…"
+              : archived
+                ? "Remettre en activité"
+                : "Archiver l’opération"}
+          </button>
+          <button
+            className="v2-btn"
+            data-variant="secondary"
+            disabled={busy}
+            onClick={fermer}
+            type="button"
+          >
+            Annuler
           </button>
         </footer>
 
-        {content.note && <p className="v2-dialog-note">{content.note}</p>}
+        <p className="v2-dialog-note">
+          L’archivage est réversible : vous pourrez remettre cette opération en
+          activité depuis la liste.
+        </p>
       </div>
     </>
   );
