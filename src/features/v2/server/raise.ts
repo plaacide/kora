@@ -34,6 +34,15 @@ export interface Raise {
   /** Types d'investisseurs visés : `vc`, `dfi`, `banque`. */
   audience: string[];
   description: string | null;
+  /** La fourchette de ticket recherchée — se compare, contrairement à un texte. */
+  ticketMin: number | null;
+  ticketMax: number | null;
+  /** « recherche » · « trouve » · « sans_lead ». `null` = non renseigné. */
+  leadStatut: string | null;
+  /** Part de capital envisagée, en pourcentage. */
+  partCapital: number | null;
+  /** Répartition de l'usage des fonds — les postes changent d'une levée à l'autre. */
+  usagesFonds: Array<{ poste: string; part: number }>;
   status: string;
   closedAt: string | null;
 }
@@ -51,6 +60,12 @@ function enRaise(row: Record<string, unknown>): Raise {
     deadline: (row.date_cloture as string | null) ?? null,
     audience: (row.audience as string[] | null) ?? [],
     description: (row.description as string | null) ?? null,
+    ticketMin: (row.ticket_min as number | null) ?? null,
+    ticketMax: (row.ticket_max as number | null) ?? null,
+    leadStatut: (row.lead_statut as string | null) ?? null,
+    partCapital: (row.part_capital as number | null) ?? null,
+    usagesFonds:
+      (row.usages_fonds as Array<{ poste: string; part: number }> | null) ?? [],
     status: (row.statut as string | null) ?? "en_cours",
     closedAt: (row.updated_at as string | null) ?? null,
   };

@@ -201,87 +201,79 @@ export default async function DocumentsPage({
           </section>
         )}
 
-        {folders.length === 0 ? (
-          <section className="v2-folder-card">
-            <header>
-              <strong>Aucun dossier</strong>
-              <span>— cette opération a été créée sans structure documentaire</span>
-            </header>
-          </section>
-        ) : (
-          <section className="v2-folder-card">
-            <header>
-              <strong>Structure suggérée par votre plan</strong>
-              <span>
-                — modifiable ; les exigences restent indépendantes de
-                l’arborescence
-              </span>
-            </header>
-            {folders.map((row) => (
-              <div className="v2-folder-row" key={row.id}>
-                <Link
-                  className="v2-folder-link"
-                  href={v2Routes.operations.documents(operationId, [row.name])}
-                >
-                  <Icon name="folder" />
-                  <strong>{row.name}</strong>
-                  <span>
-                    {row.documentCount === 0
-                      ? "0 pièce"
-                      : `${row.documentCount} pièce${row.documentCount > 1 ? "s" : ""}`}
-                  </span>
-                  <span className="v2-status" data-tone="neutral">
-                    {row.guestCount === 0 ? "Privé" : folderVisibilityLabel(row.guestCount)}
-                  </span>
-                </Link>
-                <MenuDossier
-                  contient={row.documentCount}
-                  folderId={row.id}
-                  nom={row.name}
-                  operationId={operationId}
-                  urlOuvrir={v2Routes.operations.documents(operationId, [row.name])}
-                />
-              </div>
-            ))}
-          </section>
-        )}
+        {/* UN SEUL BLOC. Les dossiers et les pièces hors dossier vivaient dans
+            deux cartes séparées : une data room sans structure en affichait
+            donc deux, dont l'une ne disait que « aucun dossier ». Deux cadres
+            pour un même contenu obligent à comprendre pourquoi ils sont deux —
+            et la réponse n'intéresse personne. */}
+        <section className="v2-folder-card">
+          <header>
+            <strong>Contenu de la data room</strong>
+            <span>
+              {folders.length === 0
+                ? "— aucun dossier ; les exigences restent indépendantes de l’arborescence"
+                : "— structure modifiable ; les exigences restent indépendantes de l’arborescence"}
+            </span>
+          </header>
 
-        {/* Les pièces hors dossier. Le texte ne les présente pas comme un
-            oubli : déposer à la racine est un choix valable — elles restent
-            privées à l'équipe. Il dit simplement ce que le rangement change,
-            car c'est la seule conséquence qui compte. */}
-        {racine.length > 0 && (
-          <section className="v2-folder-card">
-            <header>
-              <strong>Pièces hors dossier</strong>
-              <span>
-                — visibles de votre équipe seule ; rangez-les dans un dossier
-                pour pouvoir les partager
-              </span>
-            </header>
-            {racine.map((row) => (
-              <div className="v2-folder-row" key={row.id}>
-                <Link
-                  className="v2-folder-link"
-                  href={`?document=${row.id}`}
-                >
-                  <Icon name="file" />
-                  <strong>{row.name}</strong>
-                  <span>{frenchDate(row.updatedAt)}</span>
-                  <span className="v2-status" data-tone="neutral">
-                    {row.hidden ? "Masquée" : "Privée"}
-                  </span>
-                </Link>
-                <MenuPiece
-                  document={row}
-                  dossierActuel={null}
-                  dossiers={choixDossiers}
-                  operationId={operationId}
-                />
-              </div>
-            ))}
-          </section>
-        )}
+          {folders.map((row) => (
+            <div className="v2-folder-row" key={row.id}>
+              <Link
+                className="v2-folder-link"
+                href={v2Routes.operations.documents(operationId, [row.name])}
+              >
+                <Icon name="folder" />
+                <strong>{row.name}</strong>
+                <span>
+                  {row.documentCount === 0
+                    ? "0 pièce"
+                    : `${row.documentCount} pièce${row.documentCount > 1 ? "s" : ""}`}
+                </span>
+                <span className="v2-status" data-tone="neutral">
+                  {row.guestCount === 0 ? "Privé" : folderVisibilityLabel(row.guestCount)}
+                </span>
+              </Link>
+              <MenuDossier
+                contient={row.documentCount}
+                folderId={row.id}
+                nom={row.name}
+                operationId={operationId}
+                urlOuvrir={v2Routes.operations.documents(operationId, [row.name])}
+              />
+            </div>
+          ))}
+
+          {/* Les pièces hors dossier suivent les dossiers, dans le même cadre.
+              Un simple intertitre les distingue : y déposer est un choix
+              valable, pas un oubli — elles restent privées à l'équipe. */}
+          {racine.length > 0 && (
+            <>
+              {folders.length > 0 && (
+                <div className="v2-folder-sous-titre">
+                  Hors dossier — visibles de votre équipe seule
+                </div>
+              )}
+              {racine.map((row) => (
+                <div className="v2-folder-row" key={row.id}>
+                  <Link className="v2-folder-link" href={`?document=${row.id}`}>
+                    <Icon name="file" />
+                    <strong>{row.name}</strong>
+                    <span>{frenchDate(row.updatedAt)}</span>
+                    <span className="v2-status" data-tone="neutral">
+                      {row.hidden ? "Masquée" : "Privée"}
+                    </span>
+                  </Link>
+                  <MenuPiece
+                    document={row}
+                    dossierActuel={null}
+                    dossiers={choixDossiers}
+                    operationId={operationId}
+                  />
+                </div>
+              ))}
+            </>
+          )}
+        </section>
       </div>
     );
   }

@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
+  DEVISES,
+  INSTRUMENTS_LEVEE,
+  STADES,
+} from "@/features/v2/domain/levee";
+
+import {
   closeV2Raise,
   createV2Raise,
   saveV2Raise,
@@ -20,27 +26,10 @@ import { Icon } from "./Icon";
  * ferait une levée dont le stade ne se relit nulle part.
  */
 
-const STADES: Array<[string, string]> = [
-  ["pre_seed", "Pré-amorçage"],
-  ["seed", "Amorçage"],
-  ["serie_a", "Série A"],
-  ["serie_b_plus", "Série B et plus"],
-];
-
-const DEVISES: Array<[string, string]> = [
-  ["XOF", "XOF — Franc CFA"],
-  ["EUR", "EUR — Euro"],
-  ["USD", "USD — Dollar US"],
-  ["GHS", "GHS — Cedi"],
-  ["NGN", "NGN — Naira"],
-];
-
-const INSTRUMENTS: Array<[string, string]> = [
-  ["equity", "Prise de participation"],
-  ["convertible", "Obligation convertible"],
-  ["safe", "SAFE"],
-  ["dette", "Dette"],
-];
+// Les listes vivent dans le domaine : la vue de levée les relit pour afficher
+// « Série A » là où la base porte « serie_a ». Les garder ici obligeait cet
+// écran-là à les réécrire, et il les avait écrites en dur.
+const INSTRUMENTS = INSTRUMENTS_LEVEE;
 
 /** Les trois seules audiences que `save_raise` accepte — elle filtre le reste. */
 const AUDIENCES: Array<[string, string]> = [
@@ -83,6 +72,23 @@ export function RaiseConfigure({
   const [deadline, setDeadline] = useState(raise?.deadline ?? "");
   const [audience, setAudience] = useState<string[]>(raise?.audience ?? []);
   const [description, setDescription] = useState(raise?.description ?? "");
+  const [ticketMin, setTicketMin] = useState(
+    raise?.ticketMin ? String(raise.ticketMin) : "",
+  );
+  const [ticketMax, setTicketMax] = useState(
+    raise?.ticketMax ? String(raise.ticketMax) : "",
+  );
+  const [leadStatut, setLeadStatut] = useState(raise?.leadStatut ?? "");
+  const [partCapital, setPartCapital] = useState(
+    raise?.partCapital ? String(raise.partCapital) : "",
+  );
+
+  // Se calcule à la saisie, pas à l'enregistrement : découvrir une fourchette
+  // inversée après avoir rempli tout le formulaire est une punition.
+  const ticketInverse =
+    enNombre(ticketMin) !== null &&
+    enNombre(ticketMax) !== null &&
+    (enNombre(ticketMin) as number) > (enNombre(ticketMax) as number);
 
   async function enregistrer() {
     setBusy(true);
@@ -99,6 +105,10 @@ export function RaiseConfigure({
       deadline: deadline || null,
       audience,
       description,
+      ticketMin: enNombre(ticketMin),
+      ticketMax: enNombre(ticketMax),
+      leadStatut: leadStatut || null,
+      partCapital: enNombre(partCapital),
     });
 
     setBusy(false);
@@ -246,13 +256,76 @@ export function RaiseConfigure({
                   />
                 </span>
               </label>
+
+              <label className="v2-field">
+                <span>
+                  Part de capital envisagée <small>— facultatif</small>
+                </span>
+                <span className="v2-control">
+                  <input
+                    inputMode="decimal"
+                    onChange={(event) => setPartCapital(event.target.value)}
+                    placeholder="15"
+                    value={partCapital}
+                  />
+                  <span className="v2-control-suffixe">%</span>
+                </span>
+              </label>
+
+              <label className="v2-field">
+                <span>
+                  Ticket minimum <small>— facultatif</small>
+                </span>
+                <span className="v2-control">
+                  <input
+                    inputMode="numeric"
+                    onChange={(event) => setTicketMin(event.target.value)}
+                    placeholder="25 000 000"
+                    value={ticketMin}
+                  />
+                </span>
+              </label>
+
+              <label className="v2-field">
+                <span>
+                  Ticket maximum <small>— facultatif</small>
+                </span>
+                <span className="v2-control">
+                  <input
+                    inputMode="numeric"
+                    onChange={(event) => setTicketMax(event.target.value)}
+                    placeholder="150 000 000"
+                    value={ticketMax}
+                  />
+                </span>
+              </label>
+
+              <label className="v2-field">
+                <span>
+                  Investisseur principal <small>— facultatif</small>
+                </span>
+                <span className="v2-control">
+                  <select
+                    onChange={(event) => setLeadStatut(event.target.value)}
+                    value={leadStatut}
+                  >
+                    <option value="">Non renseigné</option>
+                    <option value="recherche">Recherché</option>
+                    <option value="trouve">Trouvé</option>
+                    <option value="sans_lead">Ce tour s’en passe</option>
+                  </select>
+                </span>
+              </label>
             </div>
-            <p className="v2-panel-note">
-              Ticket minimum et maximum, recherche d’un lead et part de capital
-              envisagée ne sont pas encore enregistrables : aucune colonne ne
-              les porte. Les afficher ici ferait saisir des valeurs qui
-              disparaîtraient à l’enregistrement.
-            </p>
+            {/* La cohérence se dit AVANT l'enregistrement. La base refuse une
+                fourchette inversée ; l'apprendre par un message d'erreur après
+                avoir rempli tout le formulaire serait une punition. */}
+            {ticketInverse && (
+              <p className="v2-panel-note">
+                Le ticket minimum dépasse le maximum — vérifiez les deux
+                montants avant d’enregistrer.
+              </p>
+            )}
           </div>
         </div>
 

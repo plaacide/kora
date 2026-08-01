@@ -11,6 +11,13 @@ import type {
 } from "@/features/v2/domain/pipeline";
 import type { AccessRow } from "@/features/v2/server/access";
 import type { SignauxDocumentaires } from "@/features/v2/server/fiche";
+import {
+  fourchetteTicket,
+  libelleInstrumentLevee,
+  libelleLead,
+  libelleStade,
+  repartition,
+} from "@/features/v2/domain/levee";
 import type { Raise } from "@/features/v2/server/raise";
 import type { MiseAJour, MiseAJourResume } from "@/features/v2/server/updates";
 import { CommitmentsScreen } from "./Commitments";
@@ -415,13 +422,43 @@ function RaiseOverview({
 
       <section className="v2-lever-card v2-raise-settings">
         <header><h2>Paramètres essentiels</h2><Link href={queryHref("configure")}>Modifier la levée</Link></header>
+        {/* CES SIX VALEURS ÉTAIENT ÉCRITES EN DUR. « Série A · Prise de
+            participation · 25 – 150 M XOF » s'affichait sur toutes les levées,
+            y compris une levée vide qui n'avait jamais rien déclaré. Un écran
+            de synthèse qui invente ses chiffres est pire qu'un écran vide : on
+            s'y fie. */}
         <div>
-          <div><span>Stade</span><strong>Série A</strong></div>
-          <div><span>Instrument</span><strong>Prise de participation</strong></div>
-          <div><span>Ticket recherché</span><strong>25 – 150 M XOF</strong></div>
-          <div><span>Lead</span><strong>Recherché</strong></div>
-          <div><span>Date cible</span><strong>30-11-2026</strong></div>
-          <div><span>Usages des fonds</span><strong>Réseau 60 % · équipe 25 % · BFR 15 %</strong></div>
+          <div>
+            <span>Stade</span>
+            <strong>{libelleStade(raise.stage) ?? "Non renseigné"}</strong>
+          </div>
+          <div>
+            <span>Instrument</span>
+            <strong>{libelleInstrumentLevee(raise.instrument) ?? "Non renseigné"}</strong>
+          </div>
+          <div>
+            <span>Ticket recherché</span>
+            <strong>
+              {fourchetteTicket(raise.ticketMin, raise.ticketMax, devise) ??
+                "Non renseigné"}
+            </strong>
+          </div>
+          <div>
+            <span>Lead</span>
+            <strong>{libelleLead(raise.leadStatut) ?? "Non renseigné"}</strong>
+          </div>
+          <div>
+            <span>Date cible</span>
+            <strong>
+              {raise.deadline
+                ? new Date(raise.deadline).toLocaleDateString("fr-FR")
+                : "Non renseignée"}
+            </strong>
+          </div>
+          <div>
+            <span>Usages des fonds</span>
+            <strong>{repartition(raise.usagesFonds) ?? "Non renseignés"}</strong>
+          </div>
         </div>
       </section>
     </LeverFrame>

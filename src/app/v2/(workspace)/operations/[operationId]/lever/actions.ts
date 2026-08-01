@@ -50,6 +50,15 @@ export async function saveV2Raise(input: {
   deadline?: string | null;
   audience?: string[] | null;
   description?: string | null;
+  /** La fourchette de ticket recherchée, en unités de la devise. */
+  ticketMin?: number | null;
+  ticketMax?: number | null;
+  /** « recherche » · « trouve » · « sans_lead ». */
+  leadStatut?: string | null;
+  /** Part de capital envisagée, en pourcentage. */
+  partCapital?: number | null;
+  /** Répartition de l'usage des fonds : [{ poste, part }]. */
+  usagesFonds?: Array<{ poste: string; part: number }> | null;
 }): Promise<Resultat> {
   const supabase = await createClient();
 
@@ -68,6 +77,11 @@ export async function saveV2Raise(input: {
     // porte un `revoke update from authenticated`, et l'écriture directe
     // était refusée SANS erreur — le nom saisi disparaissait en silence.
     p_name: input.name ?? null,
+    p_ticket_min: input.ticketMin ?? null,
+    p_ticket_max: input.ticketMax ?? null,
+    p_lead_statut: input.leadStatut ?? null,
+    p_part_capital: input.partCapital ?? null,
+    p_usages_fonds: input.usagesFonds ?? null,
   });
 
   if (error) {
