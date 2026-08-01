@@ -3,10 +3,26 @@
 La boussole du branchement : ce qui lit vraiment la base, ce qui affiche encore
 des données écrites en dur, et ce qui manque côté serveur pour finir.
 
-**Dernière vérification : 4 août 2026**, branche `v2/rebuild`. Établie en
+**Dernière vérification : 1er août 2026**, branche `v2/rebuild`. Établie en
 re-dérivant depuis le code — quels écrans importent `features/v2/server/*` — et
 en interrogeant la base de staging pour l'état réel des migrations. Ce document
 se périme : le relire avant de s'y fier.
+
+## Ce qui a changé le 1er août
+
+**Les erreurs ne fuient plus.** Cinquante-sept retours d'échec portaient une
+chaîne libre, dont trente-six le message Postgres brut ; les vingt-quatre
+messages humains écrits dans les écrans étaient inatteignables. `CodeErreur` est
+désormais une union fermée et `Echec` ne porte aucun texte — voir
+[ADR-001](ADR-001-frontiere-des-erreurs.md).
+
+**Les paramètres d'une levée sont validés.** `saveV2Raise` n'écrivait rien de
+plus que ce qu'on lui donnait : fourchette de ticket inversée, part de capital à
+250 %, devise inventée. Les règles du §27 vivent dans `domain/levee-schema.ts`,
+testées.
+
+**L'onboarding ne part plus deux fois.** Ses quatre formulaires n'avaient aucun
+état d'envoi ; un second clic sur connexion lente créait deux organisations.
 
 ## Comment lire
 
@@ -528,17 +544,25 @@ autorisés — mais staging reste la première étape.
 
 ### 1. Réglages d'une opération — PRIORITÉ, décidée le 1er août
 
-**Rien ne permet de modifier une opération après sa création.** Ni son nom, ni
-son montant, ni sa devise, ni son étape, ni l'exigence de NDA ; ni de
-l'archiver, ni de la clôturer, ni de la supprimer. Le dossier de l'opération
-contient `overview`, `preparation`, `documents`, `access`, `lever`,
-`investors`, `activity` — et aucun `settings`.
+**Presque rien ne permet de modifier une opération après sa création.** Ni son
+nom, ni son montant, ni sa devise, ni son étape, ni l'exigence de NDA ; ni de la
+supprimer. Le dossier de l'opération contient `overview`, `preparation`,
+`documents`, `access`, `lever`, `investors`, `activity` — et aucun `settings`.
 
-C'est ce trou qui a fait retirer trois options du menu « ⋯ » le 4 août —
-« Modifier », « Dupliquer la structure », « Exporter l'index » — plutôt que de
-les laisser ne rien faire. `OperationDialog` (clôture, archivage) reste
-entièrement décoratif : ses boutons de confirmation n'ont aucun gestionnaire.
-**Il s'affiche et ne fait rien** — à retirer du menu tant qu'il ne sert pas.
+**L'archivage, lui, est branché** (1er août) : le menu « ⋯ » ouvre une fenêtre
+qui nomme la vraie opération et appelle `set_deal_archived`. La remise en
+activité passe par le même chemin. C'est le seul geste de réglage qui existe.
+
+C'est ce trou qui a fait retirer quatre options du menu « ⋯ » plutôt que de les
+laisser ne rien faire : « Modifier », « Dupliquer la structure », « Exporter
+l'index », et « Clôturer ».
+
+**« Clôturer une opération » n'a aucun support en base, et c'est une question
+produit ouverte.** `deal_stage` — sourcing, screening, due diligence, ic,
+signed, passed — décrit l'avancement d'un dossier côté investisseur, hérité de
+la V1. La clôture qui existe vraiment est celle d'une LEVÉE (`close_raise`), et
+elle a son écran. Reste à décider si une opération de fondateur doit pouvoir se
+clôturer autrement qu'en s'archivant.
 
 **Tout est prêt en base**, rien n'est à écrire côté SQL :
 
