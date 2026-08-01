@@ -7,6 +7,7 @@
  *   - pdf     : rendu direct par pdf.js, filigrané.
  *   - office  : converti en PDF par LibreOffice, puis filigrané (docx, pptx…).
  *   - sheet   : tableur — lu comme une grille, PAS comme une image.
+ *   - image   : photo ou capture — filigranée puis servie, comme une page.
  *   - other   : ni l'un ni l'autre (archive, vidéo…) — pas d'aperçu.
  *
  * Pourquoi les tableurs à part : un modèle financier rendu en PNG est
@@ -21,7 +22,10 @@
  * page rendue en image. Voir `viewer.sheetNotice`.
  */
 
-export type DocKind = "pdf" | "office" | "sheet" | "other";
+export type DocKind = "pdf" | "office" | "sheet" | "image" | "other";
+
+// Images : rendues telles quelles, filigranées comme une page.
+const IMAGE_EXT = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".avif"];
 
 // Tableurs : lus en grille.
 const SHEET_EXT = [".xlsx", ".xls", ".xlsm", ".ods", ".csv"];
@@ -62,8 +66,12 @@ export function docKind(name: string, mime: string | null): DocKind {
   // application/vnd.ms-excel pour un .csv, et octet-stream pour le reste.
   if (SHEET_EXT.includes(e)) return "sheet";
   if (OFFICE_EXT.includes(e)) return "office";
+  if (IMAGE_EXT.includes(e)) return "image";
   if (SHEET_MIME.includes(m)) return "sheet";
   if (OFFICE_MIME.includes(m)) return "office";
+  // Le type MIME en dernier recours : un fichier sans extension reste lisible
+  // si le navigateur a su le nommer au dépôt.
+  if (m.startsWith("image/")) return "image";
   return "other";
 }
 

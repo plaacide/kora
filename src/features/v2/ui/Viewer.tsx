@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { PageImage } from "@/components/viewer/PageImage";
@@ -32,11 +33,21 @@ const LEVEL_NOTE: Record<string, string> = {
 
 export function SecureViewer({
   document,
+  enSurcouche,
   retour,
 }: {
   document: ViewerDocument;
+  /**
+   * Posé PAR-DESSUS l'écran d'où l'on vient, plutôt qu'à sa place.
+   *
+   * Les côtés deviennent alors translucides : on continue de voir la liste
+   * derrière, et cliquer à côté de la page referme — comme on repose un
+   * dossier sur la table. Consulter une pièce n'est pas quitter la data room.
+   */
+  enSurcouche?: boolean;
   retour?: string;
 }) {
+  const router = useRouter();
   const [pageCount, setPageCount] = useState(0);
   const [current, setCurrent] = useState(1);
 
@@ -47,7 +58,7 @@ export function SecureViewer({
   const pages = pageCount > 0 ? pageCount : 1;
 
   return (
-    <div className="v2-viewer">
+    <div className="v2-viewer" data-surcouche={enSurcouche}>
       <header className="v2-viewer-bar">
         <Link
           aria-label="Fermer la visionneuse"
@@ -87,7 +98,25 @@ export function SecureViewer({
         )}
       </header>
 
-      <div className="v2-viewer-stage">
+      {/* CLIQUER À CÔTÉ DE LA PAGE REFERME — mais seulement à côté. Le test
+          `target === currentTarget` distingue le vide du contenu : un clic sur
+          le document, sur une image ou sur un bouton ne referme jamais.
+          Une couche de fond en `position:absolute` aurait été plus simple à
+          écrire, mais elle aurait avalé la molette : on ne pourrait plus
+          faire défiler les pages. */}
+      <div
+        className="v2-viewer-stage"
+        onClick={
+          enSurcouche
+            ? (event) => {
+                if (event.target !== event.currentTarget) return;
+                router.push(
+                  retour || `/v2/operations/${document.operationId}/documents`,
+                );
+              }
+            : undefined
+        }
+      >
         {/* `PageImage` porte son propre état d'échec : un format non rendable
             (tableur, archive) affiche sa propre explication à la place de
             l'image, sans faire tomber la visionneuse entière. */}

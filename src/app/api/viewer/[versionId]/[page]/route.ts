@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { renderPdfPage } from "@/lib/viewer/render";
+import { renderImage, renderPdfPage } from "@/lib/viewer/render";
 import { docKind } from "@/lib/doc-types";
 import { officeToPdf, officeConversionAvailable } from "@/lib/viewer/office";
 import { resolveVersionAccess } from "@/lib/viewer/access";
@@ -57,7 +57,8 @@ export async function GET(
   const kind = docKind(doc.name, mimeType);
 
   if (kind === "other") {
-    // Archive, vidéo, etc. : aucun aperçu filigrané possible.
+    // Archive, vidéo : aucun aperçu filigrané possible. Une vidéo se lirait en
+    // flux, ce qui est un autre modèle de sécurité — on ne le simule pas.
     return NextResponse.json(
       { error: "unsupported_format", kind: "other" },
       { status: 415 },
@@ -109,6 +110,35 @@ export async function GET(
 
   // Le PDF converti est-il déjà en cache ? Une version est immuable, la
   // conversion aussi : c'est ce qui évitait 13 conversions pour 13 pages.
+  // UNE IMAGE N'A RIEN À CONVERTIR : on la filigrane et on la sert, comme une
+  // page unique. Passer par le canvas et non par le fichier d'origine est ce
+  // qui garantit que le filigrane est dans les pixels — un JPEG servi tel quel
+  // se récupère d'un clic droit.
+  if (kind === "image") {
+    const { data: fichier, error: erreurImage } = await admin.storage
+      .from("documents")
+      .download(storageKey);
+
+    if (erreurImage || !fichier) {
+      return NextResponse.json({ error: "lecture impossible" }, { status: 500 });
+    }
+
+    try {
+      const rendu = await renderImage(
+        new Uint8Array(await fichier.arrayBuffer()),
+        watermark,
+      );
+      await auditPage(admin, userId, doc, pageNo, level, thumb);
+      return pngResponse(rendu.png, rendu.pageCount, level, false);
+    } catch (err) {
+      console.error("[viewer] image illisible", doc.name, err);
+      return NextResponse.json(
+        { error: "image_unreadable", kind: "image" },
+        { status: 502 },
+      );
+    }
+  }
+
   let pdfBytes: Uint8Array<ArrayBufferLike> | null =
     kind === "office" ? await readDerived(admin, pdfKey(versionId)) : null;
 

@@ -17,6 +17,8 @@ import {
   resolveFolderPath,
 } from "@/features/v2/server/documents";
 import { requireV2Workspace } from "@/features/v2/server/session";
+import { viewerDocument } from "@/features/v2/server/viewer";
+import { SecureViewer } from "@/features/v2/ui/Viewer";
 
 import {
   createV2Folder,
@@ -55,11 +57,14 @@ function frenchDate(value: string | null): string {
  * navigateur, qui pourrait le remplacer par celui d'une autre organisation.
  */
 function MenuPiece({
+  chemin,
   document,
   dossierActuel,
   dossiers,
   operationId,
 }: {
+  /** L'adresse de la vue courante — le lecteur s'y pose en surcouche. */
+  chemin: string;
   document: DocumentRow;
   dossierActuel: string | null;
   dossiers: readonly { id: string; nom: string }[];
@@ -89,12 +94,9 @@ function MenuPiece({
         "use server";
         return deleteV2Document({ operationId, documentId: document.id });
       }}
-      // « Ouvrir » mène à la VISIONNEUSE, pas au panneau latéral : celui-ci
-      // montre les versions et le journal, jamais le document lui-même.
-      // C'est ce qui donnait l'impression que le lecteur ne marchait pas.
-      urlVisionneuse={`/v2/visionneuse?document=${document.id}&retour=${encodeURIComponent(
-        `/v2/operations/${operationId}/documents`,
-      )}`}
+      // « Ouvrir » pose le lecteur PAR-DESSUS la liste — le panneau latéral,
+      // lui, montre les versions et le journal, jamais le document.
+      urlVisionneuse={`${chemin}?lecteur=${document.id}`}
     />
   );
 }
@@ -141,10 +143,12 @@ export default async function DocumentsPage({
     document?: string;
     upload?: string;
     associations?: string;
+    /** La pièce ouverte en surcouche, par-dessus la liste. */
+    lecteur?: string;
   }>;
 }) {
   const { operationId, folderPath } = await params;
-  const { document, upload, associations } = await searchParams;
+  const { document, upload, associations, lecteur } = await searchParams;
 
   // L'organisation compose le premier segment de la clé de stockage : c'est
   // sur lui que la policy du bucket vérifie l'appartenance.
@@ -160,6 +164,12 @@ export default async function DocumentsPage({
   // L'adresse d'où l'on est venu : « Ajouter du contenu » doit déposer DANS le
   // dossier ouvert, pas à la racine.
   const cheminActuel = v2Routes.operations.documents(operationId, folderPath ?? []);
+
+  // LE LECTEUR SE POSE SUR LA LISTE, il ne la remplace pas. Consulter une pièce
+  // n'est pas quitter la data room : on garde la liste derrière, et le clic à
+  // côté referme. La page /v2/visionneuse reste pour les liens directs, où il
+  // n'y a rien derrière à montrer.
+  const aLire = lecteur ? await viewerDocument(lecteur) : null;
 
   if (!folder) {
     // LES PIÈCES DE LA RACINE SE LISENT AUSSI. Le dépôt les y accepte depuis le
@@ -178,6 +188,7 @@ export default async function DocumentsPage({
     const choixDossiers = folders.map((f) => ({ id: f.id, nom: f.name }));
 
     return (
+      <>
       <div className="v2-documents-page">
         <BarreDataRoom
           hrefAjouter={`${cheminActuel}?upload=1`}
@@ -320,6 +331,7 @@ export default async function DocumentsPage({
                     </span>
                   </Link>
                   <MenuPiece
+                    chemin={cheminActuel}
                     document={row}
                     dossierActuel={null}
                     dossiers={choixDossiers}
@@ -331,6 +343,8 @@ export default async function DocumentsPage({
           )}
         </section>
       </div>
+      {aLire && <SecureViewer document={aLire} enSurcouche retour={cheminActuel} />}
+      </>
     );
   }
 
@@ -445,6 +459,7 @@ export default async function DocumentsPage({
                       </td>
                       <td>
                         <MenuPiece
+                          chemin={cheminActuel}
                           document={row}
                           dossierActuel={folder.id}
                           dossiers={choixDossiers}
@@ -504,9 +519,7 @@ export default async function DocumentsPage({
           detail={detail}
           operationId={operationId}
           organizationId={organization.id}
-          viewerHref={`/v2/visionneuse?document=${detail.id}&retour=${encodeURIComponent(
-            `${v2Routes.operations.documents(operationId, folderPath ?? [])}?document=${detail.id}`,
-          )}`}
+          viewerHref={`${cheminActuel}?lecteur=${detail.id}`}
         />
       )}
       {pending.length > 0 && (
@@ -517,6 +530,7 @@ export default async function DocumentsPage({
           requirements={requirements}
         />
       )}
+      {aLire && <SecureViewer document={aLire} enSurcouche retour={cheminActuel} />}
     </>
   );
 }

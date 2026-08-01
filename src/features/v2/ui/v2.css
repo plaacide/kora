@@ -1036,6 +1036,21 @@ ul.v2-check-list{margin:0;padding:0;list-style:none}
 
 /* Écran 19 — Visionneuse sécurisée */
 .v2-viewer{display:flex;min-height:100vh;flex-direction:column;background:#1d2433}
+
+/* EN SURCOUCHE : le lecteur se pose SUR la data room au lieu de la remplacer.
+   Le fond devient translucide — on continue de voir la liste derrière, donc de
+   savoir où l'on est — et le clic à côté de la page referme. Consulter une
+   pièce n'est pas quitter la data room, et l'écran ne doit pas le faire croire.
+
+   La barre et le pied restent opaques : ce sont eux qui portent le nom du
+   document, le niveau d'accès et le numéro de page. Les rendre translucides
+   les ferait lire par-dessus le contenu de la liste. */
+.v2-viewer[data-surcouche=true]{position:fixed;z-index:95;inset:0;min-height:0;background:rgba(16,24,40,.72);backdrop-filter:blur(3px)}
+.v2-viewer[data-surcouche=true] .v2-viewer-bar,
+.v2-viewer[data-surcouche=true] .v2-viewer-foot{background:rgba(16,24,40,.92)}
+/* Le vide autour de la page se clique pour refermer — le curseur le dit. */
+.v2-viewer[data-surcouche=true] .v2-viewer-stage{cursor:zoom-out}
+.v2-viewer[data-surcouche=true] .v2-page{cursor:default}
 .v2-viewer-bar{display:flex;height:60px;flex:0 0 auto;align-items:center;gap:14px;background:#101828;padding:0 24px;color:#fff}
 .v2-viewer-close{display:grid;width:32px;height:32px;flex:0 0 auto;place-items:center;border-radius:6px;color:rgba(255,255,255,.7)!important;font-size:22px;line-height:1}
 .v2-viewer-close:hover{background:rgba(255,255,255,.1)}
@@ -1048,7 +1063,11 @@ ul.v2-check-list{margin:0;padding:0;list-style:none}
 .v2-viewer-icon:hover{background:rgba(255,255,255,.08)}
 .v2-viewer-zoom{color:rgba(255,255,255,.7);font-size:12.5px;white-space:nowrap}
 .v2-viewer-download{display:inline-flex;height:36px;flex:0 0 auto;align-items:center;border-radius:6px;background:rgba(255,255,255,.1);padding:0 13px;color:rgba(255,255,255,.45);font:600 12.5px var(--font-v2-sans),sans-serif;cursor:default}
-.v2-viewer-stage{display:flex;flex:1;align-items:center;justify-content:center;padding:28px}
+/* LES PAGES SE SUIVENT VERS LE BAS, pas vers la droite. La rangée horizontale
+   venait d'un `display:flex` sans direction : avec une seule page à l'écran on
+   ne le voyait pas, et un document de douze pages s'étalait sur douze écrans
+   de large. Un document se lit en descendant. */
+.v2-viewer-stage{display:flex;flex:1;flex-direction:column;align-items:center;gap:22px;overflow:auto;padding:28px}
 /* SEUL LE DOCUMENT EST VISIBLE. Le cadre blanc, l'ombre portée et la hauteur
    fixe dessinaient une « feuille » autour de la page — un décor qui rognait le
    document et le faisait paraître plus petit qu'il n'est. La page arrive déjà

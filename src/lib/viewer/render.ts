@@ -74,3 +74,46 @@ export async function renderPdfPage(
 
   return { png, pageCount };
 }
+
+/**
+ * Rendre une IMAGE comme on rend une page de PDF.
+ *
+ * POURQUOI PASSER PAR LE CANVAS plutôt que servir le fichier tel quel. Le
+ * modèle de sécurité de la visionneuse tient à une chose : ce que reçoit le
+ * navigateur n'est JAMAIS le fichier d'origine, et le filigrane est incrusté
+ * dans les pixels. Servir un JPEG directement le rendrait téléchargeable d'un
+ * clic droit, filigrane compris s'il était posé en CSS — c'est-à-dire retirable
+ * en trois clics dans l'inspecteur.
+ *
+ * Une image compte pour UNE page : le lecteur n'a donc rien de particulier à
+ * faire, il affiche une page unique comme pour un PDF d'une feuille.
+ */
+export async function renderImage(
+  data: Uint8Array<ArrayBufferLike>,
+  watermark: string,
+): Promise<RenderResult> {
+  const { loadImage } = await import("@napi-rs/canvas");
+
+  const image = await loadImage(Buffer.from(data));
+
+  // Une très grande photo n'a pas à être servie en pleine résolution : elle
+  // pèserait plusieurs mégaoctets pour un écran qui n'en montrera qu'une
+  // fraction. On plafonne la largeur, en gardant les proportions.
+  const MAX = 1800;
+  const ratio = image.width > MAX ? MAX / image.width : 1;
+  const largeur = Math.max(1, Math.round(image.width * ratio));
+  const hauteur = Math.max(1, Math.round(image.height * ratio));
+
+  const canvas = createCanvas(largeur, hauteur);
+  const ctx = canvas.getContext("2d");
+
+  // Un fond blanc sous l'image : une PNG transparente servie sur le fond sombre
+  // du lecteur deviendrait illisible.
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, largeur, hauteur);
+  ctx.drawImage(image, 0, 0, largeur, hauteur);
+
+  if (watermark) drawWatermark(ctx, largeur, hauteur, watermark);
+
+  return { png: await canvas.encode("png"), pageCount: 1 };
+}
