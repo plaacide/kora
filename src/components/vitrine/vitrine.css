@@ -71,6 +71,11 @@
   color: var(--vit-texte-2);
   font: 500 13.5px var(--font-vit-texte), Inter, sans-serif;
 }
+/* « Produit » et « Tarifs » n'ont pas de page. Ils gardent leur place dans la
+   nav sans se donner pour des liens — ni curseur main, ni survol coloré. */
+.vit-nav nav span[data-attente] {
+  cursor: default;
+}
 .vit-espace {
   flex: 1;
 }
