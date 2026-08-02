@@ -1,0 +1,2224 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/Users/placidebakala/Developer/Sanza/kora/node_modules/.bin/playwright",
+      "test"
+    ],
+    "configFile": "/Users/placidebakala/Developer/Sanza/kora/playwright.config.ts",
+    "rootDir": "/Users/placidebakala/Developer/Sanza/kora/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "connexion",
+        "name": "connexion",
+        "testDir": "/Users/placidebakala/Developer/Sanza/kora/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/auth\\.setup\\.ts/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "connexion-neuve",
+        "name": "connexion-neuve",
+        "testDir": "/Users/placidebakala/Developer/Sanza/kora/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/auth-neuf\\.setup\\.ts/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chrome-desktop",
+        "name": "chrome-desktop",
+        "testDir": "/Users/placidebakala/Developer/Sanza/kora/e2e",
+        "testIgnore": [
+          "/auth.*\\.setup\\.ts/",
+          "/public\\./",
+          "/mobile\\./",
+          "/onboarding\\./",
+          "/deconnexion\\./"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile",
+        "name": "mobile",
+        "testDir": "/Users/placidebakala/Developer/Sanza/kora/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/mobile\\./"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "deconnexion",
+        "name": "deconnexion",
+        "testDir": "/Users/placidebakala/Developer/Sanza/kora/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/deconnexion\\./"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "onboarding",
+        "name": "onboarding",
+        "testDir": "/Users/placidebakala/Developer/Sanza/kora/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/onboarding\\./"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "public",
+        "name": "public",
+        "testDir": "/Users/placidebakala/Developer/Sanza/kora/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/public\\./"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "docs/beta-readiness/evidence/playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/beta-readiness/evidence/resultats.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "auth.setup.ts",
+      "file": "auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "ouvrir une session",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "connexion",
+              "projectName": "connexion",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4550,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-02T07:50:08.761Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/auth.setup.ts-ouvrir-une-session-connexion/test-finished-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/auth.setup.ts-ouvrir-une-session-connexion/video.webm"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/auth.setup.ts-ouvrir-une-session-connexion/trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "17e3fe6f4d9d8bd79c6b-94ecf37e235bbc921af4",
+          "file": "auth.setup.ts",
+          "line": 18,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "auth-neuf.setup.ts",
+      "file": "auth-neuf.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "ouvrir une session neuve",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "connexion-neuve",
+              "projectName": "connexion-neuve",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5568,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-02T07:50:13.816Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/auth-neuf.setup.ts-ouvrir-une-session-neuve-connexion-neuve/test-finished-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/auth-neuf.setup.ts-ouvrir-une-session-neuve-connexion-neuve/video.webm"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/auth-neuf.setup.ts-ouvrir-une-session-neuve-connexion-neuve/trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "785fbb23f32030bacf97-fe71fb63bc61fb2cdaf8",
+          "file": "auth-neuf.setup.ts",
+          "line": 12,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "limites.spec.ts",
+      "file": "limites.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Limites de plan — une seule opération active",
+          "file": "limites.spec.ts",
+          "line": 24,
+          "column": 6,
+          "specs": [
+            {
+              "title": "la seconde opération est refusée, et le refus s’explique",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chrome-desktop",
+                  "projectName": "chrome-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6101,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:12.519Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/limites-Limites-de-plan-—--c19d5-usée-et-le-refus-s’explique-chrome-desktop/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/limites-Limites-de-plan-—--c19d5-usée-et-le-refus-s’explique-chrome-desktop/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/limites-Limites-de-plan-—--c19d5-usée-et-le-refus-s’explique-chrome-desktop/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "26df262777063bd404c8-2d62a8bf1f9995804c55",
+              "file": "limites.spec.ts",
+              "line": 25,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "deconnexion.spec.ts",
+      "file": "deconnexion.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Menu du compte",
+          "file": "deconnexion.spec.ts",
+          "line": 13,
+          "column": 6,
+          "specs": [
+            {
+              "title": "l’avatar ouvre un menu qui nomme le compte",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "deconnexion",
+                  "projectName": "deconnexion",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2201,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:18.944Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-a9cdb-un-menu-qui-nomme-le-compte-deconnexion/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-a9cdb-un-menu-qui-nomme-le-compte-deconnexion/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-a9cdb-un-menu-qui-nomme-le-compte-deconnexion/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "87b325eb7c36240f7393-b726303aea76d2aa41e2",
+              "file": "deconnexion.spec.ts",
+              "line": 14,
+              "column": 7
+            },
+            {
+              "title": "Échap referme le menu et rend le focus à l’avatar",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "deconnexion",
+                  "projectName": "deconnexion",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2740,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:21.258Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-6d858-et-rend-le-focus-à-l’avatar-deconnexion/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-6d858-et-rend-le-focus-à-l’avatar-deconnexion/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-6d858-et-rend-le-focus-à-l’avatar-deconnexion/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "87b325eb7c36240f7393-4871a347fe65bf61c222",
+              "file": "deconnexion.spec.ts",
+              "line": 36,
+              "column": 7
+            },
+            {
+              "title": "un clic à l’extérieur referme le menu",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "deconnexion",
+                  "projectName": "deconnexion",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2873,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:24.016Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-90869-l’extérieur-referme-le-menu-deconnexion/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-90869-l’extérieur-referme-le-menu-deconnexion/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Menu-du-compte-90869-l’extérieur-referme-le-menu-deconnexion/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "87b325eb7c36240f7393-a5b4241c1d5ed809c990",
+              "file": "deconnexion.spec.ts",
+              "line": 48,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Se déconnecter",
+          "file": "deconnexion.spec.ts",
+          "line": 59,
+          "column": 6,
+          "specs": [
+            {
+              "title": "ramène à la connexion de la V2, et non à celle de la V1",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "deconnexion",
+                  "projectName": "deconnexion",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4511,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:26.913Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Se-déconnecter-578d0--V2-et-non-à-celle-de-la-V1-deconnexion/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Se-déconnecter-578d0--V2-et-non-à-celle-de-la-V1-deconnexion/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Se-déconnecter-578d0--V2-et-non-à-celle-de-la-V1-deconnexion/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "87b325eb7c36240f7393-511097b9762566f1d6a7",
+              "file": "deconnexion.spec.ts",
+              "line": 64,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Bandeau de l’onboarding",
+          "file": "deconnexion.spec.ts",
+          "line": 90,
+          "column": 6,
+          "specs": [
+            {
+              "title": "porte le logo, l’aide et la déconnexion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Le compte de recette a déjà terminé son onboarding.",
+                      "location": {
+                        "file": "/Users/placidebakala/Developer/Sanza/kora/e2e/deconnexion.spec.ts",
+                        "line": 104,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "deconnexion",
+                  "projectName": "deconnexion",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 2684,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:31.453Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Le compte de recette a déjà terminé son onboarding.",
+                          "location": {
+                            "file": "/Users/placidebakala/Developer/Sanza/kora/e2e/deconnexion.spec.ts",
+                            "line": 104,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Bandeau-de-l’o-c33e8-go-l’aide-et-la-déconnexion-deconnexion/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Bandeau-de-l’o-c33e8-go-l’aide-et-la-déconnexion-deconnexion/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Bandeau-de-l’o-c33e8-go-l’aide-et-la-déconnexion-deconnexion/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "87b325eb7c36240f7393-1f39e8e5b5ea477fa45b",
+              "file": "deconnexion.spec.ts",
+              "line": 100,
+              "column": 7
+            },
+            {
+              "title": "la déconnexion depuis l’onboarding ramène à la connexion V2",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Le compte de recette a déjà terminé son onboarding.",
+                      "location": {
+                        "file": "/Users/placidebakala/Developer/Sanza/kora/e2e/deconnexion.spec.ts",
+                        "line": 132,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "deconnexion",
+                  "projectName": "deconnexion",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 2667,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:34.153Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Le compte de recette a déjà terminé son onboarding.",
+                          "location": {
+                            "file": "/Users/placidebakala/Developer/Sanza/kora/e2e/deconnexion.spec.ts",
+                            "line": 132,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Bandeau-de-l’o-3f645-ng-ramène-à-la-connexion-V2-deconnexion/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Bandeau-de-l’o-3f645-ng-ramène-à-la-connexion-V2-deconnexion/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/deconnexion-Bandeau-de-l’o-3f645-ng-ramène-à-la-connexion-V2-deconnexion/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "87b325eb7c36240f7393-b7403881b2972c65a118",
+              "file": "deconnexion.spec.ts",
+              "line": 127,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "onboarding.spec.ts",
+      "file": "onboarding.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Onboarding — choix de l’objectif",
+          "file": "onboarding.spec.ts",
+          "line": 25,
+          "column": 6,
+          "specs": [
+            {
+              "title": "le clic change ce que l’écran montre",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "onboarding",
+                  "projectName": "onboarding",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2112,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:37.038Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-12763-hange-ce-que-l’écran-montre-onboarding/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-12763-hange-ce-que-l’écran-montre-onboarding/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-12763-hange-ce-que-l’écran-montre-onboarding/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fe534f0825407f213faa-26446925d3d773cdee7e",
+              "file": "onboarding.spec.ts",
+              "line": 33,
+              "column": 7
+            },
+            {
+              "title": "le clavier parcourt les cartes aux flèches",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "onboarding",
+                  "projectName": "onboarding",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2634,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:39.251Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-1ead3-ourt-les-cartes-aux-flèches-onboarding/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-1ead3-ourt-les-cartes-aux-flèches-onboarding/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-1ead3-ourt-les-cartes-aux-flèches-onboarding/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fe534f0825407f213faa-1a7a4f39016bfd872f74",
+              "file": "onboarding.spec.ts",
+              "line": 57,
+              "column": 7
+            },
+            {
+              "title": "l’objectif choisi est bien celui qui part",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "onboarding",
+                  "projectName": "onboarding",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2674,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:41.909Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-ff767-isi-est-bien-celui-qui-part-onboarding/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-ff767-isi-est-bien-celui-qui-part-onboarding/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-ch-ff767-isi-est-bien-celui-qui-part-onboarding/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fe534f0825407f213faa-04091d2aad354e75bfe3",
+              "file": "onboarding.spec.ts",
+              "line": 67,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Onboarding — la saisie ne se perd pas",
+          "file": "onboarding.spec.ts",
+          "line": 82,
+          "column": 6,
+          "specs": [
+            {
+              "title": "l’erreur s’efface de l’URL après lecture",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "onboarding",
+                  "projectName": "onboarding",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3294,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:44.602Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-5b7e9-face-de-l’URL-après-lecture-onboarding/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-5b7e9-face-de-l’URL-après-lecture-onboarding/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-5b7e9-face-de-l’URL-après-lecture-onboarding/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fe534f0825407f213faa-3d671042c3fb014b501b",
+              "file": "onboarding.spec.ts",
+              "line": 83,
+              "column": 7
+            },
+            {
+              "title": "revenir à une étape retrouve ce qu’on y a saisi",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "onboarding",
+                  "projectName": "onboarding",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3791,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:47.916Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-18dff-retrouve-ce-qu’on-y-a-saisi-onboarding/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-18dff-retrouve-ce-qu’on-y-a-saisi-onboarding/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-18dff-retrouve-ce-qu’on-y-a-saisi-onboarding/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fe534f0825407f213faa-6a77f875219e3c7c0516",
+              "file": "onboarding.spec.ts",
+              "line": 99,
+              "column": 7
+            },
+            {
+              "title": "un champ jamais rempli reste vide",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "onboarding",
+                  "projectName": "onboarding",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2695,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:51.729Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-8cfdb-mp-jamais-rempli-reste-vide-onboarding/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-8cfdb-mp-jamais-rempli-reste-vide-onboarding/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-la-8cfdb-mp-jamais-rempli-reste-vide-onboarding/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fe534f0825407f213faa-3621ab630a863776e9aa",
+              "file": "onboarding.spec.ts",
+              "line": 134,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Onboarding — une valeur hors liste ne disparaît pas",
+          "file": "onboarding.spec.ts",
+          "line": 144,
+          "column": 6,
+          "specs": [
+            {
+              "title": "un secteur enregistré sous une ancienne liste reste affiché",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "onboarding",
+                  "projectName": "onboarding",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2649,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:54.440Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-un-1177f-ncienne-liste-reste-affiché-onboarding/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-un-1177f-ncienne-liste-reste-affiché-onboarding/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/onboarding-Onboarding-—-un-1177f-ncienne-liste-reste-affiché-onboarding/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fe534f0825407f213faa-c0237c96a05b5ce29a6c",
+              "file": "onboarding.spec.ts",
+              "line": 145,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "public.auth.spec.ts",
+      "file": "public.auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Page de connexion",
+          "file": "public.auth.spec.ts",
+          "line": 37,
+          "column": 6,
+          "specs": [
+            {
+              "title": "s’affiche sans erreur de console",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1794,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:19.677Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-b15ef-iche-sans-erreur-de-console-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-b15ef-iche-sans-erreur-de-console-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-b15ef-iche-sans-erreur-de-console-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-baa6680e37621e58f4ff",
+              "file": "public.auth.spec.ts",
+              "line": 38,
+              "column": 7
+            },
+            {
+              "title": "refuse un envoi vide sans laisser passer la requête",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2669,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:21.572Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-07411-s-laisser-passer-la-requête-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-07411-s-laisser-passer-la-requête-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-07411-s-laisser-passer-la-requête-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-9656f3659aee53111562",
+              "file": "public.auth.spec.ts",
+              "line": 50,
+              "column": 7
+            },
+            {
+              "title": "refuse une adresse mal formée",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2544,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:24.263Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connexion-refuse-une-adresse-mal-formée-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connexion-refuse-une-adresse-mal-formée-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connexion-refuse-une-adresse-mal-formée-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-ec1cf7fb51a0e5537743",
+              "file": "public.auth.spec.ts",
+              "line": 59,
+              "column": 7
+            },
+            {
+              "title": "se parcourt entièrement au clavier",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2562,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:26.821Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-5ecf0-ourt-entièrement-au-clavier-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-5ecf0-ourt-entièrement-au-clavier-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-5ecf0-ourt-entièrement-au-clavier-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-49f6a6607f40ea182e67",
+              "file": "public.auth.spec.ts",
+              "line": 69,
+              "column": 7
+            },
+            {
+              "title": "ne divulgue aucun secret dans la page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1841,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:29.398Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-9ff0f-e-aucun-secret-dans-la-page-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-9ff0f-e-aucun-secret-dans-la-page-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Page-de-connex-9ff0f-e-aucun-secret-dans-la-page-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-75c504d24a1cd5b9a245",
+              "file": "public.auth.spec.ts",
+              "line": 95,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Pages protégées",
+          "file": "public.auth.spec.ts",
+          "line": 108,
+          "column": 6,
+          "specs": [
+            {
+              "title": "/v2/accueil renvoie un visiteur anonyme vers la connexion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2638,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:31.259Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-6b1fa-r-anonyme-vers-la-connexion-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-6b1fa-r-anonyme-vers-la-connexion-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-6b1fa-r-anonyme-vers-la-connexion-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-cbcf9b4682a47bf1564b",
+              "file": "public.auth.spec.ts",
+              "line": 120,
+              "column": 9
+            },
+            {
+              "title": "/v2/operations renvoie un visiteur anonyme vers la connexion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2401,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:33.911Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-32082-r-anonyme-vers-la-connexion-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-32082-r-anonyme-vers-la-connexion-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-32082-r-anonyme-vers-la-connexion-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-4afa9ecbd2a84a791353",
+              "file": "public.auth.spec.ts",
+              "line": 120,
+              "column": 9
+            },
+            {
+              "title": "/v2/team renvoie un visiteur anonyme vers la connexion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2781,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:36.326Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-b6ab5-r-anonyme-vers-la-connexion-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-b6ab5-r-anonyme-vers-la-connexion-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-b6ab5-r-anonyme-vers-la-connexion-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-ea7c0cb5481625aeacea",
+              "file": "public.auth.spec.ts",
+              "line": 120,
+              "column": 9
+            },
+            {
+              "title": "/v2/security renvoie un visiteur anonyme vers la connexion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2380,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:39.121Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-0bd58-r-anonyme-vers-la-connexion-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-0bd58-r-anonyme-vers-la-connexion-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-0bd58-r-anonyme-vers-la-connexion-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-ef52236ab47362dc1cbb",
+              "file": "public.auth.spec.ts",
+              "line": 120,
+              "column": 9
+            },
+            {
+              "title": "/v2/abonnement renvoie un visiteur anonyme vers la connexion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2747,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:41.516Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-89519-r-anonyme-vers-la-connexion-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-89519-r-anonyme-vers-la-connexion-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-89519-r-anonyme-vers-la-connexion-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-cffddbba702faa8b1e13",
+              "file": "public.auth.spec.ts",
+              "line": 120,
+              "column": 9
+            },
+            {
+              "title": "/v2/invitations renvoie un visiteur anonyme vers la connexion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2656,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:44.426Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-fbfb2-r-anonyme-vers-la-connexion-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-fbfb2-r-anonyme-vers-la-connexion-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-fbfb2-r-anonyme-vers-la-connexion-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-de94acefe4e267274d60",
+              "file": "public.auth.spec.ts",
+              "line": 120,
+              "column": 9
+            },
+            {
+              "title": "/v2/recherche renvoie un visiteur anonyme vers la connexion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2596,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:47.108Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-a52cf-r-anonyme-vers-la-connexion-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-a52cf-r-anonyme-vers-la-connexion-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Pages-protégée-a52cf-r-anonyme-vers-la-connexion-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-c9e456bfba3f2cb2cbf1",
+              "file": "public.auth.spec.ts",
+              "line": 120,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Retours d’un lien d’e-mail",
+          "file": "public.auth.spec.ts",
+          "line": 131,
+          "column": 6,
+          "specs": [
+            {
+              "title": "connexion, lien incomplet — l’écran explique ce qui vient de se passer",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1867,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:49.719Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-ed323-e-ce-qui-vient-de-se-passer-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-ed323-e-ce-qui-vient-de-se-passer-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-ed323-e-ce-qui-vient-de-se-passer-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-83e4aef65d1810820672",
+              "file": "public.auth.spec.ts",
+              "line": 157,
+              "column": 9
+            },
+            {
+              "title": "connexion, lien expiré — l’écran explique ce qui vient de se passer",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3011,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:51.606Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-d83cd-e-ce-qui-vient-de-se-passer-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-d83cd-e-ce-qui-vient-de-se-passer-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-d83cd-e-ce-qui-vient-de-se-passer-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-c795705921db9975a443",
+              "file": "public.auth.spec.ts",
+              "line": 157,
+              "column": 9
+            },
+            {
+              "title": "mot de passe oublié, lien expiré — l’écran explique ce qui vient de se passer",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2402,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:54.633Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-70645-e-ce-qui-vient-de-se-passer-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-70645-e-ce-qui-vient-de-se-passer-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-70645-e-ce-qui-vient-de-se-passer-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-3b58901b7cbf9c68e3d1",
+              "file": "public.auth.spec.ts",
+              "line": 157,
+              "column": 9
+            },
+            {
+              "title": "un paramètre inconnu n’affiche aucun avis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1743,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:57.051Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-dd1e0-nconnu-n’affiche-aucun-avis-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-dd1e0-nconnu-n’affiche-aucun-avis-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Retours-d’un-l-dd1e0-nconnu-n’affiche-aucun-avis-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-3da0f693c913497bbd12",
+              "file": "public.auth.spec.ts",
+              "line": 170,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "La saisie survit à un échec d’inscription",
+          "file": "public.auth.spec.ts",
+          "line": 177,
+          "column": 6,
+          "specs": [
+            {
+              "title": "le nom, l’adresse et la langue reviennent",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2810,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:50:58.813Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-La-saisie-surv-1e32e-sse-et-la-langue-reviennent-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-La-saisie-surv-1e32e-sse-et-la-langue-reviennent-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-La-saisie-surv-1e32e-sse-et-la-langue-reviennent-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-d90cbdaa378fe2dff80c",
+              "file": "public.auth.spec.ts",
+              "line": 184,
+              "column": 7
+            },
+            {
+              "title": "le mot de passe, lui, ne revient jamais du serveur",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2734,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:01.650Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-La-saisie-surv-b0206-e-revient-jamais-du-serveur-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-La-saisie-surv-b0206-e-revient-jamais-du-serveur-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-La-saisie-surv-b0206-e-revient-jamais-du-serveur-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-99141d1efe647ef62dfb",
+              "file": "public.auth.spec.ts",
+              "line": 208,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Les destinations restent dans la V2",
+          "file": "public.auth.spec.ts",
+          "line": 224,
+          "column": 6,
+          "specs": [
+            {
+              "title": "le formulaire d’inscription vise l’onboarding V2",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2448,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:04.450Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-4467b-iption-vise-l’onboarding-V2-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-4467b-iption-vise-l’onboarding-V2-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-4467b-iption-vise-l’onboarding-V2-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-59dbcf4aba68e0ad85e8",
+              "file": "public.auth.spec.ts",
+              "line": 232,
+              "column": 7
+            },
+            {
+              "title": "un ?suivant= vide ne fait pas retomber sur la V1",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2980,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:06.949Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-00ad9-fait-pas-retomber-sur-la-V1-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-00ad9-fait-pas-retomber-sur-la-V1-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-00ad9-fait-pas-retomber-sur-la-V1-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-41e9ca0f1b0d93a105c0",
+              "file": "public.auth.spec.ts",
+              "line": 239,
+              "column": 7
+            },
+            {
+              "title": "une destination fournie est respectée",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "public",
+                  "projectName": "public",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2345,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-02T07:51:09.944Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-5012b-ation-fournie-est-respectée-public/test-finished-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-5012b-ation-fournie-est-respectée-public/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/placidebakala/Developer/Sanza/kora/docs/beta-readiness/evidence/traces/public.auth-Les-destinatio-5012b-ation-fournie-est-respectée-public/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b44bda2e01bb64a7e6ca-2a97edb93f11ec8abc97",
+              "file": "public.auth.spec.ts",
+              "line": 248,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-02T07:50:08.527Z",
+    "duration": 108643.888,
+    "expected": 35,
+    "skipped": 2,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

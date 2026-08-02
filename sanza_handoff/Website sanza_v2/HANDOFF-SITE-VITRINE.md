@@ -1,6 +1,6 @@
 # Handoff — Site vitrine Sanza (page d'accueil, direction 2a)
 
-**Source de vérité : `Site vitrine Sanza - options.dc.html`, bloc `#2a`.**
+**Source de vérité : `site-vitrine-2a.html` (dans ce dossier — export exact du bloc `#2a`, autonome, s'ouvre dans un navigateur).**
 Reproduire ce design à l'identique. Ne pas réinterpréter, ne pas « améliorer », ne pas changer les espacements, tailles, couleurs ou textes. En cas de doute : copier la valeur exacte du fichier source.
 
 ## Contexte
