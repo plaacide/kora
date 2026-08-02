@@ -37,7 +37,13 @@
 .v2-mark{display:grid;min-width:32px;height:32px;margin-bottom:14px;place-items:center;justify-items:start}
 .v2-mark svg{display:block;border-radius:8px}
 .v2-rail-link{display:grid;width:38px;height:38px;place-items:center;border-radius:7px;color:var(--text-3);transition:background var(--motion-fast) var(--motion-ease),color var(--motion-fast) var(--motion-ease)}.v2-rail-link:hover{background:var(--line-soft);color:var(--text)}
-.v2-rail-link[data-active=true]{box-shadow:inset 2px 0 var(--orange);background:var(--orange-soft);color:var(--orange-text)}.v2-rail-space{flex:1}
+.v2-rail-link[data-active=true]{box-shadow:inset 2px 0 var(--orange);background:var(--orange-soft);color:var(--orange-text)}/* La version, au pied du rail. `margin-top:auto` la colle en bas quel que
+   soit le nombre d'entrées ; en barre mobile elle disparaît, faute de place et
+   d'utilité — on ne signale pas un défaut depuis un téléphone en général. */
+.v2-rail-version{display:flex;flex-direction:column;align-items:center;margin-top:6px;color:var(--text-4);font-size:10px;font-weight:600;letter-spacing:.02em;line-height:12px;user-select:none}
+.v2-rail-version small{color:var(--text-4);font-size:9px;font-weight:500;opacity:.8}
+@media(max-width:720px){.v2-rail-version{display:none}}
+.v2-rail-space{flex:1}
 .v2-avatar{display:grid;width:32px;height:32px;place-items:center;border-radius:50%;background:var(--orange-soft);color:var(--orange-text);font:600 12px var(--font-v2-sans),sans-serif}
 .v2-ctx{width:240px;flex:0 0 240px;border-right:1px solid var(--line);background:var(--band)}.v2-ctx-head{border-bottom:1px solid var(--line);padding:18px 16px}
 .v2-back{display:block;margin-bottom:14px;color:var(--text-3);font-size:12px}.v2-ctx-title{display:flex;align-items:center;justify-content:space-between;font:600 15px var(--font-v2-head),sans-serif}

@@ -216,6 +216,14 @@ export function WorkspaceShell({
           <span className="v2-rail-space" />
           {bottom.map(link)}
           <CompteMenu email={email} />
+          {/* LA VERSION, EN BAS DU RAIL. Un bêta-testeur qui signale un défaut
+              ne sait pas dire sur quoi il l'a vu ; nous non plus. Le numéro se
+              lit d'un coup d'œil et part avec la capture d'écran. Discret à
+              dessein — il informe, il ne se met pas en avant. */}
+          <span className="v2-rail-version" title="Version de Sanza">
+            v0.1
+            <small>bêta</small>
+          </span>
         </nav>
         {children}
       </div>
