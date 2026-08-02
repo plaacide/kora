@@ -396,7 +396,7 @@ export default async function DocumentsPage({
           </section>
         ) : (
           <>
-            <table className="v2-document-table">
+            <table className="v2-document-table" data-pleine-largeur>
               <thead>
                 <tr>
                   <th>#</th><th>Nom</th><th>Exigence associée</th><th>Visibilité</th>
