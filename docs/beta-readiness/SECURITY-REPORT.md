@@ -140,15 +140,50 @@ Ce chapitre est le plus important du document.
 
 | | Pourquoi c'est un risque |
 |---|---|
-| **Le téléchargement d'un fichier par un invité** | La RLS borne les LIGNES ; le fichier vit dans Storage, dont les règles n'ont pas été éprouvées. Un lien signé fuité resterait valide. |
-| **La suppression de pièces dans Storage** | `delete_document` retire la ligne ; **le fichier survit dans le bucket** (B-06). Non exposé aujourd'hui, à trancher avant de l'exposer. |
 | **La double authentification** | Aucun compte de test n'en porte. |
 | **Le filigrane et le téléchargement** | Non éprouvés. |
 | **Les en-têtes de sécurité HTTP** | Non mesurés sur la recette. |
 
 ---
 
-## 8. Les limites de plan — éprouvées à l'écran le 2 août
+## 8. Le Storage — éprouvé le 2 août
+
+**Le bucket est privé et n'a AUCUNE politique de lecture.** `storage.objects`
+porte la RLS et une seule politique, en écriture. Un client authentifié ne peut
+donc ni lister ni télécharger directement : tout passe par les routes de
+l'application.
+
+**Aucune URL signée n'est émise.** Les fichiers sont servis en flux par
+`/api/document/:versionId/download`, ce qui permet un contrôle à chaque requête
+plutôt qu'un jeton qui s'échappe. Deux barrières indépendantes s'y appliquent :
+
+1. La version est lue sous l'identité de l'appelant — si la RLS la lui cache,
+   la route rend **404** sans jamais toucher au bucket.
+2. `my_document_permission` doit rendre `download` ou `edit`. **Fermé par
+   défaut** : tout le reste rend **403**.
+
+**Mesuré :** un invité en lecture seule sur le dossier voit la pièce
+(`piece_visible = 1`) mais son niveau est `view`. La route lui refuserait donc
+l'original ; il n'obtient que la visionneuse filigranée.
+
+### Une régression corrigée au passage
+
+`delete_document` ne touche aucun objet de stockage — aucune cascade en base ne
+le peut. Le chemin **V1** (`app/actions/crud.ts`) nettoyait le bucket ; le
+chemin **V2** ne le faisait pas. Un fondateur qui supprimait une pièce laissait
+donc ses octets en place, en croyant l'avoir effacée.
+
+Ce n'était pas un choix mais un oubli, et son propre commentaire l'avouait. Le
+nettoyage est aligné sur celui de la V1 : la ligne part d'abord, le fichier
+ensuite — si le bucket résiste, il reste un objet orphelin, coûteux mais
+inoffensif, alors que l'inverse laisserait une pièce visible au contenu disparu.
+
+**Ce qui reste non mesuré ici :** le filigrane lui-même, et le comportement de
+la visionneuse sur un document volumineux.
+
+---
+
+## 9. Les limites de plan — éprouvées à l'écran le 2 août
 
 Elles ne l'avaient été qu'en SQL. Une limite peut tenir en base et se présenter
 à l'utilisateur comme une panne — « l'action n'a pas abouti, réessayez » —, ce
@@ -168,14 +203,17 @@ ERROR: P0001: limite atteinte : active_deals
 
 ---
 
-## 9. Verdict
+## 10. Verdict
 
-Le cloisonnement par RLS, l'immuabilité du journal, le refus de viser la
-production, **l'étanchéité de l'accès invité** et **les limites de plan** sont
-vérifiés — les deux derniers depuis le 2 août, et ils étaient les deux trous les
-plus coûteux.
+Sont vérifiés, preuve à l'appui : le cloisonnement par RLS, l'immuabilité du
+journal, le refus de viser la production, l'étanchéité de l'accès invité, les
+limites de plan à l'écran, et le Storage — bucket privé sans politique de
+lecture, aucun lien signé, double barrière avant tout téléchargement.
 
-Ce qui reste ouvert est le **Storage** : la RLS borne les lignes de base, pas
-les fichiers. Un invité ne voit pas le document masqué, mais rien n'a été
-éprouvé sur ce qu'un lien signé permettrait. C'est désormais le principal risque
-non mesuré.
+Une régression a été trouvée et corrigée en le vérifiant : la V2 ne nettoyait
+pas le bucket à la suppression d'une pièce, contrairement à la V1.
+
+**Ce qui reste non mesuré**, et qu'il faut nommer plutôt que taire : le
+filigrane, la double authentification, les en-têtes de sécurité HTTP, et le
+comportement de la visionneuse sur des documents volumineux. Aucun n'est un
+risque de fuite ; ce sont des questions de robustesse et de finition.

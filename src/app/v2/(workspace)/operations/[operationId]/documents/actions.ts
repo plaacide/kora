@@ -9,6 +9,7 @@ import {
   type Resultat,
 } from "@/features/v2/domain/erreurs";
 import { writeSuggestions } from "@/features/v2/server/documents";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -319,19 +320,33 @@ export async function setV2DocumentKey(input: {
 }
 
 /**
- * Supprimer une pièce.
+ * Supprimer une pièce, FICHIER COMPRIS.
  *
- * `delete_document` retire la ligne et ses versions. LE FICHIER STOCKÉ, LUI,
- * RESTE : aucune cascade en base ne touche un objet de stockage. C'est ce qui a
- * permis de reconstruire une opération entière le 1er août — et c'est aussi ce
- * qui fait qu'un client croit avoir effacé alors que le fichier survit. Le
- * dire ici tant que le nettoyage du bucket n'est pas écrit.
+ * `delete_document` retire la ligne et ses versions ; aucune cascade en base ne
+ * touche un objet de stockage. Ce chemin ne nettoyait donc pas le bucket, et un
+ * fondateur qui « supprimait » un document laissait ses octets en place — alors
+ * que le chemin V1 (`app/actions/crud.ts`) les effaçait depuis toujours. C'était
+ * une régression, pas un choix.
+ *
+ * LA LIGNE PART D'ABORD, LE FICHIER ENSUITE. Si la suppression métier échoue,
+ * rien n'est touché. Si c'est le nettoyage du bucket qui échoue, il reste un
+ * objet orphelin — coûteux mais inoffensif, alors que l'inverse laisserait une
+ * pièce visible dont le contenu a disparu.
+ *
+ * Les clés sont lues AVANT, sous l'identité de l'appelant : la RLS garantit
+ * qu'on ne collecte que des versions qu'il avait le droit de voir.
  */
 export async function deleteV2Document(input: {
   operationId: string;
   documentId: string;
 }): Promise<Resultat> {
   const supabase = await createClient();
+
+  const { data: versions } = await supabase
+    .from("document_versions")
+    .select("storage_key")
+    .eq("document_id", input.documentId);
+
   const { error } = await supabase.rpc("delete_document", {
     p_doc: input.documentId,
   });
@@ -339,6 +354,20 @@ export async function deleteV2Document(input: {
   if (error) {
     console.error("[v2 documents] delete_document failed", error);
     return echec(codeDepuisPostgres(error.message));
+  }
+
+  const cles = (versions ?? [])
+    .map((v) => (v as { storage_key?: string }).storage_key)
+    .filter((k): k is string => Boolean(k));
+
+  if (cles.length) {
+    try {
+      await createAdminClient().storage.from("documents").remove(cles);
+    } catch (e) {
+      // La suppression métier reste valide et auditée. On journalise plutôt
+      // que d'échouer : la pièce a bien disparu pour l'utilisateur.
+      console.error("[v2 documents] nettoyage du bucket échoué", e);
+    }
   }
 
   revalidatePath(`/v2/operations/${input.operationId}`, "layout");
