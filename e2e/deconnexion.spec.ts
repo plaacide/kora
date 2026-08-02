@@ -107,8 +107,12 @@ test.describe("Bandeau de l’onboarding", () => {
     const entete = page.locator(".v2-onboard-head");
 
     // Le vrai logo, et non le carré à lettre « S » qui traînait ici.
-    await expect(entete.locator("svg")).toBeVisible();
-    await expect(entete.getByLabel("Sanza")).toBeVisible();
+    //
+    // `locator("svg")` visait une seule image quand le bandeau n'en portait
+    // qu'une. Depuis que l'aide et la déconnexion y ont été ajoutées, il y en a
+    // trois, et l'assertion échouait en mode strict — le test était devenu faux,
+    // pas l'écran. On vise donc le logo par son rôle accessible.
+    await expect(entete.getByRole("link", { name: "Sanza" })).toBeVisible();
 
     await expect(entete.getByText(/connecté en tant que/i)).toBeVisible();
 

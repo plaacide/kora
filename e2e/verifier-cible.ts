@@ -64,3 +64,24 @@ export function identifiants(): { email: string; motDePasse: string } {
 
   return { email, motDePasse };
 }
+
+/**
+ * Les identifiants du compte NEUF — celui qui n'a jamais fait d'onboarding.
+ *
+ * Sans lui, les neuf tests du parcours d'onboarding s'ignoraient d'eux-mêmes :
+ * le compte installé y est redirigé vers son poste de pilotage. Un seul compte
+ * ne peut pas être dans les deux états, et le parcours ignoré était le plus
+ * critique de la bêta.
+ */
+export function identifiantsNeufs(): { email: string; motDePasse: string } {
+  const email = process.env.E2E_EMAIL_NEUF;
+  const motDePasse = process.env.E2E_PASSWORD_NEUF;
+
+  if (!email || !motDePasse) {
+    throw new Error(
+      "Identifiants du compte neuf absents. Lancez `node e2e/creer-compte-essai.mjs`.",
+    );
+  }
+
+  return { email, motDePasse };
+}

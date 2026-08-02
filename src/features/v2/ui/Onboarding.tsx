@@ -212,12 +212,20 @@ export function SelectField({
             ? groupes.map((groupe) => (
                 <optgroup key={groupe.titre} label={groupe.titre}>
                   {groupe.options.map((option) => (
-                    <option key={option}>{option}</option>
+                    // `value` EXPLICITE. Sans lui, le DOM déduit la valeur du
+                    // texte — ce qui marche — mais aucun sélecteur d'attribut
+                    // ne trouve l'option, et un test qui la cherche croit
+                    // qu'elle a disparu.
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </optgroup>
               ))
             : (options ?? []).map((option) => (
-                <option key={option}>{option}</option>
+                <option key={option} value={option}>
+                  {option}
+                </option>
               ))}
         </select>
       </span>

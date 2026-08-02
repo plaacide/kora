@@ -52,3 +52,4 @@ e2e/.session.json
 docs/beta-readiness/evidence/traces/
 docs/beta-readiness/evidence/playwright-report/
 docs/beta-readiness/evidence/resultats.json
+e2e/.session-neuve.json

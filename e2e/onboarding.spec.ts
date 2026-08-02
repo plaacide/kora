@@ -109,6 +109,11 @@ test.describe("Onboarding — la saisie ne se perd pas", () => {
     const nom = `${MARQUEUR_TEST} ${Date.now()}`;
     await page.locator('input[name="companyName"]').fill(nom);
     await page.locator('select[name="country"]').selectOption("Mali");
+    // FORME JURIDIQUE OBLIGATOIRE, ET SANS VALEUR PAR DÉFAUT. Le test l'omettait
+    // et la validation native du navigateur bloquait l'envoi sans un mot : la
+    // page restait en place, le test attendait une navigation qui ne venait
+    // pas. C'était le test qui avait vieilli, pas l'écran.
+    await page.locator('select[name="legalForm"]').selectOption("SARL");
     await page.locator('select[name="sector"]').selectOption("Énergie");
     await page.locator('select[name="stage"]').selectOption({ index: 1 });
     await page.getByRole("button", { name: /continuer/i }).click();
@@ -121,6 +126,9 @@ test.describe("Onboarding — la saisie ne se perd pas", () => {
     await expect(page.locator('input[name="companyName"]')).toHaveValue(nom);
     await expect(page.locator('select[name="country"]')).toHaveValue("Mali");
     await expect(page.locator('select[name="sector"]')).toHaveValue("Énergie");
+    // La forme juridique était le champ qui ne se sauvegardait pas — signalé
+    // par le fondateur le 1er août. Il est vérifié ici, pas seulement rempli.
+    await expect(page.locator('select[name="legalForm"]')).toHaveValue("SARL");
   });
 
   test("un champ jamais rempli reste vide", async ({ page }) => {

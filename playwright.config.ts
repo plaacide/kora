@@ -56,6 +56,7 @@ export default defineConfig({
 
   projects: [
     { name: "connexion", testMatch: /auth\.setup\.ts/ },
+    { name: "connexion-neuve", testMatch: /auth-neuf\.setup\.ts/ },
     {
       name: "chrome-desktop",
       dependencies: ["connexion"],
@@ -64,13 +65,27 @@ export default defineConfig({
         viewport: { width: 1440, height: 900 },
         storageState: "e2e/.session.json",
       },
-      testIgnore: [/auth\.setup\.ts/, /public\./, /mobile\./],
+      testIgnore: [/auth.*\.setup\.ts/, /public\./, /mobile\./, /onboarding\./],
     },
     {
       name: "mobile",
       dependencies: ["connexion"],
       use: { ...devices["iPhone 13"], storageState: "e2e/.session.json" },
       testMatch: /mobile\./,
+    },
+    {
+      // Le parcours d'onboarding, sur le compte qui ne l'a pas encore fait.
+      // Il vivait dans le projet `chrome-desktop`, où le compte installé était
+      // redirigé : ses neuf tests s'ignoraient d'eux-mêmes, et le parcours le
+      // plus critique de la bêta n'était éprouvé nulle part.
+      name: "onboarding",
+      dependencies: ["connexion-neuve"],
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1440, height: 900 },
+        storageState: "e2e/.session-neuve.json",
+      },
+      testMatch: /onboarding\./,
     },
     {
       // Ce qui se vérifie sans compte : la page de connexion, ses erreurs, le
