@@ -65,13 +65,41 @@ export default defineConfig({
         viewport: { width: 1440, height: 900 },
         storageState: "e2e/.session.json",
       },
-      testIgnore: [/auth.*\.setup\.ts/, /public\./, /mobile\./, /onboarding\./],
+      testIgnore: [
+        /auth.*\.setup\.ts/,
+        /public\./,
+        /mobile\./,
+        /onboarding\./,
+        // La déconnexion a son propre projet : voir plus bas.
+        /deconnexion\./,
+      ],
     },
     {
       name: "mobile",
       dependencies: ["connexion"],
       use: { ...devices["iPhone 13"], storageState: "e2e/.session.json" },
       testMatch: /mobile\./,
+    },
+    {
+      // LA DÉCONNEXION EST ISOLÉE, ET C'EST OBLIGATOIRE.
+      //
+      // Son dernier test se déconnecte POUR DE VRAI, ce qui invalide la session
+      // côté serveur. Tout ce qui s'exécutait après elle dans le même projet
+      // héritait d'une session morte et atterrissait sur la page de connexion —
+      // `limites.spec.ts` échouait ainsi une fois sur deux, et le rapport
+      // accusait le produit là où le coupable était un test voisin.
+      //
+      // L'ordre alphabétique la plaçait toujours en premier : `deconnexion` <
+      // `limites`. Un projet à part est la seule garantie qui ne dépende pas
+      // du nom des fichiers.
+      name: "deconnexion",
+      dependencies: ["connexion"],
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1440, height: 900 },
+        storageState: "e2e/.session.json",
+      },
+      testMatch: /deconnexion\./,
     },
     {
       // Le parcours d'onboarding, sur le compte qui ne l'a pas encore fait.

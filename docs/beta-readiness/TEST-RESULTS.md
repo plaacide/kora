@@ -36,7 +36,7 @@ plus critique de la bêta n'était éprouvé nulle part**, et rien ne le signala
 ## Le résultat
 
 ```text
-36 tests · 34 passés · 0 échoué · 2 ignorés · 56 s
+36 tests · 35 passés · 0 échoué · 2 ignorés
 ```
 
 *(Première exécution, 2 août : 33 passés et 1 échec, dû à un correctif poussé
@@ -108,18 +108,23 @@ restituée** — c'était le défaut signalé le 1er août.
 
 ---
 
-## Une instabilité connue de la suite
+## L'instabilité, trouvée et corrigée
 
-`limites.spec.ts` échoue par intermittence dans l'exécution complète, et **passe
-systématiquement lorsqu'il est lancé seul** (6,7 s). Le symptôme est net : le
-test atterrit sur la page de connexion, donc la session du compte installé a été
-perdue entre son ouverture et son exécution.
+`limites.spec.ts` échouait une fois sur deux et passait toujours seul. La cause
+n'était ni le produit ni les comptes : **`deconnexion.spec.ts` s'exécutait avant
+lui, et son dernier test se déconnecte pour de vrai.** La session était donc
+invalidée côté serveur, et tout ce qui suivait dans le même projet atterrissait
+sur la page de connexion.
 
-**C'est un défaut du harnais, pas du produit** — la limite elle-même est
-vérifiée en base et à l'écran. La cause probable est l'enchaînement des deux
-projets d'authentification, `connexion` et `connexion-neuve`, dont le second
-détruit et recrée un compte à chaque exécution. À corriger avant de faire de
-cette suite une porte de déploiement.
+L'ordre alphabétique le garantissait — `deconnexion` avant `limites` — et le
+rapport accusait le produit là où le coupable était un test voisin.
+
+La déconnexion a désormais **son propre projet**. C'est la seule garantie qui ne
+dépende pas du nom des fichiers.
+
+```text
+36 tests · 35 passés · 0 échoué · 2 ignorés
+```
 
 ---
 
