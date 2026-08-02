@@ -311,7 +311,16 @@ fautif. Avec VoiceOver (⌘F5), le message d'erreur est lu avec le champ.
 
 ---
 
-## LOT J — 🔴 La preuve, pas la promesse
+## LOT J — ✅ La preuve, pas la promesse
+
+**Livré les 1er et 2 août.** Les quatre documents sont écrits et adossés à des
+mesures : 34 tests au vert contre la recette déployée, l'accès invité éprouvé
+sur trois documents piégés, les limites de plan éprouvées à l'écran. Deux
+comptes d'essai créés sans qu'aucun mot de passe soit saisi ni affiché.
+
+**Reste ouvert :** le Storage. La RLS borne les lignes, pas les fichiers.
+
+### Rédaction d'origine
 
 Le dossier `docs/beta-readiness/` a `KNOWN-ISSUES.md`, et rien d'autre. Quatre
 documents manquent, et ils **dépendent tous d'essais en navigateur qui n'ont
