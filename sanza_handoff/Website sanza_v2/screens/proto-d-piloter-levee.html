@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Sanza — Prototype D — Piloter la levée</title><link rel="stylesheet" href="parcours.css">
+<style>
+body{background:#101828;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.pbar{display:flex;align-items:center;gap:14px;padding:12px 22px;background:#101828;color:#fff;flex-shrink:0}
+.pbar b{font:600 14px var(--head)}
+.pbar .q{font-size:12px;color:rgba(255,255,255,.55);max-width:420px}
+.pstep{font:500 12.5px var(--sans);color:rgba(255,255,255,.75)}
+.pbtn{height:34px;padding:0 16px;border-radius:6px;font:600 13px var(--sans);display:inline-flex;align-items:center;cursor:pointer;user-select:none}
+.pbtn.next{background:var(--orange);color:#fff}
+.pbtn.prev{background:rgba(255,255,255,.1);color:#fff}
+.pframe{flex:1;border:0;width:100%;background:#fff}
+.pnote{padding:9px 22px;background:#1D2433;color:rgba(255,255,255,.75);font-size:12.5px;flex-shrink:0}
+.spring{flex:1}
+</style></head>
+<body>
+<div class="pbar">
+<b>Prototype D — Piloter la levée</b><span class="pstep" id="step"></span>
+<span class="spring"></span><span class="q">Test : le fondateur distingue-t-il relation, accès documentaire et engagement financier ?</span>
+<span class="pbtn prev" onclick="go(-1)">← Précédent</span>
+<span class="pbtn next" onclick="go(1)">Étape suivante →</span>
+</div>
+<iframe class="pframe" id="frame"></iframe>
+<div class="pnote" id="note"></div>
+<script>
+const steps = [["35-lever-non-configure.html","Lever","Lever apparaît dans l'opération — rien n'est configuré, pas de cartes à zéro."],["36-configurer-levee.html","Configurer la levée","Objectif, conditions déclarées, cibles, calendrier — Sanza ne calcule rien."],["40-ajouter-investisseur.html","Ajouter un investisseur","Ajout au pipeline uniquement : aucun accès documentaire créé."],["42-ajouter-interaction.html","Consigner un premier échange","Interaction consignée manuellement — jamais présentée comme détectée."],["38-pipeline-colonnes.html","Planifier une relance","La relance vit sur la carte ; le glisser-déposer ne change que l'étape."],["20-partage-destinataire.html","Créer un accès documentaire","L'accès passe par l'assistant de partage — jamais par le pipeline."],["43-enregistrer-engagement.html","Enregistrer un soft-commit","Montant déclaré par l'équipe, jamais déduit de la lecture."],["37-vue-levee.html","Voir la progression","Confirmés, soft-commits et restant sont séparés ; les intérêts indicatifs ne comptent pas."],["45-cloturer-levee.html","Clôturer la levée","Récapitulatif, choix sur les accès, puis lecture seule avec historique conservé."]];
+let i = 0;
+function render() {
+  document.getElementById('frame').src = steps[i][0];
+  document.getElementById('step').textContent = 'Étape ' + (i + 1) + ' / ' + steps.length + ' — ' + steps[i][1];
+  document.getElementById('note').textContent = steps[i][2];
+}
+function go(d) { i = Math.max(0, Math.min(steps.length - 1, i + d)); render(); }
+render();
+</script>
+</body>
+</html>
