@@ -245,6 +245,100 @@ export default function NouvelleVitrine() {
         </div>
 
         {/*
+          6 — Témoignage et métriques.
+
+          RIEN ICI N'EST VÉRIFIÉ. Aminata Koné, CoolBricks, les cinq semaines de
+          due diligence, les 250 entreprises, les 12 pays : ce sont les valeurs
+          de la maquette, écrites pour montrer la mise en page. Publiées telles
+          quelles, elles seraient un témoignage inventé attribué à une personne
+          nommée, et quatre chiffres d'entreprise invérifiables.
+
+          La page n'est pas indexée et ne sert pas d'accueil, donc rien n'est
+          publié aujourd'hui. Mais tout ce bloc doit être remplacé par un vrai
+          client, une vraie citation recueillie avec son accord, et des chiffres
+          qu'on peut soutenir — avant le remplacement, pas après.
+        */}
+        <section className="vit-preuve" aria-label="Témoignage client et chiffres">
+          <div className="vit-temoignage">
+            <p>
+              « Avant Sanza, chaque investisseur recevait un Drive différent.
+              Aujourd&apos;hui notre dossier est prêt en permanence — la due
+              diligence de notre Seed a pris 5 semaines au lieu de 4 mois. »
+            </p>
+            <div className="vit-temoin">
+              <span aria-hidden="true">AK</span>
+              <div>
+                <b>Aminata Koné</b>
+                <span>CEO, CoolBricks · Levée Seed 500 K€ — Abidjan</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="vit-metriques">
+            <div>
+              <b>−60 %</b>
+              <span>de temps passé en due diligence</span>
+            </div>
+            <div>
+              <b>14 jours</b>
+              <span>pour une data room prête</span>
+            </div>
+            <div>
+              <b>250+</b>
+              <span>entreprises accompagnées</span>
+            </div>
+            <div>
+              <b>12 pays</b>
+              <span>Afrique de l&apos;Ouest et centrale</span>
+            </div>
+          </div>
+        </section>
+
+        {/*
+          7 — Bande sécurité.
+
+          Elle porte l'ancre `#securite` que le pied de page vise depuis le
+          lot 1 — c'était la destination annoncée, la voici.
+        */}
+        <section className="vit-securite" id="securite">
+          <span className="vit-sur-titre">Sécurité</span>
+          <span>Chiffrement AES-256</span>
+          <span>Journal d&apos;audit complet</span>
+          <span>NDA &amp; filigrane natifs</span>
+          <span>Vous restez propriétaire de vos données</span>
+        </section>
+
+        {/*
+          8 — Appel final.
+
+          « VOIR LES TARIFS » N'A PAS DE PAGE OÙ ALLER. La grille tarifaire est
+          hors périmètre du handoff, et l'ancre `#tarifs` de la nav ne désigne
+          rien non plus. Le bouton garde donc son dessin sans destination, comme
+          les flèches du lot 5 — c'est le seul des deux qui manque, « Créer mon
+          espace » menant bien à l'inscription.
+        */}
+        <section className="vit-final">
+          <div>
+            <h2>
+              Commencez gratuitement. Passez au niveau supérieur quand la levée
+              démarre.
+            </h2>
+            <p>
+              Plan Ready gratuit — data room et préparation incluses. Sans
+              engagement, sans carte bancaire.
+            </p>
+          </div>
+          <div className="vit-final-actions">
+            <a className="vit-cta" data-taille="final" href={`${APP}/v2/inscription`}>
+              Créer mon espace
+            </a>
+            <span className="vit-cta-clair" data-attente="">
+              Voir les tarifs
+            </span>
+          </div>
+        </section>
+
+        {/*
           9 — Pied de page.
 
           LES DEUX PREMIERS LIENS NE MÈNENT NULLE PART, ET C'EST DÉLIBÉRÉ. La
