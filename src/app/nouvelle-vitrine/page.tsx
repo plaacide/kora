@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Archivo, Inter } from "next/font/google";
 
+import {
+  CaptureDataRoom,
+  CaptureDealroom,
+  CapturePreparation,
+} from "./captures";
 import "./vitrine.css";
 
 /**
@@ -174,6 +179,63 @@ export default function NouvelleVitrine() {
           <span>BOAD</span>
           <span>Teranga Capital</span>
         </section>
+
+        {/*
+          5 — Les trois bénéfices, texte et capture en alternance.
+
+          LA DEUXIÈME INVERSE L'ORDRE : capture à gauche, texte à droite. C'est
+          la source qui l'impose, et c'est ce qui donne son rythme à la suite.
+          Sous 900 px l'alternance n'a plus de sens une fois la grille empilée —
+          le texte repasse alors devant sa capture, partout.
+        */}
+        <div className="vit-benefices">
+          <section className="vit-benefice">
+            <div>
+              <span className="vit-amorce">Data room</span>
+              <h2>Une data room qui rassure dès la première visite</h2>
+              <p>
+                Permissions par dossier, NDA avant accès, filigrane, journal
+                d&apos;audit complet. Vous savez qui a vu quoi, quand — et vous
+                coupez l&apos;accès en un clic.
+              </p>
+              <a className="vit-lien-fleche" href="#produit">
+                Découvrir la data room →
+              </a>
+            </div>
+            <CaptureDataRoom />
+          </section>
+
+          <section className="vit-benefice">
+            <CapturePreparation />
+            <div>
+              <span className="vit-amorce">Préparation</span>
+              <h2>Vous savez toujours quoi faire ensuite</h2>
+              <p>
+                Checklists par pays et par type de financeur — OHADA compris.
+                Chaque pièce déposée fait monter votre score de readiness,
+                visible par vous seul.
+              </p>
+              <a className="vit-lien-fleche" href="#produit">
+                Voir la préparation guidée →
+              </a>
+            </div>
+          </section>
+
+          <section className="vit-benefice">
+            <div>
+              <span className="vit-amorce">Mise en relation</span>
+              <h2>Présenté aux financeurs quand vous êtes prêt</h2>
+              <p>
+                Dealrooms privées, demandes d&apos;accès que vous approuvez une à
+                une. Rien ne circule sans votre accord explicite.
+              </p>
+              <a className="vit-lien-fleche" href="#produit">
+                Comment ça marche →
+              </a>
+            </div>
+            <CaptureDealroom />
+          </section>
+        </div>
 
         {/*
           9 — Pied de page.
