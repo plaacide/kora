@@ -57,24 +57,13 @@
   border-bottom: 1px solid var(--vit-bord-faible);
   padding: 16px 56px;
 }
+/* La signature « vibration » remplace le logo de maquette. Elle est plus basse
+   que le carré de 28 px qu'elle remplace : la hauteur minimale garde à la nav
+   le rythme vertical de la source. */
 .vit-marque {
   display: flex;
+  min-height: 28px;
   align-items: center;
-  gap: 9px;
-}
-.vit-marque span {
-  display: inline-flex;
-  width: 28px;
-  height: 28px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 7px;
-  background: var(--vit-orange);
-  color: #fff;
-  font: 700 14px var(--font-vit-titre), Archivo, sans-serif;
-}
-.vit-marque b {
-  font: 700 16px var(--font-vit-titre), Archivo, sans-serif;
 }
 .vit-nav nav {
   display: flex;

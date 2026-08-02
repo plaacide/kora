@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo, Inter } from "next/font/google";
 
+import { SanzaLogo } from "@/components/ui/SanzaLogo";
+
 import {
   CaptureDataRoom,
   CaptureDealroom,
@@ -58,11 +60,23 @@ export default function NouvelleVitrine() {
   return (
     <div className={`vit ${titre.variable} ${texte.variable}`}>
       <div className="vit-page">
-        {/* 1 — Nav */}
+        {/*
+          1 — Nav.
+
+          LE LOGO NE VIENT PAS DE LA MAQUETTE. Elle dessine un carré orange
+          portant un « S » capitale, suivi de « Sanza » en Archivo — ce n'est pas
+          la marque. La vraie signature est la « vibration » : `sanza` en bas de
+          casse, Instrument Sans 700, le dernier `a` doublé de deux échos orange
+          posés DERRIÈRE la lettre. Elle vit dans `SanzaLogo`, d'où la tirent
+          déjà la topbar, l'onboarding, la 404 et l'écran de chargement.
+
+          Les décalages d'écho ne sont définis que là et ne se recopient nulle
+          part : reproduire le dessin à la main ici aurait créé un deuxième logo
+          à maintenir.
+        */}
         <header className="vit-nav">
           <div className="vit-marque">
-            <span aria-hidden="true">S</span>
-            <b>Sanza</b>
+            <SanzaLogo size={22} />
           </div>
 
           <nav aria-label="Sections du site">
