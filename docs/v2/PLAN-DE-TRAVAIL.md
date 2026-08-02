@@ -269,7 +269,44 @@ Santé et Services financiers uniquement — 2 secteurs sur 10. Voir
 
 ---
 
-## LOT G — 🟠 La structure de la data room
+## LOT G — 🟠 La structure de la data room *(attend un arbitrage)*
+
+**Étudié le 2 août, pas livré — et volontairement.**
+
+`apply_dataroom_template` porte le même défaut que la checklist d'origine : un
+littéral JSONB de 6,4 Ko, et trente-deux dossiers identiques pour tout le monde.
+Un dossier d'audit reçoit « Marques OAPI » et « Noms de domaine ».
+
+**La règle envisagée**, qui ne demande aucun travail éditorial : les dossiers se
+dérivent du plan lui-même — une section apparaît **entière ou pas du tout**,
+selon qu'une exigence de l'objectif y range une pièce. Simple à expliquer, et
+incapable de dériver du référentiel puisqu'elle en découle.
+
+**Ce qu'elle produirait :**
+
+| Objectif | Sections |
+|---|---|
+| Audit · Autre | Corporate, Financier |
+| DFI | Corporate, Financier, RH, Conformité |
+| Levée | Corporate, Financier, Juridique, RH, Propriété intellectuelle |
+| Dette | Corporate, Financier, Juridique, RH, Conformité |
+| Diligence | toutes |
+
+**L'arbitrage.** Un DFI n'obtiendrait pas la section « Juridique » — ni
+contrats, ni litiges, ni assurances — parce qu'aucune exigence étiquetée `dfi`
+n'y range de pièce. La dérivation révèle donc un trou d'étiquetage, et deux
+réponses sont possibles :
+
+1. **Compléter l'étiquetage** — un bailleur regarde-t-il les contrats et les
+   litiges ? Si oui, les exigences correspondantes gagnent `dfi` et la section
+   revient d'elle-même.
+2. **Garder toutes les sections**, et ne varier que les pièces attendues.
+
+Je ne tranche pas : c'est votre expertise, pas la mienne. La question tient en
+une phrase — **un bailleur demande-t-il les contrats, les litiges et les
+assurances ?**
+
+### Rédaction d'origine
 
 **Je ne l'avais pas traité, et c'est un oubli de mes documents précédents.** La
 promesse retirée parlait de « structure documentaire », pas seulement du plan.
