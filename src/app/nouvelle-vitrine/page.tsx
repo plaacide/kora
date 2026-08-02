@@ -112,6 +112,28 @@ export default function NouvelleVitrine() {
             <span>Vos documents restent sous votre contrôle</span>
           </p>
         </section>
+
+        {/*
+          9 — Pied de page.
+
+          LES DEUX PREMIERS LIENS NE MÈNENT NULLE PART, ET C'EST DÉLIBÉRÉ. La
+          source est une maquette : ses `<a>` n'ont pas de destination. Aucune
+          page « Confidentialité » ni « Sécurité » n'existe sur le site — les
+          brancher sur des adresses inventées produirait deux 404 depuis le pied
+          de page, sur les liens mêmes qui doivent rassurer.
+
+          « Sécurité » pointe donc vers la section sécurité de cette page, qui
+          existera au lot 7. « Confidentialité » attend sa page ; le lien est
+          inerte plutôt que faux, et se branchera le jour où elle sera écrite.
+        */}
+        <footer className="vit-pied">
+          <span>© 2026 Sanza</span>
+          <nav aria-label="Liens légaux">
+            <span className="vit-pied-attente">Confidentialité</span>
+            <a href="#securite">Sécurité</a>
+            <a href="mailto:contact@sanza.africa">Contact</a>
+          </nav>
+        </footer>
       </div>
     </div>
   );

@@ -168,6 +168,27 @@
   font-style: normal;
 }
 
+/* ── Pied de page ────────────────────────────────────────────────────── */
+
+.vit-pied {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--vit-bord-faible);
+  color: var(--vit-texte-4);
+  font: 400 12.5px var(--font-vit-texte), Inter, sans-serif;
+  padding: 20px 56px;
+}
+.vit-pied nav {
+  display: flex;
+  gap: 18px;
+}
+/* Un intitulé sans page derrière : il garde sa place dans la mise en page
+   sans se donner pour un lien — ni curseur main, ni survol coloré. */
+.vit-pied-attente {
+  color: inherit;
+  cursor: default;
+}
+
 /* ── Adaptations, absentes de la maquette ────────────────────────────────
    La source est figée à 1240 px : elle n'a ni point de rupture ni ordre de
    repli. Ces règles n'altèrent aucune valeur au-delà de cette largeur — elles
@@ -209,5 +230,14 @@
   .vit-cta[data-taille="hero"],
   .vit-cta-ligne {
     text-align: center;
+  }
+  .vit-pied {
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .vit-pied nav {
+    justify-content: center;
   }
 }
