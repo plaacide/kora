@@ -85,7 +85,7 @@ export default function NouvelleVitrine() {
 
           <h1>Levez des fonds sans jamais perdre le fil de votre dossier.</h1>
 
-          <p>
+          <p className="vit-sous-titre">
             Data room sécurisée, préparation guidée selon les exigences réelles
             des financeurs, et mise en relation quand vous êtes prêt. Tout au
             même endroit.
@@ -111,6 +111,46 @@ export default function NouvelleVitrine() {
             <i aria-hidden="true">·</i>
             <span>Vos documents restent sous votre contrôle</span>
           </p>
+
+          {/*
+            3 — Aperçu produit.
+
+            IL APPARTIENT AU HERO, il n'en est pas une section voisine. La
+            source le pose dans le même conteneur, après la ligne de
+            réassurance : c'est de là qu'il tient son écart de 20 px, son
+            centrage et le dégradé qui passe derrière lui.
+
+            SA COUPURE EST L'EFFET RECHERCHÉ, pas un oubli. Il n'a ni bordure
+            ni rayon en bas, et le hero ne laisse aucune marge sous lui : la
+            barre de logos qui suivra au lot 4 vient donc le trancher net,
+            comme une fenêtre dont on ne voit que le haut. Y ajouter un rayon
+            bas ou une marge le décollerait et casserait l'illusion.
+
+            L'ombre est portée VERS LE HAUT (décalage négatif) — l'unique
+            ombre de la page, et la seule chose qui détache la carte du
+            dégradé une fois son bas absorbé.
+          */}
+          <div className="vit-apercu">
+            <div className="vit-apercu-tete">
+              <b>Levée Seed 2026 · CoolBricks</b>
+              <span className="vit-jeton-pret">Readiness 82 %</span>
+            </div>
+
+            <div className="vit-apercu-tuiles">
+              <div>
+                <b>Data room</b>
+                <span>30 pièces · 4 dossiers · NDA actif</span>
+              </div>
+              <div>
+                <b>Préparation</b>
+                <span>18 / 24 exigences prêtes</span>
+              </div>
+              <div>
+                <b>Investisseurs</b>
+                <span>3 en due diligence · 2 demandes</span>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/*

@@ -143,7 +143,11 @@
   font: 700 50px/1.08 var(--font-vit-titre), Archivo, sans-serif;
   letter-spacing: -0.025em;
 }
-.vit-hero > p {
+/* La largeur de 600 px n'appartient qu'au sous-titre. Portée par `.vit-hero >
+   p`, elle retombait aussi sur la ligne de réassurance, qui est un paragraphe
+   elle aussi : ses trois mentions se cassaient en trois lignes quand la source
+   les tient sur une seule. */
+.vit-sous-titre {
   margin: 0;
   max-width: 600px;
   color: var(--vit-texte-2);
@@ -159,6 +163,7 @@
    sous `aria-hidden`. */
 .vit-rassurance {
   display: flex;
+  margin: 0;
   gap: 20px;
   color: var(--vit-texte-3);
   font: 400 13px var(--font-vit-texte), Inter, sans-serif;
@@ -166,6 +171,65 @@
 .vit-rassurance i {
   color: #d0d5dd;
   font-style: normal;
+}
+
+/* ── Aperçu produit ──────────────────────────────────────────────────────
+   Posé dans le hero, et volontairement inachevé en bas : ni bordure, ni
+   rayon, ni marge sous lui, pour que la section suivante le tranche. L'ombre
+   monte (décalage négatif) — c'est la seule de la page. */
+
+.vit-apercu {
+  display: flex;
+  width: 920px;
+  max-width: 100%;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--vit-bord);
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  background: #fff;
+  box-shadow: 0 -8px 40px rgb(16 24 40 / 8%);
+  padding: 18px 22px;
+  text-align: left;
+}
+.vit-apercu-tete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.vit-apercu-tete b {
+  font: 600 14px var(--font-vit-titre), Archivo, sans-serif;
+}
+
+/* Le seul vert de la page : il dit qu'un seuil est atteint, et ne sert à
+   rien d'autre. */
+.vit-jeton-pret {
+  border-radius: 999px;
+  background: #ecfdf3;
+  color: #027a48;
+  font: 600 12px var(--font-vit-texte), Inter, sans-serif;
+  padding: 4px 10px;
+}
+
+.vit-apercu-tuiles {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.vit-apercu-tuiles > div {
+  border: 1px solid var(--vit-bord);
+  border-radius: 8px;
+  background: var(--vit-gris);
+  padding: 14px 16px;
+}
+.vit-apercu-tuiles b {
+  font: 600 13px var(--font-vit-texte), Inter, sans-serif;
+}
+.vit-apercu-tuiles span {
+  display: block;
+  margin-top: 3px;
+  color: var(--vit-texte-3);
+  font: 400 12.5px var(--font-vit-texte), Inter, sans-serif;
 }
 
 /* ── Pied de page ────────────────────────────────────────────────────── */
@@ -211,7 +275,7 @@
   .vit-hero h1 {
     font-size: 34px;
   }
-  .vit-hero > p {
+  .vit-sous-titre {
     font-size: 16px;
   }
   .vit-hero-actions {
@@ -230,6 +294,16 @@
   .vit-cta[data-taille="hero"],
   .vit-cta-ligne {
     text-align: center;
+  }
+  /* Trois tuiles côte à côte sous 900 px couperaient leurs libellés ; elles
+     s'empilent. La carte garde son bas ouvert. */
+  .vit-apercu-tuiles {
+    grid-template-columns: 1fr;
+  }
+  .vit-apercu-tete {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
   .vit-pied {
     flex-direction: column;
