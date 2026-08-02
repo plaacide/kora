@@ -59,7 +59,15 @@ n'est pas commencé.
 
 ---
 
-## LOT A — 🔴 Rendre l'inscription possible
+## LOT A — ✅ Rendre l'inscription possible
+
+**Clos le 2 août.** Le crochet e-mail est branché, l'expéditeur corrigé —
+`noreply@sanza.africa` au lieu de l'adresse de test partagée de Resend, qui
+refusait par 403 tout destinataire autre que le titulaire du compte. Les
+destinations reviennent vers la V2, y compris pour les liens déjà expédiés. La
+limite d'envoi Supabase a été relevée.
+
+### Rédaction d'origine
 
 **Le seul vrai bloquant.** Aujourd'hui les e-mails partent de Supabase en
 anglais, et leur lien passe par `/verify` qui consomme le jeton sans transmettre
