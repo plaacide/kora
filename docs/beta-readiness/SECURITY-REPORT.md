@@ -93,14 +93,54 @@ pas déclenché.
 
 ---
 
-## 6. Ce qui n'a PAS été vérifié
+## 6. L'accès invité — éprouvé le 2 août
+
+C'était le trou le plus coûteux du dossier : personne n'avait vérifié qu'un
+invité ne voit que ce qu'on lui a ouvert.
+
+**Montage.** Une opération de trente-deux dossiers. Une invitation en lecture
+seule portant **un seul dossier** — « 2.1 États financiers SYSCOHADA ». Trois
+documents déposés :
+
+| Document | Dossier | `hidden_from_guests` |
+|---|---|---|
+| bilan ouvert | 2.1 — **ouvert** | non |
+| bilan masqué | 2.1 — ouvert | **oui** |
+| lbc confidentiel | 6.2 — **non ouvert** | non |
+
+**Ce que l'invité atteint, sous son identité réelle :**
+
+| Contrôle | Attendu | Mesuré |
+|---|---|---|
+| Dossiers visibles | 1 sur 32 | **1** — « 2.1 » seul |
+| Documents visibles | 1 sur 3 | **1** — « bilan ouvert » seul |
+| Document masqué du même dossier | invisible | **0 ligne** |
+| Document d'un dossier non ouvert | invisible | **0 ligne** |
+| Plan de préparation | invisible | **0 exigence** |
+| Fiche entreprise | invisible | **0 ligne** |
+
+**La demande nommée échoue aussi.** Interroger directement le document par son
+nom — une requête forgée, pas un clic — rend zéro ligne. La frontière est
+portée par la RLS, pas par ce que l'écran choisit d'afficher : c'est ce qui
+compte, puisqu'un client peut interroger l'API sans passer par l'écran.
+
+**Révocation.** Après `revoke_invitation`, sous la même identité :
+
+```text
+0 dossier · 0 document · 0 opération
+```
+
+Immédiate et totale, sans reconnexion ni délai.
+
+---
+
+## 7. Ce qui n'a PAS été vérifié
 
 Ce chapitre est le plus important du document.
 
 | | Pourquoi c'est un risque |
 |---|---|
-| **Les limites de plan, à l'écran** | Vérifiées en SQL sous identité authentifiée, jamais dans un navigateur. Une limite contournable par l'interface ne se verrait pas. |
-| **L'accès invité à une data room** | Aucun test n'ouvre une salle côté destinataire. C'est pourtant le cœur du produit et le principal risque de fuite. |
+| **Le téléchargement d'un fichier par un invité** | La RLS borne les LIGNES ; le fichier vit dans Storage, dont les règles n'ont pas été éprouvées. Un lien signé fuité resterait valide. |
 | **La suppression de pièces dans Storage** | `delete_document` retire la ligne ; **le fichier survit dans le bucket** (B-06). Non exposé aujourd'hui, à trancher avant de l'exposer. |
 | **La double authentification** | Aucun compte de test n'en porte. |
 | **Le filigrane et le téléchargement** | Non éprouvés. |
@@ -108,12 +148,34 @@ Ce chapitre est le plus important du document.
 
 ---
 
-## 7. Verdict
+## 8. Les limites de plan — éprouvées à l'écran le 2 août
 
-Le cloisonnement par RLS, l'immuabilité du journal et le refus de viser la
-production sont **vérifiés**. Le traitement des secrets est correct, un incident
-près, corrigé et documenté.
+Elles ne l'avaient été qu'en SQL. Une limite peut tenir en base et se présenter
+à l'utilisateur comme une panne — « l'action n'a pas abouti, réessayez » —, ce
+qui l'envoie buter deux fois sur le même mur sans comprendre.
 
-**Rien de tout cela ne dit que les limites de plan tiennent à l'écran, ni qu'un
-invité ne voit que ce qu'on lui a ouvert.** Ce sont les deux vérifications qui
-manquent, et ce sont les deux qui coûteraient le plus cher si elles cédaient.
+Un test de navigateur vérifie désormais que le refus **se dit** : le message
+nomme le motif (« votre plan n'autorise pas une opération de plus ») et offre
+une issue (« archivez-en une terminée, ce qui est réversible, ou changez de
+plan »). Et l'opération refusée n'existe nulle part — un refus ne laisse pas de
+trace à moitié créée.
+
+En base, la même limite refuse aussi une insertion directe :
+
+```text
+ERROR: P0001: limite atteinte : active_deals
+```
+
+---
+
+## 9. Verdict
+
+Le cloisonnement par RLS, l'immuabilité du journal, le refus de viser la
+production, **l'étanchéité de l'accès invité** et **les limites de plan** sont
+vérifiés — les deux derniers depuis le 2 août, et ils étaient les deux trous les
+plus coûteux.
+
+Ce qui reste ouvert est le **Storage** : la RLS borne les lignes de base, pas
+les fichiers. Un invité ne voit pas le document masqué, mais rien n'a été
+éprouvé sur ce qu'un lien signé permettrait. C'est désormais le principal risque
+non mesuré.

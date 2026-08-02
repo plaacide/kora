@@ -16,11 +16,10 @@ Les trois documents qu'il résume portent les preuves :
 
 ## 1. Verdict
 
-**Ouvrable à une bêta fermée, avec un préalable et un aveu.**
+**Ouvrable à une bêta fermée, avec un aveu.**
 
-**Le préalable :** relever la limite d'envoi d'e-mails de Supabase. Deux `429`
-observés le 1er août ; l'inscription est le seul parcours dont l'échec ne laisse
-aucune issue.
+Le seul point bloquant — la limite d'envoi d'e-mails de Supabase, qui avait
+produit deux `429` le 1er août — a été relevé le 2 août.
 
 **L'aveu :** les parcours **de valeur** ne sont pas couverts par des essais
 automatisés. Déposer une pièce, ouvrir une data room à un invité, révoquer un
@@ -91,9 +90,8 @@ tables et sept fonctions du sous-système cohorte existent.
 
 ### Bloquant
 
-| | Qui |
-|---|---|
-| Relever la limite d'envoi Supabase | **Vous** — annoncé fait le 2 août, se confirmera à la première inscription réelle |
+**Aucun.** La limite d'envoi Supabase a été relevée le 2 août ; c'était le
+dernier point dont l'échec ne laissait aucune issue à un utilisateur.
 
 ### À faire avant d'ouvrir
 
