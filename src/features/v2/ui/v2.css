@@ -185,6 +185,21 @@
 .v2-plan-basis{margin:-14px 0 18px;color:var(--text-3);font-size:13px}
 .v2-plan-basis strong{color:var(--text-2);font-weight:600}
 .v2-tag{display:inline-flex;height:20px;align-items:center;border:1px solid var(--line);border-radius:4px;padding:0 7px;color:var(--text-2);font-size:11px;font-weight:500}
+/* L'AVIS EN CARTE, distinct de `v2-auth-error`.
+   Celui-ci est taillé pour la carte étroite de la connexion — 12,5 px, coins à
+   6 px, sans bordure. Posé dans une carte large, il s'étale en bandeau brut et
+   rompt le rythme de la page. Cet avis-ci suit `v2-private-note` : bordure,
+   coins à 10 px, icône, et la même taille de texte que le corps. */
+.v2-notice{display:flex;align-items:flex-start;gap:12px;margin:0 0 4px;border:1px solid var(--line);border-radius:10px;background:var(--band);padding:14px 16px}
+.v2-notice .v2-icon{width:18px;height:18px;flex:none;margin-top:1px;color:var(--text-3)}
+.v2-notice p{margin:0;color:var(--text-2);font-size:13.5px;line-height:20px}
+.v2-notice strong{display:block;margin-bottom:2px;color:var(--text);font-weight:600}
+/* Le refus de plan n'est pas une panne : il se dit en sourdine, pas en rouge.
+   Le rouge annonce une erreur à corriger ; ici, rien n'est cassé. */
+.v2-notice[data-ton="refus"]{border-color:#f0d5c8;background:#fef6f2}
+.v2-notice[data-ton="refus"] .v2-icon{color:var(--orange-text,#c64b1e)}
+.v2-notice[data-ton="erreur"]{border-color:#fbd5d2;background:#fef3f2}
+.v2-notice[data-ton="erreur"] p{color:#912018}
 .v2-private-note{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;background:var(--band);padding:14px 16px}
 .v2-private-note .v2-icon{width:20px;height:20px;color:var(--green)}
 .v2-private-note p{margin:0;color:var(--text-2);font-size:13.5px}

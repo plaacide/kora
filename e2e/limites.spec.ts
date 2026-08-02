@@ -47,7 +47,15 @@ test.describe("Limites de plan — une seule opération active", () => {
     // `__next-route-announcer__`, la région vide que Next.js pose sur chaque
     // page. Le test échouait alors sur une chaîne vide sans que le produit soit
     // en cause.
-    const message = page.locator("p.v2-auth-error");
+    // Les deux balisages : `v2-notice` après le passage à l'avis en carte,
+    // `p.v2-auth-error` tant que la recette porte l'ancien. Viser les deux
+    // évite que ce test casse au déploiement pour une raison de forme.
+    //
+    // Et surtout PAS `[role="alert"]` seul : il attrape
+    // `__next-route-announcer__`, la région vide que Next.js pose sur chaque
+    // page, et le test échoue alors sur une chaîne vide sans que le produit
+    // soit en cause.
+    const message = page.locator(".v2-notice, p.v2-auth-error").first();
     await expect(message).toBeVisible({ timeout: 15_000 });
     await expect(message).toContainText(/plan n’autorise pas|plan n'autorise pas/i);
     await expect(message).toContainText(/archivez|changez de plan/i);

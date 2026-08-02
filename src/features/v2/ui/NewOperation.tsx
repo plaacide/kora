@@ -308,10 +308,18 @@ export function NewOperationWizard({
         </header>
 
         {erreur && (
-          <p className="v2-auth-error" role="alert">
+          <div
+            className="v2-notice"
+            data-ton={erreur === "limite" ? "refus" : "erreur"}
+            role="alert"
+          >
             <AvisEphemere />
-            {ERROR_MESSAGES[erreur] ?? messageDErreur("inattendu")}
-          </p>
+            <Icon name={erreur === "limite" ? "lock" : "shield-check"} />
+            <p>
+              {erreur === "limite" && <strong>Plafond de votre plan atteint</strong>}
+              {ERROR_MESSAGES[erreur] ?? messageDErreur("inattendu")}
+            </p>
+          </div>
         )}
 
         {step === "type" && (
