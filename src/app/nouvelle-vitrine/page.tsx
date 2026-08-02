@@ -1,0 +1,118 @@
+import type { Metadata } from "next";
+import { Archivo, Inter } from "next/font/google";
+
+import "./vitrine.css";
+
+/**
+ * La nouvelle vitrine — direction 2a.
+ *
+ * Source de vérité : `sanza_handoff/Website sanza_v2/site-vitrine-2a.html`,
+ * dont le brief impose de reproduire le design à l'identique et interdit de
+ * réinterpréter. Toute valeur vient de là ; rien n'est arrondi ni dérivé.
+ *
+ * POURQUOI UNE ROUTE À PART, et non `app/page.tsx`. La page se construit
+ * section par section : la poser directement à la racine laisserait l'accueil
+ * de `sanza.africa` à moitié fait entre deux livraisons. Elle prendra la place
+ * de l'actuelle quand les neuf sections y seront, d'un seul remplacement.
+ *
+ * LES POLICES NE VIENNENT PAS DE GOOGLE. Le brief prévoit un `<link>` vers
+ * `fonts.googleapis.com` ; la politique de sécurité du site pose
+ * `font-src 'self' data:` et l'aurait bloqué en silence — la page serait
+ * tombée sur une police système sans que rien ne le signale. `next/font` les
+ * héberge à la compilation : mêmes fontes, même rendu, servies depuis notre
+ * domaine.
+ */
+
+const titre = Archivo({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-vit-titre",
+  display: "swap",
+});
+
+const texte = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-vit-texte",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: "Sanza — Levez des fonds sans jamais perdre le fil de votre dossier",
+  description:
+    "Data room sécurisée, préparation guidée selon les exigences réelles des financeurs, et mise en relation quand vous êtes prêt. Tout au même endroit.",
+  // Page en construction : elle ne doit pas être indexée avant de remplacer
+  // l'accueil, sinon deux versions du même contenu se feraient concurrence.
+  robots: { index: false, follow: false },
+};
+
+/** Là où mènent les deux points d'entrée pendant la bêta. */
+const APP = "https://v2.sanza.africa";
+
+export default function NouvelleVitrine() {
+  return (
+    <div className={`vit ${titre.variable} ${texte.variable}`}>
+      <div className="vit-page">
+        {/* 1 — Nav */}
+        <header className="vit-nav">
+          <div className="vit-marque">
+            <span aria-hidden="true">S</span>
+            <b>Sanza</b>
+          </div>
+
+          <nav aria-label="Sections du site">
+            <a href="#produit">Produit</a>
+            <a href="#programmes">Pour les programmes</a>
+            <a href="#financeurs">Pour les financeurs</a>
+            <a href="#tarifs">Tarifs</a>
+          </nav>
+
+          <span className="vit-espace" />
+
+          <a className="vit-lien-discret" href={`${APP}/v2/connexion`}>
+            Se connecter
+          </a>
+          <a className="vit-cta" href={`${APP}/v2/inscription`}>
+            Commencer gratuitement
+          </a>
+        </header>
+
+        {/* 2 — Hero centré */}
+        <section className="vit-hero">
+          <span className="vit-pilule">
+            Data room · Préparation · Mise en relation investisseurs
+          </span>
+
+          <h1>Levez des fonds sans jamais perdre le fil de votre dossier.</h1>
+
+          <p>
+            Data room sécurisée, préparation guidée selon les exigences réelles
+            des financeurs, et mise en relation quand vous êtes prêt. Tout au
+            même endroit.
+          </p>
+
+          <div className="vit-hero-actions">
+            <a
+              className="vit-cta"
+              data-taille="hero"
+              href={`${APP}/v2/inscription`}
+            >
+              Commencer gratuitement
+            </a>
+            <a className="vit-cta-ligne" href="#demo">
+              Réserver une démo
+            </a>
+          </div>
+
+          <p className="vit-rassurance">
+            <span>Sans carte bancaire</span>
+            <i aria-hidden="true">·</i>
+            <span>Data room prête en 14 jours</span>
+            <i aria-hidden="true">·</i>
+            <span>Vos documents restent sous votre contrôle</span>
+          </p>
+        </section>
+      </div>
+    </div>
+  );
+}
