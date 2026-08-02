@@ -226,25 +226,7 @@
   font: 400 12.5px var(--font-vit-texte), Inter, sans-serif;
 }
 
-/* ── Barre de logos ──────────────────────────────────────────────────────
-   Son filet supérieur est ce qui tranche l'aperçu du hero. */
-
-.vit-confiance {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 36px;
-  border-top: 1px solid var(--vit-bord);
-  border-bottom: 1px solid var(--vit-bord-faible);
-  background: #fff;
-  padding: 22px 56px;
-}
-.vit-confiance > span:not(.vit-sur-titre) {
-  color: var(--vit-texte-3);
-  font: 700 15px var(--font-vit-titre), Archivo, sans-serif;
-}
-
-/* L'intitulé en petites capitales espacées, partagé avec la bande sécurité. */
+/* L'intitulé en petites capitales espacées, porté par la bande sécurité. */
 .vit-sur-titre {
   color: var(--vit-texte-4);
   font: 500 12px var(--font-vit-texte), Inter, sans-serif;
@@ -254,10 +236,14 @@
 
 /* ── Sections bénéfices ────────────────────────────────────────────────── */
 
+/* Le filet supérieur vient de la barre de logos retirée : c'est lui qui tranche
+   l'aperçu du hero, dont le bas n'a ni bordure ni rayon. Sans lui la carte
+   flotterait, ouverte, sur du blanc. */
 .vit-benefices {
   display: flex;
   flex-direction: column;
   gap: 48px;
+  border-top: 1px solid var(--vit-bord);
   padding: 64px 56px;
 }
 .vit-benefice {
@@ -722,83 +708,17 @@
   left: 60%;
 }
 
-/* ── Témoignage et métriques ─────────────────────────────────────────── */
-
-.vit-preuve {
-  display: grid;
-  align-items: center;
-  gap: 48px;
-  border-top: 1px solid var(--vit-bord);
-  border-bottom: 1px solid var(--vit-bord);
-  background: var(--vit-gris);
-  grid-template-columns: 1fr 1fr;
-  padding: 52px 56px;
-}
-.vit-temoignage {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-/* La citation est en Archivo 500, pas en Inter : c'est le seul texte courant
-   de la page composé dans la police des titres. */
-.vit-temoignage p {
-  margin: 0;
-  font: 500 21px/1.45 var(--font-vit-titre), Archivo, sans-serif;
-  letter-spacing: -0.01em;
-}
-.vit-temoin {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.vit-temoin > span {
-  display: inline-flex;
-  width: 40px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--vit-teinte);
-  color: var(--vit-orange-fonce);
-  font: 600 14px var(--font-vit-texte), Inter, sans-serif;
-}
-.vit-temoin b {
-  font: 600 14px var(--font-vit-texte), Inter, sans-serif;
-}
-.vit-temoin div span {
-  display: block;
-  color: var(--vit-texte-3);
-  font: 400 12.5px var(--font-vit-texte), Inter, sans-serif;
-}
-
-.vit-metriques {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: 1fr 1fr;
-}
-.vit-metriques > div {
-  border: 1px solid var(--vit-bord);
-  border-radius: 10px;
-  background: #fff;
-  padding: 20px;
-}
-.vit-metriques b {
-  font: 700 26px var(--font-vit-titre), Archivo, sans-serif;
-}
-.vit-metriques span {
-  display: block;
-  margin-top: 3px;
-  color: var(--vit-texte-3);
-  font: 400 13px var(--font-vit-texte), Inter, sans-serif;
-}
-
 /* ── Bande sécurité ──────────────────────────────────────────────────── */
 
+/* Le filet supérieur vient du bloc témoignage retiré, qui la précédait et la
+   détachait des sections bénéfices. Sans lui, les deux se toucheraient sans
+   rien pour les séparer. */
 .vit-securite {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 40px;
+  border-top: 1px solid var(--vit-bord);
   padding: 44px 56px;
 }
 .vit-securite > span:not(.vit-sur-titre) {
@@ -927,17 +847,6 @@
     align-items: flex-start;
     gap: 8px;
   }
-  /* Cinq noms sur une ligne débordent bien avant 900 px : ils passent à la
-     ligne, l'intitulé gardant la sienne. */
-  .vit-confiance {
-    flex-wrap: wrap;
-    gap: 12px 24px;
-    padding: 20px 24px;
-    text-align: center;
-  }
-  .vit-confiance .vit-sur-titre {
-    width: 100%;
-  }
   .vit-pied {
     flex-direction: column;
     gap: 12px;
@@ -961,14 +870,6 @@
   }
   .vit-benefice h2 {
     font-size: 24px;
-  }
-  .vit-preuve {
-    gap: 28px;
-    grid-template-columns: 1fr;
-    padding: 40px 24px;
-  }
-  .vit-temoignage p {
-    font-size: 18px;
   }
   .vit-securite {
     flex-wrap: wrap;

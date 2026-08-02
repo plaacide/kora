@@ -17,6 +17,15 @@
  * seules, et qu'aucune n'a d'état : ce sont des composants serveur, sans une
  * ligne de JavaScript envoyée au navigateur.
  *
+ * LES NOMS DE FINANCEURS SONT INVENTÉS, ET DOIVENT LE RESTER. La maquette met
+ * en scène Banque Atlantique, Teranga Capital, Impact Partners et KPMG — des
+ * institutions réelles. Une capture qui montre « Banque Atlantique a consulté
+ * Cap table » laisse entendre qu'elle est sur la plateforme, ce qui n'est pas
+ * établi. Banque Kiraso, Kaledou Capital et Wassa Impact n'engagent personne ;
+ * la pièce d'audit ne nomme plus de cabinet du tout. Voir
+ * `docs/site/DECISIONS.md` §3. CoolBricks reste : c'est la société de démo, elle
+ * est fictive de part en part.
+ *
  * Source : `sanza_handoff/Website sanza_v2/site-vitrine-2a.html` et son
  * annexe `captures-video-produit.html`.
  */
@@ -126,7 +135,7 @@ export function CaptureDataRoom() {
                 <i className="vit-format" data-format="pdf">
                   PDF
                 </i>
-                Rapport d&apos;audit KPMG
+                Rapport d&apos;audit externe
                 <span className="vit-espace" />
                 <i className="vit-mention">Lecture seule</i>
               </span>
@@ -137,8 +146,8 @@ export function CaptureDataRoom() {
 
       <div className="vit-journal" aria-hidden="true">
         <i />
-        Journal d&apos;audit — Banque Atlantique a consulté « Cap table » · il y
-        a 2 min
+        Journal d&apos;audit — Banque Kiraso a consulté « Cap table » · il y a
+        2 min
       </div>
 
       <Curseur scenario="a" />
@@ -184,7 +193,7 @@ export function CapturePreparation() {
             <span className="vit-exigence">
               <i className="vit-coche">✓</i>États financiers 2023–2025
               <span className="vit-espace" />
-              <i className="vit-note">Demandé par Banque Atlantique</i>
+              <i className="vit-note">Demandé par Banque Kiraso</i>
             </span>
             <span className="vit-exigence">
               <i className="vit-coche">✓</i>Cap table à jour
@@ -234,7 +243,7 @@ export function CaptureDealroom() {
 
           <div className="vit-dl">
             <span className="vit-investisseur">
-              <i className="vit-sigle">TC</i>Teranga Capital
+              <i className="vit-sigle">KC</i>Kaledou Capital
               <span className="vit-espace" />
               <i className="vit-jeton-vivant">
                 <b />
@@ -244,9 +253,9 @@ export function CaptureDealroom() {
 
             <span className="vit-investisseur" data-attente="">
               <i className="vit-sigle" data-ton="orange">
-                IP
+                WI
               </i>
-              Impact Partners
+              Wassa Impact
               <span className="vit-espace" />
               <span className="vit-bascule" data-temps="42">
                 <span className="vit-avant vit-arbitrage">
@@ -262,7 +271,7 @@ export function CaptureDealroom() {
             </span>
 
             <span className="vit-investisseur" data-tardive="">
-              <i className="vit-sigle">BA</i>Banque Atlantique
+              <i className="vit-sigle">BK</i>Banque Kiraso
               <span className="vit-espace" />
               <i className="vit-jeton-cours">Nouvelle demande d&apos;accès</i>
             </span>

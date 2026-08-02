@@ -209,26 +209,19 @@ export default function Accueil() {
         </section>
 
         {/*
-          4 — Barre de logos.
+          4 — Barre de logos : RETIRÉE, décision du fondateur.
 
-          C'EST ELLE QUI TRANCHE L'APERÇU du hero : son filet supérieur passe
-          exactement au ras du bas de la carte, dont la bordure s'arrête là.
+          Elle disait « Ils font confiance à Sanza » au-dessus de cinq
+          institutions nommées — Banque Atlantique, BOAD, Teranga Capital,
+          Impact Partners, Savane Accelerator — qui venaient de la maquette et
+          n'étaient pas des références confirmées. La page ne l'affirme pas tant
+          que ce n'est pas vrai. Voir `docs/site/DECISIONS.md` §3.
 
-          LES CINQ NOMS SONT DES EXEMPLES DE MAQUETTE, pas des clients établis.
-          « Ils font confiance à Sanza » est une affirmation publique sur des
-          tiers nommés — Banque Atlantique, BOAD et les autres doivent être
-          vérifiés, et leurs logos obtenus, AVANT que cette page remplace
-          l'accueil. Le handoff prévoit d'ailleurs de remplacer ces noms par les
-          vrais logos en niveaux de gris.
+          ELLE ÉTAIT CE QUI TRANCHAIT L'APERÇU DU HERO : son filet supérieur
+          tombait au ras du bas de la carte, qui n'a ni bordure ni rayon en bas.
+          Ce filet passe donc aux sections bénéfices, sinon la carte flotterait,
+          ouverte, sur un fond blanc.
         */}
-        <section className="vit-confiance" aria-label="Références clients">
-          <span className="vit-sur-titre">Ils font confiance à Sanza</span>
-          <span>Savane Accelerator</span>
-          <span>Banque Atlantique</span>
-          <span>Impact Partners</span>
-          <span>BOAD</span>
-          <span>Teranga Capital</span>
-        </section>
 
         {/*
           5 — Les trois bénéfices, texte et capture en alternance.
@@ -295,60 +288,28 @@ export default function Accueil() {
         </div>
 
         {/*
-          6 — Témoignage et métriques.
+          6 — Témoignage et métriques : RETIRÉS, décision du fondateur.
 
-          RIEN ICI N'EST VÉRIFIÉ. Aminata Koné, CoolBricks, les cinq semaines de
-          due diligence, les 250 entreprises, les 12 pays : ce sont les valeurs
-          de la maquette, écrites pour montrer la mise en page. Publiées telles
-          quelles, elles seraient un témoignage inventé attribué à une personne
-          nommée, et quatre chiffres d'entreprise invérifiables.
+          Le bloc portait une citation signée Aminata Koné (CoolBricks) et quatre
+          chiffres — −60 % de temps de due diligence, 14 jours, 250+ entreprises,
+          12 pays. Tout venait de la maquette : un témoignage inventé attribué à
+          une personne nommée, et quatre chiffres d'entreprise invérifiables. Sur
+          l'accueil d'une société réelle, ce n'était pas tenable.
 
-          La page n'est pas indexée et ne sert pas d'accueil, donc rien n'est
-          publié aujourd'hui. Mais tout ce bloc doit être remplacé par un vrai
-          client, une vraie citation recueillie avec son accord, et des chiffres
-          qu'on peut soutenir — avant le remplacement, pas après.
+          Il revient dès qu'un vrai client accepte d'être cité et que les chiffres
+          peuvent être soutenus. Le balisage se relit dans l'historique — inutile
+          de le garder en commentaire. Voir `docs/site/DECISIONS.md` §3.
         */}
-        <section className="vit-preuve" aria-label="Témoignage client et chiffres">
-          <div className="vit-temoignage">
-            <p>
-              « Avant Sanza, chaque investisseur recevait un Drive différent.
-              Aujourd&apos;hui notre dossier est prêt en permanence — la due
-              diligence de notre Seed a pris 5 semaines au lieu de 4 mois. »
-            </p>
-            <div className="vit-temoin">
-              <span aria-hidden="true">AK</span>
-              <div>
-                <b>Aminata Koné</b>
-                <span>CEO, CoolBricks · Levée Seed 500 K€ — Abidjan</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="vit-metriques">
-            <div>
-              <b>−60 %</b>
-              <span>de temps passé en due diligence</span>
-            </div>
-            <div>
-              <b>14 jours</b>
-              <span>pour une data room prête</span>
-            </div>
-            <div>
-              <b>250+</b>
-              <span>entreprises accompagnées</span>
-            </div>
-            <div>
-              <b>12 pays</b>
-              <span>Afrique de l&apos;Ouest et centrale</span>
-            </div>
-          </div>
-        </section>
 
         {/*
           7 — Bande sécurité.
 
           Elle porte l'ancre `#securite` que le pied de page vise depuis le
           lot 1 — c'était la destination annoncée, la voici.
+
+          SON FILET SUPÉRIEUR REMPLACE celui du bloc preuve qui la précédait :
+          sans lui, la bande se collerait aux sections bénéfices sans rien pour
+          l'en séparer.
         */}
         <section className="vit-securite" id="securite">
           <span className="vit-sur-titre">Sécurité</span>

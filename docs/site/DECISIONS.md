@@ -46,3 +46,40 @@ dans le handoff.
 
 **À rouvrir quand** : la maquette est ré-exportée, ou si le produit renomme son
 indicateur.
+
+## 3. La barre de logos et le bloc témoignage sont retirés — **tranché, 2 août 2026**
+
+La maquette porte deux blocs de preuve sociale, tous deux repris tels quels
+pendant la construction :
+
+- **« Ils font confiance à Sanza »** au-dessus de cinq institutions nommées :
+  Savane Accelerator, Banque Atlantique, Impact Partners, BOAD, Teranga Capital.
+- **Un témoignage** signé Aminata Koné (CEO, CoolBricks · Levée Seed 500 K€ —
+  Abidjan), et quatre métriques : −60 % de temps de due diligence, 14 jours pour
+  une data room prête, 250+ entreprises accompagnées, 12 pays.
+
+Rien de tout cela n'est vérifié. Ce sont des valeurs de maquette, écrites pour
+montrer une mise en page. Tant que la page vivait sur une route non indexée, la
+question ne se posait pas.
+
+**Décision du fondateur, au moment de faire de cette page l'accueil :** les
+retirer. Sur le site d'une société réelle, ces deux blocs affirment
+publiquement que cinq institutions nommées sont clientes, et attribuent une
+citation à une personne nommée qui ne l'a pas dite. La page ne l'affirme pas
+tant que ce n'est pas vrai.
+
+**Ce que leur retrait a déplacé.** Les deux blocs ne portaient pas que du texte,
+ils portaient deux filets :
+
+- La barre de logos **tranchait l'aperçu produit du hero**, dont le bas n'a ni
+  bordure ni rayon. Son filet supérieur passe aux sections bénéfices, sinon la
+  carte flotte, ouverte, sur du blanc.
+- Le bloc témoignage **séparait les bénéfices de la bande sécurité**. Son filet
+  passe à la bande sécurité.
+
+**Pour les remettre** : le balisage et le CSS se relisent dans l'historique
+(`git show c2e5a68` et `fb59409`), et les deux filets repris sont commentés à
+l'endroit où ils ont été posés. Ne pas les remettre sans les retirer de là.
+
+**À rouvrir quand** : un vrai client accepte d'être cité, les références sont
+confirmées avec leurs logos, et les chiffres peuvent être soutenus.
