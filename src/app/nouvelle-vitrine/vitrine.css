@@ -288,11 +288,17 @@
   color: var(--vit-texte-2);
   font: 400 15px/1.65 var(--font-vit-texte), Inter, sans-serif;
 }
+/* Les trois flèches attendent la page Produit, qui n'est pas écrite. Elles
+   gardent leur place et leur couleur, sans se donner pour des liens : même
+   règle que « Confidentialité » au pied de page. */
 .vit-lien-fleche {
   display: inline-block;
   margin-top: 14px;
   color: var(--vit-orange-fonce);
   font: 600 14px var(--font-vit-texte), Inter, sans-serif;
+}
+.vit-lien-fleche[data-attente] {
+  cursor: default;
 }
 
 /* ── Captures produit ────────────────────────────────────────────────────

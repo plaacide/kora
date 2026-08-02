@@ -187,6 +187,13 @@ export default function NouvelleVitrine() {
           la source qui l'impose, et c'est ce qui donne son rythme à la suite.
           Sous 900 px l'alternance n'a plus de sens une fois la grille empilée —
           le texte repasse alors devant sa capture, partout.
+
+          LES TROIS FLÈCHES NE MÈNENT NULLE PART, ET C'EST VOULU. Elles
+          appellent la page Produit, qui reste à écrire : la brancher sur `#produit`
+          l'aurait faite pointer sur la section qu'on lit déjà, et sur une page
+          inexistante le jour où l'ancre disparaîtrait. Même arbitrage qu'au pied
+          de page — un intitulé qui attend sa destination plutôt qu'un lien qui
+          ment.
         */}
         <div className="vit-benefices">
           <section className="vit-benefice">
@@ -198,9 +205,9 @@ export default function NouvelleVitrine() {
                 d&apos;audit complet. Vous savez qui a vu quoi, quand — et vous
                 coupez l&apos;accès en un clic.
               </p>
-              <a className="vit-lien-fleche" href="#produit">
+              <span className="vit-lien-fleche" data-attente="">
                 Découvrir la data room →
-              </a>
+              </span>
             </div>
             <CaptureDataRoom />
           </section>
@@ -215,9 +222,9 @@ export default function NouvelleVitrine() {
                 Chaque pièce déposée fait monter votre score de readiness,
                 visible par vous seul.
               </p>
-              <a className="vit-lien-fleche" href="#produit">
+              <span className="vit-lien-fleche" data-attente="">
                 Voir la préparation guidée →
-              </a>
+              </span>
             </div>
           </section>
 
@@ -229,9 +236,9 @@ export default function NouvelleVitrine() {
                 Dealrooms privées, demandes d&apos;accès que vous approuvez une à
                 une. Rien ne circule sans votre accord explicite.
               </p>
-              <a className="vit-lien-fleche" href="#produit">
+              <span className="vit-lien-fleche" data-attente="">
                 Comment ça marche →
-              </a>
+              </span>
             </div>
             <CaptureDealroom />
           </section>
