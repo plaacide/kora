@@ -108,6 +108,21 @@ restituée** — c'était le défaut signalé le 1er août.
 
 ---
 
+## Une instabilité connue de la suite
+
+`limites.spec.ts` échoue par intermittence dans l'exécution complète, et **passe
+systématiquement lorsqu'il est lancé seul** (6,7 s). Le symptôme est net : le
+test atterrit sur la page de connexion, donc la session du compte installé a été
+perdue entre son ouverture et son exécution.
+
+**C'est un défaut du harnais, pas du produit** — la limite elle-même est
+vérifiée en base et à l'écran. La cause probable est l'enchaînement des deux
+projets d'authentification, `connexion` et `connexion-neuve`, dont le second
+détruit et recrée un compte à chaque exécution. À corriger avant de faire de
+cette suite une porte de déploiement.
+
+---
+
 ## Ce qui n'est PAS couvert
 
 À dire avant qu'on prenne ce document pour une garantie :
