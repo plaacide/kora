@@ -36,13 +36,14 @@ publique, non.
 ## 2. Ce qui a été mesuré aujourd'hui
 
 ```text
-36 tests · 33 passés · 1 échoué · 2 ignorés · 65 s
+36 tests · 34 passés · 0 échoué · 2 ignorés · 56 s
 contre la recette déployée, sur deux comptes réels
 ```
 
-L'échec unique vient d'un correctif poussé mais **pas encore déployé** — les
-options des sélecteurs n'ont pas d'attribut `value`. L'écran fonctionne ; c'est
-le sélecteur du test qui ne trouve rien.
+La première exécution comptait un échec, dû à un correctif poussé mais pas
+encore déployé. **Le déploiement fait, la suite est au vert.** Les deux tests
+ignorés le sont légitimement : le compte installé ne peut pas atteindre le
+bandeau d'onboarding, et le compte neuf les couvre.
 
 **La suite authentifiée n'avait jamais tourné avant aujourd'hui.** C'est le
 changement principal de cette journée, et il a immédiatement produit trois
@@ -92,13 +93,12 @@ tables et sept fonctions du sous-système cohorte existent.
 
 | | Qui |
 |---|---|
-| Relever la limite d'envoi Supabase | **Vous** |
+| Relever la limite d'envoi Supabase | **Vous** — annoncé fait le 2 août, se confirmera à la première inscription réelle |
 
 ### À faire avant d'ouvrir
 
 | | Qui |
 |---|---|
-| Déployer le dernier build (le test en échec passera) | Vous |
 | Éprouver les limites de plan **à l'écran** | Moi |
 | Éprouver l'accès invité à une data room | Moi |
 | Trancher `complete_onboarding(p_create_room)` (B-05) | Vous |

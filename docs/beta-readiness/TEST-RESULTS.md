@@ -36,13 +36,16 @@ plus critique de la bêta n'était éprouvé nulle part**, et rien ne le signala
 ## Le résultat
 
 ```text
-36 tests · 33 passés · 1 échoué · 2 ignorés · 65 s
+36 tests · 34 passés · 0 échoué · 2 ignorés · 56 s
 ```
+
+*(Première exécution, 2 août : 33 passés et 1 échec, dû à un correctif poussé
+mais pas encore déployé. Le déploiement effectué, la suite est au vert.)*
 
 | Projet | Tests | Passés | Échoués | Ignorés |
 |---|---:|---:|---:|---:|
 | `public` — sans compte | 21 | **21** | 0 | 0 |
-| `onboarding` — compte neuf | 7 | 6 | **1** | 0 |
+| `onboarding` — compte neuf | 7 | **7** | 0 | 0 |
 | `chrome-desktop` — compte installé | 6 | 4 | 0 | 2 |
 | Ouverture de session (×2) | 2 | 2 | 0 | 0 |
 
@@ -68,7 +71,7 @@ la V2 et non de la V1**.
 
 ---
 
-## L'échec, et sa cause
+## L'échec de la première exécution, et sa correction
 
 ```text
 [onboarding] › un secteur enregistré sous une ancienne liste reste affiché
@@ -76,13 +79,16 @@ la V2 et non de la V1**.
   Expected: 1 · Received: 0
 ```
 
-**Ce n'est pas une régression du produit.** Les options des sélecteurs n'avaient
-pas d'attribut `value` : le DOM la déduit du texte — l'écran fonctionne — mais
-aucun sélecteur d'attribut ne trouve l'option, et le test croit qu'elle a
-disparu.
+**Ce n'était pas une régression du produit.** Les options des sélecteurs
+n'avaient pas d'attribut `value` : le DOM la déduit du texte — l'écran
+fonctionne — mais aucun sélecteur d'attribut ne trouve l'option, et le test
+croyait qu'elle avait disparu.
 
-Le correctif est écrit et poussé. **Il n'est pas encore déployé**, et la suite
-vise le build déployé : ce test passera au prochain déploiement, pas avant.
+Corrigé et déployé le 2 août. **La suite est au vert depuis.**
+
+Les 2 tests ignorés le restent légitimement : ce sont ceux du bandeau
+d'onboarding, que le compte installé ne peut plus atteindre — il y est redirigé
+vers son poste de pilotage. Le compte neuf les couvre.
 
 ---
 
