@@ -55,7 +55,7 @@ Les 3 blocs capture des sections bénéfices sont des **maquettes produit animé
 2. Ne pas remplacer les couleurs par une palette Tailwind « proche » — utiliser les hex exacts.
 3. Ne pas ajouter de sections (FAQ, pricing, blog…) sans validation.
 4. Un seul H1. Boutons : padding 14px 26px (hero) / 10px 18px (nav).
-5. Textes : copier-coller depuis la source, y compris ponctuation française (« », ·, —, espaces insécables).
+5. Textes : copier-coller depuis la source, y compris ponctuation française (« », ·, —, espaces insécables). **Une seule exception, tranchée le 2 août 2026 : « Readiness » devient « Dossier prêt » aux trois endroits où la source l'écrit** (jeton du hero, jauge de la capture Préparation, paragraphe de la section Préparation). Ne pas le rétablir en ré-exportant la maquette — voir `docs/site/DECISIONS.md` §2.
 6. Toutes les durées d'animation = 14s partagées, sinon les scénarios se désynchronisent.
 
 ## Reste à faire (hors périmètre de ce handoff)

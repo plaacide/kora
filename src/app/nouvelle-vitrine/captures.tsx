@@ -154,7 +154,7 @@ export function CaptureDataRoom() {
  */
 export function CapturePreparation() {
   return (
-    <div className="vit-capture" data-scenario="b" role="img" aria-label="Aperçu de la préparation : une pièce manquante est déposée, le compteur d'exigences prêtes passe de 18 à 19 sur 24 et la jauge de readiness monte de 58 à 79 %.">
+    <div className="vit-capture" data-scenario="b" role="img" aria-label="Aperçu de la préparation : une pièce manquante est déposée, le compteur d'exigences prêtes passe de 18 à 19 sur 24 et la jauge « Dossier prêt » monte de 58 à 79 %.">
       <div className="vit-scene" aria-hidden="true">
         <div className="vit-fenetre" data-largeur="82">
           <div className="vit-fenetre-tete">
@@ -175,7 +175,7 @@ export function CapturePreparation() {
 
           <div className="vit-prep">
             <div className="vit-jauge">
-              <span>Readiness</span>
+              <span>Dossier prêt</span>
               <span className="vit-jauge-piste">
                 <span className="vit-jauge-barre" />
               </span>

@@ -134,11 +134,16 @@ export default function NouvelleVitrine() {
             L'ombre est portée VERS LE HAUT (décalage négatif) — l'unique
             ombre de la page, et la seule chose qui détache la carte du
             dégradé une fois son bas absorbé.
+
+            « DOSSIER PRÊT » S'ÉCARTE DE LA SOURCE, QUI DIT « READINESS ». Seule
+            divergence de texte de toute la page, sur décision du fondateur : le
+            terme anglais n'a pas sa place sur une page française, et l'app dit
+            déjà « dossier prêt ». Voir `docs/site/DECISIONS.md`.
           */}
           <div className="vit-apercu">
             <div className="vit-apercu-tete">
               <b>Levée Seed 2026 · CoolBricks</b>
-              <span className="vit-jeton-pret">Readiness 82 %</span>
+              <span className="vit-jeton-pret">Dossier prêt 82 %</span>
             </div>
 
             <div className="vit-apercu-tuiles">
@@ -219,7 +224,7 @@ export default function NouvelleVitrine() {
               <h2>Vous savez toujours quoi faire ensuite</h2>
               <p>
                 Checklists par pays et par type de financeur — OHADA compris.
-                Chaque pièce déposée fait monter votre score de readiness,
+                Chaque pièce déposée fait monter votre score « Dossier prêt »,
                 visible par vous seul.
               </p>
               <span className="vit-lien-fleche" data-attente="">
