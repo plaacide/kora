@@ -269,7 +269,23 @@ Santé et Services financiers uniquement — 2 secteurs sur 10. Voir
 
 ---
 
-## LOT G — 🟠 La structure de la data room *(attend un arbitrage)*
+## LOT G — ✅ La structure de la data room
+
+**Livré le 2 août**, l'arbitrage rendu. Un bailleur peut demander les contrats,
+les litiges et les assurances — mais « selon la matérialité, l'instrument et les
+risques du projet, pas comme trois documents obligatoires ». Cela a exigé un
+QUATRIÈME axe de variante, l'objectif : le niveau étant une colonne unique du
+catalogue, rien ne permettait de dire « requis pour une diligence, recommandé
+pour un bailleur ».
+
+| Objectif | Dossiers |
+|---|---:|
+| Audit · Autre | 12 |
+| Levée | 27 |
+| Dette · DFI | 28 |
+| Diligence | 32 |
+
+### Rédaction d'origine
 
 **Étudié le 2 août, pas livré — et volontairement.**
 
