@@ -256,7 +256,24 @@ C'est votre expertise, pas la mienne. Je fournis la structure et je saisis.
 
 ---
 
-## LOT F — 🟠 Extensions sectorielles *(attend V4, D3)*
+## LOT F — ✅ Extensions sectorielles
+
+**Livré le 2 août.** Deux secteurs sur dix : santé et services financiers. Une
+levée passe de 17 exigences pour un commerce à **24 pour la santé** et 19 pour
+les services financiers.
+
+Trois arbitrages du fondateur, appliqués : **une seule exigence** énumérant les
+quatre voies d'agrément fintech plutôt que quatre lignes dont trois seront
+écartées ; **LBC/FT précisé et non dédoublé** ; et les **dispositifs médicaux
+conservés mais activés pays par pays** — l'exigence existe au référentiel,
+documentée, et n'apparaît chez personne tant qu'un pays vérifié ne l'allume pas.
+
+Deux mécanismes créés : le **secteur** devient le cinquième axe de variante, et
+`activation_par_pays` inverse la logique habituelle — ailleurs une exigence est
+visible et une variante la retire ; ici elle est éteinte et seul un pays
+l'allume.
+
+### Rédaction d'origine
 
 Santé et Services financiers uniquement — 2 secteurs sur 10. Voir
 `EXIGENCES-SECTORIELLES.md`.
