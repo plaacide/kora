@@ -154,6 +154,28 @@ export default function NouvelleVitrine() {
         </section>
 
         {/*
+          4 — Barre de logos.
+
+          C'EST ELLE QUI TRANCHE L'APERÇU du hero : son filet supérieur passe
+          exactement au ras du bas de la carte, dont la bordure s'arrête là.
+
+          LES CINQ NOMS SONT DES EXEMPLES DE MAQUETTE, pas des clients établis.
+          « Ils font confiance à Sanza » est une affirmation publique sur des
+          tiers nommés — Banque Atlantique, BOAD et les autres doivent être
+          vérifiés, et leurs logos obtenus, AVANT que cette page remplace
+          l'accueil. Le handoff prévoit d'ailleurs de remplacer ces noms par les
+          vrais logos en niveaux de gris.
+        */}
+        <section className="vit-confiance" aria-label="Références clients">
+          <span className="vit-sur-titre">Ils font confiance à Sanza</span>
+          <span>Savane Accelerator</span>
+          <span>Banque Atlantique</span>
+          <span>Impact Partners</span>
+          <span>BOAD</span>
+          <span>Teranga Capital</span>
+        </section>
+
+        {/*
           9 — Pied de page.
 
           LES DEUX PREMIERS LIENS NE MÈNENT NULLE PART, ET C'EST DÉLIBÉRÉ. La

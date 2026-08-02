@@ -232,6 +232,32 @@
   font: 400 12.5px var(--font-vit-texte), Inter, sans-serif;
 }
 
+/* ── Barre de logos ──────────────────────────────────────────────────────
+   Son filet supérieur est ce qui tranche l'aperçu du hero. */
+
+.vit-confiance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  border-top: 1px solid var(--vit-bord);
+  border-bottom: 1px solid var(--vit-bord-faible);
+  background: #fff;
+  padding: 22px 56px;
+}
+.vit-confiance > span:not(.vit-sur-titre) {
+  color: var(--vit-texte-3);
+  font: 700 15px var(--font-vit-titre), Archivo, sans-serif;
+}
+
+/* L'intitulé en petites capitales espacées, partagé avec la bande sécurité. */
+.vit-sur-titre {
+  color: var(--vit-texte-4);
+  font: 500 12px var(--font-vit-texte), Inter, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 /* ── Pied de page ────────────────────────────────────────────────────── */
 
 .vit-pied {
@@ -304,6 +330,17 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+  /* Cinq noms sur une ligne débordent bien avant 900 px : ils passent à la
+     ligne, l'intitulé gardant la sienne. */
+  .vit-confiance {
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .vit-confiance .vit-sur-titre {
+    width: 100%;
   }
   .vit-pied {
     flex-direction: column;
