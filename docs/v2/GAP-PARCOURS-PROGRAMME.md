@@ -33,24 +33,23 @@ revanche, une bonne moitié du socle est déjà là (§3).
 
 ## 1. Deux manques dans le paquet lui-même
 
-**1.1 — Le CSS de référence est absent.** Les 34 écrans pointent tous sur
-`../parcours/parcours.css`. Ce dossier n'existe nulle part dans le dépôt : les
-écrans s'ouvrent aujourd'hui **sans aucun style**. Le seul fichier qui couvre
-leur vocabulaire est `sanza_handoff/Website sanza_v2/parcours.css` — il définit
-60 des 61 classes utilisées (seule `row` manque) et exactement les tokens
-appelés par les écrans.
+**1.1 — Le CSS de référence — RÉSOLU le 5 août.** Les 34 écrans pointent tous
+sur `../parcours/parcours.css`, et ce fichier manquait : ils s'ouvraient sans
+aucun style. Le fondateur l'a versé le jour même, en **variante rail 216 px à
+libellés** (`.rail a::after{content:attr(title)}`), et il est en place à
+`sanza_handoff/maquettes/parcours/parcours.css` — là où les 35 fichiers le
+cherchent.
 
-Mais il en existe trois copies dans le dépôt, qui **divergent sur le rail** :
+Couverture vérifiée : **61 classes sur 61, 23 tokens sur 23**. La seule classe
+absente du fichier, `.row`, n'appartient pas aux écrans — c'est la mise en page
+du sommaire `index.html`, qui porte son propre `<style>`.
 
-| Fichier | Rail |
-|---|---|
-| `Website sanza_v2/parcours.css` | 216 px, libellés visibles (`::after{content:attr(title)}`) |
-| `Website sanza_v2/screens/parcours.css` | 60 px, icônes seules |
-| `Website sanza_v2/abonnement/parcours.css` | 216 px |
-
-Le balisage des écrans programme (`<a title="Accueil"><svg…></a>`) fonctionne
-avec les deux. L'app V2 actuelle, elle, a un rail de 60 px (`.v2-rail`).
-**Je ne tranche pas** : voir question Q1.
+Reste une question de produit, et non de fichier : ce rail de 216 px à libellés
+n'est pas celui de l'app V2 d'aujourd'hui, qui fait 60 px en icônes seules
+(`.v2-rail`). Six destinations de premier niveau — Portefeuille, Cohortes,
+Dealrooms, Demandes, Rapports — se distinguent mal en icônes, ce qui plaide pour
+le rail large côté programme. Mais deux coques dans un même produit se paient.
+→ **Q1**, reformulée.
 
 **1.2 — `design-system/` est absent** du paquet (annoncé au §1 du handoff). La
 référence existante est `sanza_handoff/Website sanza_v2/design-system/` ; à
@@ -283,9 +282,11 @@ pas*.
 
 ## 8. Ce que je ne tranche pas — huit questions
 
-1. **Quel `parcours.css`** fait foi pour ces écrans : le rail de 216 px avec
-   libellés, ou celui de 60 px en icônes seules — qui est ce que l'app V2 fait
-   déjà aujourd'hui ? (Et où verse-t-on le fichier manquant ?)
+1. ~~Quel `parcours.css` fait foi~~ — **réglé le 5 août** : le fichier est versé,
+   rail 216 px à libellés (§1.1). Ce qu'il reste à trancher : le programme et le
+   fondateur ont-ils **deux coques différentes** — rail large à libellés d'un
+   côté, rail étroit en icônes de l'autre — ou l'une des deux doit-elle
+   rejoindre l'autre ?
 2. **Équipe et Abonnement** dans le rail programme : oubli à réparer, ou choix
    assumé ?
 3. **Dealroom multi-cohortes** : on crée le nouvel objet et on migre la vitrine
