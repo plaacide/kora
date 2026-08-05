@@ -1,4 +1,4 @@
-export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize"|"logout";
+export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize"|"logout"|"wallet"|"layers"|"presentation"|"chart";
 
 const paths:Record<string,string[]>={
 // Rail — tracés repris à l'identique des maquettes du handoff.
@@ -41,20 +41,36 @@ star:["m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"
 // disposition, pas d'agrandir. Une icône qui ment sur ce qu'elle fait est un
 // bouton qu'on n'ose plus cliquer.
 maximize:["M8 3H5a2 2 0 0 0-2 2v3","M21 8V5a2 2 0 0 0-2-2h-3","M3 16v3a2 2 0 0 0 2 2h3","M16 21h3a2 2 0 0 0 2-2v-3"],
-minimize:["M8 3v3a2 2 0 0 1-2 2H3","M21 8h-3a2 2 0 0 1-2-2V3","M3 16h3a2 2 0 0 1 2 2v3","M16 21v-3a2 2 0 0 1 2-2h3"]};
+minimize:["M8 3v3a2 2 0 0 1-2 2H3","M21 8h-3a2 2 0 0 1-2-2V3","M3 16h3a2 2 0 0 1 2 2v3","M16 21v-3a2 2 0 0 1 2-2h3"],
+// Rail du parcours programme — tracés relevés un à un dans l'écran 01.
+// « Portefeuille » n'est pas la mallette du rail fondateur : c'est la mallette
+// à poignée haute, et elle porte un rectangle, d'où la généralisation de la
+// table des rectangles juste en dessous.
+wallet:["M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"],
+layers:["M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z","m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65","m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"],
+presentation:["M2 3h20","M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3","m7 21 5-5 5 5"],
+chart:["M3 3v18h18","M18 17V9","M13 17V5","M8 17v-3"]};
 
 /** Cercles des maquettes : `<circle>`, pas un chemin approché. */
 const circles:Record<string,Array<[number,number,number]>>={
 search:[[11,11,8]],help:[[12,12,10]],users:[[9,7,4]],eye:[[12,12,3]],
 clock:[[12,12,10]],globe:[[12,12,10]]};
 
-/** Grille de l'item « Opérations » : quatre carrés arrondis. */
-const rects:Record<string,Array<[number,number]>>={grid:[[3,3],[14,3],[14,14],[3,14]]};
+/**
+ * Rectangles des maquettes : `x, y, largeur, hauteur, rayon`.
+ *
+ * La table ne portait que `x, y`, la taille étant écrite en dur à 7×7 — ce qui
+ * allait tant que « Opérations » était seule à en avoir besoin. Le portefeuille
+ * du rail programme porte un 20×14 : la taille remonte donc dans la donnée.
+ */
+const rects:Record<string,Array<[number,number,number,number,number]>>={
+  grid:[[3,3,7,7,1],[14,3,7,7,1],[14,14,7,7,1],[3,14,7,7,1]],
+  wallet:[[2,6,20,14,2]]};
 
 export function Icon({name}:{name:IconName}){
   return (
     <svg aria-hidden="true" className="v2-icon" viewBox="0 0 24 24">
-      {(rects[name]??[]).map(([x,y])=><rect height="7" key={`${x}-${y}`} rx="1" width="7" x={x} y={y}/>)}
+      {(rects[name]??[]).map(([x,y,w,h,rx])=><rect height={h} key={`${x}-${y}`} rx={rx} width={w} x={x} y={y}/>)}
       {(circles[name]??[]).map(([cx,cy,r])=><circle cx={cx} cy={cy} key={`${cx}-${cy}`} r={r}/>)}
       {(paths[name]??[]).map(d=><path d={d} key={d}/>)}
     </svg>

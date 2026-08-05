@@ -71,17 +71,54 @@ function setRailExpanded(next: boolean): void {
   railListeners.forEach((listener) => listener());
 }
 
-const rail: Array<{
+interface EntreeRail {
   href: string;
   label: string;
   icon: IconName;
   mobile?: boolean;
-}> = [
-  { href: "/v2/accueil", label: "Accueil", icon: "home" },
-  { href: "/v2/operations", label: "Opérations", icon: "grid" },
-  { href: "/v2/invitations", label: "Invitations", icon: "inbox" },
-  { href: "/v2/recherche", label: "Recherche", icon: "search", mobile: true },
-];
+}
+
+/**
+ * Le rail n'est pas le même selon le métier.
+ *
+ * Le fondateur pilote SES opérations ; le programme pilote un PORTEFEUILLE
+ * d'entreprises qu'il n'a pas le droit d'ouvrir. Ce ne sont pas les mêmes
+ * destinations, et une liste unique obligeait à masquer les unes pour montrer
+ * les autres — ce qui revient à écrire deux rails en un, mais illisible.
+ *
+ * Les libellés, l'ordre et les icônes viennent des attributs `title` du rail
+ * des maquettes : `screens/` pour le fondateur, `parcours-programme/` pour le
+ * programme.
+ *
+ * Tant que les écrans sont en dur, le métier est porté par le groupe de
+ * routes. Il viendra de `profiles.account_type` au branchement.
+ */
+export type Metier = "fondateur" | "programme";
+
+const RAILS: Record<Metier, readonly EntreeRail[]> = {
+  fondateur: [
+    { href: "/v2/accueil", label: "Accueil", icon: "home" },
+    { href: "/v2/operations", label: "Opérations", icon: "grid" },
+    { href: "/v2/invitations", label: "Invitations", icon: "inbox" },
+    { href: "/v2/recherche", label: "Recherche", icon: "search", mobile: true },
+  ],
+  programme: [
+    { href: v2Routes.programme.accueil, label: "Accueil", icon: "home" },
+    {
+      href: v2Routes.programme.portefeuille,
+      label: "Portefeuille",
+      icon: "wallet",
+    },
+    { href: v2Routes.programme.cohortes.list, label: "Cohortes", icon: "layers" },
+    {
+      href: v2Routes.programme.dealrooms.list,
+      label: "Dealrooms",
+      icon: "presentation",
+    },
+    { href: v2Routes.programme.demandes, label: "Demandes", icon: "inbox" },
+    { href: v2Routes.programme.rapports, label: "Rapports", icon: "chart" },
+  ],
+};
 
 /**
  * Le second niveau du fil d'Ariane — « Lever › Configurer la levée ».
@@ -142,11 +179,14 @@ function sousEcranCourant(
 export function WorkspaceShell({
   children,
   email,
+  metier = "fondateur",
 }: {
   children: ReactNode;
   email: string;
+  metier?: Metier;
 }) {
   const path = usePathname();
+  const rail = RAILS[metier];
   const expanded = useSyncExternalStore(
     subscribeToRail,
     railIsExpanded,
@@ -154,6 +194,11 @@ export function WorkspaceShell({
   );
 
   // Libellés repris des attributs `title` du rail dans les maquettes.
+  // Le pied est commun aux deux métiers : le rail programme ne dessine ni
+  // Équipe ni Abonnement, alors qu'un programme a des collaborateurs et un
+  // plan qui mord déjà à l'invitation. Les laisser dehors reproduirait, pour
+  // le programme, le défaut corrigé pour le fondateur — un écran qu'aucun
+  // chemin ne dessert n'existe pas.
   const bottom: Array<{ href: string; label: string; icon: IconName; mobile?: boolean }> = [
     { href: "/v2/team", label: "Équipe", icon: "users" },
     { href: "/v2/security", label: "Sécurité", icon: "shield" },
@@ -171,7 +216,13 @@ export function WorkspaceShell({
       data-active={
         item.href === "/v2/operations"
           ? path.startsWith("/v2/operations")
-          : path === item.href
+          : item.href === v2Routes.programme.cohortes.list ||
+              item.href === v2Routes.programme.dealrooms.list
+            ? // Une cohorte ouverte garde « Cohortes » allumé, comme une
+              // opération ouverte garde « Opérations » : le rail dit où l'on
+              // est, pas sur quoi l'on vient de cliquer.
+              path.startsWith(item.href)
+            : path === item.href
       }
       data-mobile-hide={item.mobile}
       href={item.href}
@@ -450,6 +501,123 @@ export function OperationShell({
               {cta.label}
             </Link>
           )}
+        </header>
+        <main className="v2-work">{children}</main>
+      </div>
+    </>
+  );
+}
+
+/**
+ * La coque d'une cohorte — écrans 03 à 17.
+ *
+ * Même anatomie que celle d'une opération, autre contenu : on revient à la
+ * liste des cohortes, le titre est celui de la cohorte, et les six
+ * destinations portent leur compteur. La maquette n'affiche PAS un compteur à
+ * zéro — l'écran 03 montre « Entreprises 0 » parce que la cohorte est vide et
+ * que le zéro est justement l'information, mais les Challenges, les questions
+ * et les Dealrooms n'y portent aucun nombre. D'où `compteur ?? undefined` et
+ * non `compteur ?? 0`.
+ */
+export function CohorteShell({
+  children,
+  cohorteId,
+  nom,
+  periode,
+  effectif,
+  compteurs,
+  crumb,
+  search = "Rechercher",
+  action,
+}: {
+  children: ReactNode;
+  cohorteId: string;
+  nom: string;
+  /** « mars → décembre 2026 ». */
+  periode: string;
+  /** « 12 entreprises » ou « 0 / 15 places » selon que la cohorte est peuplée. */
+  effectif: string;
+  compteurs: {
+    entreprises?: number;
+    challenges?: number;
+    questions?: number;
+    dealrooms?: number;
+  };
+  /** Le dernier étage du fil d'Ariane, quand l'écran en ouvre un. */
+  crumb?: ReactNode;
+  search?: string | false;
+  action?: ReactNode;
+}) {
+  const path = usePathname();
+  const routes = v2Routes.programme.cohortes;
+  const nav: Array<[string, string, number | undefined]> = [
+    [routes.root(cohorteId), "Vue d’ensemble", undefined],
+    [routes.entreprises(cohorteId), "Entreprises", compteurs.entreprises],
+    [routes.challenges(cohorteId), "Challenges", compteurs.challenges],
+    [
+      routes.questions(cohorteId),
+      "Questions & suggestions",
+      compteurs.questions,
+    ],
+    [routes.dealrooms(cohorteId), "Dealrooms", compteurs.dealrooms],
+    [routes.rapports(cohorteId), "Rapports", undefined],
+  ];
+
+  return (
+    <>
+      <aside className="v2-ctx">
+        <div className="v2-ctx-head">
+          <PushLink back className="v2-back" href={routes.list}>
+            ← Toutes les cohortes
+          </PushLink>
+          <div className="v2-ctx-title">
+            <b>{nom}</b>
+          </div>
+          {/* UNE SEULE LIGNE, séparée par un point médian — « mars → décembre
+              2026 · 12 entreprises ». Deux éléments distincts héritaient du
+              `space-between` de la coque d'opération, qui les repoussait aux
+              deux bords : « mars → décembre » et « 2026 » se retrouvaient sur
+              deux lignes dans 240 px. La maquette n'écrit qu'un texte. */}
+          <div className="v2-ctx-sub">
+            <span>
+              {periode} · {effectif}
+            </span>
+          </div>
+        </div>
+        <div className="v2-nav-group">
+          <div className="v2-nav-label">Cohorte</div>
+          {nav.map(([href, label, compteur]) => (
+            <Link
+              className="v2-nav-item"
+              data-active={
+                href === routes.root(cohorteId)
+                  ? path === href
+                  : path.startsWith(href)
+              }
+              href={href}
+              key={href}
+            >
+              {label}
+              {compteur !== undefined && <small>{compteur}</small>}
+            </Link>
+          ))}
+        </div>
+      </aside>
+      <div className="v2-main">
+        <header className="v2-top">
+          <span className="v2-crumb-muted">Mes cohortes ›</span>
+          <strong>{nom}</strong>
+          {crumb && (
+            <>
+              <span className="v2-crumb-sep">›</span>
+              <strong className="v2-crumb-leaf">{crumb}</strong>
+            </>
+          )}
+          <span className="v2-spacer" />
+          {search !== false && (
+            <div className="v2-search"><Icon name="search" />{search}</div>
+          )}
+          {action}
         </header>
         <main className="v2-work">{children}</main>
       </div>

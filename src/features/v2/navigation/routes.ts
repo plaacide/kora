@@ -47,4 +47,59 @@ export const v2Routes = {
   team: "/v2/team",
   security: "/v2/security",
   help: "/v2/roadmap",
+
+  /**
+   * Le parcours programme — accélérateurs, incubateurs, studios.
+   *
+   * Les adresses viennent des notes d'écran du paquet `parcours-programme`,
+   * préfixées de `/v2` : elles y sont écrites une à une, de « Route /cohortes »
+   * à « Route /dealrooms/[id] ». Elles sont déclarées ICI avant d'exister,
+   * pour qu'aucun écran ne naisse à une adresse que rien ne propose — l'erreur
+   * consignée trois fois dans l'arbre des connexions.
+   *
+   * Deux entrées du rail ne sont maquettées nulle part : l'accueil du
+   * programme et les rapports. Elles mènent à un écran d'attente, et le
+   * disent.
+   */
+  programme: {
+    accueil: "/v2/programme",
+    portefeuille: "/v2/portefeuille",
+    demandes: "/v2/demandes",
+    rapports: "/v2/rapports",
+    cohortes: {
+      list: "/v2/cohortes",
+      root: (cohorteId: string) => `/v2/cohortes/${segment(cohorteId)}`,
+      entreprises: (cohorteId: string) =>
+        `/v2/cohortes/${segment(cohorteId)}/entreprises`,
+      challenges: (cohorteId: string) =>
+        `/v2/cohortes/${segment(cohorteId)}/challenges`,
+      challengeNouveau: (cohorteId: string) =>
+        `/v2/cohortes/${segment(cohorteId)}/challenges/nouveau`,
+      challenge: (cohorteId: string, challengeId: string) =>
+        `/v2/cohortes/${segment(cohorteId)}/challenges/${segment(challengeId)}`,
+      bibliotheque: (cohorteId: string) =>
+        `/v2/cohortes/${segment(cohorteId)}/challenges/bibliotheque`,
+      questions: (cohorteId: string) =>
+        `/v2/cohortes/${segment(cohorteId)}/questions`,
+      dealrooms: (cohorteId: string) =>
+        `/v2/cohortes/${segment(cohorteId)}/dealrooms`,
+      rapports: (cohorteId: string) =>
+        `/v2/cohortes/${segment(cohorteId)}/rapports`,
+    },
+    dealrooms: {
+      list: "/v2/dealrooms",
+      nouvelle: "/v2/dealrooms/nouvelle",
+      root: (dealroomId: string) => `/v2/dealrooms/${segment(dealroomId)}`,
+      entreprises: (dealroomId: string) =>
+        `/v2/dealrooms/${segment(dealroomId)}/entreprises`,
+      audience: (dealroomId: string) =>
+        `/v2/dealrooms/${segment(dealroomId)}/audience`,
+      demandes: (dealroomId: string) =>
+        `/v2/dealrooms/${segment(dealroomId)}/demandes`,
+      branding: (dealroomId: string) =>
+        `/v2/dealrooms/${segment(dealroomId)}/branding`,
+      activite: (dealroomId: string) =>
+        `/v2/dealrooms/${segment(dealroomId)}/activite`,
+    },
+  },
 } as const;
