@@ -1,4 +1,4 @@
-export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize"|"logout"|"wallet"|"layers"|"presentation"|"chart";
+export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize"|"logout"|"wallet"|"layers"|"presentation"|"chart"|"bulb";
 
 const paths:Record<string,string[]>={
 // Rail — tracés repris à l'identique des maquettes du handoff.
@@ -49,7 +49,9 @@ minimize:["M8 3v3a2 2 0 0 1-2 2H3","M21 8h-3a2 2 0 0 1-2-2V3","M3 16h3a2 2 0 0 1
 wallet:["M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"],
 layers:["M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z","m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65","m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"],
 presentation:["M2 3h20","M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3","m7 21 5-5 5 5"],
-chart:["M3 3v18h18","M18 17V9","M13 17V5","M8 17v-3"]};
+chart:["M3 3v18h18","M18 17V9","M13 17V5","M8 17v-3"],
+// L'ampoule du bloc « Conseil » — un conseil n'est ni une alerte ni une erreur.
+bulb:["M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5","M9 18h6","M10 22h4"]};
 
 /** Cercles des maquettes : `<circle>`, pas un chemin approché. */
 const circles:Record<string,Array<[number,number,number]>>={
