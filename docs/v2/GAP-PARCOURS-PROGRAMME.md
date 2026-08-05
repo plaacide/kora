@@ -44,12 +44,17 @@ Couverture vérifiée : **61 classes sur 61, 23 tokens sur 23**. La seule classe
 absente du fichier, `.row`, n'appartient pas aux écrans — c'est la mise en page
 du sommaire `index.html`, qui porte son propre `<style>`.
 
-Reste une question de produit, et non de fichier : ce rail de 216 px à libellés
-n'est pas celui de l'app V2 d'aujourd'hui, qui fait 60 px en icônes seules
-(`.v2-rail`). Six destinations de premier niveau — Portefeuille, Cohortes,
-Dealrooms, Demandes, Rapports — se distinguent mal en icônes, ce qui plaide pour
-le rail large côté programme. Mais deux coques dans un même produit se paient.
-→ **Q1**, reformulée.
+**Et il n'y a rien à trancher sur le rail.** L'app V2 a déjà un **rail
+dépliable** — `Shell.tsx` et `.v2-rail[data-expanded]`, `v2.css:1455 :
+60 px en icônes replié, 216 px avec libellés déplié, bascule persistée. Les deux
+variantes du `parcours.css` ne sont donc pas deux partis pris concurrents : ce
+sont **les deux états du même rail**. Le paquet programme est dessiné dans
+l'état déplié, ce que le fichier versé reflète.
+
+Le commentaire du code le dit déjà : « le bouton n'est pas dans les maquettes,
+les libellés en viennent ». Seule différence de forme, sans portée : la maquette
+rend les libellés par `::after{content:attr(title)}`, l'app par un vrai
+`<span>`.
 
 **1.2 — `design-system/` est absent** du paquet (annoncé au §1 du handoff). La
 référence existante est `sanza_handoff/Website sanza_v2/design-system/` ; à
@@ -282,11 +287,9 @@ pas*.
 
 ## 8. Ce que je ne tranche pas — huit questions
 
-1. ~~Quel `parcours.css` fait foi~~ — **réglé le 5 août** : le fichier est versé,
-   rail 216 px à libellés (§1.1). Ce qu'il reste à trancher : le programme et le
-   fondateur ont-ils **deux coques différentes** — rail large à libellés d'un
-   côté, rail étroit en icônes de l'autre — ou l'une des deux doit-elle
-   rejoindre l'autre ?
+1. ~~Quel `parcours.css` fait foi~~ — **close le 5 août.** Le fichier est versé
+   et couvre tout (§1.1). Le rail large n'est pas un second parti pris : c'est
+   l'état déplié du rail que l'app a déjà. Rien à décider.
 2. **Équipe et Abonnement** dans le rail programme : oubli à réparer, ou choix
    assumé ?
 3. **Dealroom multi-cohortes** : on crée le nouvel objet et on migre la vitrine
@@ -323,6 +326,6 @@ Un lot = un commit, dans l'ordre où chaque lot rend le suivant possible.
 
 Les états vides (01, 03, 06, 09, 18) partent **avec** leur lot, jamais après.
 
-Rien ne commence avant que ce diagnostic soit validé et les huit questions
-tranchées — au minimum Q1 (sans le CSS, il n'y a pas de référence) et Q3 (elle
-décide la forme de la base).
+Rien ne commence avant que ce diagnostic soit validé et les questions
+tranchées. Q1 est close depuis le 5 août ; **Q3 devient la première**, parce
+qu'elle décide la forme de la base.
