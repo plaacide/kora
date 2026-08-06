@@ -690,3 +690,73 @@ export const A_ASSIGNER: readonly {
   { initiales: "NS", nom: "Nimba Solar", ton: "green", secteur: "Énergie", pays: "Guinée", preparation: 81, retenue: false },
   { initiales: "BL", nom: "Bissap Labs", ton: "amber", secteur: "Ag-tech", pays: "Bénin", preparation: 12, retenue: true },
 ];
+
+export interface DealroomFixture {
+  id: string;
+  nom: string;
+  statut: "Publiée" | "Brouillon" | "Prête à publier" | "Archivée";
+  entreprises: number;
+  investisseurs: number | null;
+  demandes: number | null;
+  consentementsEnAttente: number | null;
+  activite: string | null;
+}
+
+/** Les trois Dealrooms de l'écran 19 : deux publiées, une en brouillon. */
+export const DEALROOMS: readonly DealroomFixture[] = [
+  {
+    id: "demo-day-2026", nom: "Demo Day 2026", statut: "Publiée",
+    entreprises: 12, investisseurs: 28, demandes: 6,
+    consentementsEnAttente: null, activite: "aujourd’hui",
+  },
+  {
+    id: "agri-2026", nom: "Agri 2026", statut: "Publiée",
+    entreprises: 8, investisseurs: 14, demandes: 2,
+    consentementsEnAttente: null, activite: "il y a 3 jours",
+  },
+  {
+    id: "women-led", nom: "Sélection Women-led", statut: "Brouillon",
+    entreprises: 5, investisseurs: null, demandes: null,
+    consentementsEnAttente: 3, activite: null,
+  },
+];
+
+/** L'identité de la Dealroom en cours de création — écran 20. */
+export const DEALROOM_NEUVE = {
+  nomInterne: "Demo Day 2026",
+  titrePublic: "Meet the next generation of African founders",
+  sousTitre: "12 entreprises sélectionnées par Savane Accelerator",
+  contact: "investors@savane.africa",
+  /** L'accent choisi à l'étape 2. Le vert de la maquette 21. */
+  accent: "#147a5c",
+  partenaires: ["AFD", "Proparco"],
+} as const;
+
+/**
+ * Les entreprises proposées à la Dealroom — écran 22.
+ *
+ * Le consentement est le pivot : « une entreprise sans accord peut préparer la
+ * Dealroom, mais ne sera pas publiée ». Quatre états, dont un REFUS qui reste
+ * visible — masquer un refus reviendrait à le faire oublier.
+ */
+export const CANDIDATES_DEALROOM: readonly {
+  initiales: string; nom: string; ton: Ton;
+  secteur: string; pays: string; cohorte: string; stade: string;
+  preparation: number;
+  consentement: "Accord donné" | "En attente" | "À demander" | "Refusé";
+  retenue: boolean;
+}[] = [
+  { initiales: "CB", nom: "CoolBricks", ton: "orange", secteur: "Construction", pays: "Côte d’Ivoire", cohorte: "Agri & Agro", stade: "Seed", preparation: 62, consentement: "Accord donné", retenue: true },
+  // §4 du handoff : Kalyx Foods est en Seed, pas en Série A.
+  { initiales: "KF", nom: "Kalyx Foods", ton: "blue", secteur: "Agroalimentaire", pays: "Sénégal", cohorte: "Agri & Agro", stade: "Seed", preparation: 38, consentement: "En attente", retenue: true },
+  { initiales: "NS", nom: "Nimba Solar", ton: "green", secteur: "Énergie", pays: "Guinée", cohorte: "Agri & Agro", stade: "Seed", preparation: 81, consentement: "Accord donné", retenue: true },
+  { initiales: "MP", nom: "Moneta Pay", ton: "neutral", secteur: "Fintech", pays: "Togo", cohorte: "Fintech 2026", stade: "Série A", preparation: 74, consentement: "À demander", retenue: false },
+  { initiales: "TH", nom: "Teranga Health", ton: "red", secteur: "Santé", pays: "Sénégal", cohorte: "Agri & Agro", stade: "Pre-seed", preparation: 31, consentement: "Refusé", retenue: false },
+];
+
+/** Les trois vignettes de l'aperçu investisseur — écrans 21 et 24. */
+export const APERCU_ENTREPRISES: readonly { nom: string; ligne: string }[] = [
+  { nom: "CoolBricks", ligne: "Construction · Seed" },
+  { nom: "Kalyx Foods", ligne: "Agro · Seed" },
+  { nom: "Nimba Solar", ligne: "Énergie · Seed" },
+];

@@ -2160,3 +2160,57 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-crit-suivi .v2-icon{width:13px;height:13px}
 .v2-crit-suivi b{font:500 13.5px var(--font-v2-sans),sans-serif}
 .v2-crit-suivi small{display:block;margin-top:2px;color:var(--text-3);font-size:12px}
+
+/* Écrans 18 à 24 — les Dealrooms et leur assistant. */
+.v2-dr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.v2-dr-carte{overflow:hidden}
+.v2-dr-banniere{display:flex;height:64px;align-items:center;justify-content:center;gap:8px;background:var(--band);border-bottom:1px solid var(--line-soft);color:var(--text-4);font-size:12px}
+.v2-dr-corps{display:flex;flex-direction:column;gap:8px;padding:16px 18px}
+.v2-dr-corps>header{display:flex;align-items:center;gap:8px}
+.v2-dr-corps h3{font-size:15px}
+.v2-dr-corps>small{color:var(--text-3);font-size:12.5px;line-height:1.5}
+.v2-dr-corps>footer{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line-soft);padding-top:12px}
+.v2-icbtn{display:grid;width:30px;height:30px;place-items:center;border-radius:var(--r-md);color:var(--text-3);cursor:pointer}
+.v2-icbtn:hover{background:var(--line-soft)}
+/* L'assistant : deux colonnes, le formulaire et ce qui l'explique. */
+.v2-dr-assistant{display:grid;grid-template-columns:1fr 320px;align-items:start;gap:16px}
+.v2-dr-form{display:flex;flex-direction:column;gap:16px;padding:22px 24px}
+.v2-dr-form .v2-control>span{font-size:14px}
+.v2-dr-actions{display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line-soft);padding-top:16px}
+.v2-dr-actions[data-entre=true]{justify-content:space-between}
+/* Une ligne de réglage : un libellé, sa conséquence, et l'interrupteur. */
+.v2-reglage{display:flex;align-items:flex-start;gap:14px}
+.v2-reglage>div{flex:1}
+.v2-reglage b{font:500 13.5px var(--font-v2-sans),sans-serif}
+.v2-reglage small{display:block;margin-top:2px;color:var(--text-3);font-size:12.5px}
+/* L'interrupteur ne se clique pas encore — il dit un état, il ne le change
+   pas. Le curseur reste donc par défaut : promettre une action qu'on ne rend
+   pas est pire que de ne rien promettre. */
+.v2-inter{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0;border-radius:999px;background:var(--line)}
+.v2-inter[data-actif=true]{background:var(--orange)}
+.v2-inter::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left var(--motion-fast) var(--motion-ease)}
+.v2-inter[data-actif=true]::after{left:18px}
+/* L'aperçu investisseur, rendu par les écrans 21, 24 et 28 — un seul
+   composant, jamais une seconde implémentation. Il porte l'accent choisi. */
+.v2-apercu{overflow:hidden;border:1px solid var(--line);border-radius:var(--r-lg);background:#fff}
+.v2-apercu-liseré{height:8px;background:var(--dr-accent)}
+.v2-apercu-nav{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line-soft);padding:10px 14px}
+.v2-apercu-nav b{font:600 13px var(--font-v2-head),sans-serif}
+.v2-apercu-nav>span:last-child{color:var(--text-4);font-size:11px}
+.v2-apercu-marque{display:grid;width:26px;height:26px;place-items:center;border-radius:6px;background:var(--dr-accent);color:#fff;font:600 10px var(--font-v2-head),sans-serif}
+.v2-apercu-banniere{display:flex;height:96px;align-items:center;justify-content:center;gap:8px;background:var(--band);color:var(--text-4);font-size:12px}
+.v2-apercu-hero{display:flex;flex-direction:column;gap:8px;padding:18px 20px}
+.v2-apercu-hero>b{font:600 16px var(--font-v2-head),sans-serif;letter-spacing:-.01em}
+.v2-apercu-hero>span{color:var(--text-3);font-size:12.5px}
+.v2-apercu-cta{align-self:flex-start;border-color:var(--dr-accent)!important;background:var(--dr-accent)!important}
+.v2-apercu-sponsors{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:var(--text-3);font-size:11.5px}
+.v2-apercu-cartes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 20px 20px}
+.v2-apercu-cartes>div{border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px}
+.v2-apercu-cartes b{font:600 12px var(--font-v2-head),sans-serif}
+.v2-apercu-cartes div{color:var(--text-3);font-size:11px}
+/* Le bandeau qui bloque la publication — écran 24. */
+.v2-dr-blocage{display:flex;align-items:center;gap:10px;margin-bottom:16px;border:1px solid var(--amber);border-radius:var(--r-lg);background:var(--amber-soft);padding:13px 18px;color:var(--text);font-size:13.5px}
+.v2-btn[disabled]{cursor:default;opacity:.45}
+.v2-chips{display:flex;flex-wrap:wrap;gap:8px}
+/* Une étiquette qui porte un choix courant — thème clair/sombre, écran 21. */
+.v2-tag[data-active=true]{border-color:var(--ink);background:var(--ink);color:#fff}
