@@ -619,9 +619,12 @@ alors que les fichiers restent.
 
 ## Le parcours programme
 
-**Re-dérivé le 6 août 2026** : quels fichiers existent sous
-`src/app/v2/(programme)` et `(onboarding)/onboarding/programme`, et lesquels
-importent quoi que ce soit de `features/v2/server`.
+**Re-dérivé le 6 août 2026, en fin de journée** : quels fichiers existent sous
+`src/app/v2/(programme)`, `(vitrine)` et `(onboarding)/onboarding/programme`,
+et lesquels importent quoi que ce soit de `features/v2/server`.
+
+**LES TRENTE-HUIT ÉCRANS SONT INTÉGRÉS.** Lots A à I livrés. Ce qui reste est
+le branchement, pas l'intégration.
 
 **Un seul fichier de ce parcours lit la base** : `(programme)/layout.tsx`, pour
 savoir qui est connecté. **Aucun écran** ne lit ni n'écrit — tous affichent les
@@ -680,19 +683,32 @@ Nav de cohorte   Vue d'ensemble · Entreprises · Challenges ·
 🔴 12  Personnaliser un modèle   …/challenges/nouveau?modele=…
 ```
 
-### Ce qui n'existe pas encore
+### Dealrooms — lots G et H
 
 ```
-⚪ 13, 14, 15   Assigner, suivre, détail d'une entreprise      lot F
-⚪ 06, 07       Portefeuille vide et rempli                    lot C
-⚪ 18 à 24      Dealroom — assistant en quatre étapes          lot G
-⚪ 25 à 28      Dealroom — gestion après publication           lot H
-⚪ 29 à 33      Parcours investisseur, hors application        lot I
-⚪ Rapports     aucune maquette                                lot J
+🔴 18 à 24   État vide, liste, assistant en quatre étapes, aperçu
+🔴 25 à 28   Vue d'ensemble, entreprises publiées, audience, branding
 ```
 
-Les six adresses non encore intégrées portent un écran d'attente qui dit ce
-qu'il attend. Aucune n'est un cul-de-sac.
+### Investisseur, hors application — lot I
+
+```
+🔴 30 à 33   /v2/d/[dealroom] — accueil, filtres, fiche, demande d'accès
+📧 29        docs/emails/dealroom-01-invitation-investisseur.html
+```
+
+### Portefeuille — lot C
+
+```
+🔴 06, 07    /v2/portefeuille — vide et rempli
+```
+
+### Quatre entrées que rien ne dessine
+
+Rapports (rail global ET nav de cohorte), Demandes et Activité d'une Dealroom,
+et la vue entreprise d'un Challenge. Toutes portent un écran d'attente qui dit
+ce qu'il attend ; aucune n'est un cul-de-sac. Voir
+[INCOHERENCES-MAQUETTES.md](INCOHERENCES-MAQUETTES.md).
 
 ### Ce que la base a déjà, et que rien n'appelle
 

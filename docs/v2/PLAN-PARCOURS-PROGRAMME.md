@@ -2,10 +2,11 @@
 
 **Date :** 5 août 2026, **révisé le 6 août** · **Branche :** `v2/rebuild`
 
-**État au 6 août : lots A, B, D, E livrés, plus le tunnel d'inscription versé
-en cours de route.** Dix-neuf écrans sur trente-huit. L'état re-dérivé depuis
-le code est dans [ARBRE-CONNEXIONS.md](ARBRE-CONNEXIONS.md), section « Le
-parcours programme ».
+**État au 6 août, fin de journée : LES TRENTE-HUIT ÉCRANS SONT INTÉGRÉS.**
+Lots A à I livrés, plus le tunnel d'inscription — versé en cours de route et
+seul morceau branché sur la base. Ce qui reste est le branchement, pas
+l'intégration. L'état re-dérivé depuis le code est dans
+[ARBRE-CONNEXIONS.md](ARBRE-CONNEXIONS.md), section « Le parcours programme ».
 **Source :** [GAP-PARCOURS-PROGRAMME.md](GAP-PARCOURS-PROGRAMME.md) et
 [EVALUATION-PARCOURS-PROGRAMME.md](EVALUATION-PARCOURS-PROGRAMME.md).
 
@@ -103,7 +104,7 @@ et le bloc « Conseil » sont rendus depuis les fixtures.
 **Test :** les cinq états s'ouvrent depuis le rail, sans jamais taper une URL à
 la main. Les chiffres de l'écran 05 se recoupent : 12 = 3 + 5 + 2 + 2.
 
-### LOT C — Portefeuille 🟠 · écrans 06, 07
+### LOT C — ✅ Portefeuille · écrans 06, 07
 
 État vide et rempli, quatre indicateurs, trois priorités maximum.
 Dépend de V3 (Q7) pour que la ligne CoolBricks soit cohérente avec les écrans
@@ -132,7 +133,7 @@ grille en trois colonnes de l'écran 16, le « N critères » insécable de l'é
 **Test :** rien ne déborde d'une carte à 1440 px ni à 1280 px. Le critère
 structurel de l'écran 12 ne peut pas être supprimé.
 
-### LOT F — Challenges : assignation et suivi 🟠 · écrans 13, 14, 15
+### LOT F — ✅ Challenges : assignation et suivi · écrans 13, 14, 15
 
 Sélection d'entreprises avec résumé latéral, détail programme trié retards
 d'abord, panneau latéral d'une entreprise suivie.
@@ -141,7 +142,7 @@ La vue côté fondateur attend V5.
 **Test :** le tri met bien Teranga Health en tête. Aucun critère n'ouvre un
 document.
 
-### LOT G — Dealroom : assistant 🟠 · écrans 18, 19, 20, 21, 22, 23, 24
+### LOT G — ✅ Dealroom : assistant · écrans 18, 19, 20, 21, 22, 23, 24
 
 État vide, liste à quatre statuts, les quatre étapes, l'aperçu.
 L'aperçu des écrans 21, 24 et 28 rend **le même composant** que la vue
@@ -150,7 +151,7 @@ investisseur du lot I — pas une seconde implémentation.
 **Test :** « Publier » reste désactivé tant que des accords manquent, et
 l'écran dit pourquoi.
 
-### LOT H — Dealroom : gestion 🟠 · écrans 25, 26, 27, 28
+### LOT H — ✅ Dealroom : gestion · écrans 25, 26, 27, 28
 
 Vue d'ensemble, entreprises publiées, audience, branding après publication.
 Dépend de V3 (Q6) pour Kalyx Foods.
@@ -158,7 +159,7 @@ Dépend de V3 (Q6) pour Kalyx Foods.
 **Test :** retirer l'accès d'un investisseur affiche bien qu'un accès data room
 déjà accordé n'est pas révoqué.
 
-### LOT I — Investisseur ⚪ · écrans 29, 30, 31, 32, 33
+### LOT I — ✅ Investisseur · écrans 29, 30, 31, 32, 33
 
 Hors de l'application, hors du rail, brandé par Dealroom. L'écran 29 est un
 e-mail : il rejoint `docs/emails`.
@@ -207,12 +208,21 @@ direz — `save_programme()` et `create_cohort()` existent déjà en base.
 
 | Lot | Écrans | État |
 |---|---|---|
-| F | 13, 14, 15 — assigner, suivre, détail | à faire |
-| C | 06, 07 — portefeuille | à faire |
-| G | 18 à 24 — Dealroom, assistant | à faire, dépend d'ADR-002 au branchement |
-| H | 25 à 28 — Dealroom, gestion | à faire |
-| I | 29 à 33 — investisseur hors app | à faire |
+| A à I | les trente-huit | ✅ intégrés |
 | J | Rapports | attend une maquette |
 
-Aucun de ces lots n'est bloqué pour l'intégration : les quatre ADR ne
-commandent que le branchement.
+**La suite est le branchement**, et c'est là que les quatre ADR mordent. Rien
+n'est bloqué pour l'intégration ; tout l'est pour la donnée.
+
+Ordre suggéré, du plus court au plus structurant :
+
+1. **Cohortes et invitations** — le socle existe depuis le 28 juillet et n'est
+   appelé nulle part : `cohorts`, `cohort_members`, `cohort_links`,
+   `invite_to_cohort`, `create_cohort`.
+2. **Portefeuille** — `sae_portfolio()` existe ; il faut trancher
+   [ADR-004](ADR-004-canal-de-lecture-du-programme.md).
+3. **Questions & suggestions** — `program_threads` existe, il lui manque un
+   rattachement à la cohorte.
+4. **Challenges** — rien n'existe. Dépend d'[ADR-003](ADR-003-critere-connecte-a-sanza.md).
+5. **Dealrooms** — le modèle change de forme. Dépend d'[ADR-002](ADR-002-portee-de-la-dealroom.md).
+6. **Investisseur** — dépend d'[ADR-005](ADR-005-investisseur-externe.md).
