@@ -72,7 +72,7 @@ export default function AccueilProgrammePage() {
       </div>
       <div className="v2-card" style={{ overflow: "hidden" }}>
         {ACCUEIL_ACTIVITE.map((ligne) => (
-          <div className="v2-journal" key={ligne.acteur + ligne.quand}>
+          <div className="v2-prog-journal" key={ligne.acteur + ligne.quand}>
             <span className="v2-pastille" data-ton={ligne.ton}>
               {ligne.initiales}
             </span>

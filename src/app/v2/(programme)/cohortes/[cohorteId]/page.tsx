@@ -87,7 +87,7 @@ export default async function CohortePage({
         </div>
         <div className="v2-card" style={{ overflow: "hidden" }}>
           {COHORTE_CHALLENGES.map((challenge) => (
-            <div className="v2-journal" key={challenge.titre}>
+            <div className="v2-prog-journal" key={challenge.titre}>
               <div>
                 <b>{challenge.titre}</b>
                 <div className="v2-muted">
@@ -138,7 +138,7 @@ export default async function CohortePage({
         </div>
         <div className="v2-card" style={{ overflow: "hidden" }}>
           {COHORTE_ACTIVITE.map((ligne) => (
-            <div className="v2-journal" key={ligne.acteur}>
+            <div className="v2-prog-journal" key={ligne.acteur}>
               <span className="v2-pastille" data-ton={ligne.ton}>
                 {ligne.initiales}
               </span>

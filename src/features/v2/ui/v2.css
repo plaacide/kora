@@ -2295,12 +2295,19 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-atraiter>div>span{display:block;font-size:13.5px}
 .v2-atraiter>div>small{display:block;margin-top:2px;color:var(--text-3);font-size:12px}
 /* Le journal : qui, ce qu'il a fait, où et quand. La cible est en gras parce
-   que c'est elle qu'on cherche en parcourant. */
-.v2-journal{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:12px 18px;font-size:13.5px}
-.v2-journal:last-child{border-bottom:0}
-.v2-journal>div{flex:1;min-width:0}
-.v2-journal b{font-weight:600}
-.v2-journal>small{color:var(--text-3);font-size:12px;white-space:nowrap}
+   que c'est elle qu'on cherche en parcourant.
+   ⚠️ CETTE LIGNE S'APPELAIT `.v2-journal`, ET C'ÉTAIT UNE COLLISION. Le même
+   nom sert plus haut (l. 1036) au CONTENEUR du journal de sécurité, qui est
+   une colonne de sections. Notre règle venant après, elle imposait bien
+   `align-items:center` et le `gap` — mais ne redéfinissait pas
+   `flex-direction`, donc la ligne héritait de `column`. Résultat : pastille
+   au-dessus du texte, et tout centré, sur les cinq écrans programme.
+   Une règle plus loin dans le fichier n'écrase que ce qu'elle nomme. */
+.v2-prog-journal{display:flex;flex-direction:row;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:12px 18px;font-size:13.5px}
+.v2-prog-journal:last-child{border-bottom:0}
+.v2-prog-journal>div{flex:1;min-width:0}
+.v2-prog-journal b{font-weight:600}
+.v2-prog-journal>small{color:var(--text-3);font-size:12px;white-space:nowrap}
 .v2-journal-ou{margin-left:10px;color:var(--text-4);font-size:11.5px;white-space:nowrap}
 .v2-journal-jour{padding:14px 18px 6px;color:var(--text-4);font:700 10.5px var(--font-v2-sans),sans-serif;letter-spacing:.08em;text-transform:uppercase}
 /* Les listes de demandes des écrans 35 et 40 partagent LA MÊME grille —
@@ -2372,7 +2379,7 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
    qui traîne. Couleur et bordure seulement : jamais d'échelle, jamais de
    pulsation. */
 .v2-card,.v2-tbl tr,.v2-crit-ligne,.v2-radio,.v2-tag,.v2-case,.v2-inter,
-.v2-atraiter,.v2-demande,.v2-journal,.v2-priorite,.v2-fil-item{
+.v2-atraiter,.v2-demande,.v2-prog-journal,.v2-priorite,.v2-fil-item{
   transition:background var(--motion-fast) var(--motion-ease),
              border-color var(--motion-fast) var(--motion-ease),
              box-shadow var(--motion-fast) var(--motion-ease)}

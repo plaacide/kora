@@ -27,7 +27,7 @@ export default function DealroomActivitePage() {
           <div key={groupe.jour}>
             <div className="v2-journal-jour">{groupe.jour}</div>
             {groupe.lignes.map((ligne) => (
-              <div className="v2-journal" key={ligne.texte + ligne.heure}>
+              <div className="v2-prog-journal" key={ligne.texte + ligne.heure}>
                 <span className="v2-pastille" data-ton={ligne.ton}>
                   {ligne.initiales}
                 </span>

@@ -106,7 +106,7 @@ export default function CohorteRapportsPage() {
             Historique
           </div>
           {HISTORIQUE.map((rapport) => (
-            <div className="v2-journal" key={rapport.titre}>
+            <div className="v2-prog-journal" key={rapport.titre}>
               <span className="v2-pastille" data-ton="red">
                 <Icon name="file" />
               </span>
