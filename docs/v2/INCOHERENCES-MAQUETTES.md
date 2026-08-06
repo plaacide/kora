@@ -99,18 +99,36 @@ demande nommément.
 
 ---
 
-## Deux écrans que rien ne dessine
+## Neuf écrans que rien ne dessine
 
-Vérifié fichier par fichier sur les trente-huit : aucun ne les montre.
+Recompté depuis le code le 6 août : huit destinations portent un écran
+d'attente, plus un écran promis par le texte sans entrée de navigation. Aucune
+n'est un cul-de-sac — chacune dit ce qu'elle attend.
 
-- **Rapports.** L'entrée est dans le rail global ET dans la navigation de
-  cohorte, et l'écran 07 porte un bouton « Rapport bailleur ». Trois chemins,
-  aucune destination. L'export XLSX existe déjà (`/api/portefeuille/export`) et
-  pourrait s'y brancher.
-- **La vue entreprise d'un Challenge.** Quatre écrans la promettent — « chaque
-  entreprise verra ce Challenge dans son espace, avec la mention Demandé par
-  Savane Accelerator » (13), « confirmé par l'entreprise » (11, 12, 15) — et
-  aucun ne la montre. Le paquet est entièrement côté programme et côté
-  investisseur : il ne contient aucun écran de l'espace d'un fondateur.
+| # | Destination | Ce qui l'annonce |
+|---|---|---|
+| 1 | `/v2/programme` — **Accueil** | **première entrée du rail programme** |
+| 2 | `/v2/demandes` — **Demandes** | rail global |
+| 3 | `/v2/rapports` — **Rapports** | rail global, ET le bouton « Rapport bailleur » de l'écran 07 |
+| 4 | `/v2/cohortes/[id]` — **vue d'ensemble peuplée** | l'écran 03 ne montre que l'état vide |
+| 5 | `/v2/cohortes/[id]/dealrooms` | nav de cohorte |
+| 6 | `/v2/cohortes/[id]/rapports` | nav de cohorte |
+| 7 | `/v2/dealrooms/[id]/demandes` | nav de Dealroom, avec un compteur à 6 |
+| 8 | `/v2/dealrooms/[id]/activite` | nav de Dealroom |
+| 9 | **La vue entreprise d'un Challenge** | quatre écrans la promettent, aucune nav ne la porte |
 
-En attendant, les deux entrées mènent à un écran qui dit ce qu'il attend.
+**Les deux plus visibles sont les n° 1 et 4.** L'accueil est la première entrée
+du rail : c'est l'écran sur lequel un programme atterrit, et il n'existe pas.
+La vue d'ensemble d'une cohorte n'est maquettée qu'au premier jour — dès qu'une
+entreprise entre, l'écran que le programme ouvrira le plus souvent n'est pas
+dessiné.
+
+**Le n° 9 est le seul qui sorte du parcours** : le paquet est entièrement côté
+programme et côté investisseur. Rien n'y montre l'espace d'un fondateur, alors
+que quatre écrans annoncent ce qu'il verra — « chaque entreprise verra ce
+Challenge dans son espace, avec la mention Demandé par Savane Accelerator »
+(13), « confirmé par l'entreprise » (11, 12, 15).
+
+**Le n° 3 est annoncé trois fois** : deux entrées de navigation et un bouton.
+L'export bailleur en XLSX existe déjà (`/api/portefeuille/export`) et pourrait
+lui servir de première version.
