@@ -1,11 +1,16 @@
 import {
-  CHALLENGES,
-  CHALLENGES_TERMINES,
-  cohorte,
-  ENTREPRISES_EN_RETARD,
-} from "@/features/v2/fixtures/programme";
+  avancement,
+  echeanceCourte,
+  etatSuivi,
+  repartition,
+  type Repartition,
+} from "@/features/v2/domain/challenges";
 import { v2Routes } from "@/features/v2/navigation/routes";
-import { BarreEtats } from "@/features/v2/ui/BarreEtats";
+import {
+  type ChallengeLu,
+  listerChallenges,
+  rafraichirChallenge,
+} from "@/features/v2/server/challenges";
 
 const ROUTES = v2Routes.programme.cohortes;
 
@@ -55,49 +60,65 @@ function Vide({ cohorteId }: { cohorteId: string }) {
  * retard : la seule chose à voir ici.
  */
 function Avancement({
-  repartition,
-  entreprises,
+  part,
+  total,
 }: {
-  repartition: (typeof CHALLENGES)[number]["repartition"];
-  entreprises: number;
+  part: Repartition;
+  total: number;
 }) {
-  const part = (valeur: number) => `${(valeur / entreprises) * 100}%`;
+  const largeur = (valeur: number) =>
+    total > 0 ? `${(valeur / total) * 100}%` : "0%";
   const mots = [
-    repartition.terminees > 0 && `${repartition.terminees} terminées`,
-    repartition.enCours > 0 && `${repartition.enCours} en cours`,
-    repartition.enRetard > 0 && `${repartition.enRetard} en retard`,
-    repartition.aFaire > 0 && `${repartition.aFaire} à faire`,
+    part.terminees > 0 && `${part.terminees} terminées`,
+    part.enCours > 0 && `${part.enCours} en cours`,
+    part.enRetard > 0 && `${part.enRetard} en retard`,
+    part.aFaire > 0 && `${part.aFaire} à faire`,
   ].filter(Boolean);
 
   return (
     <div className="v2-chal-avancement">
       <div className="v2-segbar">
-        <i
-          data-part="terminees"
-          style={{ width: part(repartition.terminees) }}
-        />
-        <i data-part="encours" style={{ width: part(repartition.enCours) }} />
-        <i data-part="enretard" style={{ width: part(repartition.enRetard) }} />
+        <i data-part="terminees" style={{ width: largeur(part.terminees) }} />
+        <i data-part="encours" style={{ width: largeur(part.enCours) }} />
+        <i data-part="enretard" style={{ width: largeur(part.enRetard) }} />
       </div>
-      <small>{mots.join(" · ")}</small>
+      <small>{mots.join(" · ") || "aucune entreprise assignée"}</small>
     </div>
   );
 }
 
-/** Écran 09b — quatre Challenges actifs, un terminé. */
-function Actifs({ cohorteId }: { cohorteId: string }) {
+/** Écran 09b — les Challenges actifs. */
+function Actifs({
+  challenges,
+  cohorteId,
+  maintenant,
+}: {
+  challenges: readonly ChallengeLu[];
+  cohorteId: string;
+  maintenant: Date;
+}) {
+  // « N entreprises en retard », et non le nombre de Challenges qui en
+  // comptent : deux Challenges peuvent être en retard sur la MÊME entreprise.
+  // On dédoublonne donc par organisation.
+  const enRetard = new Set<string>();
+  for (const c of challenges) {
+    for (const e of c.entreprises) {
+      if (etatSuivi(e, c.echeance, maintenant) === "En retard") {
+        enRetard.add(e.org);
+      }
+    }
+  }
+
   return (
     <>
       <div className="v2-prog-head">
         <div>
           <h1>Challenges</h1>
-          {/* « 1 entreprise en retard », et non le nombre de Challenges qui
-              en comptent une : deux Challenges peuvent être en retard sur la
-              MÊME entreprise. Le chiffre est celui de la maquette, il ne se
-              déduit pas des quatre lignes. */}
           <p>
-            {CHALLENGES.length} Challenges actifs · {ENTREPRISES_EN_RETARD}{" "}
-            entreprise en retard
+            {challenges.length} Challenge{challenges.length > 1 ? "s" : ""} actif
+            {challenges.length > 1 ? "s" : ""}
+            {enRetard.size > 0 &&
+              ` · ${enRetard.size} entreprise${enRetard.size > 1 ? "s" : ""} en retard`}
           </p>
         </div>
         <span className="v2-spacer" />
@@ -116,65 +137,53 @@ function Actifs({ cohorteId }: { cohorteId: string }) {
       </div>
 
       <div className="v2-chal-liste">
-        {CHALLENGES.map((challenge) => (
-          <article className="v2-card v2-chal" key={challenge.id}>
-            <div>
-              <div className="v2-chal-titre">
-                <a href={ROUTES.challenge(cohorteId, challenge.id)}>
-                  {challenge.titre}
+        {challenges.map((challenge) => {
+          const part = repartition(
+            challenge.entreprises,
+            challenge.echeance,
+            maintenant,
+          );
+          const pourcent = avancement(challenge.entreprises);
+          return (
+            <article className="v2-card v2-chal" key={challenge.id}>
+              <div>
+                <div className="v2-chal-titre">
+                  <a href={ROUTES.challenge(cohorteId, challenge.id)}>
+                    {challenge.titre}
+                  </a>
+                  {challenge.categorie && (
+                    <span className="v2-tag">{challenge.categorie}</span>
+                  )}
+                  {part.enRetard > 0 && (
+                    <span className="v2-badge" data-tone="red">
+                      <span className="v2-dot" />
+                      {part.enRetard} en retard
+                    </span>
+                  )}
+                </div>
+                <div className="v2-chal-meta">
+                  {challenge.entreprises.length} entreprise
+                  {challenge.entreprises.length > 1 ? "s" : ""} ·{" "}
+                  {challenge.echeance
+                    ? `Échéance · ${echeanceCourte(challenge.echeance)}`
+                    : "sans échéance"}
+                  {pourcent !== null && ` · ${pourcent} %`}
+                </div>
+              </div>
+              <Avancement part={part} total={challenge.entreprises.length} />
+              <div className="v2-chal-actions">
+                <a
+                  className="v2-btn"
+                  data-variant="secondary"
+                  href={ROUTES.challenge(cohorteId, challenge.id)}
+                >
+                  Voir
                 </a>
-                <span className="v2-tag">{challenge.categorie}</span>
-                {challenge.repartition.enRetard > 0 && (
-                  <span className="v2-badge" data-tone="red">
-                    <span className="v2-dot" />
-                    {challenge.repartition.enRetard} en retard
-                  </span>
-                )}
               </div>
-              <div className="v2-chal-meta">
-                {challenge.entreprises} entreprises · Échéance ·{" "}
-                {challenge.echeance}
-              </div>
-            </div>
-            <Avancement
-              entreprises={challenge.entreprises}
-              repartition={challenge.repartition}
-            />
-            <div className="v2-chal-actions">
-              <a
-                className="v2-btn"
-                data-variant="secondary"
-                href={`${ROUTES.challenge(cohorteId, challenge.id)}?assigner=1`}
-              >
-                Assigner
-              </a>
-              <a
-                className="v2-btn"
-                data-variant="secondary"
-                href={ROUTES.challenge(cohorteId, challenge.id)}
-              >
-                Voir
-              </a>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
-
-      <div className="v2-nav-label" style={{ padding: "22px 0 8px" }}>
-        Terminés
-      </div>
-      {CHALLENGES_TERMINES.map((challenge) => (
-        <div className="v2-card v2-chal-clos" key={challenge.titre}>
-          <b>{challenge.titre}</b>
-          <span className="v2-tag">{challenge.categorie}</span>
-          <span className="v2-badge" data-tone="green">
-            <span className="v2-dot" />
-            {challenge.resultat}
-          </span>
-          <span className="v2-spacer" />
-          <span>{challenge.clos}</span>
-        </div>
-      ))}
     </>
   );
 }
@@ -185,25 +194,26 @@ export default async function ChallengesPage({
   params: Promise<{ cohorteId: string }>;
 }) {
   const { cohorteId } = await params;
-  const vide = cohorte(cohorteId).challenges === 0;
 
-  return (
-    <>
-      {vide ? <Vide cohorteId={cohorteId} /> : <Actifs cohorteId={cohorteId} />}
-      <BarreEtats
-        etats={[
-          {
-            actif: vide,
-            href: ROUTES.challenges("saison-4-jour-1"),
-            label: "09 · aucun Challenge",
-          },
-          {
-            actif: !vide,
-            href: ROUTES.challenges("saison-4"),
-            label: "09b · quatre actifs",
-          },
-        ]}
-      />
-    </>
+  // Les critères connectés se remettent à jour AVANT l'affichage. La fonction
+  // ne fait qu'ajouter et deux passages valent un seul : on peut l'appeler à
+  // chaque ouverture sans y réfléchir.
+  const premiers = await listerChallenges(cohorteId);
+  await Promise.all(premiers.map((c) => rafraichirChallenge(c.id)));
+  const challenges = premiers.length > 0 ? await listerChallenges(cohorteId) : premiers;
+
+  // UNE seule lecture de l'heure pour toute la page : deux appels séparés
+  // pourraient tomber de part et d'autre de minuit et donner deux verdicts
+  // différents sur la même échéance.
+  const maintenant = new Date();
+
+  return challenges.length === 0 ? (
+    <Vide cohorteId={cohorteId} />
+  ) : (
+    <Actifs
+      challenges={challenges}
+      cohorteId={cohorteId}
+      maintenant={maintenant}
+    />
   );
 }
