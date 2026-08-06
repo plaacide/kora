@@ -108,10 +108,33 @@ la seule protection qui reste :
   à un partenaire, qui tient dans un lien.
 - Devient plus dur : la révocation, le journal nominatif, l'écran 27
   « audience » — tout ce que l'identité rendait gratuit.
-- À revisiter : le NDA Dealroom (écran 23). Un NDA suppose un signataire
-  identifié ; il ne peut donc plus se placer *avant* l'entrée. Soit il
-  disparaît, soit il devient la marche qui déclenche la création de compte.
-  **Non tranché.**
+### Le NDA de la Dealroom disparaît — tranché le 6 août 2026
+
+Un NDA suppose un signataire identifié. Une Dealroom qui s'ouvre sans compte
+n'en a pas, et faire signer un engagement à un anonyme ne produit rien
+d'opposable — juste une case cochée qui donne l'illusion d'une protection.
+
+**Le NDA en portail est donc supprimé** (écran 23). Le fondateur l'a tranché
+ainsi : *« le NDA est annulé si le lien est ouvert au public »*.
+
+⚠️ **NE PAS LIRE CETTE DÉCISION PLUS LARGE QU'ELLE N'EST.** Ce qui disparaît,
+c'est le NDA *à l'entrée de la Dealroom*. Le mécanisme NDA reste entier partout
+où un signataire est identifié :
+
+| Chemin | NDA |
+|---|---|
+| Entrer dans une Dealroom | **supprimé** — pas de compte, pas de signataire |
+| Demander l'accès à la **data room** d'une entreprise (écrans 30, 26) | **conservé** — c'est le NDA du fondateur sur son propre dossier, `deals.nda_required` |
+| Inviter un investisseur sur une opération (parcours fondateur) | **conservé**, inchangé |
+
+Une Dealroom montre des FICHES ; une data room contient des PIÈCES. La première
+s'ouvre, la seconde se demande. C'est cette frontière qui porte désormais seule
+la protection, et elle doit être d'autant plus nette dans les écrans.
+
+Conséquence à traiter au lot I : le texte de l'écran 23 qui annonce le NDA
+disparaît, et l'écran 22 doit dire clairement à l'entreprise que la fiche
+publiée sera visible **sans authentification ni engagement de confidentialité** —
+c'est ce sur quoi elle donne son accord.
 
 ## Suites
 
@@ -124,6 +147,7 @@ la seule protection qui reste :
 5. [ ] Jouer le parcours investisseur de bout en bout, ce qui n'a jamais été
        fait.
 6. [ ] Réécrire les trois textes que l'arbitrage rend faux (écrans 29, 23, 27).
-7. [ ] Décider du sort du NDA Dealroom, qui ne peut plus précéder l'entrée.
+7. [x] Sort du NDA Dealroom — **supprimé de l'entrée le 6 août 2026**. Conservé
+       sur la demande d'accès à une data room, où le signataire est identifié.
 8. [ ] Énoncer dans l'accord de l'entreprise qu'elle sera vue sans
        authentification.

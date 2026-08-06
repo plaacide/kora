@@ -145,8 +145,13 @@ Dealroom s'ouvre sans compte**, qui reste proposé mais jamais exigé.
 
 ⚠️ Trois textes de maquette deviennent faux et sont à réécrire : le lien
 « personnel » du 29, l'invitation « liée à l'adresse » du 23, l'audience
-nominative du 27. **Le lien EST l'accès.** Et le sort du NDA Dealroom, qui ne
-peut plus précéder l'entrée, reste à trancher.
+nominative du 27. **Le lien EST l'accès.**
+
+**Le NDA de la Dealroom est supprimé** (6 août) : pas de compte, donc pas de
+signataire, donc rien d'opposable. Il reste entier là où un signataire existe —
+la demande d'accès à une **data room**, et le parcours fondateur. Une Dealroom
+montre des FICHES, une data room contient des PIÈCES : la première s'ouvre, la
+seconde se demande, et c'est cette frontière qui porte seule la protection.
 
 ### Le reste du rail 🔴
 
