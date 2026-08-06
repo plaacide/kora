@@ -19,6 +19,8 @@ export interface LignePortefeuille {
   amount: number | null;
   currency: string | null;
   readiness: number | null;
+  /** Les exigences non fournies, cinq au plus. Vide si tout est en ordre. */
+  manques?: readonly string[];
 }
 
 /**
@@ -124,4 +126,75 @@ export function volumeRecherche(
   return [...parDevise.values()].sort(
     (a, b) => b.montant - a.montant || a.devise.localeCompare(b.devise),
   );
+}
+
+/** Une entreprise à contacter, et pourquoi. */
+export interface Priorite {
+  startupOrg: string;
+  nom: string;
+  /** Le nombre d'exigences non fournies sur l'opération la plus en retard. */
+  manques: number;
+  preparation: number | null;
+}
+
+/**
+ * Trois priorités à la fois — l'écran 07 le dit, et s'y tient.
+ *
+ * « Une quatrième ligne ferait de la réponse une liste, et d'une liste on ne
+ * fait rien. » Le plafond vient donc de la maquette.
+ *
+ * CE QUI EST À MOI, ET QU'IL FAUT SAVOIR RELIRE : le CLASSEMENT. La maquette
+ * montre trois priorités de trois natures différentes — un Challenge dont
+ * l'échéance tombe demain, une exigence prioritaire en retard, un consentement
+ * Dealroom qui traîne. Deux de ces trois natures lisent des objets qui
+ * n'existent pas encore en base, et la troisième demande un niveau et une
+ * échéance que le canal ne transporte pas.
+ *
+ * On classe donc sur ce qu'on SAIT : la préparation la plus basse d'abord,
+ * puis le plus de manques, puis le nom pour que deux ex æquo ne changent pas
+ * d'ordre d'un chargement à l'autre. Ce dernier critère n'est pas cosmétique —
+ * un tri instable ferait danser la liste sans raison visible.
+ *
+ * Une entreprise n'apparaît qu'UNE fois, par son opération la plus en retard :
+ * c'est elle qu'on rappelle, pas un de ses dossiers.
+ */
+export function priorites(
+  lignes: readonly LignePortefeuille[],
+  max = 3,
+): readonly Priorite[] {
+  const parEntreprise = new Map<string, Priorite>();
+
+  for (const l of lignes) {
+    const manques = l.manques?.length ?? 0;
+    if (manques === 0) continue;
+
+    const vue = parEntreprise.get(l.startupOrg);
+    const candidate: Priorite = {
+      startupOrg: l.startupOrg,
+      nom: l.startupName,
+      manques,
+      preparation: l.readiness,
+    };
+
+    // L'opération la plus en retard représente l'entreprise.
+    if (!vue || rang(candidate) < rang(vue)) {
+      parEntreprise.set(l.startupOrg, candidate);
+    }
+  }
+
+  return [...parEntreprise.values()]
+    .sort((a, b) => rang(a) - rang(b) || a.nom.localeCompare(b.nom))
+    .slice(0, max);
+}
+
+/**
+ * Plus c'est bas, plus c'est urgent.
+ *
+ * Une opération sans préparation mesurée passe AVANT celles qui en ont une :
+ * ne rien savoir d'une entreprise est un motif de la rappeler, pas une raison
+ * de l'oublier.
+ */
+function rang(p: Priorite): number {
+  const base = p.preparation ?? -1;
+  return base * 100 - Math.min(p.manques, 99);
 }

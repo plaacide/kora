@@ -6,6 +6,7 @@ import {
   nombreEntreprises,
   nombrePretes,
   preparationMoyenne,
+  priorites,
   SEUIL_PRETE,
   tendance,
   volumeRecherche,
@@ -16,6 +17,7 @@ function ligne(
   readiness: number | null,
   amount: number | null = null,
   currency: string | null = null,
+  manques: readonly string[] = [],
 ): LignePortefeuille {
   return {
     startupOrg,
@@ -24,6 +26,7 @@ function ligne(
     amount,
     currency,
     readiness,
+    manques,
   };
 }
 
@@ -159,5 +162,59 @@ describe("volumeRecherche", () => {
 
   it("rend une liste vide quand rien n'est renseigné", () => {
     expect(volumeRecherche([ligne("a", 50)])).toEqual([]);
+  });
+});
+
+describe("priorites", () => {
+  const avec = (org: string, prep: number | null, nb: number) =>
+    ligne(org, prep, null, null, Array.from({ length: nb }, (_, i) => `m${i}`));
+
+  it("s'arrête à trois, comme l'écran l'annonce", () => {
+    const lignes = [
+      avec("a", 10, 1),
+      avec("b", 20, 1),
+      avec("c", 30, 1),
+      avec("d", 40, 1),
+    ];
+    expect(priorites(lignes).map((p) => p.nom)).toEqual(["a", "b", "c"]);
+  });
+
+  it("met la préparation la plus basse en tête", () => {
+    const lignes = [avec("haute", 80, 1), avec("basse", 12, 1)];
+    expect(priorites(lignes).map((p) => p.nom)).toEqual(["basse", "haute"]);
+  });
+
+  it("fait passer une entreprise SANS préparation mesurée devant les autres", () => {
+    // Ne rien savoir d'une entreprise est un motif de la rappeler, pas une
+    // raison de l'oublier.
+    const lignes = [avec("mesuree", 5, 1), avec("inconnue", null, 1)];
+    expect(priorites(lignes)[0]?.nom).toBe("inconnue");
+  });
+
+  it("écarte les entreprises qui n'ont aucun manque", () => {
+    expect(priorites([avec("a", 30, 0), avec("b", 40, 2)])).toHaveLength(1);
+  });
+
+  it("ne fait apparaître une entreprise qu'une fois, par son opération la plus en retard", () => {
+    const lignes = [avec("a", 90, 1), avec("a", 20, 3)];
+    const res = priorites(lignes);
+    expect(res).toHaveLength(1);
+    expect(res[0]).toMatchObject({ nom: "a", preparation: 20, manques: 3 });
+  });
+
+  it("départage deux ex æquo par le nombre de manques", () => {
+    const lignes = [avec("peu", 50, 1), avec("beaucoup", 50, 4)];
+    expect(priorites(lignes).map((p) => p.nom)).toEqual(["beaucoup", "peu"]);
+  });
+
+  it("garde un ordre STABLE quand tout est à égalité", () => {
+    // Un tri instable ferait danser la liste d'un chargement à l'autre, sans
+    // qu'aucune donnée n'ait changé.
+    const lignes = [avec("zoe", 50, 2), avec("adam", 50, 2)];
+    expect(priorites(lignes).map((p) => p.nom)).toEqual(["adam", "zoe"]);
+  });
+
+  it("rend une liste vide sur un portefeuille sans manque", () => {
+    expect(priorites([])).toEqual([]);
   });
 });
