@@ -23,6 +23,20 @@ const PAYS = [
   "Togo", "Guinée", "Cameroun", "Gabon", "Congo", "Autre",
 ];
 
+/**
+ * Les trois échecs du logo se disent séparément.
+ *
+ * « L'enregistrement n'a pas abouti » devant un fichier trop lourd envoie
+ * ressaisir un formulaire qui, lui, est déjà enregistré — le reste de l'étape
+ * est passé avant le dépôt. Chacun dit donc ce qui s'est passé, et quoi faire.
+ */
+const MESSAGES: Readonly<Record<string, string>> = {
+  logo_depot: "Le logo n’a pas pu être déposé. Le reste est enregistré : réessayez le fichier seul.",
+  logo_taille: "Ce logo dépasse 2 Mo. Le reste est enregistré : déposez une version plus légère.",
+  logo_type: "Ce format de logo n’est pas accepté. Déposez un PNG, un SVG, un JPEG ou un WEBP.",
+  nom: "Donnez le nom de votre organisation pour continuer.",
+};
+
 /** Écran 00a — étape 2 : l'organisation. */
 export default async function OrganisationPage({
   searchParams,
@@ -45,9 +59,7 @@ export default async function OrganisationPage({
       {erreur && (
         <p className="v2-auth-error" role="alert">
           <AvisEphemere />
-          {erreur === "nom"
-            ? "Donnez le nom de votre organisation pour continuer."
-            : "L’enregistrement n’a pas abouti. Réessayez."}
+          {MESSAGES[erreur] ?? "L’enregistrement n’a pas abouti. Réessayez."}
         </p>
       )}
 
@@ -106,16 +118,34 @@ export default async function OrganisationPage({
         {/* La maquette peint cette pastille avec `var(--brand)`, un token qui
             n'existe dans aucun `parcours.css` : elle serait transparente.
             L'accent orange est la seule lecture possible.
-            LE DÉPÔT N'EST PAS BRANCHÉ — aucun Storage derrière ce bouton. */}
-        <div className="v2-onb-depot">
-          <b>{initiales(saisie.nom)}</b>
+
+            L'`input` couvre toute la boîte en transparence : on clique donc
+            n'importe où, et le clavier l'atteint — d'où le `:focus-within` qui
+            dessine le contour, sans quoi le focus serait invisible. */}
+        <label className="v2-onb-depot">
+          {saisie.logo ? (
+            // Une pastille de 40 px, servie par le Storage : `next/image`
+            // exigerait d'inscrire ce domaine dans `remotePatterns` et de faire
+            // passer chaque logo par l'optimiseur, pour rien à cette taille.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img alt="" src={saisie.logo} />
+          ) : (
+            <b>{initiales(saisie.nom)}</b>
+          )}
           <span>
-            Déposez un fichier PNG ou SVG — sinon nous utilisons vos initiales.
+            {saisie.logo
+              ? "Déposez un autre fichier pour le remplacer."
+              : "Déposez un fichier PNG ou SVG — sinon nous utilisons vos initiales."}
           </span>
-          <span className="v2-btn" data-variant="secondary">
+          <span aria-hidden="true" className="v2-btn" data-variant="secondary">
             Choisir un fichier
           </span>
-        </div>
+          <input
+            accept="image/png,image/svg+xml,image/jpeg,image/webp"
+            name="logo"
+            type="file"
+          />
+        </label>
       </div>
 
       <div className="v2-form-actions">

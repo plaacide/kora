@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 
+import { urlImageDeMarque } from "./branding";
 import { requireV2User } from "./session";
 
 /**
@@ -17,6 +18,9 @@ export interface SaisieProgramme {
   type: string | null;
   pays: string | null;
   site: string | null;
+  /** L'adresse publique du logo déposé, ou `null` — l'écran retombe alors sur
+   *  les initiales, comme la maquette 00a le prévoit. */
+  logo: string | null;
   focus: readonly string[];
   cohorte: {
     id: string;
@@ -33,6 +37,7 @@ const VIDE: SaisieProgramme = {
   type: null,
   pays: null,
   site: null,
+  logo: null,
   focus: [],
   cohorte: null,
 };
@@ -54,7 +59,7 @@ export async function saisieProgramme(): Promise<SaisieProgramme> {
   const [{ data: org }, { data: cohortes }] = await Promise.all([
     supabase
       .from("organizations")
-      .select("id, name, program_type, country, website")
+      .select("id, name, program_type, country, website, branding")
       .eq("id", membership.org_id)
       .maybeSingle(),
     // La PREMIÈRE cohorte, celle que l'inscription vient de créer — d'où
@@ -89,6 +94,7 @@ export async function saisieProgramme(): Promise<SaisieProgramme> {
     type: org.program_type ?? null,
     pays: org.country ?? null,
     site: org.website ?? null,
+    logo: urlImageDeMarque((org.branding as { logo?: string } | null)?.logo),
     focus: (focusRow?.program_focus as string[] | null) ?? [],
     cohorte: premiere
       ? {

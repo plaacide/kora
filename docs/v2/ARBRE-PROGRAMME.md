@@ -51,9 +51,15 @@ Nav de cohorte   Vue d'ensemble · Entreprises · Challenges ·
                                    fondateur pour tout le monde
 🟢 Onboarding programme (00a-d)  ÉCRIT. Les quatre écrans appellent, dans
    organisation → save_programme      l'ordre : save_programme,
-   accompagnement → set_programme_focus  set_programme_focus, create_cohort
-   cohorte → create_cohort            (ou report), finish_programme_onboarding.
+                + set_org_logo        set_programme_focus, create_cohort
+   accompagnement → set_programme_focus  (ou report), finish_programme_onboarding.
+   cohorte → create_cohort
    prêt → finish_programme_onboarding
+🟢 Le logo du programme          bucket `branding` (public), clé
+                                 `<org_id>/logo-<alea>.<ext>`, enregistrée dans
+                                 `organizations.branding`. Public parce que la
+                                 Dealroom l'est — ADR-005. Les pièces d'un
+                                 dossier restent dans `documents`, privé.
 ⚠️ Aucun chemin n'y mène          l'inscription propose « Un programme » mais
                                    ne redirige toujours pas vers ce tunnel.
 ```

@@ -2102,9 +2102,17 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 /* Écrans 00a à 00d — l'onboarding d'un programme. Il réutilise la coque, le
    fil d'étapes et les cartes de l'onboarding fondateur : seules les questions
    changent. */
-.v2-onb-depot{display:flex;align-items:center;gap:14px;border:1px dashed var(--line);border-radius:var(--r-lg);background:#fff;padding:14px 16px}
+.v2-onb-depot{position:relative;display:flex;align-items:center;gap:14px;border:1px dashed var(--line);border-radius:var(--r-lg);background:#fff;padding:14px 16px;cursor:pointer}
 .v2-onb-depot>b{display:inline-flex;width:40px;height:40px;flex-shrink:0;align-items:center;justify-content:center;border-radius:8px;background:var(--orange);color:#fff;font:700 15px var(--font-v2-head),sans-serif}
 .v2-onb-depot>span{flex:1;color:var(--text-2);font-size:13px}
+/* Le logo déjà déposé prend la place de la pastille d'initiales. `contain` et
+   non `cover` : un logo qu'on recadre n'est plus le logo. */
+.v2-onb-depot>img{display:block;width:40px;height:40px;flex-shrink:0;border-radius:8px;background:#fff;object-fit:contain}
+/* Le champ couvre toute la boîte en transparence : le clic porte partout, et
+   le clavier l'atteint encore — d'où le contour au focus, sans quoi la
+   tabulation traverserait un champ que rien ne signale. */
+.v2-onb-depot>input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.v2-onb-depot:focus-within{border-color:var(--orange);outline:2px solid var(--orange);outline-offset:2px}
 /* Le récapitulatif de l'écran 00d : des paires clé-valeur cloisonnées, pour
    qu'on relise ce qu'on vient de déclarer sans avoir à y revenir. */
 .v2-onb-recap{overflow:hidden;padding:0}

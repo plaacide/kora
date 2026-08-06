@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { v2Routes } from "@/features/v2/navigation/routes";
+import { deposerImageDeMarque } from "@/features/v2/server/branding";
 import { createClient } from "@/lib/supabase/server";
 
 const ROUTES = v2Routes.programme.onboarding;
@@ -28,7 +29,7 @@ export async function enregistrerOrganisation(formData: FormData) {
   if (!nom) redirect(`${ROUTES.organisation}?erreur=nom`);
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("save_programme", {
+  const { data: orgId, error } = await supabase.rpc("save_programme", {
     p_name: nom,
     p_type: valeur(formData, "type"),
     p_country: valeur(formData, "pays"),
@@ -37,6 +38,35 @@ export async function enregistrerOrganisation(formData: FormData) {
   });
 
   if (error) echec(ROUTES.organisation, "save_programme", error);
+
+  // LE LOGO EN SECOND, ET C'EST L'ORDRE QUI COMPTE : `save_programme` CRÉE
+  // l'organisation quand elle n'existe pas encore, et la clé de stockage
+  // commence par son identifiant. Déposer avant, c'est ne pas savoir où.
+  const depose = formData.get("logo");
+  if (orgId && depose instanceof File && depose.size > 0) {
+    const { data: avant } = await supabase
+      .from("organizations")
+      .select("branding")
+      .eq("id", orgId)
+      .maybeSingle();
+
+    const { cle, echec: probleme } = await deposerImageDeMarque(
+      orgId,
+      "logo",
+      depose,
+      (avant?.branding as { logo?: string } | null)?.logo ?? null,
+    );
+
+    // Un logo refusé n'annule pas le reste de l'étape : le nom, le type et le
+    // pays sont enregistrés. On revient le dire, sans rien reprendre.
+    if (probleme) redirect(`${ROUTES.organisation}?erreur=logo_${probleme}`);
+
+    const { error: erreurLogo } = await supabase.rpc("set_org_logo", {
+      p_key: cle,
+    });
+    if (erreurLogo) echec(ROUTES.organisation, "set_org_logo", erreurLogo);
+  }
+
   redirect(ROUTES.accompagnement);
 }
 
