@@ -1,176 +1,179 @@
+import { notFound } from "next/navigation";
+
 import {
-  A_ASSIGNER,
-  ASSIGNATIONS,
-  CHALLENGES,
-  CRITERES_SUIVIS,
-  PROGRAMME,
-  SEGMENTS_SUIVI,
-} from "@/features/v2/fixtures/programme";
+  echeanceCourte,
+  type EtatSuivi,
+  etatSuivi,
+  ordreDeSuivi,
+  repartition,
+} from "@/features/v2/domain/challenges";
+import { initiales } from "@/features/v2/domain/questions";
 import { v2Routes } from "@/features/v2/navigation/routes";
-import { BarreEtats } from "@/features/v2/ui/BarreEtats";
+import {
+  type CritereSuivi,
+  criteresSuivis,
+  type EntrepriseSuivie,
+  lireChallenge,
+  listerChallenges,
+  rafraichirChallenge,
+} from "@/features/v2/server/challenges";
+import { destinataires } from "@/features/v2/server/questions";
+import { AvisEphemere } from "@/features/v2/ui/AvisEphemere";
+import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
 import { Icon } from "@/features/v2/ui/Icon";
+
+import { assignerChallenge } from "./actions";
 
 const ROUTES = v2Routes.programme.cohortes;
 
-function challengeOu(id: string) {
-  return CHALLENGES.find((item) => item.id === id) ?? CHALLENGES[0];
+const TON_STATUT: Record<EtatSuivi, string> = {
+  "À faire": "neutral",
+  "En cours": "blue",
+  "En retard": "red",
+  Terminé: "green",
+};
+
+const TONS = ["orange", "blue", "green", "amber", "neutral"] as const;
+function ton(nom: string): (typeof TONS)[number] {
+  let somme = 0;
+  for (const c of nom) somme = (somme + c.charCodeAt(0)) % 997;
+  return TONS[somme % TONS.length]!;
 }
 
 /** Écran 13 — à qui assigner ce Challenge. */
 function Assigner({
-  cohorteId,
   challengeId,
+  cohorteId,
+  dejaAssignees,
+  entreprises,
+  erreur,
 }: {
-  cohorteId: string;
   challengeId: string;
+  cohorteId: string;
+  dejaAssignees: ReadonlySet<string>;
+  entreprises: readonly { org: string; nom: string }[];
+  erreur?: string;
 }) {
-  const challenge = challengeOu(challengeId);
-  const retenues = A_ASSIGNER.filter((item) => item.retenue).length;
-  const connectes = 2;
-
   return (
-    <>
+    <form action={assignerChallenge}>
+      <input name="cohorte" type="hidden" value={cohorteId} />
+      <input name="challenge" type="hidden" value={challengeId} />
+
       <div className="v2-prog-head">
         <div>
           <h1>À qui souhaitez-vous assigner ce Challenge&nbsp;?</h1>
         </div>
       </div>
 
+      {erreur && (
+        <p className="v2-auth-error" role="alert">
+          <AvisEphemere />
+          {erreur === "aucune"
+            ? "Choisissez au moins une entreprise."
+            : "L’assignation n’a pas abouti. Réessayez."}
+        </p>
+      )}
+
       <div className="v2-assigner">
         <div>
-          <div className="v2-radios">
-            <label className="v2-radio">
-              <i />
-              <div>
-                <b>Toute la cohorte</b>
-                <small>12 entreprises</small>
-              </div>
-            </label>
-            <label className="v2-radio" data-active>
-              <i />
-              <div>
-                <b>Entreprises sélectionnées</b>
-                <small>{retenues} sélectionnées</small>
-              </div>
-            </label>
-          </div>
-
           <div className="v2-card" style={{ overflow: "hidden" }}>
             <table className="v2-tbl">
               <thead>
                 <tr>
                   <th aria-label="Sélection" />
                   <th>Entreprise</th>
-                  <th>Préparation</th>
+                  <th>État</th>
                 </tr>
               </thead>
               <tbody>
-                {A_ASSIGNER.map((item) => (
-                  <tr data-retenue={item.retenue} key={item.nom}>
-                    <td style={{ width: 36 }}>
-                      <span className="v2-case" data-cochee={item.retenue}>
-                        {item.retenue && <Icon name="check" />}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="v2-ident">
-                        <span className="v2-pastille" data-ton={item.ton}>
-                          {item.initiales}
-                        </span>
-                        <div>
-                          <b>{item.nom}</b>
+                {entreprises.map((e) => {
+                  const deja = dejaAssignees.has(e.org);
+                  return (
+                    <tr key={e.org}>
+                      <td style={{ width: 36 }}>
+                        {/* Une entreprise DÉJÀ assignée reste cochée et
+                            désactivée : on n'assigne pas deux fois, et la
+                            décocher ne la retirerait pas — `assign_challenge`
+                            n'enlève rien. Laisser croire le contraire serait
+                            pire que de l'interdire. */}
+                        <input
+                          defaultChecked={deja}
+                          disabled={deja}
+                          name="entreprise"
+                          type="checkbox"
+                          value={e.org}
+                        />
+                      </td>
+                      <td>
+                        <div className="v2-ident">
+                          <span className="v2-pastille" data-ton={ton(e.nom)}>
+                            {initiales(e.nom)}
+                          </span>
                           <div>
-                            {item.secteur} · {item.pays}
+                            <b>{e.nom}</b>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="v2-prep">
-                        <div className="v2-prep-bar">
-                          <i style={{ width: `${item.preparation}%` }} />
-                        </div>
-                        <span>{item.preparation}&nbsp;%</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="v2-dim">
+                        {deja ? "déjà assignée" : "à assigner"}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
 
-        <aside className="v2-card v2-resume">
-          <div className="v2-nav-label" style={{ padding: 0 }}>
-            Résumé
-          </div>
-          <div className="v2-kv">
-            <span className="v2-k">Challenge</span>
-            <span className="v2-v">{challenge.titre}</span>
-          </div>
-          <hr className="v2-hr" />
-          <div className="v2-kv">
-            <span className="v2-k">Entreprises</span>
-            <span className="v2-v">{retenues} sélectionnées</span>
-          </div>
-          <div className="v2-kv">
-            <span className="v2-k">Critères</span>
-            <span className="v2-v">
-              4 · dont {connectes} connectés à Sanza
-            </span>
-          </div>
-          <div className="v2-kv">
-            <span className="v2-k">Échéance</span>
-            <span className="v2-v">{challenge.echeance}</span>
-          </div>
-          <a
+        <aside className="v2-card">
+          <BoutonEnvoi
             className="v2-btn"
-            data-bloc="true"
-            href={ROUTES.challenge(cohorteId, challengeId)}
-            style={{ marginTop: 6 }}
+            enCours="Assignation…"
           >
             Assigner le Challenge
-          </a>
-          {/* Un Challenge EXISTANT s'assigne à tout moment à de nouvelles
-              entreprises — sans le recréer. C'est ce que dit la maquette, et
-              c'est pourquoi cet écran est atteignable depuis la liste. */}
+          </BoutonEnvoi>
           <p>
-            Chaque entreprise verra ce Challenge dans son espace, avec la
-            mention «&nbsp;Demandé par {PROGRAMME.nom}&nbsp;». Un Challenge
+            Chaque entreprise verra ce Challenge dans son espace. Un Challenge
             existant peut être assigné à tout moment à de nouvelles
             entreprises — sans le recréer.
           </p>
         </aside>
       </div>
-    </>
+    </form>
   );
 }
 
 /** Le panneau de l'écran 15 — une entreprise suivie sur ce Challenge. */
 function PanneauEntreprise({
-  cohorteId,
-  challengeId,
+  criteres,
+  echeance,
+  entreprise,
+  retour,
+  titre,
 }: {
-  cohorteId: string;
-  challengeId: string;
+  criteres: readonly CritereSuivi[];
+  echeance: string | null;
+  entreprise: EntrepriseSuivie;
+  retour: string;
+  titre: string;
 }) {
-  const suivie = ASSIGNATIONS.find((item) => item.initiales === "CB")!;
-  const faits = CRITERES_SUIVIS.filter((item) => item.fait).length;
-  const retour = ROUTES.challenge(cohorteId, challengeId);
+  const faits = criteres.filter((c) => c.fait).length;
+  const part = criteres.length > 0 ? (faits / criteres.length) * 100 : 0;
 
   return (
     <>
-      <a aria-label="Fermer le panneau" className="v2-scrim-panneau" href={retour} />
+      <a
+        aria-label="Fermer le panneau"
+        className="v2-scrim-panneau"
+        href={retour}
+      />
       <aside className="v2-panneau">
         <div className="v2-panneau-head">
-          <span className="v2-pastille" data-ton={suivie.ton}>
-            {suivie.initiales}
+          <span className="v2-pastille" data-ton={ton(entreprise.nom)}>
+            {initiales(entreprise.nom)}
           </span>
           <div style={{ flex: 1 }}>
-            <h2>{suivie.nom}</h2>
-            <small>
-              {suivie.secteur} · {suivie.pays}
-            </small>
+            <h2>{entreprise.nom}</h2>
           </div>
           <a className="v2-x" href={retour}>
             <Icon name="close" />
@@ -183,14 +186,17 @@ function PanneauEntreprise({
               Challenge
             </div>
             <b style={{ font: "600 15px var(--font-v2-head), sans-serif" }}>
-              {challengeOu(challengeId).titre}
+              {titre}
             </b>
             <div className="v2-chal-meta">
-              {faits} / {CRITERES_SUIVIS.length} critères réalisés · Échéance ·{" "}
-              {suivie.echeance}
+              {faits} / {criteres.length} critères réalisés · Échéance ·{" "}
+              {echeanceCourte(echeance)}
             </div>
-            <div className="v2-prep-bar" style={{ marginTop: 10, width: "100%" }}>
-              <i style={{ width: `${(faits / CRITERES_SUIVIS.length) * 100}%` }} />
+            <div
+              className="v2-prep-bar"
+              style={{ marginTop: 10, width: "100%" }}
+            >
+              <i style={{ width: `${part}%` }} />
             </div>
           </div>
 
@@ -198,16 +204,28 @@ function PanneauEntreprise({
             <div className="v2-nav-label" style={{ padding: "0 0 4px" }}>
               Critères
             </div>
-            {CRITERES_SUIVIS.map((critere) => (
+            {criteres.map((critere) => (
               <div
                 className="v2-crit-suivi"
                 data-fait={critere.fait}
-                key={critere.libelle}
+                key={critere.id}
               >
                 <i>{critere.fait && <Icon name="check" />}</i>
                 <div>
                   <b>{critere.libelle}</b>
-                  <small>{critere.detail}</small>
+                  <small>
+                    {/* L'ORIGINE EST DITE. « Validé automatiquement » et
+                        « confirmé par l'entreprise » n'engagent pas la même
+                        personne, et le programme doit savoir laquelle. */}
+                    {critere.fait
+                      ? critere.origine === "auto"
+                        ? "validé automatiquement par Sanza"
+                        : "confirmé par l’entreprise"
+                      : critere.source === "connecte"
+                        ? "se validera seul dès l’exigence satisfaite"
+                        : "à confirmer par l’entreprise"}
+                    {!critere.requis && " · facultatif"}
+                  </small>
                 </div>
               </div>
             ))}
@@ -223,83 +241,70 @@ function PanneauEntreprise({
           <a className="v2-btn" data-variant="secondary" href={retour}>
             Fermer
           </a>
-          <span className="v2-btn">Envoyer un rappel</span>
         </div>
       </aside>
     </>
   );
 }
 
-const TON_STATUT: Record<string, string> = {
-  "En retard": "red",
-  "En cours": "blue",
-  Terminé: "green",
-  "À faire": "neutral",
-};
-
 /** Écran 14 — le suivi du Challenge, retards en tête. */
 function Suivi({
-  cohorteId,
   challengeId,
+  categorie,
+  cohorteId,
+  echeance,
+  entreprises,
+  maintenant,
+  titre,
 }: {
-  cohorteId: string;
   challengeId: string;
+  categorie: string | null;
+  cohorteId: string;
+  echeance: string | null;
+  entreprises: readonly EntrepriseSuivie[];
+  maintenant: Date;
+  titre: string;
 }) {
-  const challenge = challengeOu(challengeId);
-  const { repartition } = challenge;
+  const part = repartition(entreprises, echeance, maintenant);
+  const base = ROUTES.challenge(cohorteId, challengeId);
+  const triees = ordreDeSuivi(entreprises, echeance, maintenant);
 
   return (
     <>
       <div className="v2-prog-head">
         <div>
-          <h1>{challenge.titre}</h1>
+          <h1>{titre}</h1>
           <p>
-            {challenge.entreprises} entreprises · Échéance ·{" "}
-            {challenge.echeance}{" "}
-            <span className="v2-tag" style={{ marginLeft: 8 }}>
-              {challenge.categorie}
-            </span>
+            {entreprises.length} entreprise{entreprises.length > 1 ? "s" : ""} ·
+            Échéance · {echeanceCourte(echeance)}
+            {categorie && (
+              <span className="v2-tag" style={{ marginLeft: 8 }}>
+                {categorie}
+              </span>
+            )}
           </p>
         </div>
         <span className="v2-spacer" />
         <nav>
-          <a
-            className="v2-btn"
-            data-variant="secondary"
-            href={`${ROUTES.challenge(cohorteId, challengeId)}?assigner=1`}
-          >
+          <a className="v2-btn" data-variant="secondary" href={`${base}?assigner=1`}>
             Assigner à d’autres entreprises
           </a>
-          <span className="v2-btn" data-variant="secondary">
-            Modifier
-          </span>
-          <span className="v2-btn" data-variant="text-grey">
-            Archiver
-          </span>
         </nav>
       </div>
 
       <div className="v2-chiffres">
         <div className="v2-card v2-chiffre">
-          <b>{repartition.terminees}</b>
+          <b>{part.terminees}</b>
           <span>terminées</span>
         </div>
         <div className="v2-card v2-chiffre">
-          <b>{repartition.enCours}</b>
+          <b>{part.enCours}</b>
           <span>en cours</span>
         </div>
         <div className="v2-card v2-chiffre" data-ton="red">
-          <b>{repartition.enRetard}</b>
+          <b>{part.enRetard}</b>
           <span>en retard</span>
         </div>
-      </div>
-
-      <div className="v2-prog-segments">
-        {SEGMENTS_SUIVI.map((segment, rang) => (
-          <span className="v2-tag" data-active={rang === 0} key={segment}>
-            {segment}
-          </span>
-        ))}
       </div>
 
       <div className="v2-card" style={{ overflow: "hidden" }}>
@@ -309,61 +314,48 @@ function Suivi({
               <th>Entreprise</th>
               <th>Progression</th>
               <th>Statut</th>
-              <th>Échéance</th>
               <th aria-label="Actions" />
             </tr>
           </thead>
           <tbody>
-            {ASSIGNATIONS.map((ligne) => (
-              <tr key={ligne.nom}>
-                <td>
-                  <a
-                    href={`${ROUTES.challenge(cohorteId, challengeId)}?entreprise=${ligne.initiales.toLowerCase()}`}
-                    style={{ color: "inherit" }}
-                  >
-                    <div className="v2-ident">
-                      <span className="v2-pastille" data-ton={ligne.ton}>
-                        {ligne.initiales}
-                      </span>
-                      <div>
-                        <b>{ligne.nom}</b>
+            {triees.map((ligne) => {
+              const etat = etatSuivi(ligne, echeance, maintenant);
+              return (
+                <tr key={ligne.org}>
+                  <td>
+                    <a
+                      href={`${base}?entreprise=${ligne.org}`}
+                      style={{ color: "inherit" }}
+                    >
+                      <div className="v2-ident">
+                        <span className="v2-pastille" data-ton={ton(ligne.nom)}>
+                          {initiales(ligne.nom)}
+                        </span>
                         <div>
-                          {ligne.secteur} · {ligne.pays}
+                          <b>{ligne.nom}</b>
                         </div>
                       </div>
-                    </div>
-                  </a>
-                </td>
-                <td>
-                  {ligne.faits} / {ligne.total}
-                </td>
-                <td>
-                  <span
-                    className="v2-badge"
-                    data-tone={TON_STATUT[ligne.statut]}
-                  >
-                    <span className="v2-dot" />
-                    {ligne.statut}
-                  </span>
-                </td>
-                <td className="v2-dim">{ligne.echeance}</td>
-                <td data-actions>
-                  {ligne.statut === "Terminé" ? (
-                    <span className="v2-muted">—</span>
-                  ) : (
-                    <span className="v2-btn" data-variant="text">
-                      Envoyer un rappel
+                    </a>
+                  </td>
+                  <td>
+                    {ligne.faits} / {ligne.requis}
+                  </td>
+                  <td>
+                    <span className="v2-badge" data-tone={TON_STATUT[etat]}>
+                      <span className="v2-dot" />
+                      {etat}
                     </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td data-actions>
+                    {ligne.fige && <span className="v2-muted">figée</span>}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         <div className="v2-prog-tbl-foot">
-          <span>
-            Tri&nbsp;: en retard, puis échéance proche.
-          </span>
+          <span>Tri : en retard d’abord.</span>
           <span>Vous voyez l’état de réalisation, jamais les documents.</span>
         </div>
       </div>
@@ -376,32 +368,68 @@ export default async function ChallengePage({
   searchParams,
 }: {
   params: Promise<{ cohorteId: string; challengeId: string }>;
-  searchParams: Promise<{ assigner?: string; entreprise?: string }>;
+  searchParams: Promise<{
+    assigner?: string;
+    entreprise?: string;
+    erreur?: string;
+  }>;
 }) {
-  const [{ cohorteId, challengeId }, { assigner, entreprise }] =
+  const [{ challengeId, cohorteId }, { assigner, entreprise, erreur }] =
     await Promise.all([params, searchParams]);
+
+  await rafraichirChallenge(challengeId);
+
+  const [entete, challenges] = await Promise.all([
+    lireChallenge(challengeId),
+    listerChallenges(cohorteId),
+  ]);
+  if (!entete) notFound();
+
+  const ici = challenges.find((c) => c.id === challengeId);
+  const assignees = ici?.entreprises ?? [];
   const base = ROUTES.challenge(cohorteId, challengeId);
+
+  // UNE seule lecture de l'heure : deux appels séparés pourraient tomber de
+  // part et d'autre de minuit et rendre deux verdicts sur la même échéance.
+  const maintenant = new Date();
+
+  if (assigner === "1") {
+    const membres = await destinataires(cohorteId);
+    return (
+      <Assigner
+        challengeId={challengeId}
+        cohorteId={cohorteId}
+        dejaAssignees={new Set(assignees.map((e) => e.org))}
+        entreprises={membres}
+        erreur={erreur}
+      />
+    );
+  }
+
+  const suivie = entreprise
+    ? assignees.find((e) => e.org === entreprise)
+    : undefined;
+  const criteres = suivie ? await criteresSuivis(challengeId, suivie.org) : [];
 
   return (
     <>
-      {assigner === "1" ? (
-        <Assigner challengeId={challengeId} cohorteId={cohorteId} />
-      ) : (
-        <Suivi challengeId={challengeId} cohorteId={cohorteId} />
-      )}
-      <BarreEtats
-        etats={[
-          { actif: assigner === "1", href: `${base}?assigner=1`, label: "13 · assigner" },
-          { actif: !assigner && !entreprise, href: base, label: "14 · suivi" },
-          {
-            actif: Boolean(entreprise),
-            href: `${base}?entreprise=cb`,
-            label: "15 · une entreprise suivie",
-          },
-        ]}
+      <Suivi
+        categorie={entete.categorie}
+        challengeId={challengeId}
+        cohorteId={cohorteId}
+        echeance={entete.echeance}
+        entreprises={assignees}
+        maintenant={maintenant}
+        titre={entete.titre}
       />
-      {entreprise && (
-        <PanneauEntreprise challengeId={challengeId} cohorteId={cohorteId} />
+      {suivie && (
+        <PanneauEntreprise
+          criteres={criteres}
+          echeance={entete.echeance}
+          entreprise={suivie}
+          retour={base}
+          titre={entete.titre}
+        />
       )}
     </>
   );
