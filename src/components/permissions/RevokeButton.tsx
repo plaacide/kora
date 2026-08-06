@@ -47,7 +47,7 @@ export function RevokeButton({
       disabled={pending || folderIds.length === 0}
       className={
         "text-right text-[12px] font-[600] cursor-pointer disabled:opacity-50 " +
-        (error ? "text-[#A32D2D]" : "text-[#C24619] hover:text-[#1A1B1F]")
+        (error ? "text-[#A32D2D]" : "text-[#C44518] hover:text-[#1A1B1F]")
       }
     >
       {pending ? "…" : label}

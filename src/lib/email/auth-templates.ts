@@ -25,7 +25,7 @@ export type AuthEmailKind =
 export type Locale = "fr" | "en";
 
 const INK = "#171A2C";
-const ACCENT = "#E85C2B";
+const ACCENT = "#FF5A1F";
 const ACCENT_DARK = "#C64B1E";
 const BODY = "#4A4E63";
 const MUTED = "#8B8FA3";

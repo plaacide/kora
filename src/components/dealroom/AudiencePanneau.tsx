@@ -81,12 +81,12 @@ export function AudiencePanneau({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={t("invitePlaceholder")}
-          className="flex-1 min-w-[200px] rounded-[6px] border border-[#E2DED4] bg-white px-3 py-2 text-[13px] text-[#1A1B1F] placeholder:text-[#A0A3AB] focus:border-[#E85C2B] focus:outline-none"
+          className="flex-1 min-w-[200px] rounded-[6px] border border-[#E2DED4] bg-white px-3 py-2 text-[13px] text-[#1A1B1F] placeholder:text-[#A0A3AB] focus:border-[#FF5A1F] focus:outline-none"
         />
         <button
           type="submit"
           disabled={encours || email.trim() === ""}
-          className="rounded-[6px] bg-[#E85C2B] px-4 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
+          className="rounded-[6px] bg-[#FF5A1F] px-4 py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
         >
           {encours ? t("inviting") : t("invite")}
         </button>
@@ -113,7 +113,7 @@ export function AudiencePanneau({
                 navigator.clipboard.writeText(lien);
                 setCopie(true);
               }}
-              className="shrink-0 text-[11.5px] font-[550] text-[#C24619] underline underline-offset-2"
+              className="shrink-0 text-[11.5px] font-[550] text-[#C44518] underline underline-offset-2"
             >
               {copie ? t("linkCopied") : t("copyLink")}
             </button>

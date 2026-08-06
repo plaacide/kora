@@ -150,7 +150,7 @@ export function DemandeCarte({ d }: { d: Demande }) {
               <button
                 onClick={() => decider("granted")}
                 disabled={encours}
-                className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60"
+                className="rounded-[5px] bg-[#FF5A1F] px-4 py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-60"
               >
                 {t("grant")}
               </button>
@@ -158,7 +158,7 @@ export function DemandeCarte({ d }: { d: Demande }) {
               <button
                 onClick={() => decider("recommended")}
                 disabled={encours}
-                className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60"
+                className="rounded-[5px] bg-[#FF5A1F] px-4 py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-60"
               >
                 {t("recommend")}
               </button>

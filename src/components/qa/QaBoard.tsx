@@ -39,7 +39,7 @@ const FILTERS: Array<AnswerStatus | "all"> = [
 ];
 
 const champ =
-  "w-full px-2.5 py-2 text-[12.5px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-none";
+  "w-full px-2.5 py-2 text-[12.5px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#FF5A1F] focus:outline-none resize-none";
 
 export function QaBoard({
   dealId,
@@ -148,7 +148,7 @@ export function QaBoard({
               {t("export")}
             </button>
           )}
-          <button onClick={() => setAskOpen(true)} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]">
+          <button onClick={() => setAskOpen(true)} className="rounded-[5px] bg-[#FF5A1F] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16]">
             {t("ask")}
           </button>
         </div>
@@ -160,7 +160,7 @@ export function QaBoard({
           description={t("emptyBody")}
           icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>}
           action={
-            <button onClick={() => setAskOpen(true)} className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]">
+            <button onClick={() => setAskOpen(true)} className="rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]">
               {t("ask")}
             </button>
           }
@@ -256,7 +256,7 @@ export function QaBoard({
             <button
               onClick={submitQuestion}
               disabled={busy || question.trim().length < 5}
-              className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60"
+              className="rounded-[5px] bg-[#FF5A1F] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-60"
             >
               {busy ? t("sending") : t("send")}
             </button>

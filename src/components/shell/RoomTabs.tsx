@@ -57,7 +57,7 @@ export function RoomTabs({
 
       {/* En-tête de la salle */}
       <div className="flex items-start gap-4 mb-[22px]">
-        <span className="grid place-items-center w-[52px] h-[52px] shrink-0 rounded-[6px] bg-[#FBEDE6] text-[#C24619]">
+        <span className="grid place-items-center w-[52px] h-[52px] shrink-0 rounded-[6px] bg-[#FFEDE6] text-[#C44518]">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
         </span>
         <div className="flex-1 min-w-0">
@@ -65,7 +65,7 @@ export function RoomTabs({
           <div className="text-[12.5px] text-[#6E727A] mt-[5px]">Data room</div>
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
-          <ShareButton dealId={dealId} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />
+          <ShareButton dealId={dealId} className="rounded-[5px] bg-[#FF5A1F] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#E74C16]" />
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export function RoomTabs({
               href={tab.href}
               className={
                 "flex items-center gap-2 py-[9px] px-px -mb-px border-b-2 whitespace-nowrap transition-colors " +
-                (active ? "border-[#E85C2B] text-[#1A1B1F]" : "border-transparent text-[#6E727A] hover:text-[#1A1B1F]")
+                (active ? "border-[#FF5A1F] text-[#1A1B1F]" : "border-transparent text-[#6E727A] hover:text-[#1A1B1F]")
               }
             >
               {tab.label}
@@ -89,7 +89,7 @@ export function RoomTabs({
                   style={{ fontFamily: "var(--font-plex-mono), monospace" }}
                   className={
                     tab.accent
-                      ? "text-[10px] font-[600] bg-[#FBEDE6] text-[#C24619] rounded-[4px] px-[7px] py-0.5"
+                      ? "text-[10px] font-[600] bg-[#FFEDE6] text-[#C44518] rounded-[4px] px-[7px] py-0.5"
                       : "text-[11px] font-[500] text-[#A0A3AB]"
                   }
                 >

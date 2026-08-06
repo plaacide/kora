@@ -32,7 +32,7 @@ function badgeType(mime: string | null | undefined): BadgeType {
 }
 
 const BADGE: Record<BadgeType, string> = {
-  PDF: "bg-[#FBEDE6] text-[#C0392B]",
+  PDF: "bg-[#FFEDE6] text-[#C0392B]",
   XLSX: "bg-[#E4F3EC] text-[#147A5C]",
   DOCX: "bg-[#E9F2FB] text-[#185FA5]",
   DOC: "bg-[#E8E5DC] text-[#6E727A]",
@@ -266,7 +266,7 @@ export async function AccueilFondateur({
               {t("active")}
             </span>
           </div>
-          <Link href="/deal" className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
+          <Link href="/deal" className="text-[12.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">
             {(estLevee ? t("openRaise") : t("openRoom"))} →
           </Link>
         </div>
@@ -282,10 +282,10 @@ export async function AccueilFondateur({
                   {objectifTxt}
                 </div>
                 <span className="block h-[5px] rounded-[2px] bg-[#E2DED4] overflow-hidden mt-[9px]">
-                  <span className="block h-full bg-[#E85C2B]" style={{ width: `${softPct}%` }} />
+                  <span className="block h-full bg-[#FF5A1F]" style={{ width: `${softPct}%` }} />
                 </span>
                 <div className="text-[11px] text-[#6E727A] mt-1.5">
-                  <span className="font-mono font-[600] text-[#C24619]">{softTxt}</span>{" "}
+                  <span className="font-mono font-[600] text-[#C44518]">{softTxt}</span>{" "}
                   {t("softCommit", { pct: softPct })}
                 </div>
               </>
@@ -294,7 +294,7 @@ export async function AccueilFondateur({
                 <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#C7C9CF]">
                   {t("objectiveEmpty")}
                 </div>
-                <div className="text-[11px] font-[600] text-[#C24619] mt-2.5">{t("openRaise")} →</div>
+                <div className="text-[11px] font-[600] text-[#C44518] mt-2.5">{t("openRaise")} →</div>
               </Link>
             )}
           </div>
@@ -305,7 +305,7 @@ export async function AccueilFondateur({
             <div className="font-mono text-[22px] font-[600] tracking-[-0.02em] text-[#1A1B1F]">
               {score}<span className="text-[13px] text-[#A0A3AB]">%</span>
             </div>
-            <div className="text-[11px] font-[600] text-[#C24619] mt-1.5">
+            <div className="text-[11px] font-[600] text-[#C44518] mt-1.5">
               {t("readyMissing", { n: total - faites })} →
             </div>
           </Link>
@@ -351,15 +351,15 @@ export async function AccueilFondateur({
       {/* Prochaine action — icône + bouton plein orange */}
       {prochaine && (
         <div className="flex items-center gap-4 rounded-[6px] border border-[#F3D9CB] bg-[#FEF8F4] px-[18px] py-4">
-          <span className="grid place-items-center w-[38px] h-[38px] shrink-0 rounded-[6px] bg-[#FBEDE6]">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D24E1F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <span className="grid place-items-center w-[38px] h-[38px] shrink-0 rounded-[6px] bg-[#FFEDE6]">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#E74C16" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" />
               <path d="M16 6l-4-4-4 4" />
               <path d="M12 2v13" />
             </svg>
           </span>
           <span className="flex-1 min-w-0">
-            <span className="block font-mono text-[9.5px] font-[600] uppercase tracking-[0.1em] text-[#C24619] mb-[3px]">
+            <span className="block font-mono text-[9.5px] font-[600] uppercase tracking-[0.1em] text-[#C44518] mb-[3px]">
               {t("nextAction")}
             </span>
             <span className="block text-[14.5px] font-[650] tracking-[-0.01em] text-[#1A1B1F]">
@@ -368,7 +368,7 @@ export async function AccueilFondateur({
           </span>
           <Link
             href={prochaine.folder_id ? `/data-room?dossier=${prochaine.folder_id}` : "/checklist"}
-            className="shrink-0 whitespace-nowrap rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] transition-colors"
+            className="shrink-0 whitespace-nowrap rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16] transition-colors"
           >
             {t("deposit")} →
           </Link>
@@ -380,7 +380,7 @@ export async function AccueilFondateur({
         <div>
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-[15px] font-[700] text-[#1A1B1F]">{t("recentVisits")}</h2>
-            <Link href="/contacts" className="text-[12px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
+            <Link href="/contacts" className="text-[12px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">
               {t("allVisits")} →
             </Link>
           </div>
@@ -422,7 +422,7 @@ export async function AccueilFondateur({
 
           {topLecteurs[0] && topLecteurs[0].docs >= 2 && (
             <div className="mt-3 rounded-[6px] bg-[#FEF8F4] border border-[#F3D9CC] px-4 py-3 text-[12.5px] text-[#33353B] leading-relaxed">
-              <span className="font-mono text-[9.5px] font-[700] uppercase tracking-[0.06em] text-[#C24619]">
+              <span className="font-mono text-[9.5px] font-[700] uppercase tracking-[0.06em] text-[#C44518]">
                 {t("signal")}
               </span>{" "}
               {t("signalBody", {
@@ -445,7 +445,7 @@ export async function AccueilFondateur({
                     <Badge type={d.type} />
                     <span className="flex-1 min-w-0 text-[12px] text-[#33353B] truncate">{d.nom}</span>
                     <span className="w-[80px] h-[6px] rounded-[3px] bg-[#E8E5DC] overflow-hidden">
-                      <span className="block h-full bg-[#E85C2B]" style={{ width: `${Math.round((d.vues / maxVues) * 100)}%` }} />
+                      <span className="block h-full bg-[#FF5A1F]" style={{ width: `${Math.round((d.vues / maxVues) * 100)}%` }} />
                     </span>
                     <span className="w-5 text-right font-mono text-[11px] text-[#6E727A]">{d.vues}</span>
                   </div>

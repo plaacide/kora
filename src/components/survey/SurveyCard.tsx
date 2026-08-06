@@ -87,7 +87,7 @@ export function SurveyProgress({
             className="block h-[5px] rounded-full transition-none"
             style={{
               width: i + 1 === etape ? 16 : 5,
-              background: i + 1 === etape ? "#E85C2B" : "#E2DED4",
+              background: i + 1 === etape ? "#FF5A1F" : "#E2DED4",
             }}
           />
         ))}
@@ -127,7 +127,7 @@ export function SurveyChip({
       className={
         "rounded-full border px-3.5 min-h-[32px] text-[12.5px] font-medium " +
         (actif
-          ? "border-[#E85C2B] bg-[#FDF1EA] text-[#C24619]"
+          ? "border-[#FF5A1F] bg-[#FDF1EA] text-[#C44518]"
           : "border-[#E4E2DC] bg-white text-[#33353B] hover:border-[#C9C6BD]")
       }
     >
@@ -155,7 +155,7 @@ export function SurveyPrimary({
         "rounded-[6px] px-4 min-h-[34px] text-[13px] font-[600] " +
         (disabled
           ? "bg-[#F1F0EB] text-[#A9ACBB] cursor-not-allowed"
-          : "bg-[#E85C2B] text-white hover:bg-[#D24E1F]")
+          : "bg-[#FF5A1F] text-white hover:bg-[#E74C16]")
       }
     >
       {children}

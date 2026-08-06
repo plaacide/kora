@@ -156,7 +156,7 @@ export function SurveyFlow({
       {/* 0 — invitation. Rien n'est écrit en base tant qu'elle n'est pas acceptée. */}
       {ecran === 0 && (
         <>
-          <span className="grid place-items-center w-9 h-9 rounded-[8px] bg-[#FDF1EA] text-[#C24619] mb-3" aria-hidden>
+          <span className="grid place-items-center w-9 h-9 rounded-[8px] bg-[#FDF1EA] text-[#C44518] mb-3" aria-hidden>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.9-.9L3 21l1.9-5A8.4 8.4 0 0 1 4 11.5a8.4 8.4 0 0 1 8.5-8.4h.5a8.4 8.4 0 0 1 8 8.4z" />
             </svg>
@@ -184,7 +184,7 @@ export function SurveyFlow({
                 className={
                   "text-left rounded-[8px] border px-3.5 py-2.5 " +
                   (humeur === h.cle
-                    ? "border-[#E85C2B] bg-[#FDF1EA]"
+                    ? "border-[#FF5A1F] bg-[#FDF1EA]"
                     : "border-[#E4E2DC] bg-white hover:border-[#C9C6BD]")
                 }
               >
@@ -276,7 +276,7 @@ export function SurveyFlow({
       {/* 5 — remerciement. */}
       {ecran === 5 && (
         <>
-          <span className="grid place-items-center w-9 h-9 rounded-full bg-[#E85C2B] text-white mb-3" aria-hidden>
+          <span className="grid place-items-center w-9 h-9 rounded-full bg-[#FF5A1F] text-white mb-3" aria-hidden>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6 9 17l-5-5" />
             </svg>

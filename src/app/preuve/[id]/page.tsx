@@ -37,7 +37,7 @@ export default async function PreuvePage({ params }: { params: Promise<{ id: str
       <div className="min-h-screen grid place-items-center bg-[#F5F4F0] px-4 text-center">
         <div>
           <p className="text-[14px] font-[600] text-[#1A1B1F]">Preuve introuvable ou accès refusé.</p>
-          <a href="/nda" className="inline-block mt-3 text-[13px] font-[600] text-[#C24619]">← Retour aux signatures</a>
+          <a href="/nda" className="inline-block mt-3 text-[13px] font-[600] text-[#C44518]">← Retour aux signatures</a>
         </div>
       </div>
     );
@@ -58,7 +58,7 @@ export default async function PreuvePage({ params }: { params: Promise<{ id: str
     <div className="min-h-screen bg-[#F5F4F0] py-10 px-4 text-[#1A1B1F] print:bg-white print:py-0">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-4 print:hidden">
-          <a href="/nda" className="text-[13px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">← Retour aux signatures</a>
+          <a href="/nda" className="text-[13px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">← Retour aux signatures</a>
           <PrintButton />
         </div>
 

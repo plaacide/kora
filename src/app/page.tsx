@@ -108,7 +108,7 @@ export default function Home() {
                 <Link
                   href="/inscription"
                   data-analytics="signup_founder_click"
-                  className="inline-flex items-center justify-center rounded-[7px] bg-[#E85C2B] text-white px-7 py-[14px] text-[15px] font-[650] hover:bg-[#D24E1F] transition-colors"
+                  className="inline-flex items-center justify-center rounded-[7px] bg-[#FF5A1F] text-white px-7 py-[14px] text-[15px] font-[650] hover:bg-[#E74C16] transition-colors"
                 >
                   Créer ma dealroom
                 </Link>
@@ -136,7 +136,7 @@ export default function Home() {
               key={t}
               className="font-mono text-[11.5px] text-[#6E727A] flex items-center gap-2"
             >
-              <span className="text-[#E85C2B]">◈</span>
+              <span className="text-[#FF5A1F]">◈</span>
               {t}
             </span>
           ))}
@@ -155,7 +155,7 @@ export default function Home() {
         <div className="grid gap-5 md:grid-cols-3">
           {CONSTAT.map((c, i) => (
             <Reveal key={c.titre} delay={i * 70}>
-              <div className="h-full border border-[#ECEBE6] rounded-[8px] p-6 border-t-2 border-t-[#E85C2B]">
+              <div className="h-full border border-[#ECEBE6] rounded-[8px] p-6 border-t-2 border-t-[#FF5A1F]">
                 <h3 className="text-[16px] font-[650] mb-2.5 text-[#1A1B1F]">
                   {c.titre}
                 </h3>
@@ -203,7 +203,7 @@ export default function Home() {
                   <span className="text-[19px] font-[700] text-[#1A1B1F]">
                     {f.title}
                   </span>
-                  <span className="font-mono text-[11.5px] text-[#C24619]">
+                  <span className="font-mono text-[11.5px] text-[#C44518]">
                     {f.kind}
                   </span>
                 </div>
@@ -211,7 +211,7 @@ export default function Home() {
                 <div className="flex flex-col gap-2 pt-4 border-t border-[#F1F0EC]">
                   {f.points.map((p) => (
                     <div key={p} className="flex gap-2.5 items-start">
-                      <span className="text-[#E85C2B] text-[13px] font-bold leading-[1.5]">
+                      <span className="text-[#FF5A1F] text-[13px] font-bold leading-[1.5]">
                         ✓
                       </span>
                       <span className="text-[13px] text-[#4A4E63] leading-[1.5]">
@@ -279,9 +279,9 @@ export default function Home() {
       <section className="mx-auto max-w-[1240px] px-6 md:px-10 py-16 md:py-20 text-center">
         <Reveal>
           <div className="inline-flex gap-[5px] items-end mb-6">
-            <span className="w-[7px] h-[20px] rounded-[3px] bg-[#E85C2B] opacity-30 inline-block" />
-            <span className="w-[7px] h-[32px] rounded-[3px] bg-[#E85C2B] opacity-55 inline-block" />
-            <span className="w-[7px] h-[48px] rounded-[3px] bg-[#E85C2B] inline-block" />
+            <span className="w-[7px] h-[20px] rounded-[3px] bg-[#FF5A1F] opacity-30 inline-block" />
+            <span className="w-[7px] h-[32px] rounded-[3px] bg-[#FF5A1F] opacity-55 inline-block" />
+            <span className="w-[7px] h-[48px] rounded-[3px] bg-[#FF5A1F] inline-block" />
           </div>
           <h2 className="font-display text-[clamp(26px,3.8vw,38px)] font-bold tracking-[-0.02em] m-0 mb-3.5">
             Faites résonner vos deals.
@@ -293,7 +293,7 @@ export default function Home() {
           <Link
             href="/inscription"
             data-analytics="signup_founder_click"
-            className="inline-flex items-center justify-center rounded-[7px] bg-[#E85C2B] text-white px-8 py-[15px] text-[15.5px] font-[650] hover:bg-[#D24E1F] transition-colors"
+            className="inline-flex items-center justify-center rounded-[7px] bg-[#FF5A1F] text-white px-8 py-[15px] text-[15.5px] font-[650] hover:bg-[#E74C16] transition-colors"
           >
             Créer ma dealroom
           </Link>

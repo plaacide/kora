@@ -122,7 +122,7 @@ export function CohorteTable({
               className={
                 "rounded-full border px-3.5 min-h-[30px] text-[12.5px] font-medium " +
                 (filtre === cle
-                  ? "border-[#E85C2B] bg-[#FDF1EA] text-[#C24619]"
+                  ? "border-[#FF5A1F] bg-[#FDF1EA] text-[#C44518]"
                   : "border-[#E4E2DC] bg-white text-[#33353B] hover:border-[#C9C6BD]")
               }
             >
@@ -177,7 +177,7 @@ export function CohorteTable({
             onClick={mettreAJour}
             disabled={encours || !modifie || publiables.length === 0}
             title={publiables.length === 0 ? t("nothingListable") : undefined}
-            className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
+            className="rounded-[5px] bg-[#FF5A1F] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
           >
             {t("updateShowcase")}
           </button>
@@ -225,7 +225,7 @@ export function CohorteTable({
                 disabled={!l.consent}
                 title={!l.consent ? t("consentMissing") : undefined}
                 aria-label={l.nom}
-                className="w-[17px] h-[17px] accent-[#E85C2B] disabled:cursor-not-allowed"
+                className="w-[17px] h-[17px] accent-[#FF5A1F] disabled:cursor-not-allowed"
                 style={!l.consent ? { background: "#F4F1EA" } : undefined}
               />
             </span>
@@ -276,7 +276,7 @@ export function CohorteTable({
                             ? "#C0392B"
                             : l.preparation >= PREPARATION_VERTE
                               ? "#1D9E75"
-                              : "#E85C2B",
+                              : "#FF5A1F",
                       }}
                     />
                   </span>

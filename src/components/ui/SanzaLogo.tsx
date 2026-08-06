@@ -58,7 +58,7 @@ export function SanzaLogo({
   markOnly?: boolean;
 }) {
   const main = dark ? "#ffffff" : "#171a2c";
-  const echo = dark ? "#f08a5e" : "#e85c2b";
+  const echo = dark ? "#f08a5e" : "#ff5a1f";
 
   return (
     <span

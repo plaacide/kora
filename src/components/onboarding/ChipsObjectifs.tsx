@@ -136,7 +136,7 @@ export function ChipsObjectifs({
             type="button"
             onClick={ajouter}
             disabled={normaliserObjectifLibre(saisie) === null}
-            className="rounded-[5px] bg-[#E85C2B] px-3 py-1.5 text-[12px] font-[600] text-white hover:bg-[#D24E1F] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
+            className="rounded-[5px] bg-[#FF5A1F] px-3 py-1.5 text-[12px] font-[600] text-white hover:bg-[#E74C16] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
           >
             {t("goalAddConfirm")}
           </button>

@@ -82,7 +82,7 @@ export default function AccelerateursPage() {
             <div className="flex flex-col sm:flex-row gap-3">
               <a
                 href="mailto:equipe@sanza.africa?subject=Sanza%20pour%20notre%20programme"
-                className="inline-flex items-center justify-center rounded-[7px] bg-[#E85C2B] text-white px-7 py-[14px] text-[15px] font-[650] hover:bg-[#D24E1F] transition-colors"
+                className="inline-flex items-center justify-center rounded-[7px] bg-[#FF5A1F] text-white px-7 py-[14px] text-[15px] font-[650] hover:bg-[#E74C16] transition-colors"
               >
                 Parler à l&apos;équipe
               </a>
@@ -137,7 +137,7 @@ export default function AccelerateursPage() {
                   "Alertes sur les dossiers en retard",
                 ].map((p) => (
                   <div key={p} className="flex gap-3 items-start">
-                    <span className="text-[#E85C2B] text-[14px] font-bold leading-[1.5]">
+                    <span className="text-[#FF5A1F] text-[14px] font-bold leading-[1.5]">
                       ✓
                     </span>
                     <span className="text-[14px] text-[#4A4E63] leading-[1.55]">
@@ -155,7 +155,7 @@ export default function AccelerateursPage() {
                     <span className="text-[13px] font-[650] text-[#1A1B1F]">
                       Readiness de la cohorte
                     </span>
-                    <span className="font-mono text-[12px] text-[#C24619]">
+                    <span className="font-mono text-[12px] text-[#C44518]">
                       dossier prêt moyen · {moyen} %
                     </span>
                   </div>
@@ -174,8 +174,8 @@ export default function AccelerateursPage() {
                                 c.readiness >= 70
                                   ? "#147A5C"
                                   : c.readiness >= 50
-                                    ? "#E85C2B"
-                                    : "#C24619",
+                                    ? "#FF5A1F"
+                                    : "#C44518",
                             }}
                           />
                         </span>
@@ -189,7 +189,7 @@ export default function AccelerateursPage() {
                     {COHORTE.map((c) => (
                       <span
                         key={c.nom}
-                        className="flex-1 rounded-t-[2px] bg-[#E85C2B]"
+                        className="flex-1 rounded-t-[2px] bg-[#FF5A1F]"
                         style={{ height: `${(c.readiness / max) * 100}%`, opacity: 0.25 + (c.readiness / max) * 0.6 }}
                       />
                     ))}
@@ -246,7 +246,7 @@ export default function AccelerateursPage() {
           </p>
           <a
             href="mailto:equipe@sanza.africa?subject=Sanza%20pour%20notre%20programme"
-            className="inline-flex items-center justify-center rounded-[7px] bg-[#E85C2B] text-white px-8 py-[15px] text-[15.5px] font-[650] hover:bg-[#D24E1F] transition-colors"
+            className="inline-flex items-center justify-center rounded-[7px] bg-[#FF5A1F] text-white px-8 py-[15px] text-[15.5px] font-[650] hover:bg-[#E74C16] transition-colors"
           >
             Parler à l&apos;équipe
           </a>

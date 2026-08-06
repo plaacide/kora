@@ -49,7 +49,7 @@ export async function Topbar({
         href="/deal"
         className="flex items-center gap-2.5 rounded-[5px] px-2.5 py-1.5 -ml-0.5 hover:bg-[#F5F4F0] transition-colors"
       >
-        <span className="grid place-items-center w-6 h-6 rounded-[5px] bg-[#FBEDE6] text-[#C24619] text-[9.5px] font-[700]">
+        <span className="grid place-items-center w-6 h-6 rounded-[5px] bg-[#FFEDE6] text-[#C44518] text-[9.5px] font-[700]">
           {orgInitials(orgName)}
         </span>
         <span className="text-[13.5px] font-[600] text-ink truncate max-w-[160px]">

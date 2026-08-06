@@ -117,7 +117,7 @@ export default async function FichePage({
       {/* Bandeau au-delà de trois mois : des chiffres vieux présentés sans date
           se lisent comme des chiffres d'aujourd'hui. */}
       {perime && (
-        <div className="max-w-[760px] mb-4 rounded-[6px] border border-[#F0C4AE] bg-[#FEFAF7] px-4 py-2.5 text-[12.5px] text-[#C24619]">
+        <div className="max-w-[760px] mb-4 rounded-[6px] border border-[#F0C4AE] bg-[#FEFAF7] px-4 py-2.5 text-[12.5px] text-[#C44518]">
           {t("stale")}
         </div>
       )}

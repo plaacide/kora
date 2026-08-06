@@ -211,7 +211,7 @@ export function RoomContenu({
             className={
               salleVide
                 ? "border border-[#E4E2DC] rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] text-[#33353B] hover:border-[#C9C6BD] hover:bg-[#FAF8F4]"
-                : "rounded-[5px] bg-[#E85C2B] px-3 py-[7px] text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]"
+                : "rounded-[5px] bg-[#FF5A1F] px-3 py-[7px] text-[12.5px] font-[600] text-white hover:bg-[#E74C16]"
             }
           >{t("addContent")}</button>
         )}
@@ -240,7 +240,7 @@ export function RoomContenu({
             autoFocus
             className="bg-white flex-1 max-w-[280px] h-8 px-2.5 text-[12.5px] border border-[#E4E2DC] rounded-[5px] focus:outline-none focus:border-[#C9C6BD]"
           />
-          <button onClick={ajouterDossier} disabled={busy || nom.trim().length < 2} className="rounded-[5px] bg-[#E85C2B] px-3 text-[12.5px] font-[600] text-white disabled:opacity-50">{t("create")}</button>
+          <button onClick={ajouterDossier} disabled={busy || nom.trim().length < 2} className="rounded-[5px] bg-[#FF5A1F] px-3 text-[12.5px] font-[600] text-white disabled:opacity-50">{t("create")}</button>
         </div>
       )}
 
@@ -258,8 +258,8 @@ export function RoomContenu({
           <span className="mx-auto flex flex-col gap-[3px] items-center w-fit mb-4" aria-hidden>
             {[0.28, 0.5, 1].map((o, i) => (
               <span key={i} className="flex gap-[3px]" style={{ opacity: o }}>
-                <span className="block w-[26px] h-[5px] rounded-full bg-[#E85C2B]" />
-                <span className="block w-[13px] h-[5px] rounded-full bg-[#E85C2B]" />
+                <span className="block w-[26px] h-[5px] rounded-full bg-[#FF5A1F]" />
+                <span className="block w-[13px] h-[5px] rounded-full bg-[#FF5A1F]" />
               </span>
             ))}
           </span>
@@ -271,7 +271,7 @@ export function RoomContenu({
             <div className="flex items-center justify-center gap-2.5 mt-5 flex-wrap">
               <button
                 onClick={() => setCourant(sousDossiers[0]?.id ?? null)}
-                className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
+                className="rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]"
               >
                 {t("waitingUpload")}
               </button>
@@ -313,7 +313,7 @@ export function RoomContenu({
           <span className="text-[12px] text-[#6E727A]">{t("folder")}</span>
           <span className="text-[12px] text-[#9DA0A8]">
             {canEdit && salleVide ? (
-              <span className="text-[#C24619] font-[600] underline underline-offset-2">{t("dropHere")}</span>
+              <span className="text-[#C44518] font-[600] underline underline-offset-2">{t("dropHere")}</span>
             ) : (
               "\u2014"
             )}
@@ -413,7 +413,7 @@ export function RoomContenu({
           racine on ne peut pas déposer : « Ajouter des contenus » y crée un
           dossier. Le bouton du haut déclenche aussi ce même sélecteur. */}
       {canEdit && courant && (
-        <div className="mt-3 rounded-[6px] border border-dashed border-[#D5D2CA] hover:border-[#C24619] transition-colors overflow-hidden">
+        <div className="mt-3 rounded-[6px] border border-dashed border-[#D5D2CA] hover:border-[#C44518] transition-colors overflow-hidden">
           <Uploader
             ref={uploadRef}
             orgId={orgId}
@@ -438,7 +438,7 @@ export function RoomContenu({
         </div>
         <div className="px-6 py-4 border-t border-[#E8E5DC] flex justify-end gap-2.5">
           <button onClick={() => { setRenomme(null); setErreur(undefined); }} className="border border-[#E4E2DC] rounded-[5px] px-4 py-2 text-[13px] font-[600] text-[#33353B] hover:bg-[#FAF8F4]">{t("cancel")}</button>
-          <button onClick={confirmerRenommage} disabled={busy || (renomme?.nom.trim().length ?? 0) < 2} className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-50">{t("save")}</button>
+          <button onClick={confirmerRenommage} disabled={busy || (renomme?.nom.trim().length ?? 0) < 2} className="rounded-[5px] bg-[#FF5A1F] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-50">{t("save")}</button>
         </div>
       </Modal>
 
@@ -465,7 +465,7 @@ export function RoomContenu({
               <ul className="mt-2 flex flex-col gap-1 text-[12.5px] text-[#33353B]">
                 <li>{t("impactDocProof", { n: impactDoc.exigencesLiees })}</li>
                 {impactDoc.exigencesARefaire > 0 && (
-                  <li className="text-[#C24619]">
+                  <li className="text-[#C44518]">
                     {t("impactDocRedo", { n: impactDoc.exigencesARefaire })}
                   </li>
                 )}
@@ -521,7 +521,7 @@ export function RoomContenu({
                   )}
                   {impact.exigencesLiees > 0 && <li>{t("impactChecklistKept", { n: impact.exigencesLiees })}</li>}
                   {impact.exigencesARefaire > 0 && (
-                    <li className="text-[#C24619]">{t("impactChecklistRedo", { n: impact.exigencesARefaire })}</li>
+                    <li className="text-[#C44518]">{t("impactChecklistRedo", { n: impact.exigencesARefaire })}</li>
                   )}
                 </ul>
               </div>

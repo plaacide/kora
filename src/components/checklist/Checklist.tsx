@@ -224,7 +224,7 @@ export function Checklist({
 
   const done = local.filter((i) => i.status === "done").length;
   const champ =
-    "w-full h-8 px-2.5 text-[12.5px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none";
+    "w-full h-8 px-2.5 text-[12.5px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#FF5A1F] focus:outline-none";
 
   return (
     <div className="flex flex-col gap-6 text-[#1A1B1F]">
@@ -306,7 +306,7 @@ export function Checklist({
                           className={champ + " text-[#6E727A]"}
                         />
                         <div className="flex gap-2 mt-0.5">
-                          <button onClick={() => saveEdit(i)} className="text-[11.5px] font-[600] text-[#C24619] cursor-pointer">
+                          <button onClick={() => saveEdit(i)} className="text-[11.5px] font-[600] text-[#C44518] cursor-pointer">
                             {tc("save")}
                           </button>
                           <button onClick={() => setEditing(null)} className="text-[11.5px] text-[#9DA0A8] cursor-pointer">
@@ -332,7 +332,7 @@ export function Checklist({
                             return (
                               <Link
                                 href={`/data-room?dossier=${dossier.id}`}
-                                className="inline-flex items-center gap-1 mt-1.5 text-[11px] text-[#C24619] hover:text-[#1A1B1F]"
+                                className="inline-flex items-center gap-1 mt-1.5 text-[11px] text-[#C44518] hover:text-[#1A1B1F]"
                               >
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                                   <path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2.5h7A1.5 1.5 0 0 1 19 10v7.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z" />
@@ -459,7 +459,7 @@ export function Checklist({
                         <button
                           onClick={() => saveNew(cat)}
                           disabled={newLabel.trim().length < 2}
-                          className="text-[11.5px] font-[600] text-[#C24619] disabled:opacity-40 cursor-pointer disabled:cursor-default"
+                          className="text-[11.5px] font-[600] text-[#C44518] disabled:opacity-40 cursor-pointer disabled:cursor-default"
                         >
                           {t("addBtn")}
                         </button>
@@ -478,7 +478,7 @@ export function Checklist({
                   ) : (
                     <button
                       onClick={() => setAdding(cat)}
-                      className="text-[11.5px] font-[600] text-[#C24619] cursor-pointer"
+                      className="text-[11.5px] font-[600] text-[#C44518] cursor-pointer"
                     >
                       {t("addRequirement")}
                     </button>

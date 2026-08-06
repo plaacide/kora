@@ -74,7 +74,7 @@ export default async function RejoindreVitrinePage({
       </p>
       <Link
         href="/connexion"
-        className="inline-flex items-center mt-5 rounded-[6px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
+        className="inline-flex items-center mt-5 rounded-[6px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]"
       >
         {t("joinSwitchAccount")}
       </Link>

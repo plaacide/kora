@@ -257,7 +257,7 @@ function Bienvenue({
               <span
                 className={
                   it.done
-                    ? "grid place-items-center w-[18px] h-[18px] rounded-full bg-[#E85C2B] text-white shrink-0"
+                    ? "grid place-items-center w-[18px] h-[18px] rounded-full bg-[#FF5A1F] text-white shrink-0"
                     : "w-[18px] h-[18px] rounded-full border border-white/25 shrink-0"
                 }
               >
@@ -277,7 +277,7 @@ function Bienvenue({
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
             href={principal.href}
-            className="inline-flex items-center justify-center bg-[#E85C2B] text-white font-[600] text-[13.5px] rounded-[10px] px-5 py-3 hover:bg-[#D24E1F] transition-colors"
+            className="inline-flex items-center justify-center bg-[#FF5A1F] text-white font-[600] text-[13.5px] rounded-[10px] px-5 py-3 hover:bg-[#E74C16] transition-colors"
           >
             {principal.libelle}
           </Link>

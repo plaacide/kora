@@ -112,7 +112,7 @@ export function QuestionsPanel({
               className={
                 "rounded-full border px-3 min-h-[28px] text-[11.5px] font-medium " +
                 (type === k
-                  ? "border-[#E85C2B] bg-[#FDF1EA] text-[#C24619]"
+                  ? "border-[#FF5A1F] bg-[#FDF1EA] text-[#C44518]"
                   : "border-[#E4E2DC] bg-white text-[#33353B]")
               }
             >
@@ -144,7 +144,7 @@ export function QuestionsPanel({
         <button
           onClick={envoyer}
           disabled={encours || !cible || texte.trim().length < 3}
-          className="w-full mt-2 rounded-[5px] bg-[#E85C2B] py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
+          className="w-full mt-2 rounded-[5px] bg-[#FF5A1F] py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
         >
           {t("composerSend")}
         </button>

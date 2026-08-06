@@ -26,9 +26,9 @@ const PILL: Record<string, string> = {
   "document.sheet_viewed": "text-[#147A5C] bg-[#E4F3EC]",
   "document.thumbnail_viewed": "text-[#147A5C] bg-[#E4F3EC]",
   "nda.signed": "text-[#185FA5] bg-[#E9F2FB]",
-  "invitation.accepted": "text-[#C24619] bg-[#FBEDE6]",
+  "invitation.accepted": "text-[#C44518] bg-[#FFEDE6]",
   "invitation.created": "text-[#185FA5] bg-[#E9F2FB]",
-  "checklist.document_linked": "text-[#C24619] bg-[#FBEDE6]",
+  "checklist.document_linked": "text-[#C44518] bg-[#FFEDE6]",
   "document.downloaded": "text-[#B4741B] bg-[#FBF1DF]",
 };
 const PILL_DEFAULT = "text-[#6E727A] bg-[#F1F0EB]";

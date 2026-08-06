@@ -71,7 +71,7 @@ export function RightsEditor({
               <button
                 key={n.value}
                 onClick={() => change(n.value)}
-                className={"text-left px-3 py-2 text-[12.5px] hover:bg-[#FAF8F4] " + (n.value === level ? "text-[#C24619] font-[600]" : "text-[#33353B]")}
+                className={"text-left px-3 py-2 text-[12.5px] hover:bg-[#FAF8F4] " + (n.value === level ? "text-[#C44518] font-[600]" : "text-[#33353B]")}
               >
                 {n.label}
               </button>

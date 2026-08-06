@@ -47,8 +47,8 @@ export function ProductTabs() {
               onClick={() => setTab(t.id)}
               className="rounded-[7px] px-3.5 py-2 text-[13px] font-[600] transition-colors border"
               style={{
-                borderColor: on ? "#E85C2B" : "#E4E2DC",
-                background: on ? "#E85C2B" : "#FFFFFF",
+                borderColor: on ? "#FF5A1F" : "#E4E2DC",
+                background: on ? "#FF5A1F" : "#FFFFFF",
                 color: on ? "#FFFFFF" : "#4A4E63",
               }}
             >
@@ -126,9 +126,9 @@ function DiligencePane({
               onClick={() => setAud(a.id)}
               className="rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] transition-colors border"
               style={{
-                borderColor: on ? "#E85C2B" : "#E4E2DC",
-                background: on ? "#FBEDE6" : "#FFFFFF",
-                color: on ? "#C24619" : "#4A4E63",
+                borderColor: on ? "#FF5A1F" : "#E4E2DC",
+                background: on ? "#FFEDE6" : "#FFFFFF",
+                color: on ? "#C44518" : "#4A4E63",
               }}
             >
               {a.label}
@@ -141,7 +141,7 @@ function DiligencePane({
         <span className="text-[12.5px] text-[#6E727A]">
           Pièces exigées par ce financeur
         </span>
-        <span className="font-mono text-[12px] text-[#C24619]">
+        <span className="font-mono text-[12px] text-[#C44518]">
           {Math.round((done / items.length) * 100)} % · {done}/{items.length}
         </span>
       </div>
@@ -159,7 +159,7 @@ function DiligencePane({
               className="text-[11px] font-[600] rounded-[4px] px-2 py-0.5"
               style={{
                 background: it.done ? "#E4F3EC" : "#FEF8F4",
-                color: it.done ? "#147A5C" : "#C24619",
+                color: it.done ? "#147A5C" : "#C44518",
               }}
             >
               {it.done ? "Fait" : "À fournir"}
@@ -210,7 +210,7 @@ function SignalPane() {
         {LECTURES.map((v, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
             <div
-              className="w-full rounded-t-[3px] bg-[#E85C2B]"
+              className="w-full rounded-t-[3px] bg-[#FF5A1F]"
               style={{ height: `${(v / max) * 100}%`, opacity: 0.35 + (v / max) * 0.65 }}
             />
             <span className="font-mono text-[10px] text-[#9DA0A8]">J{i + 1}</span>
@@ -218,7 +218,7 @@ function SignalPane() {
         ))}
       </div>
       <div className="rounded-[8px] bg-[#FEF8F4] border border-[#F6E0D3] px-4 py-3">
-        <div className="text-[12px] font-[650] text-[#C24619] mb-0.5">Signal</div>
+        <div className="text-[12px] font-[650] text-[#C44518] mb-0.5">Signal</div>
         <p className="text-[12.5px] text-[#6E727A] leading-[1.5]">
           Proparco a consulté « États SYSCOHADA » 3 fois cette semaine — un
           intérêt qui mérite une relance.
@@ -238,7 +238,7 @@ function Toggle({ on }: { on: boolean }) {
   return (
     <span
       className="inline-flex items-center rounded-full w-[34px] h-[19px] px-[2px] transition-colors"
-      style={{ background: on ? "#E85C2B" : "#D8D6CE", justifyContent: on ? "flex-end" : "flex-start" }}
+      style={{ background: on ? "#FF5A1F" : "#D8D6CE", justifyContent: on ? "flex-end" : "flex-start" }}
       aria-hidden
     >
       <span className="w-[15px] h-[15px] rounded-full bg-white" />

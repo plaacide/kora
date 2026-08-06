@@ -74,7 +74,7 @@ export default async function DealPage() {
                     className={
                       "grid place-items-center w-7 h-7 shrink-0 rounded-full text-[11px] font-[700] " +
                       (e.actif
-                        ? "bg-[#E85C2B] text-white"
+                        ? "bg-[#FF5A1F] text-white"
                         : "border-[1.5px] border-[#D9D5CB] bg-white text-[#A0A3AB]")
                     }
                   >
@@ -93,7 +93,7 @@ export default async function DealPage() {
             <div className="flex items-center gap-4 mt-8 flex-wrap">
               <NewDataRoomButton
                 label={t("createDataRoom")}
-                className="rounded-[6px] bg-[#E85C2B] px-5 py-3 text-[13.5px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap"
+                className="rounded-[6px] bg-[#FF5A1F] px-5 py-3 text-[13.5px] font-[600] text-white hover:bg-[#E74C16] whitespace-nowrap"
               />
               <span className="text-[12.5px] text-[#8B8FA3]">{t("createRoomNote")}</span>
             </div>
@@ -122,7 +122,7 @@ export default async function DealPage() {
                   {t("previewAmount")}
                 </div>
                 <span className="block h-1.5 rounded-full bg-white/10 overflow-hidden mt-3">
-                  <span className="block h-full w-[62%] rounded-full bg-[#E85C2B]" />
+                  <span className="block h-full w-[62%] rounded-full bg-[#FF5A1F]" />
                 </span>
                 <div className="text-[12.5px] text-white/55 mt-2">{t("previewCommitted")}</div>
 

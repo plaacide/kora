@@ -139,11 +139,11 @@ export function SignupForm({
                 "flex flex-col items-start gap-1.5 rounded-[10px] p-2.5 text-left transition-colors cursor-pointer",
                 // Carte active : bordure 1.5px orange + fond #FDF1EA (handoff §3).
                 role === r.key
-                  ? "border-[1.5px] border-[#E85C2B] bg-[#FDF1EA]"
+                  ? "border-[1.5px] border-[#FF5A1F] bg-[#FDF1EA]"
                   : "border-[1.5px] border-[#E2DED4] hover:border-[#C9C6BD]",
               )}
             >
-              <span className={role === r.key ? "text-[#E85C2B]" : "text-[#8B8FA3]"}>
+              <span className={role === r.key ? "text-[#FF5A1F]" : "text-[#8B8FA3]"}>
                 <RoleIcon name={r.key} />
               </span>
               <span className="text-[12.5px] font-[650]">{r.title}</span>

@@ -218,7 +218,7 @@ export default async function CohortesPage() {
                         className="block h-full rounded-full"
                         style={{
                           width: `${c.preparation}%`,
-                          background: c.preparation >= PREPARATION_VERTE ? "#1D9E75" : "#E85C2B",
+                          background: c.preparation >= PREPARATION_VERTE ? "#1D9E75" : "#FF5A1F",
                         }}
                       />
                     </span>

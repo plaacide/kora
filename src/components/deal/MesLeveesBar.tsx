@@ -48,7 +48,7 @@ export function MesLeveesBar({
         <OuvrirLeveeButton
           deals={roomsSansLevee}
           label={t("newRaise")}
-          className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F] disabled:opacity-50"
+          className="text-[12.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F] disabled:opacity-50"
         />
       </div>
       {/* Les puces s'affichent dès UNE levée : sinon, en basculant sur une data

@@ -54,7 +54,7 @@ export async function InvitationsEnAttente() {
           </div>
           <Link
             href={`/rejoindre/${i.token}`}
-            className="shrink-0 rounded-[6px] bg-[#E85C2B] px-4 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]"
+            className="shrink-0 rounded-[6px] bg-[#FF5A1F] px-4 py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16]"
           >
             {t("pendingInviteCta")}
           </Link>

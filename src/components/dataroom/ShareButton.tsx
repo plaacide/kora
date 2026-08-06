@@ -148,7 +148,7 @@ export function ShareButton({
           <button
             onClick={envoyer}
             disabled={busy || !email.includes("@")}
-            className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-50"
+            className="rounded-[5px] bg-[#FF5A1F] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-50"
           >
             {busy ? t("sending") : t("sendInvite")}
           </button>

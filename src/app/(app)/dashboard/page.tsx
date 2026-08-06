@@ -124,7 +124,7 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-4 mt-7 flex-wrap">
               <NewDataRoomButton
                 label={t("createMyRoom")}
-                className="rounded-[6px] bg-[#E85C2B] px-5 py-3 text-[13.5px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap"
+                className="rounded-[6px] bg-[#FF5A1F] px-5 py-3 text-[13.5px] font-[600] text-white hover:bg-[#E74C16] whitespace-nowrap"
               />
               <span className="text-[12px] text-white/45">{t("firstStepNote")}</span>
             </div>

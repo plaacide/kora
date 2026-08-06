@@ -45,7 +45,7 @@ export function MarketingNav({ active = null }: { active?: NavActive }) {
               className={cn(
                 "text-[14px] font-[550] transition-colors",
                 active === l.key
-                  ? "text-[#C24619]"
+                  ? "text-[#C44518]"
                   : "text-[#4A4E63] hover:text-[#1A1B1F]",
               )}
             >
@@ -54,14 +54,14 @@ export function MarketingNav({ active = null }: { active?: NavActive }) {
           ))}
           <Link
             href="/connexion"
-            className="text-[14px] font-[600] text-[#1A1B1F] hover:text-[#C24619] transition-colors"
+            className="text-[14px] font-[600] text-[#1A1B1F] hover:text-[#C44518] transition-colors"
           >
             Se connecter
           </Link>
           <Link
             href="/inscription"
             data-analytics="signup_founder_click"
-            className="inline-flex items-center justify-center rounded-[7px] bg-[#E85C2B] text-white px-4 py-2.5 text-[14px] font-[650] hover:bg-[#D24E1F] transition-colors"
+            className="inline-flex items-center justify-center rounded-[7px] bg-[#FF5A1F] text-white px-4 py-2.5 text-[14px] font-[650] hover:bg-[#E74C16] transition-colors"
           >
             Créer ma dealroom
           </Link>
@@ -100,7 +100,7 @@ export function MarketingNav({ active = null }: { active?: NavActive }) {
               onClick={() => setOpen(false)}
               className={cn(
                 "py-3 text-[15px] font-[550]",
-                active === l.key ? "text-[#C24619]" : "text-[#4A4E63]",
+                active === l.key ? "text-[#C44518]" : "text-[#4A4E63]",
               )}
             >
               {l.label}
@@ -117,7 +117,7 @@ export function MarketingNav({ active = null }: { active?: NavActive }) {
             href="/inscription"
             onClick={() => setOpen(false)}
             data-analytics="signup_founder_click"
-            className="mt-2 mb-1 inline-flex items-center justify-center rounded-[7px] bg-[#E85C2B] text-white py-3 text-[15px] font-[650]"
+            className="mt-2 mb-1 inline-flex items-center justify-center rounded-[7px] bg-[#FF5A1F] text-white py-3 text-[15px] font-[650]"
           >
             Créer ma dealroom
           </Link>

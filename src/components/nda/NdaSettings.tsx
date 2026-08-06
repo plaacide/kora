@@ -81,12 +81,12 @@ export function NdaSettings({
             onChange={(e) => setText(e.target.value)}
             rows={12}
             placeholder="En signant, le destinataire s'engage à garder confidentielles les informations de cette data room…"
-            className="w-full px-3 py-2.5 text-[13px] leading-relaxed bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-y"
+            className="w-full px-3 py-2.5 text-[13px] leading-relaxed bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#FF5A1F] focus:outline-none resize-y"
           />
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
             <button onClick={() => setOpen(false)} className="rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAFAF8]">{t("cancel")}</button>
-            <button onClick={saveTemplate} disabled={pending} className="rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60">
+            <button onClick={saveTemplate} disabled={pending} className="rounded-[5px] bg-[#FF5A1F] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-60">
               {pending ? "Enregistrement…" : t("saveTemplate")}
             </button>
           </div>

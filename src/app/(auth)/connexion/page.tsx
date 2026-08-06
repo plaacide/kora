@@ -26,13 +26,13 @@ export default async function ConnexionPage({
         <div>
           {/* Badge pill, titre 36px, puis carte produit en verre (handoff §3). */}
           <span className="inline-flex items-center gap-2 rounded-full bg-white/[0.07] border border-white/10 px-3 py-1.5 text-[11.5px] text-white/80">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#e85c2b]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ff5a1f]" />
             {t("badge")}
           </span>
 
           <h2 className="mt-5 text-[36px] font-[700] leading-[1.1] tracking-[-0.025em]">
             {t("headline")}{" "}
-            <span className="text-[#e85c2b]">{t("headlineAccent")}</span>
+            <span className="text-[#ff5a1f]">{t("headlineAccent")}</span>
           </h2>
           <p className="mt-3 text-[13.5px] text-white/70 leading-relaxed">
             {t("sub")}
@@ -47,7 +47,7 @@ export default async function ConnexionPage({
                   {t("exampleRef")}
                 </div>
               </div>
-              <span style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="shrink-0 text-[9px] font-[600] uppercase tracking-[0.06em] text-[#f08a5e] bg-[#e85c2b]/15 rounded-[4px] px-2 py-[3px]">
+              <span style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="shrink-0 text-[9px] font-[600] uppercase tracking-[0.06em] text-[#f08a5e] bg-[#ff5a1f]/15 rounded-[4px] px-2 py-[3px]">
                 {t("exampleStage")}
               </span>
             </div>
@@ -58,7 +58,7 @@ export default async function ConnexionPage({
                 <span style={{ fontFamily: "var(--font-plex-mono), monospace" }} className="text-white/85">82 %</span>
               </div>
               <span className="block h-1.5 rounded-[3px] bg-white/10 overflow-hidden mt-2">
-                <span className="block h-full bg-[#e85c2b]" style={{ width: "82%" }} />
+                <span className="block h-full bg-[#ff5a1f]" style={{ width: "82%" }} />
               </span>
             </div>
 

@@ -26,9 +26,9 @@ export function HeroPreview() {
                 onClick={() => setAud(a.id)}
                 className="rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] transition-colors border"
                 style={{
-                  borderColor: on ? "#E85C2B" : "#E4E2DC",
-                  background: on ? "#FBEDE6" : "#FFFFFF",
-                  color: on ? "#C24619" : "#4A4E63",
+                  borderColor: on ? "#FF5A1F" : "#E4E2DC",
+                  background: on ? "#FFEDE6" : "#FFFFFF",
+                  color: on ? "#C44518" : "#4A4E63",
                 }}
               >
                 {a.label}

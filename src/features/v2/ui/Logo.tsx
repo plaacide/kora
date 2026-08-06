@@ -65,7 +65,7 @@ export function SanzaWordmark({
   height?: number;
 }) {
   const mot = dark ? "#FFFFFF" : "#171A2C";
-  const echo = dark ? "#F08A5E" : "#E85C2B";
+  const echo = dark ? "#F08A5E" : "#FF5A1F";
   const echoFort = dark ? 0.6 : 0.55;
   const echoFaible = dark ? 0.35 : 0.3;
 

@@ -79,7 +79,7 @@ export function VitrineGrid({
   const chip = (actif: boolean) =>
     "rounded-full border px-3 min-h-[30px] text-[12px] font-medium " +
     (actif
-      ? "border-[#E85C2B] bg-[#FDF1EA] text-[#C24619]"
+      ? "border-[#FF5A1F] bg-[#FDF1EA] text-[#C44518]"
       : "border-[#E4E2DC] bg-white text-[#33353B] hover:border-[#C9C6BD]");
 
   const ligneChips = (
@@ -117,10 +117,10 @@ export function VitrineGrid({
               step={Math.max(1, Math.round(revMax / 50))}
               value={revMin}
               onChange={(e) => setRevMin(Number(e.target.value))}
-              className="flex-1 max-w-[280px] accent-[#E85C2B]"
+              className="flex-1 max-w-[280px] accent-[#FF5A1F]"
               aria-label={t("revenue")}
             />
-            <span style={mono} className="text-[12px] font-[600] text-[#C24619]">
+            <span style={mono} className="text-[12px] font-[600] text-[#C44518]">
               ≥ {argent.format(revMin)}
             </span>
           </div>
@@ -199,7 +199,7 @@ export function VitrineGrid({
                 </span>
                 <span className="block h-1.5 rounded-full bg-[#E8E5DC] overflow-hidden mt-1.5">
                   <span
-                    className="block h-full rounded-full bg-[#E85C2B]"
+                    className="block h-full rounded-full bg-[#FF5A1F]"
                     style={{ width: `${f.preparation ?? 0}%` }}
                   />
                 </span>

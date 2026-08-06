@@ -78,7 +78,7 @@ export default function InstitutionsPage() {
             <div className="flex flex-col sm:flex-row gap-3">
               <a
                 href="mailto:institutions@sanza.africa?subject=Demande%20d%27acc%C3%A8s%20Sanza%20Institutions"
-                className="inline-flex items-center justify-center rounded-[7px] bg-[#E85C2B] text-white px-7 py-[14px] text-[15px] font-[650] hover:bg-[#D24E1F] transition-colors"
+                className="inline-flex items-center justify-center rounded-[7px] bg-[#FF5A1F] text-white px-7 py-[14px] text-[15px] font-[650] hover:bg-[#E74C16] transition-colors"
               >
                 Demander un accès
               </a>
@@ -142,7 +142,7 @@ export default function InstitutionsPage() {
                     <span className="text-[16px] font-[700] text-[#1A1B1F]">
                       {g.title}
                     </span>
-                    <span className="font-mono text-[11.5px] text-[#C24619]">
+                    <span className="font-mono text-[11.5px] text-[#C44518]">
                       {g.kind}
                     </span>
                   </div>
@@ -178,7 +178,7 @@ export default function InstitutionsPage() {
             <div className="flex flex-col gap-3">
               {CONFORMITE.map((c) => (
                 <div key={c} className="flex gap-3 items-start">
-                  <span className="text-[#E85C2B] text-[14px] font-bold leading-[1.5]">
+                  <span className="text-[#FF5A1F] text-[14px] font-bold leading-[1.5]">
                     ✓
                   </span>
                   <span className="text-[14px] text-[#4A4E63] leading-[1.55]">
@@ -246,7 +246,7 @@ export default function InstitutionsPage() {
             </p>
             <a
               href="mailto:institutions@sanza.africa?subject=Demande%20d%27acc%C3%A8s%20Sanza%20Institutions"
-              className="inline-flex items-center justify-center rounded-[7px] bg-[#E85C2B] text-white px-8 py-[15px] text-[15.5px] font-[650] hover:bg-[#D24E1F] transition-colors"
+              className="inline-flex items-center justify-center rounded-[7px] bg-[#FF5A1F] text-white px-8 py-[15px] text-[15.5px] font-[650] hover:bg-[#E74C16] transition-colors"
             >
               Demander un accès
             </a>

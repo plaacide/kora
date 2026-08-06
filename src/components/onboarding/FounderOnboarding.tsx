@@ -194,7 +194,7 @@ export function FounderOnboarding() {
               style={{ fontFamily: "var(--font-plex-mono), monospace" }}
               className={
                 "text-[10.5px] " +
-                (oneLiner.length > PHRASE_MAX - 10 ? "text-[#C24619]" : "text-[#A9ACBB]")
+                (oneLiner.length > PHRASE_MAX - 10 ? "text-[#C44518]" : "text-[#A9ACBB]")
               }
             >
               {oneLiner.length} / {PHRASE_MAX}

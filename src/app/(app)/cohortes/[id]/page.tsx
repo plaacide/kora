@@ -347,7 +347,7 @@ export default async function CohortePage({
             </Link>
             <Link
               href="/dealroom"
-              className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F]"
+              className="rounded-[5px] bg-[#FF5A1F] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16]"
             >
               {t("publishDealroom")}
             </Link>

@@ -92,7 +92,7 @@ export default async function NdaPage() {
             </span>
             <span style={mono} className="text-[11.5px] text-[#55585F]">{fmt.format(new Date(n.signed_at))}</span>
             <span style={mono} className="text-[10.5px] text-[#9DA0A8] truncate">{n.signature_hash.slice(0, 10)}…</span>
-            <span className="text-right"><Link href={`/preuve/${n.id}`} className="text-[12px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">Preuve ↓</Link></span>
+            <span className="text-right"><Link href={`/preuve/${n.id}`} className="text-[12px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">Preuve ↓</Link></span>
           </div>
         ))
       )}

@@ -197,7 +197,7 @@ export default async function RapportsPage({
               className={
                 "rounded-full border px-3.5 min-h-[30px] inline-flex items-center text-[12.5px] font-medium " +
                 (c.id === cohorteId
-                  ? "border-[#E85C2B] bg-[#FDF1EA] text-[#C24619]"
+                  ? "border-[#FF5A1F] bg-[#FDF1EA] text-[#C44518]"
                   : "border-[#E4E2DC] bg-white text-[#33353B] hover:border-[#C9C6BD]")
               }
             >
@@ -213,7 +213,7 @@ export default async function RapportsPage({
         // rapport vide : l'un frustre, l'autre dessert la cohorte auprès du
         // bailleur.
         <div className="mt-5 rounded-[8px] border border-[#F0C4AE] bg-[#FEFAF7] px-5 py-4">
-          <h2 className="text-[14px] font-[700] text-[#C24619]">{t("refusedTitle")}</h2>
+          <h2 className="text-[14px] font-[700] text-[#C44518]">{t("refusedTitle")}</h2>
           <p className="text-[12.5px] text-[#8A4B2C] mt-1.5 leading-relaxed">
             {t("refusedBody")}
           </p>
@@ -253,7 +253,7 @@ export default async function RapportsPage({
                     <span className="text-[12.5px] text-[#55585F] w-[150px] shrink-0">{c.libelle}</span>
                     <span className="flex-1 h-1.5 rounded-full bg-[#E8E5DC] overflow-hidden">
                       <span
-                        className="block h-full rounded-full bg-[#E85C2B]"
+                        className="block h-full rounded-full bg-[#FF5A1F]"
                         style={{ width: `${pct ?? 0}%` }}
                       />
                     </span>
@@ -319,7 +319,7 @@ export default async function RapportsPage({
                       </span>
                       <span className="flex-1 h-1.5 rounded-full bg-[#E8E5DC] overflow-hidden">
                         <span
-                          className="block h-full rounded-full bg-[#E85C2B]"
+                          className="block h-full rounded-full bg-[#FF5A1F]"
                           style={{ width: `${Math.min(100, Math.max(0, prep))}%` }}
                         />
                       </span>

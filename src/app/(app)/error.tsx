@@ -32,7 +32,7 @@ export default function ErreurEcran({ reset }: { error: Error; reset: () => void
         action={
           <button
             onClick={reset}
-            className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
+            className="rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]"
           >
             {t("retry")}
           </button>

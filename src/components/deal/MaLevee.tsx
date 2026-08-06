@@ -101,7 +101,7 @@ function DOC_BADGE(type: string): string {
 }
 
 const ROLE_TAG: Record<string, { label: string; cls: string }> = {
-  owner: { label: "roleOwner", cls: "text-[#C24619] bg-[#FBEDE6]" },
+  owner: { label: "roleOwner", cls: "text-[#C44518] bg-[#FFEDE6]" },
   admin: { label: "roleEditor", cls: "text-[#33353B] bg-[#F1F0EB]" },
   member: { label: "roleMember", cls: "text-[#8B8E96] bg-[#F1F0EB]" },
 };
@@ -175,10 +175,10 @@ function AvatarStack({ investors }: { investors: RaiseInvestor[] }) {
 }
 
 const champ =
-  "h-9 w-full px-2.5 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none";
+  "h-9 w-full px-2.5 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#FF5A1F] focus:outline-none";
 const lab = "text-[11.5px] font-[600] text-[#6E727A] mb-1 block";
 const btnPrimary =
-  "rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60";
+  "rounded-[5px] bg-[#FF5A1F] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-60";
 const btnGhost =
   "bg-white rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAF8F4]";
 
@@ -247,7 +247,7 @@ export function MaLevee({
             <h1 className="font-display text-[27px] font-[700] tracking-[-0.025em]">{t("myDataRoom")}</h1>
             <p className="text-[13.5px] text-[#6E727A] mt-1">{t("diligenceSubtitle")}</p>
           </div>
-          <ShareButton dealId={dealId} defaultNda={ndaDefault} label={t("inviteToView")} className="shrink-0 whitespace-nowrap rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] mt-1" />
+          <ShareButton dealId={dealId} defaultNda={ndaDefault} label={t("inviteToView")} className="shrink-0 whitespace-nowrap rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16] mt-1" />
         </div>
         <PreparationCard dealName={dealName} readiness={readiness} missing={missing} legende={t("diligenceFile")} />
       </div>
@@ -315,7 +315,7 @@ export function MaLevee({
             label={t("share")}
             disabled={enMiseEnRoute}
             disabledTitle={t("shareDisabled")}
-            className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-[5px] bg-[#FF5A1F] px-3.5 py-2 text-[13px] font-[600] text-white hover:bg-[#E74C16] whitespace-nowrap mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
           />
           {raise && <ModifierLevee dealId={dealId} raise={raise} signalOuverture={signalEdition} />}
         </div>
@@ -351,7 +351,7 @@ export function MaLevee({
           <p className="text-[13px] font-[600] text-[#1A1B1F]">{t("noRaiseTitle")}</p>
           <p className="text-[12px] text-[#9DA0A8] mt-1 mb-4">{t("noRaiseBody")}</p>
           <div className="flex justify-center">
-            <OuvrirLeveeButton deals={dataRooms} defaultDealId={dealId} label={t("openRaise")} className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />
+            <OuvrirLeveeButton deals={dataRooms} defaultDealId={dealId} label={t("openRaise")} className="rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]" />
           </div>
         </div>
       ) : (
@@ -364,10 +364,10 @@ export function MaLevee({
             {cible != null && cible > 0 && (
               <>
                 <span className="block h-1.5 rounded-[3px] bg-[#E8E5DC] overflow-hidden mt-2" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
-                  <span className="block h-full bg-[#E85C2B]" style={{ width: `${pct}%` }} />
+                  <span className="block h-full bg-[#FF5A1F]" style={{ width: `${pct}%` }} />
                 </span>
                 <div className="text-[11px] text-[#6E727A] mt-1.5">
-                  <span style={mono} className="text-[#C24619] font-[600]">{formatMoney(engage, devise)}</span> · {pct} %
+                  <span style={mono} className="text-[#C44518] font-[600]">{formatMoney(engage, devise)}</span> · {pct} %
                 </div>
               </>
             )}
@@ -409,13 +409,13 @@ export function MaLevee({
           <div className="px-5 py-[18px]">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("amountSought")}</div>
             <div style={mono} className="text-[26px] font-[600] tracking-[-0.02em]">
-              {cible != null ? formatMoney(cible, devise) : <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><IconePlus /> {t("addAmount")}</button>}
+              {cible != null ? formatMoney(cible, devise) : <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C44518] hover:text-[#C44518]"><IconePlus /> {t("addAmount")}</button>}
             </div>
             {cible != null && cible > 0 && (
               <>
-                <span className="block h-1.5 rounded-[3px] bg-[#E2DED4] overflow-hidden mt-[11px]"><span className="block h-full bg-[#E85C2B]" style={{ width: `${pct}%` }} /></span>
+                <span className="block h-1.5 rounded-[3px] bg-[#E2DED4] overflow-hidden mt-[11px]"><span className="block h-full bg-[#FF5A1F]" style={{ width: `${pct}%` }} /></span>
                 <div className="text-[11.5px] text-[#6E727A] mt-[7px]">
-                  <span style={mono} className="text-[#C24619] font-[600]">{formatMoney(engage, devise)}</span> {t("committedSuffix")}
+                  <span style={mono} className="text-[#C44518] font-[600]">{formatMoney(engage, devise)}</span> {t("committedSuffix")}
                   {restant != null && restant > 0 && <> · <span style={mono}>{formatMoney(restant, devise)}</span> {t("remainingSuffix")}</>}
                   {" "}· {pct} %
                 </div>
@@ -425,7 +425,7 @@ export function MaLevee({
           <div className="px-5 py-[18px]">
             <div className="text-[11.5px] font-[600] text-[#8B8E96] mb-[7px]">{t("financingType")}</div>
             <div className="text-[15px] font-[650]">
-              {[labelOf(TYPE_TOUR, raise?.type_tour ?? null), labelOf(STADE_RAISE, raise?.stade ?? null)].filter(Boolean).join(" — ") || <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><IconePlus /> {t("addType")}</button>}
+              {[labelOf(TYPE_TOUR, raise?.type_tour ?? null), labelOf(STADE_RAISE, raise?.stade ?? null)].filter(Boolean).join(" — ") || <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C44518] hover:text-[#C44518]"><IconePlus /> {t("addType")}</button>}
             </div>
             {raise?.valorisation_pre != null && (
               <div className="text-[12px] text-[#6E727A] mt-1">{t("preMoney", { montant: formatMoney(raise.valorisation_pre, devise) })}</div>
@@ -443,7 +443,7 @@ export function MaLevee({
             <div className="text-[15px] font-[650]">
               {raise?.date_cloture
                 ? new Date(raise.date_cloture).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
-                : <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619]"><IconePlus /> {t("addDate")}</button>}
+                : <button onClick={ouvrirEdition} className="inline-flex items-center gap-1.5 rounded-[5px] border border-dashed border-[#D5D2CA] px-2.5 py-1 text-[12.5px] font-[600] text-[#8B8E96] hover:border-[#C44518] hover:text-[#C44518]"><IconePlus /> {t("addDate")}</button>}
             </div>
           </div>
         </div>
@@ -531,7 +531,7 @@ export function MaLevee({
                   <span className="block text-[13px] font-[600]">{l.t}</span>
                   <span className="block text-[11.5px] text-[#9DA0A8] truncate">{l.b}</span>
                 </span>
-                <Link href={l.href} className="shrink-0 text-[12px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">{l.cta}</Link>
+                <Link href={l.href} className="shrink-0 text-[12px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">{l.cta}</Link>
               </div>
             ))}
           </div>
@@ -547,11 +547,11 @@ export function MaLevee({
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("keyDocs")}</h2>
-            <Link href="/data-room" className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">{t("seeDataRoom")} →</Link>
+            <Link href="/data-room" className="text-[12.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">{t("seeDataRoom")} →</Link>
           </div>
           <div className="border-t border-[#E2DED4]">
             {keyDocs.length === 0 ? (
-              <p className="text-[12px] text-[#9DA0A8] py-4">{t("noDocs")} <Link href="/data-room" className="font-[600] text-[#C24619]">{t("upload")} →</Link></p>
+              <p className="text-[12px] text-[#9DA0A8] py-4">{t("noDocs")} <Link href="/data-room" className="font-[600] text-[#C44518]">{t("upload")} →</Link></p>
             ) : (
               keyDocs.map((d) => (
                 <Link key={d.id} href={`/visionneuse?doc=${d.id}`} className="bg-white flex items-center gap-2.5 py-3 border-b border-[#E8E5DC] last:border-0 hover:bg-[#FAF8F4]">
@@ -705,7 +705,7 @@ function MiseEnRoute({
                       ? `/data-room?dossier=${premiereManquante.folderId}`
                       : "/data-room"
                 }
-                className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
+                className="rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]"
               >
                 {courante.cta}
               </Link>
@@ -718,7 +718,7 @@ function MiseEnRoute({
                       : onEditerLevee
                     : onAjouterInvestisseur
                 }
-                className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]"
+                className="rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]"
               >
                 {courante.cta}
               </button>
@@ -746,11 +746,11 @@ function MiseEnRoute({
                 }
               >
                 {e.fait ? (
-                  <span className="grid place-items-center w-5 h-5 rounded-full bg-[#E85C2B] text-white shrink-0">
+                  <span className="grid place-items-center w-5 h-5 rounded-full bg-[#FF5A1F] text-white shrink-0">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5" /></svg>
                   </span>
                 ) : (
-                  <span className={"w-5 h-5 rounded-full border-[1.5px] shrink-0 " + (active ? "border-[#E85C2B]" : "border-white/25")} aria-hidden />
+                  <span className={"w-5 h-5 rounded-full border-[1.5px] shrink-0 " + (active ? "border-[#FF5A1F]" : "border-white/25")} aria-hidden />
                 )}
                 <span className="flex-1 min-w-0">
                   <span className={"block text-[12.5px] font-[600] truncate " + (e.fait || active ? "text-white" : "text-white/50")}>{e.titre}</span>
@@ -816,7 +816,7 @@ function VitrineBand({
               <button
                 key={a}
                 onClick={() => setSel(a)}
-                className={"rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] border transition-colors " + (activeSel === a ? "border-[#E85C2B] bg-[#FEF8F4] text-[#C24619]" : "bg-white border-[#E4E2DC] text-[#55585F] hover:border-[#C9C6BD]")}
+                className={"rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] border transition-colors " + (activeSel === a ? "border-[#FF5A1F] bg-[#FEF8F4] text-[#C44518]" : "bg-white border-[#E4E2DC] text-[#55585F] hover:border-[#C9C6BD]")}
               >
                 {labelOf(AUDIENCES, a) || a}
               </button>
@@ -944,7 +944,7 @@ function VitrineEditor({
                 <button
                   type="button"
                   onClick={() => loadTemplate(aud)}
-                  className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]"
+                  className="text-[11.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F]"
                 >
                   {(data[aud] ?? []).length === 0 ? t("fromTemplate") : t("resetTemplate")}
                 </button>
@@ -955,11 +955,11 @@ function VitrineEditor({
                 utiles, mais eux seuls la remplissent. */}
             <div className="flex items-center gap-2 mb-2">
               <span className="text-[11px] text-[#9DA0A8]">{t("ficheModels")}</span>
-              <button type="button" onClick={() => loadFiche(aud, "equity")} className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
+              <button type="button" onClick={() => loadFiche(aud, "equity")} className="text-[11.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">
                 {t("ficheEquity")}
               </button>
               <span className="text-[#D5D2CA]">·</span>
-              <button type="button" onClick={() => loadFiche(aud, "dette")} className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
+              <button type="button" onClick={() => loadFiche(aud, "dette")} className="text-[11.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">
                 {t("ficheDette")}
               </button>
             </div>
@@ -985,7 +985,7 @@ function VitrineEditor({
                   <button type="button" onClick={() => remove(aud, i)} title={t("remove")} className="bg-white grid place-items-center w-9 h-9 rounded-[5px] border border-[#E4E2DC] text-[#9DA0A8] hover:text-[#C0392B] hover:border-[#E3B4AD]"><IconeCroix /></button>
                 </div>
               ))}
-              <button type="button" onClick={() => addRow(aud)} className="self-start text-[12px] font-[600] text-[#C24619] mt-0.5">+ Ajouter un indicateur</button>
+              <button type="button" onClick={() => addRow(aud)} className="self-start text-[12px] font-[600] text-[#C44518] mt-0.5">+ Ajouter un indicateur</button>
             </div>
           </div>
         ))}
@@ -1030,7 +1030,7 @@ function PipelineInvestisseurs({
     <>
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-[15px] font-[700] tracking-[-0.01em]">{t("investorsOnRaise")}</h2>
-        <button onClick={() => setEditing("new")} className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]">
+        <button onClick={() => setEditing("new")} className="text-[12.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F]">
           + Ajouter un investisseur
         </button>
       </div>
@@ -1057,7 +1057,7 @@ function PipelineInvestisseurs({
                   <span>
                     <span style={mono} className={"text-[9px] font-[600] rounded-[4px] px-2 py-[3px] " + toneCls(st?.tone ?? "gray")}>{(st?.label ?? inv.statut).toUpperCase()}</span>
                   </span>
-                  <button onClick={() => setEditing(inv)} className="text-[11.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F] justify-self-end">{t("modify")}</button>
+                  <button onClick={() => setEditing(inv)} className="text-[11.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F] justify-self-end">{t("modify")}</button>
                 </div>
               );
             })}
@@ -1225,7 +1225,7 @@ function AddPastRaiseButton({ dealId }: { dealId: string }) {
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
 
-  const champ = "h-9 w-full px-2.5 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none";
+  const champ = "h-9 w-full px-2.5 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#FF5A1F] focus:outline-none";
   const lab = "text-[11.5px] font-[600] text-[#6E727A] mb-1 block";
 
   function submit() {
@@ -1249,7 +1249,7 @@ function AddPastRaiseButton({ dealId }: { dealId: string }) {
     <>
       <button
         onClick={() => { setError(undefined); setOpen(true); }}
-        className="flex items-center border border-dashed border-[#D5D2CA] rounded-[5px] px-3.5 py-2.5 text-[13px] font-[600] text-[#8B8E96] hover:border-[#C24619] hover:text-[#C24619] whitespace-nowrap"
+        className="flex items-center border border-dashed border-[#D5D2CA] rounded-[5px] px-3.5 py-2.5 text-[13px] font-[600] text-[#8B8E96] hover:border-[#C44518] hover:text-[#C44518] whitespace-nowrap"
       >
         + Tour passé
       </button>
@@ -1286,7 +1286,7 @@ function AddPastRaiseButton({ dealId }: { dealId: string }) {
           </div>
           <div>
             <label className={lab}>{t("noteOptional")}</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} placeholder={t("phInvestorsContext")} className="w-full px-2.5 py-2 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-none" />
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} placeholder={t("phInvestorsContext")} className="w-full px-2.5 py-2 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#FF5A1F] focus:outline-none resize-none" />
           </div>
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
@@ -1365,7 +1365,7 @@ function CloseRaiseButton({ dealId }: { dealId: string }) {
     <>
       <button
         onClick={() => { setError(undefined); setOpen(true); }}
-        className="bg-white flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2.5 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C24619] hover:text-[#C24619] whitespace-nowrap"
+        className="bg-white flex items-center gap-1.5 border border-[#E4E2DC] rounded-[5px] px-3.5 py-2.5 text-[12.5px] font-[600] text-[#33353B] hover:border-[#C44518] hover:text-[#C44518] whitespace-nowrap"
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>{t("closeRaise")}</button>
 
@@ -1419,7 +1419,7 @@ function PreparationCard({
             <div className="text-[11px] font-[600] text-[#8B8E96]">{t("readyFile")}</div>
             <div style={mono} className="text-[18px] font-[600]">{readiness}%</div>
           </div>
-          <Link href="/data-room" className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]">{t("open")} →</Link>
+          <Link href="/data-room" className="rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]">{t("open")} →</Link>
         </div>
       </div>
       {missing.length > 0 && (
@@ -1430,12 +1430,12 @@ function PreparationCard({
               <div key={m.label} className="flex items-center gap-3 text-[12.5px]">
                 <span style={mono} className="text-[9px] font-[600] text-[#8B8E96] bg-[#F1F0EB] rounded-[4px] px-2 py-0.5 w-[52px] text-center">{t("todoCaps")}</span>
                 <span className="flex-1 text-[#33353B]">{m.label}</span>
-                {i === 0 && <span style={mono} className="text-[9px] font-[600] text-[#C24619] bg-[#FBEDE6] rounded-[4px] px-2 py-0.5">{t("nextCaps")}</span>}
-                <Link href={m.folderId ? `/data-room?dossier=${m.folderId}` : "/checklist"} className="text-[12px] font-[600] text-[#C24619]">{t("upload")}</Link>
+                {i === 0 && <span style={mono} className="text-[9px] font-[600] text-[#C44518] bg-[#FFEDE6] rounded-[4px] px-2 py-0.5">{t("nextCaps")}</span>}
+                <Link href={m.folderId ? `/data-room?dossier=${m.folderId}` : "/checklist"} className="text-[12px] font-[600] text-[#C44518]">{t("upload")}</Link>
               </div>
             ))}
           </div>
-          <Link href="/checklist" className="inline-block mt-3 text-[12.5px] font-[600] text-[#C24619]">{t("openChecklist")} →</Link>
+          <Link href="/checklist" className="inline-block mt-3 text-[12.5px] font-[600] text-[#C44518]">{t("openChecklist")} →</Link>
         </div>
       )}
     </div>
@@ -1582,7 +1582,7 @@ function ModifierLevee({ dealId, raise, signalOuverture = 0 }: { dealId: string;
                     key={a.key}
                     type="button"
                     onClick={() => toggleAud(a.key)}
-                    className={"rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] border transition-colors " + (on ? "border-[#E85C2B] bg-[#FEF8F4] text-[#C24619]" : "bg-white border-[#E4E2DC] text-[#55585F] hover:border-[#C9C6BD]")}
+                    className={"rounded-[5px] px-3 py-[7px] text-[12.5px] font-[600] border transition-colors " + (on ? "border-[#FF5A1F] bg-[#FEF8F4] text-[#C44518]" : "bg-white border-[#E4E2DC] text-[#55585F] hover:border-[#C9C6BD]")}
                   >
                     {a.label}
                   </button>
@@ -1593,13 +1593,13 @@ function ModifierLevee({ dealId, raise, signalOuverture = 0 }: { dealId: string;
 
           <div>
             <label className={lab}>{t("description")}</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder={t("phDescription")} className="w-full px-2.5 py-2 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none resize-none" />
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder={t("phDescription")} className="w-full px-2.5 py-2 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#FF5A1F] focus:outline-none resize-none" />
           </div>
 
           {error && <p className="text-[12px] text-[#C0392B]">{error}</p>}
 
           {confDel && (
-            <div className="rounded-[6px] border border-[#E3B4AD] bg-[#FBEDE6] px-3 py-2.5 text-[12px] text-[#8A2A1E] leading-relaxed">
+            <div className="rounded-[6px] border border-[#E3B4AD] bg-[#FFEDE6] px-3 py-2.5 text-[12px] text-[#8A2A1E] leading-relaxed">
               Supprimer cette levée et toutes ses données (montant, indicateurs, pipeline d&apos;investisseurs, historique)&nbsp;? La data room, elle, est conservée. Cette action est définitive.
             </div>
           )}

@@ -27,7 +27,7 @@ export interface OnboardingStep {
 function Pastille({ state }: { state: "done" | "active" | "todo" }) {
   if (state === "done") {
     return (
-      <span className="grid place-items-center w-6 h-6 rounded-full bg-[#E85C2B] text-white shrink-0">
+      <span className="grid place-items-center w-6 h-6 rounded-full bg-[#FF5A1F] text-white shrink-0">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M20 6 9 17l-5-5" />
         </svg>
@@ -36,7 +36,7 @@ function Pastille({ state }: { state: "done" | "active" | "todo" }) {
   }
   if (state === "active") {
     return (
-      <span className="grid place-items-center w-6 h-6 rounded-full bg-[#E85C2B] shrink-0">
+      <span className="grid place-items-center w-6 h-6 rounded-full bg-[#FF5A1F] shrink-0">
         <span className="w-2 h-2 rounded-full bg-white" />
       </span>
     );
@@ -71,7 +71,7 @@ export function OnboardingShell({
             {t("stepOf", { step, total })}
           </span>
           <span className="block w-[140px] h-1 rounded-full bg-[#E8E5DC] overflow-hidden">
-            <span className="block h-full bg-[#E85C2B] transition-all" style={{ width: `${pct}%` }} />
+            <span className="block h-full bg-[#FF5A1F] transition-all" style={{ width: `${pct}%` }} />
           </span>
           <Link href="/dashboard" className="text-[12.5px] font-[600] text-[#8B8FA3] hover:text-[#4A4E63]">
             {t("saveAndQuit")}

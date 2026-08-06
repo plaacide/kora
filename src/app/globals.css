@@ -18,11 +18,11 @@
   --color-ink-muted: #8b8fa3; /* brume */
   --color-ink-placeholder: #a8abb8;
 
-  --color-primary: #e85c2b; /* vibration — CTA */
+  --color-primary: #ff5a1f; /* vibration — CTA */
   --color-primary-strong: #d14e20; /* survol CTA */
-  --color-accent: #e85c2b;
+  --color-accent: #ff5a1f;
   --color-vibration-soft: #f08a5e; /* échos sur fond sombre */
-  --color-link: #e85c2b;
+  --color-link: #ff5a1f;
   --color-link-hover: #171a2c;
 
   --color-success: oklch(0.60 0.13 155);

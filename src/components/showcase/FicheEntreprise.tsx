@@ -136,7 +136,7 @@ export function FicheEntreprise({
               className={
                 "rounded-full border px-3.5 min-h-[30px] text-[12.5px] font-medium " +
                 (lecture === l
-                  ? "border-[#E85C2B] bg-[#FDF1EA] text-[#C24619]"
+                  ? "border-[#FF5A1F] bg-[#FDF1EA] text-[#C44518]"
                   : "border-[#E4E2DC] bg-white text-[#33353B] hover:border-[#C9C6BD]")
               }
             >
@@ -192,7 +192,7 @@ export function FicheEntreprise({
               <button
                 onClick={relancer}
                 disabled={encours}
-                className="mt-2.5 rounded-[6px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60"
+                className="mt-2.5 rounded-[6px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-60"
               >
                 {t("requestRelaunch")}
               </button>
@@ -212,7 +212,7 @@ export function FicheEntreprise({
           <button
             onClick={demander}
             disabled={encours}
-            className="rounded-[6px] bg-[#E85C2B] px-5 py-3 text-[13.5px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60"
+            className="rounded-[6px] bg-[#FF5A1F] px-5 py-3 text-[13.5px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-60"
           >
             {t("requestAccess")}
           </button>

@@ -27,13 +27,13 @@ export interface Room {
 const mono = { fontFamily: "var(--font-plex-mono), monospace" } as const;
 
 const OBJ_BADGE: Record<string, { label: string; cls: string }> = {
-  levee: { label: "Levée", cls: "text-[#C24619] bg-[#FBEDE6]" },
+  levee: { label: "Levée", cls: "text-[#C44518] bg-[#FFEDE6]" },
   diligence: { label: "Diligence", cls: "text-[#185FA5] bg-[#E9F2FB]" },
 };
 
 const btnGhost = "bg-white rounded-[5px] border border-[#E4E2DC] px-4 py-2 text-[13px] font-[600] text-[#55585F] hover:bg-[#FAF8F4]";
-const btnPrimary = "rounded-[5px] bg-[#E85C2B] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#D24E1F] disabled:opacity-60";
-const champ = "h-9 w-full px-2.5 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#E85C2B] focus:outline-none";
+const btnPrimary = "rounded-[5px] bg-[#FF5A1F] px-4 py-2 text-[13px] font-[600] text-white hover:bg-[#E74C16] disabled:opacity-60";
+const champ = "h-9 w-full px-2.5 text-[13px] bg-white text-[#1A1B1F] rounded-[5px] border border-[#E4E2DC] focus:border-[#FF5A1F] focus:outline-none";
 
 const FILTERS: { key: string; label: string }[] = [
   { key: "all", label: "filterAll" },
@@ -82,7 +82,7 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
             {t("listSubtitle")}
           </p>
         </div>
-        <NewDataRoomButton className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap mt-1" />
+        <NewDataRoomButton className="rounded-[5px] bg-[#FF5A1F] px-3.5 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16] whitespace-nowrap mt-1" />
       </div>
 
       {/* Filtre par objectif */}
@@ -114,7 +114,7 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
           return (
             <div key={r.id} className="bg-white grid grid-cols-[2.4fr_0.9fr_1fr_150px] gap-3.5 items-center px-2 py-[15px] border-b border-[#E8E5DC] hover:bg-[#FAF8F4]">
               <button onClick={() => open(r.id)} disabled={pending} className="flex items-center gap-3 min-w-0 text-left">
-                <span className="grid place-items-center w-9 h-9 rounded-[6px] bg-[#FBEDE6] text-[#C24619] shrink-0">
+                <span className="grid place-items-center w-9 h-9 rounded-[6px] bg-[#FFEDE6] text-[#C44518] shrink-0">
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                 </span>
                 <span className="min-w-0">
@@ -136,7 +136,7 @@ export function RoomsList({ rooms, currentId }: { rooms: Room[]; currentId: stri
                 <span className="text-[12.5px] text-[#33353B]">{t("you")}</span>
               </span>
               <span className="flex items-center gap-3 justify-end">
-                <ShareButton dealId={r.id} className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]" />
+                <ShareButton dealId={r.id} className="text-[12.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F]" />
                 <RoomActions room={r} />
               </span>
             </div>
@@ -167,7 +167,7 @@ export function NewDataRoomButton({
     <>
       <button
         onClick={() => setOpen(true)}
-        className={className ?? "rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap"}
+        className={className ?? "rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16] whitespace-nowrap"}
       >
         {label}
       </button>
@@ -221,7 +221,7 @@ function NewRoomModal({ onClose, fixedObjectif }: { onClose: () => void; fixedOb
                   key={String(o.key)}
                   type="button"
                   onClick={() => setTemplate(o.key)}
-                  className={"text-left rounded-[8px] border p-3 transition-colors " + (actif ? "border-[#E85C2B] bg-[#FEF8F4]" : "border-[#E4E2DC] hover:border-[#C9C6BD]")}
+                  className={"text-left rounded-[8px] border p-3 transition-colors " + (actif ? "border-[#FF5A1F] bg-[#FEF8F4]" : "border-[#E4E2DC] hover:border-[#C9C6BD]")}
                 >
                   <div className="text-[13px] font-[650] text-[#1A1B1F]">{o.titre}</div>
                   <p className="text-[11px] text-[#9DA0A8] mt-1 leading-snug">{o.sous}</p>
@@ -300,7 +300,7 @@ function RoomActions({ room }: { room: Room }) {
             ) : (
               <button onClick={() => archiver(true)} className="text-left px-3 py-2 text-[12.5px] text-[#33353B] hover:bg-[#FAF8F4]">{t("archive")}</button>
             )}
-            <button onClick={() => { setMenu(false); setError(undefined); room.hasRaise ? setWarnOpen(true) : setDeleteOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#C0392B] hover:bg-[#FBEDE6]">{t("delete")}</button>
+            <button onClick={() => { setMenu(false); setError(undefined); room.hasRaise ? setWarnOpen(true) : setDeleteOpen(true); }} className="text-left px-3 py-2 text-[12.5px] text-[#C0392B] hover:bg-[#FFEDE6]">{t("delete")}</button>
           </span>
         </>
       )}
@@ -320,7 +320,7 @@ function RoomActions({ room }: { room: Room }) {
       <Modal open={warnOpen} onClose={() => setWarnOpen(false)} title={t("linkedToRaise")} width={470}>
         <div className="px-6 py-5">
           <div className="flex gap-3">
-            <span className="grid place-items-center w-9 h-9 rounded-[6px] bg-[#FBEDE6] text-[#C24619] shrink-0 mt-0.5">
+            <span className="grid place-items-center w-9 h-9 rounded-[6px] bg-[#FFEDE6] text-[#C44518] shrink-0 mt-0.5">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
             </span>
             <p className="text-[13px] text-[#33353B] leading-relaxed">
@@ -329,7 +329,7 @@ function RoomActions({ room }: { room: Room }) {
           </div>
           <div className="flex justify-end gap-2 mt-5">
             <button onClick={() => setWarnOpen(false)} className={btnGhost}>{t("cancel")}</button>
-            <button onClick={() => { setWarnOpen(false); setDeleteOpen(true); }} className="rounded-[5px] border border-[#E3B4AD] bg-white px-4 py-2 text-[13px] font-[600] text-[#C0392B] hover:bg-[#FBEDE6]">{t("continueAnyway")}</button>
+            <button onClick={() => { setWarnOpen(false); setDeleteOpen(true); }} className="rounded-[5px] border border-[#E3B4AD] bg-white px-4 py-2 text-[13px] font-[600] text-[#C0392B] hover:bg-[#FFEDE6]">{t("continueAnyway")}</button>
           </div>
         </div>
       </Modal>

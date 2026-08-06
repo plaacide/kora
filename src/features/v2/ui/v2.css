@@ -8,7 +8,7 @@
   --motion-rail:240ms;--motion-view:300ms;--motion-cascade:340ms;--motion-push:480ms;
   --motion-stagger:40ms;
   --motion-ease:cubic-bezier(.32,.72,.24,1);--motion-ease-enter:cubic-bezier(.32,.72,.24,1);
-  --orange:#e85c2b;--orange-h:#d24e1f;--orange-text:#c24619;--orange-soft:#fdf4ef;
+  --orange:#ff5a1f;--orange-h:#e74c16;--orange-text:#c44518;--orange-soft:#fff4f0;
   --ink:#14161f;--text:#1a1b1f;--text-2:#475467;--text-3:#667085;--text-4:#98a2b3;
   --line:#ecebe6;--line-soft:#f1f0ec;--band:#fafaf8;--green:#147a5c;--green-bg:#eaf4f1;
   /* Deux couleurs que le produit n'avait pas, et dont l'absence faisait mentir
@@ -1982,6 +1982,16 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-bascule{display:inline-flex;overflow:hidden;border:1px solid var(--line);border-radius:var(--r-md)}
 .v2-bascule span{background:#fff;padding:7px 16px;color:var(--text-2);cursor:pointer;font:500 13px var(--font-v2-sans),sans-serif}
 .v2-bascule span[data-active=true]{background:var(--ink);color:#fff}
+/* La bascule devient un vrai choix : deux boutons radio, invisibles, dont
+   l'état peint le libellé. Sans eux le type ne partait pas avec le
+   formulaire, et une suggestion serait enregistrée en question. */
+.v2-bascule label{display:inline-flex}
+.v2-bascule input[type=radio]{position:absolute;width:1px;height:1px;opacity:0}
+.v2-bascule input[type=radio]:checked+span{background:var(--ink);color:#fff}
+.v2-bascule label:focus-within span{outline:2px solid var(--orange);outline-offset:-2px}
+/* Le champ long du formulaire d'envoi : le `.v2-control` lui sert de cadre. */
+.v2-fil-envoi textarea{width:100%;height:100%;border:0;background:none;outline:0;color:inherit;font:inherit;resize:none}
+.v2-fil-envoi .v2-btn{display:flex;width:100%}
 .v2-btn[data-bloc=true]{display:flex;width:100%}
 
 /* Écrans 09 et 09b — les Challenges d'une cohorte. */

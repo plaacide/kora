@@ -50,7 +50,7 @@ export function invitationEmail(input: InvitationEmailInput): {
           <h1 style="margin:20px 0 12px;font-size:20px;font-weight:600;color:#171a2c;letter-spacing:-0.02em;">${escape(subject)}</h1>
           <p style="margin:0 0 14px;font-size:14px;line-height:1.6;color:#4a4e63;">${intro}</p>
           ${ndaLine ? `<p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#4a4e63;">${escape(ndaLine)}</p>` : ""}
-          <a href="${input.link}" style="display:inline-block;background:#e85c2b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
+          <a href="${input.link}" style="display:inline-block;background:#ff5a1f;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
           <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#8b8fa3;">${escape(notice)}</p>
           <hr style="border:none;border-top:1px solid #e8e5dc;margin:24px 0 16px;">
           <p style="margin:0;font-size:11px;color:#8b8fa3;">Sanza — ${fr ? "data room sécurisée" : "secure data room"} · ${fr ? "Chiffré" : "Encrypted"} · SOC 2</p>
@@ -168,7 +168,7 @@ export function cohortInviteEmail(input: {
           <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#4a4e63;">${intro}</p>
           <p style="margin:0 0 10px;font-size:13px;line-height:1.6;color:#4a4e63;">${escape(voit)}</p>
           <p style="margin:0 0 20px;font-size:13px;line-height:1.6;color:#4a4e63;">${escape(voitPas)}</p>
-          <a href="${input.link}" style="display:inline-block;background:#e85c2b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
+          <a href="${input.link}" style="display:inline-block;background:#ff5a1f;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
           <hr style="border:none;border-top:1px solid #e8e5dc;margin:24px 0 16px;">
           <p style="margin:0;font-size:11px;color:#8b8fa3;">Sanza — ${fr ? "data room sécurisée" : "secure data room"}</p>
         </td></tr>
@@ -234,7 +234,7 @@ export function showcaseInviteEmail(input: {
           <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#4a4e63;">${intro}</p>
           <p style="margin:0 0 10px;font-size:13px;line-height:1.6;color:#4a4e63;">${escape(voit)}</p>
           <p style="margin:0 0 20px;font-size:13px;line-height:1.6;color:#4a4e63;">${escape(voitPas)}</p>
-          <a href="${input.link}" style="display:inline-block;background:#e85c2b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
+          <a href="${input.link}" style="display:inline-block;background:#ff5a1f;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
           <hr style="border:none;border-top:1px solid #e8e5dc;margin:24px 0 16px;">
           <p style="margin:0 0 6px;font-size:11px;color:#8b8fa3;">${escape(nominatif)}</p>
           <p style="margin:0;font-size:11px;color:#8b8fa3;">Sanza — ${fr ? "data room sécurisée" : "secure data room"}</p>
@@ -288,7 +288,7 @@ export function teamInvitationEmail(input: {
           <div style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;border-radius:8px;background:#171a2c;color:#ffffff;font-weight:700;font-size:16px;letter-spacing:-0.015em;">a</div>
           <h1 style="margin:20px 0 12px;font-size:20px;font-weight:600;color:#171a2c;letter-spacing:-0.02em;">${escape(subject)}</h1>
           <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#4a4e63;">${intro}</p>
-          <a href="${input.link}" style="display:inline-block;background:#e85c2b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
+          <a href="${input.link}" style="display:inline-block;background:#ff5a1f;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(cta)}</a>
           <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#8b8fa3;">${escape(notice)}</p>
           <hr style="border:none;border-top:1px solid #e8e5dc;margin:24px 0 16px;">
           <p style="margin:0;font-size:11px;color:#8b8fa3;">Sanza — ${fr ? "data room sécurisée" : "secure data room"} · ${fr ? "Chiffré" : "Encrypted"} · SOC 2</p>

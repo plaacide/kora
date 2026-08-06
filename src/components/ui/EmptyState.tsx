@@ -74,7 +74,7 @@ export function EmptyState({
             className={
               "grid place-items-center rounded-[8px] " +
               (inset ? "w-9 h-9 mb-2.5 " : "w-12 h-12 mb-4 ") +
-              (sombre ? "bg-white/10 text-[#F08A5E]" : "bg-[#FBEDE6] text-[#C24619]")
+              (sombre ? "bg-white/10 text-[#F08A5E]" : "bg-[#FFEDE6] text-[#C44518]")
             }
             aria-hidden
           >

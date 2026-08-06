@@ -13,8 +13,8 @@ export function EchoMotif({
   const solid = dark ? "#ffffff" : "#171a2c";
   // Hauteurs variées par barre (px) — la 3e (pleine) domine.
   const bars = [
-    { h: 14, c: "#e85c2b", o: 0.3 },
-    { h: 22, c: "#e85c2b", o: 0.55 },
+    { h: 14, c: "#ff5a1f", o: 0.3 },
+    { h: 22, c: "#ff5a1f", o: 0.55 },
     { h: 30, c: solid, o: 1 },
   ];
   return (

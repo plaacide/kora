@@ -75,7 +75,7 @@ export function DocViewerModal({
         <div className="px-5 py-3 border-t border-[#E8E5DC] flex justify-end">
           <Link
             href={`/visionneuse?doc=${docId}`}
-            className="text-[12.5px] font-[600] text-[#C24619] hover:text-[#1A1B1F]"
+            className="text-[12.5px] font-[600] text-[#C44518] hover:text-[#1A1B1F]"
           >
             {t("openFullPage")}
           </Link>

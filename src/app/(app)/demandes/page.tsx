@@ -114,7 +114,7 @@ export default async function DemandesPage() {
         {enAttente > 0 && (
           <span
             style={{ fontFamily: "var(--font-plex-mono), monospace" }}
-            className="shrink-0 text-[9px] font-[700] tracking-[0.08em] text-[#C24619] bg-[#FBEDE6] rounded-[4px] px-2.5 py-[5px]"
+            className="shrink-0 text-[9px] font-[700] tracking-[0.08em] text-[#C44518] bg-[#FFEDE6] rounded-[4px] px-2.5 py-[5px]"
           >
             {t("pending", { n: enAttente })}
           </span>

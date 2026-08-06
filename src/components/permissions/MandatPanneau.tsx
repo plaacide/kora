@@ -213,7 +213,7 @@ export function MandatPanneau({
               {p.mandate && (
                 <span
                   style={mono}
-                  className="shrink-0 text-[8.5px] font-[700] tracking-[0.06em] rounded-[4px] px-2 py-[3px] text-[#C24619] bg-[#FBEDE6]"
+                  className="shrink-0 text-[8.5px] font-[700] tracking-[0.06em] rounded-[4px] px-2 py-[3px] text-[#C44518] bg-[#FFEDE6]"
                 >
                   {t("mandateBadge")}
                 </span>
@@ -240,7 +240,7 @@ export function MandatPanneau({
                     <button
                       onClick={() => agir(p.orgId, true)}
                       disabled={encours}
-                      className="rounded-[5px] bg-[#E85C2B] px-3 py-1.5 text-[12px] font-[600] text-white hover:bg-[#D24E1F] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
+                      className="rounded-[5px] bg-[#FF5A1F] px-3 py-1.5 text-[12px] font-[600] text-white hover:bg-[#E74C16] disabled:bg-[#F1F0EB] disabled:text-[#A9ACBB]"
                     >
                       {t("mandateConfirm")}
                     </button>

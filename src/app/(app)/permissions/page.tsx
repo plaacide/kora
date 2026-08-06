@@ -198,7 +198,7 @@ export default async function PermissionsPage() {
     <div className="text-[#1A1B1F]">
       <div className="flex items-center justify-between mb-3.5">
         <p className="text-[12.5px] text-[#6E727A]">{t("accessNote")}</p>
-        <ShareButton dealId={deal.id} label={t("invite")} className="rounded-[5px] bg-[#E85C2B] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#D24E1F] whitespace-nowrap" />
+        <ShareButton dealId={deal.id} label={t("invite")} className="rounded-[5px] bg-[#FF5A1F] px-3.5 py-2 text-[12.5px] font-[600] text-white hover:bg-[#E74C16] whitespace-nowrap" />
       </div>
 
       <div style={mono} className="bg-white grid grid-cols-[2fr_1.1fr_1fr_1fr_80px] gap-3 px-2 pt-3 pb-2 border-b border-[#E2DED4] text-[9px] tracking-[0.08em] text-[#A0A3AB]">
@@ -210,7 +210,7 @@ export default async function PermissionsPage() {
           title={t("emptyTitle")}
           description={t("emptyBody")}
           icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>}
-          action={<ShareButton dealId={deal.id} label={t("invite")} className="rounded-[5px] bg-[#E85C2B] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#D24E1F]" />}
+          action={<ShareButton dealId={deal.id} label={t("invite")} className="rounded-[5px] bg-[#FF5A1F] px-4 py-2.5 text-[13px] font-[600] text-white hover:bg-[#E74C16]" />}
         />
       ) : (
         invites.map((i) => (

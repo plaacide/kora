@@ -47,7 +47,7 @@ function enveloppe(input: {
     .join("");
 
   const bouton = input.lien
-    ? `<a href="${input.lien.url}" style="display:inline-block;background:#e85c2b;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(input.lien.label)}</a>`
+    ? `<a href="${input.lien.url}" style="display:inline-block;background:#ff5a1f;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:11px 20px;border-radius:8px;">${escape(input.lien.label)}</a>`
     : "";
 
   return `<!doctype html>

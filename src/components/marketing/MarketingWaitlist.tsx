@@ -88,7 +88,7 @@ export function MarketingWaitlist() {
         type="submit"
         disabled={pending}
         data-analytics="waitlist_investor_submit"
-        className="inline-flex items-center justify-center h-11 rounded-[7px] bg-[#E85C2B] text-white text-[14px] font-[650] hover:bg-[#D24E1F] transition-colors disabled:opacity-60"
+        className="inline-flex items-center justify-center h-11 rounded-[7px] bg-[#FF5A1F] text-white text-[14px] font-[650] hover:bg-[#E74C16] transition-colors disabled:opacity-60"
       >
         {pending ? "Envoi…" : "Rejoindre la liste d'attente"}
       </button>
