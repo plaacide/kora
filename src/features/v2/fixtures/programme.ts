@@ -809,3 +809,60 @@ export const DEALROOM_AUDIENCE: readonly {
   { personne: "t.mensah@axiscap.com", organisation: "Axis Capital", statut: "Expirée", ton: "red", activite: "—", action: "Renvoyer" },
   { personne: "paul@oldfund.com", organisation: "—", statut: "Accès retiré", ton: undefined, activite: "retiré le 18 juillet", action: "—" },
 ];
+
+export interface FicheInvestisseur {
+  initiales: string; nom: string; ton: Ton;
+  secteur: string; pays: string; pitch: string;
+  stade: string; instrument: string; montant: string;
+}
+
+/**
+ * Les entreprises telles qu'un investisseur les voit — écrans 30, 31, 32.
+ *
+ * CHAQUE CARTE PORTE UNE LIGNE DE PITCH : sans elle, un investisseur ne
+ * distingue douze cartes que par leur secteur. Les montants portent une espace
+ * insécable comme séparateur de milliers, comme l'exige le §3 du handoff.
+ *
+ * Aucune de ces valeurs n'est un document : ce sont celles que l'entreprise a
+ * accepté de publier, et rien d'autre ne sort.
+ */
+export const FICHES: readonly FicheInvestisseur[] = [
+  { initiales: "CB", nom: "CoolBricks", ton: "orange", secteur: "Construction", pays: "Côte d’Ivoire", pitch: "Matériaux de construction bas carbone fabriqués à partir de déchets agricoles.", stade: "Seed", instrument: "Equity", montant: "500 000 €" },
+  { initiales: "NS", nom: "Nimba Solar", ton: "green", secteur: "Énergie", pays: "Guinée", pitch: "Mini-réseaux solaires pour les zones rurales non raccordées.", stade: "Seed", instrument: "Equity", montant: "750 000 €" },
+  { initiales: "MP", nom: "Moneta Pay", ton: "neutral", secteur: "Fintech", pays: "Togo", pitch: "Paiements transfrontaliers pour les PME d'Afrique de l'Ouest.", stade: "Série A", instrument: "Equity", montant: "2 000 000 €" },
+  { initiales: "KF", nom: "Kalyx Foods", ton: "blue", secteur: "Agroalimentaire", pays: "Sénégal", pitch: "Transformation de fruits locaux en snacks longue conservation.", stade: "Seed", instrument: "Dette", montant: "300 000 €" },
+  { initiales: "WL", nom: "Wari Logistics", ton: "neutral", secteur: "Logistique", pays: "Mali", pitch: "Fret routier digitalisé entre Bamako et les ports côtiers.", stade: "Seed", instrument: "Equity", montant: "400 000 €" },
+  { initiales: "TH", nom: "Teranga Health", ton: "red", secteur: "Santé", pays: "Sénégal", pitch: "Réseau de cliniques de proximité adossé à la télémédecine.", stade: "Pre-seed", instrument: "Equity", montant: "250 000 €" },
+  { initiales: "BL", nom: "Bissap Labs", ton: "amber", secteur: "Ag-tech", pays: "Bénin", pitch: "Boissons à base d’hibiscus, distribuées dans quatre pays.", stade: "Pre-seed", instrument: "Equity", montant: "150 000 €" },
+  { initiales: "SD", nom: "Sahel Dairy", ton: "neutral", secteur: "Agroalimentaire", pays: "Burkina Faso", pitch: "Collecte et transformation laitière en circuit court.", stade: "Seed", instrument: "Equity", montant: "300 000 €" },
+];
+
+export function fiche(initiales: string): FicheInvestisseur {
+  return (
+    FICHES.find((f) => f.initiales.toLowerCase() === initiales.toLowerCase()) ??
+    FICHES[0]
+  );
+}
+
+/** Le détail de la fiche CoolBricks — écran 32. Rien qui soit un document. */
+export const FICHE_DETAIL = {
+  cohorte: "Agri & Agro 2026",
+  aPropos:
+    "CoolBricks fabrique des matériaux de construction bas carbone à partir de déchets agricoles. 40 employés, 3 sites de production, présence en Côte d’Ivoire et au Ghana.",
+  chiffres: [
+    { k: "CA 2025", v: "820 K€" },
+    { k: "Croissance", v: "+64 % / an" },
+    { k: "Marge brute", v: "38 %" },
+  ],
+  equipe: [
+    { initiales: "AK", nom: "Aminata Koné", role: "CEO" },
+    { initiales: "YB", nom: "Yao Brou", role: "CTO" },
+  ],
+} as const;
+
+/** L'investisseur connecté à la Dealroom — écrans 30 à 33. */
+export const INVESTISSEUR = {
+  nom: "Marie Dupont",
+  organisation: "Acme Ventures",
+  email: "marie@fund.com",
+} as const;

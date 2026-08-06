@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sanza — Invitation à une Dealroom</title>
+</head>
+<!--
+  Écran 29 du paquet `parcours-programme` — l'invitation d'un investisseur.
+
+  CE FICHIER EST UN E-MAIL, pas une page : il vit ici et non dans `src/app`.
+  D'où les tableaux, les styles en ligne et l'absence de toute variable CSS —
+  aucun client de messagerie ne garantit mieux. Ce que le reste du produit
+  interdit (styles en dur) est ici la seule façon d'être lu.
+
+  L'ACCENT est celui de la Dealroom, pas du produit : il se substitue à
+  {{accent}} à l'envoi, comme {{programme}}, {{dealroom}}, {{sousTitre}},
+  {{destinataire}} et {{lien}}.
+-->
+<body style="margin:0;padding:0;background:#fafafa;font-family:Inter,-apple-system,'Segoe UI',Roboto,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fafafa;padding:40px 16px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="520" cellpadding="0" cellspacing="0" border="0" style="width:520px;max-width:100%;background:#ffffff;border:1px solid #ecebe6;border-radius:10px;overflow:hidden;">
+        <tr><td style="height:8px;background:{{accent}};line-height:8px;font-size:0;">&nbsp;</td></tr>
+        <tr>
+          <td align="center" style="padding:40px 44px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="width:48px;height:48px;border-radius:10px;background:{{accent}};color:#ffffff;font-size:19px;font-weight:600;">{{initiales}}</td>
+              </tr>
+            </table>
+
+            <p style="margin:20px 0 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#667085;">Vous êtes invité à découvrir</p>
+
+            <h1 style="margin:8px 0 0;font-size:24px;letter-spacing:-.01em;color:#1a1b1f;">{{dealroom}}</h1>
+
+            <p style="margin:8px 0 0;font-size:14px;color:#475467;">{{sousTitre}}</p>
+
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px auto 0;">
+              <tr>
+                <td style="padding:10px 16px;background:#fafaf8;border-radius:6px;font-size:12.5px;color:#475467;">
+                  Invitation envoyée à <b style="color:#1a1b1f;">{{destinataire}}</b>
+                </td>
+              </tr>
+            </table>
+
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:16px auto 0;">
+              <tr>
+                <td style="border-radius:6px;background:{{accent}};">
+                  <a href="{{lien}}" style="display:inline-block;padding:12px 20px;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;">Accéder à la Dealroom</a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- La phrase qui porte toute la promesse de sécurité de la
+                 Dealroom. Elle doit rester DANS l'e-mail : c'est là qu'on
+                 décide de transférer le lien, ou non. -->
+            <p style="margin:12px 0 0;font-size:12px;color:#98a2b3;">Le lien est personnel — transféré, il n’ouvre pas l’accès.</p>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:18px 0 0;font-size:11.5px;color:#98a2b3;">Espace privé — accès sur invitation uniquement · Powered by Sanza</p>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
