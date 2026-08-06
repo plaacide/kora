@@ -109,9 +109,18 @@ export default async function PremiereCohortePage({
           {/* PAS DE COLONNE POUR CE CHAMP. `cohorts` porte un `goal`, pas un
               secteur ; la maquette le demande, la base ne sait pas où le
               mettre. Il est affiché et non enregistré, plutôt que d'inventer
-              une colonne dans le dos du modèle. */}
+              une colonne dans le dos du modèle.
+
+              ET SURTOUT PAS DE `name`. Il s'appelait `focus` — or un contrôle
+              nommé `focus` REMPLACE `form.focus` : le DOM expose les champs
+              nommés comme propriétés du formulaire, et la propriété gagne sur
+              la méthode héritée. React appelait donc `domNode.focus()` et
+              recevait ce `<select>`, d'où un « domNode.focus is not a
+              function » qui emportait toute la page. Le champ étant
+              `disabled`, il n'était de toute façon jamais soumis : ce `name`
+              ne servait à rien et coûtait l'écran. */}
           <div className="v2-control">
-            <select defaultValue="Agri & Agro" disabled name="focus">
+            <select defaultValue="Agri & Agro" disabled>
               <option>Agri &amp; Agro</option>
             </select>
           </div>
