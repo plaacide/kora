@@ -52,7 +52,19 @@ export async function requireV2Workspace(): Promise<V2WorkspaceContext> {
     .limit(1)
     .maybeSingle();
 
-  if (!membership) redirect(v2Routes.onboarding.company);
+  // SANS ORGANISATION, ON RENVOIE VERS LE BON TUNNEL. Celui-ci envoyait tout
+  // le monde sur « Parlez-nous de votre entreprise » — un programme qui vient
+  // de s'inscrire se voyait donc demander sa forme juridique et son stade de
+  // développement. Le métier n'est lu que dans ce cas-là : sur le chemin
+  // normal, l'organisation existe et rien de plus n'est interrogé.
+  if (!membership) {
+    const metier = await metierDuCompte(user.id);
+    redirect(
+      metier === "sae"
+        ? v2Routes.programme.onboarding.organisation
+        : v2Routes.onboarding.company,
+    );
+  }
 
   const organization = membership.organizations as {
     name?: string;
