@@ -1,6 +1,7 @@
 # ADR-002 : Portée de la Dealroom et du consentement
 
-**Statut :** Proposé — option B recommandée
+**Statut :** **ACCEPTÉ le 6 août 2026** — option B, avec la clause sur les
+consentements existants. Tranché par le fondateur.
 **Date :** 5 août 2026
 **Branche :** `v2/rebuild`
 **Décideur :** fondateur

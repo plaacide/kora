@@ -44,14 +44,17 @@ Aucun lot n'est fini sur ma parole. Un lot ne dépend jamais d'un lot qui le sui
 |---|---|---|---|
 | Q2 | **Équipe** et **Abonnement** sont absents du rail programme dessiné. Oubli ou choix ? | A | Les ajouter. Un programme a des collaborateurs et un plan qui mord déjà à l'invitation. Le rail fondateur a reçu Abonnement pour cette raison exacte : un écran qu'aucun chemin ne dessert n'existe pas. **Je les ajoute sauf avis contraire.** |
 
-### Celles qui ne bloquent que le branchement
+### Celles qui ne bloquaient que le branchement — TOUTES TRANCHÉES LE 6 AOÛT
 
-| # | Décision | Bloque | Ma recommandation |
+| # | Décision | Bloquait | Arbitrage rendu |
 |---|---|---|---|
-| [ADR-002](ADR-002-portee-de-la-dealroom.md) | Dealroom : objet de premier rang ou attribut de cohorte ? Et les consentements existants ? | branchement G, H, I | Objet de premier rang ; les accords ne se migrent pas |
-| [ADR-003](ADR-003-critere-connecte-a-sanza.md) | Le critère « connecté à Sanza » | branchement E, F | Lecture énumérée + opération présentée de premier rang + instanciation par copie |
-| [ADR-004](ADR-004-canal-de-lecture-du-programme.md) | Un canal de lecture ou trois ? | branchement B, C | Trois, composés dans l'application |
-| [ADR-005](ADR-005-investisseur-externe.md) | L'accès investisseur | branchement I | Compte obligatoire, code e-mail en repli |
+| [ADR-002](ADR-002-portee-de-la-dealroom.md) | Dealroom : objet de premier rang ou attribut de cohorte ? Et les consentements existants ? | branchement G, H, I | ✅ Objet de premier rang ; les accords ne se migrent pas |
+| [ADR-003](ADR-003-critere-connecte-a-sanza.md) | Le critère « connecté à Sanza » | branchement E, F | ✅ Lecture énumérée + opération présentée de premier rang + instanciation par copie |
+| [ADR-004](ADR-004-canal-de-lecture-du-programme.md) | Un canal de lecture ou trois ? | branchement B, C | ✅ Trois, composés dans l'application |
+| [ADR-005](ADR-005-investisseur-externe.md) | L'accès investisseur | branchement I | ⚠️ **La Dealroom s'ouvre SANS compte** — contre la recommandation. Le compte est proposé, jamais exigé |
+
+L'arbitrage d'ADR-005 rend faux trois textes de la maquette (écrans 29, 23, 27) :
+le lien n'est plus personnel, il EST l'accès. À réécrire avant d'intégrer.
 
 ### Celles que la consigne « en dur » repousse
 

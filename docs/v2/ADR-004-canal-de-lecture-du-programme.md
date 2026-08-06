@@ -1,6 +1,7 @@
 # ADR-004 : Le canal de lecture du programme
 
-**Statut :** Proposé — option B recommandée
+**Statut :** **ACCEPTÉ le 6 août 2026** — option B, trois canaux composés dans
+l'application. Tranché par le fondateur.
 **Date :** 5 août 2026
 **Branche :** `v2/rebuild`
 **Décideur :** fondateur

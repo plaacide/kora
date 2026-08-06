@@ -87,7 +87,8 @@ portefeuille, lui, doit suivre le patron — c'est l'objet d'
 🔴 06, 07    /v2/portefeuille — vide et rempli
 ```
 
-Dépend d'[ADR-004](ADR-004-canal-de-lecture-du-programme.md), **non tranchée**.
+[ADR-004](ADR-004-canal-de-lecture-du-programme.md) **est tranchée** (6 août,
+option B) : trois canaux courts composés dans l'application. Le lot peut partir.
 
 ### Questions & suggestions — lot D
 
@@ -110,8 +111,10 @@ manque un rattachement à la cohorte. Aucune ADR ne bloque.
 🔴 42  Vue entreprise            /v2/challenges/[id] · CÔTÉ FONDATEUR
 ```
 
-**Rien n'existe en base.** Dépend d'[ADR-003](ADR-003-critere-connecte-a-sanza.md),
-**non tranchée**.
+**Rien n'existe en base.** [ADR-003](ADR-003-critere-connecte-a-sanza.md) **est
+tranchée** (6 août, option B et ses deux clauses) : lecture énumérée,
+désignation de l'opération présentée par l'entreprise, Challenge instancié par
+copie, progression persistée.
 
 L'écran 42 est le seul du parcours à se placer du côté de l'entreprise : il a
 sa propre coque, un bandeau et rien d'autre.
@@ -125,8 +128,10 @@ sa propre coque, un bandeau et rien d'autre.
 🔴 38        /v2/cohortes/[id]/dealrooms
 ```
 
-**Le modèle change de forme.** Dépend d'[ADR-002](ADR-002-portee-de-la-dealroom.md),
-**non tranchée**.
+**Le modèle change de forme.** [ADR-002](ADR-002-portee-de-la-dealroom.md) **est
+tranchée** (6 août, option B) : la Dealroom devient un objet de premier rang,
+les `showcase_*` sont reprises puis supprimées, et les accords déjà donnés ne
+se reportent pas.
 
 ### Investisseur, hors application — lot I
 
@@ -135,7 +140,13 @@ sa propre coque, un bandeau et rien d'autre.
 📧 29        docs/emails/dealroom-01-invitation-investisseur.html
 ```
 
-Dépend d'[ADR-005](ADR-005-investisseur-externe.md), **non tranchée**.
+[ADR-005](ADR-005-investisseur-externe.md) **est tranchée** (6 août,
+**option B**, contre la recommandation) : **la Dealroom s'ouvre sans compte**,
+qui reste proposé mais jamais exigé.
+
+⚠️ Trois textes de la maquette deviennent faux et sont à réécrire avant
+intégration — le lien « personnel » de l'écran 29, l'invitation « liée à
+l'adresse » du 23, l'audience nominative du 27. Le lien EST l'accès.
 
 ### Le reste du rail
 

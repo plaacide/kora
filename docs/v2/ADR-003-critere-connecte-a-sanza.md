@@ -1,6 +1,7 @@
 # ADR-003 : Le critère « connecté à Sanza »
 
-**Statut :** Proposé — option B recommandée · **amendé le 5 août 2026** (§ Amendement)
+**Statut :** **ACCEPTÉ le 6 août 2026** — option B et ses deux clauses, amendement
+du 5 août compris. Tranché par le fondateur.
 **Date :** 5 août 2026
 **Branche :** `v2/rebuild`
 **Décideur :** fondateur
