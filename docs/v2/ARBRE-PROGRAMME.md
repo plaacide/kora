@@ -182,10 +182,35 @@ quelles serait au mieux inutile, au pire destructeur :
 - `pipeline_deux_axes` échouerait, sa reprise lisant `raise_investors.statut`,
   que cette même migration supprime.
 
-`20260731200000_objectif_quatre_valeurs` est écartée pour de bon : elle est
-antérieure à `objectif_six_valeurs`, déjà en place.
+`20260731200000_objectif_quatre_valeurs` ne doit **jamais** être rejouée seule :
+`objectif_six_valeurs` lui succède et est déjà en place. Dans un rejeu ORDONNÉ,
+en revanche, elle est inoffensive — elle passe avant, et se fait remplacer.
 
-Seul `checklist_metadata()` manque vraiment. `src/` ne l'appelle jamais.
+`checklist_metadata()` est le seul objet absent, et il doit le rester : le
+catalogue est devenu une TABLE le 4 août (`checklist_catalog`, 54 lignes contre
+22 dans la fonction). La poser recréerait la divergence que son propre
+commentaire redoute. `src/` ne l'appelle jamais.
+
+### Le registre ne correspond pas aux noms de fichiers
+
+Constat du 6 août, et il change la conclusion : **aucune** des 120 lignes du
+registre ne porte l'horodatage de son fichier. La plus ancienne version inscrite
+est `20260729134637`, alors que la plus ancienne migration du dépôt est
+`20260716090000` ; 67 lignes portent un nom préfixé `bootstrap_`.
+
+Les versions sont donc des heures d'APPLICATION, pas des heures de fichier.
+Conséquence : `supabase db push` ne peut pas se réconcilier avec ce registre, et
+y ajouter à la main les douze lignes manquantes n'y changerait rien — ce serait
+ajouter de l'incohérent à de l'incohérent.
+
+**Le seul chemin vers un dépôt et un staging qui s'accordent est une
+reconstruction complète**, et elle ne passe pas par le connecteur : 124 fichiers,
+696 Ko de SQL. Elle demande la CLI et le mot de passe de la base. `db reset` est
+LOCAL uniquement ; pour le distant c'est vider le schéma puis `db push`.
+
+`supabase/apply_pending.sql` a été supprimé le 6 août : c'était `pipeline_deux_axes`
+recopiée « à exécuter dans le SQL editor », et c'est ce mécanisme — appliquer à
+la main sans passer par le registre — qui a produit toute la dérive.
 
 **Le dépôt ne savait pas reconstruire le staging** jusqu'au commit `669ec8b` :
 `apply_checklist_template` avait été corrigée à la main sur la base, et la
