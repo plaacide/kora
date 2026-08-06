@@ -456,3 +456,108 @@ export const CHALLENGES_TERMINES = [
  * retards peuvent porter sur la même. Le compter à partir des lignes donnait 2.
  */
 export const ENTREPRISES_EN_RETARD = 1;
+
+export interface CritereFixture {
+  libelle: string;
+  /** Manuel : l'entreprise confirme. Connecté : Sanza valide tout seul. */
+  source: "manuel" | "connecte";
+  obligatoire: boolean;
+  /** Écran 12 : un critère structurel ne se supprime pas d'un modèle Sanza. */
+  structurel?: boolean;
+}
+
+export interface ModeleFixture {
+  id: string;
+  titre: string;
+  categorie: string;
+  duree: string;
+  description?: string;
+  criteres: readonly CritereFixture[];
+  /** Écran 10 : « Déjà utilisé dans 2 de vos cohortes ». */
+  cohortes?: number;
+}
+
+/** Les catégories du volet gauche de l'écran 10, et leurs comptes. */
+export const CATEGORIES: readonly { nom: string; nombre: number }[] = [
+  { nom: "Tous", nombre: 14 },
+  { nom: "Levée de fonds", nombre: 3 },
+  { nom: "Dette", nombre: 2 },
+  { nom: "Finance", nombre: 2 },
+  { nom: "Gouvernance", nombre: 2 },
+  { nom: "Conformité", nombre: 2 },
+  { nom: "Commercial", nombre: 1 },
+  { nom: "ESG", nombre: 1 },
+  { nom: "Reporting", nombre: 1 },
+];
+
+/** Les trois modèles Sanza de la catégorie « Levée de fonds », écran 10. */
+export const MODELES_SANZA: readonly ModeleFixture[] = [
+  {
+    id: "dossier-investisseur",
+    titre: "Préparer le dossier investisseur",
+    categorie: "Levée de fonds",
+    duree: "2 semaines",
+    description:
+      "Une version claire et investissable de l’entreprise, prête à être partagée : pitch deck, états financiers, cap table et montant recherché. Le modèle le plus utilisé avant un Demo Day ou une mise en relation.",
+    cohortes: 2,
+    criteres: [
+      { libelle: "Pitch deck finalisé", source: "manuel", obligatoire: true },
+      {
+        libelle: "États financiers disponibles",
+        source: "connecte",
+        obligatoire: true,
+        structurel: true,
+      },
+      { libelle: "Cap table à jour", source: "connecte", obligatoire: true },
+      {
+        libelle: "Montant recherché renseigné",
+        source: "connecte",
+        obligatoire: true,
+      },
+      { libelle: "One-pager rédigé", source: "manuel", obligatoire: false },
+    ],
+  },
+  {
+    id: "levee-seed",
+    titre: "Structurer votre levée Seed",
+    categorie: "Levée de fonds",
+    duree: "4 semaines",
+    criteres: new Array(6).fill(null).map((_, rang) => ({
+      libelle: `Critère ${rang + 1}`,
+      source: "manuel" as const,
+      obligatoire: true,
+    })),
+  },
+  {
+    id: "closing",
+    titre: "Préparer votre closing",
+    categorie: "Levée de fonds",
+    duree: "3 semaines",
+    criteres: new Array(4).fill(null).map((_, rang) => ({
+      libelle: `Critère ${rang + 1}`,
+      source: "manuel" as const,
+      obligatoire: true,
+    })),
+  },
+];
+
+/** Les deux modèles privés de l'organisation — écran 16. */
+export const MES_MODELES: readonly {
+  titre: string;
+  criteres: number;
+  cohortes: string;
+  modifie: string;
+}[] = [
+  {
+    titre: "Demo Day — version Savane",
+    criteres: 4,
+    cohortes: "Utilisé dans 3 cohortes",
+    modifie: "Modifié le 22 juillet",
+  },
+  {
+    titre: "Reporting bailleur trimestriel",
+    criteres: 3,
+    cohortes: "Utilisé dans 1 cohorte",
+    modifie: "Modifié le 4 juin",
+  },
+];
