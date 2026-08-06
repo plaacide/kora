@@ -1,4 +1,7 @@
+import { saisieProgramme } from "@/features/v2/server/programme";
 import { v2Routes } from "@/features/v2/navigation/routes";
+import { AvisEphemere } from "@/features/v2/ui/AvisEphemere";
+import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
 import { Icon } from "@/features/v2/ui/Icon";
 import {
   ETAPES_PROGRAMME,
@@ -6,22 +9,59 @@ import {
   Stepper,
 } from "@/features/v2/ui/Onboarding";
 
-const ROUTES = v2Routes.programme.onboarding;
+import { creerPremiereCohorte, reporterLaCohorte } from "../actions";
 
-/** Écran 00c — étape 4 : la première cohorte, pré-remplie. */
-export default function PremiereCohortePage() {
+/** Les mois proposés, de l'année en cours à la suivante. */
+const MOIS = [
+  "janvier", "février", "mars", "avril", "mai", "juin",
+  "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+];
+
+function moisProposes(): string[] {
+  const annee = new Date().getUTCFullYear();
+  return [annee, annee + 1].flatMap((an) =>
+    MOIS.map((mois) => `${mois[0].toUpperCase()}${mois.slice(1)} ${an}`),
+  );
+}
+
+/** Écran 00c — étape 4 : la première cohorte. */
+export default async function PremiereCohortePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erreur?: string }>;
+}) {
+  const [{ erreur }, saisie] = await Promise.all([
+    searchParams,
+    saisieProgramme(),
+  ]);
+  const mois = moisProposes();
+
   return (
-    <div className="v2-onboard-body">
+    <form action={creerPremiereCohorte} className="v2-onboard-body">
       <Stepper current={4} etapes={ETAPES_PROGRAMME} />
       <OnboardingTitle
         description="Une cohorte rassemble les entreprises que vous accompagnez sur une période donnée."
         title="Créez votre première cohorte"
       />
 
+      {erreur && (
+        <p className="v2-auth-error" role="alert">
+          <AvisEphemere />
+          {erreur === "nom"
+            ? "Donnez un nom à votre cohorte pour continuer."
+            : "La cohorte n’a pas pu être créée. Réessayez."}
+        </p>
+      )}
+
       <label className="v2-field">
         <span>Nom de la cohorte</span>
         <div className="v2-control">
-          <input defaultValue="Saison 4 · Agri & Agro" name="nom" />
+          <input
+            defaultValue={saisie.cohorte?.nom ?? ""}
+            name="nom"
+            placeholder="Saison 4 · Agri &amp; Agro"
+            required
+          />
         </div>
         <small className="v2-field-aide">
           Visible par les entreprises invitées.
@@ -32,16 +72,20 @@ export default function PremiereCohortePage() {
         <label className="v2-field">
           <span>Début</span>
           <div className="v2-control">
-            <select defaultValue="Mars 2026" name="debut">
-              <option>Mars 2026</option>
+            <select defaultValue={mois[2]} name="debut">
+              {mois.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
             </select>
           </div>
         </label>
         <label className="v2-field">
           <span>Fin</span>
           <div className="v2-control">
-            <select defaultValue="Décembre 2026" name="fin">
-              <option>Décembre 2026</option>
+            <select defaultValue={mois[11]} name="fin">
+              {mois.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
             </select>
           </div>
         </label>
@@ -51,15 +95,23 @@ export default function PremiereCohortePage() {
         <label className="v2-field">
           <span>Nombre de places</span>
           <div className="v2-control">
-            <input defaultValue="15" name="places" />
+            <input
+              defaultValue={saisie.cohorte?.places ?? 15}
+              inputMode="numeric"
+              name="places"
+            />
           </div>
         </label>
         <label className="v2-field">
           <span>
             Focus sectoriel <small>— facultatif</small>
           </span>
+          {/* PAS DE COLONNE POUR CE CHAMP. `cohorts` porte un `goal`, pas un
+              secteur ; la maquette le demande, la base ne sait pas où le
+              mettre. Il est affiché et non enregistré, plutôt que d'inventer
+              une colonne dans le dos du modèle. */}
           <div className="v2-control">
-            <select defaultValue="Agri & Agro" name="focus">
+            <select defaultValue="Agri & Agro" disabled name="focus">
               <option>Agri &amp; Agro</option>
             </select>
           </div>
@@ -75,21 +127,28 @@ export default function PremiereCohortePage() {
       </p>
 
       <div className="v2-form-actions">
-        <a className="v2-onboard-back" href={ROUTES.accompagnement}>
+        <a
+          className="v2-onboard-back"
+          href={v2Routes.programme.onboarding.accompagnement}
+        >
           ← Retour
         </a>
         <div>
-          <a className="v2-onboard-later" href={ROUTES.pret}>
+          <BoutonEnvoi
+            className="v2-onboard-later"
+            formAction={reporterLaCohorte}
+            sansValidation
+          >
             Créer ma cohorte plus tard
-          </a>
-          <a className="v2-btn" href={ROUTES.pret}>
+          </BoutonEnvoi>
+          <BoutonEnvoi className="v2-onboard-primary">
             Créer la cohorte
-          </a>
+          </BoutonEnvoi>
         </div>
       </div>
       <p className="v2-onboard-disclaimer">
         Vous inviterez les entreprises juste après — par email ou lien ouvert.
       </p>
-    </div>
+    </form>
   );
 }

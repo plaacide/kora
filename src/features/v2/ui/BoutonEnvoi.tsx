@@ -21,6 +21,7 @@ export function BoutonEnvoi({
   children,
   className,
   enCours,
+  formAction,
   name,
   sansValidation,
   value,
@@ -35,6 +36,15 @@ export function BoutonEnvoi({
    * mensonge. Le bouton se contente alors d'être désactivé.
    */
   enCours?: string;
+  /**
+   * Une action DIFFÉRENTE de celle du formulaire.
+   *
+   * Deux boutons d'un même formulaire ne font pas toujours la même chose :
+   * « Créer la cohorte » écrit, « Créer ma cohorte plus tard » passe. Sans
+   * cela il fallait un second formulaire imbriqué — que le HTML interdit — ou
+   * un champ caché lu par l'action, qui ne dit pas son nom.
+   */
+  formAction?: (formData: FormData) => void | Promise<void>;
   name?: string;
   /**
    * Soumettre SANS passer par la validation du navigateur.
@@ -53,6 +63,7 @@ export function BoutonEnvoi({
       aria-busy={pending}
       className={className}
       disabled={pending}
+      formAction={formAction}
       formNoValidate={sansValidation}
       name={name}
       type="submit"

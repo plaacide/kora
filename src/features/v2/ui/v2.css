@@ -2122,3 +2122,6 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .v2-field-aide{color:var(--text-3);font-size:12.5px}
 .v2-onb-titre-centre{align-items:center;text-align:center}
+/* Le second bouton de la sortie d'inscription : le même, en secondaire. */
+.v2-onb-fin button:last-child{border-color:var(--line);background:#fff;color:var(--text-2)!important}
+.v2-onb-fin button:last-child:hover{background:var(--band)}
