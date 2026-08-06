@@ -2125,3 +2125,38 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 /* Le second bouton de la sortie d'inscription : le même, en secondaire. */
 .v2-onb-fin button:last-child{border-color:var(--line);background:#fff;color:var(--text-2)!important}
 .v2-onb-fin button:last-child:hover{background:var(--band)}
+
+/* Écrans 13, 14 et 15 — assigner un Challenge et suivre son avancement. */
+.v2-chiffres{display:flex;gap:16px;margin-bottom:16px}
+.v2-chiffre{display:flex;flex:1;align-items:baseline;gap:8px;padding:14px 18px}
+.v2-chiffre b{font:600 22px var(--font-v2-head),sans-serif;font-variant-numeric:tabular-nums}
+.v2-chiffre[data-ton=red] b{color:var(--red)}
+.v2-chiffre span{color:var(--text-2);font-size:13px}
+.v2-assigner{display:grid;grid-template-columns:1fr 320px;align-items:start;gap:16px}
+.v2-assigner>div:first-child{display:flex;flex-direction:column;gap:14px}
+/* Une ligne retenue prend le fond de l'accent : la case cochée seule se
+   remarque mal dans une liste qu'on parcourt du regard. */
+.v2-tbl tr[data-retenue=true] td{background:var(--orange-soft)}
+.v2-case{display:inline-grid;width:16px;height:16px;place-items:center;border:1.5px solid #d0d5dd;border-radius:4px;color:#fff}
+.v2-case[data-cochee=true]{border-color:var(--orange);background:var(--orange)}
+.v2-case .v2-icon{width:12px;height:12px}
+.v2-resume{display:flex;flex-direction:column;gap:12px;padding:18px 20px}
+.v2-resume>p{margin:0;color:var(--text-3);font-size:12px}
+/* Le panneau latéral : il vient PAR-DESSUS, il ne pousse pas le tableau. */
+.v2-scrim-panneau{position:fixed;z-index:60;inset:0;background:rgba(16,24,40,.32)}
+.v2-panneau{position:fixed;z-index:61;top:0;right:0;bottom:0;display:flex;width:460px;max-width:100vw;flex-direction:column;border-left:1px solid var(--line);background:#fff;box-shadow:-12px 0 32px rgba(16,24,40,.06)}
+.v2-panneau-head{display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid var(--line-soft);padding:20px 24px}
+.v2-panneau-head h2{flex:1;font-size:16px}
+.v2-panneau-head small{display:block;margin-top:2px;color:var(--text-3);font-size:12.5px}
+.v2-panneau-body{display:flex;flex:1;flex-direction:column;gap:18px;overflow:auto;padding:20px 24px}
+.v2-panneau-foot{display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line-soft);padding:14px 24px}
+.v2-panneau-note{border-radius:var(--r-md);background:var(--band);padding:12px 14px;color:var(--text-2);font-size:12.5px}
+/* Un critère suivi : la pastille dit s'il est fait, la ligne dit comment on
+   le sait. Jamais avec quelle pièce. */
+.v2-crit-suivi{display:flex;align-items:flex-start;gap:10px;padding:9px 0}
+.v2-crit-suivi>i{display:grid;width:20px;height:20px;flex-shrink:0;place-items:center;border-radius:50%;background:var(--green-bg);color:var(--green)}
+.v2-crit-suivi[data-fait=false]>i{border:1.5px dashed #d0d5dd;background:transparent}
+.v2-crit-suivi[data-fait=false] b{color:var(--text-3)}
+.v2-crit-suivi .v2-icon{width:13px;height:13px}
+.v2-crit-suivi b{font:500 13.5px var(--font-v2-sans),sans-serif}
+.v2-crit-suivi small{display:block;margin-top:2px;color:var(--text-3);font-size:12px}

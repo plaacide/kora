@@ -594,3 +594,99 @@ export const CHALLENGE_PERSONNALISE = {
   echeance: "30 septembre 2026",
   criteres: MODELES_SANZA[0].criteres,
 } as const;
+
+export interface AssignationFixture {
+  initiales: string;
+  nom: string;
+  ton: Ton;
+  secteur: string;
+  pays: string;
+  faits: number;
+  total: number;
+  statut: "En retard" | "En cours" | "Terminé" | "À faire";
+  echeance: string;
+}
+
+/**
+ * Le suivi de « Préparer votre Demo Day » — écran 14.
+ *
+ * L'ordre est celui de l'écran, et il n'est pas alphabétique : LES RETARDS
+ * D'ABORD, puis l'échéance la plus proche. Un programme ouvre cette page pour
+ * savoir qui relancer, pas pour lire une liste.
+ */
+export const ASSIGNATIONS: readonly AssignationFixture[] = [
+  {
+    initiales: "TH", nom: "Teranga Health", ton: "red",
+    secteur: "Santé", pays: "Sénégal",
+    faits: 1, total: 4, statut: "En retard", echeance: "dépassée de 4 jours",
+  },
+  {
+    initiales: "CB", nom: "CoolBricks", ton: "orange",
+    secteur: "Construction", pays: "Côte d’Ivoire",
+    faits: 3, total: 4, statut: "En cours", echeance: "demain",
+  },
+  {
+    initiales: "WL", nom: "Wari Logistics", ton: "neutral",
+    secteur: "Logistique", pays: "Mali",
+    faits: 2, total: 4, statut: "En cours", echeance: "15 octobre",
+  },
+  {
+    initiales: "NS", nom: "Nimba Solar", ton: "green",
+    secteur: "Énergie", pays: "Guinée",
+    faits: 4, total: 4, statut: "Terminé", echeance: "terminé le 28 juillet",
+  },
+  {
+    initiales: "KF", nom: "Kalyx Foods", ton: "blue",
+    secteur: "Agroalimentaire", pays: "Sénégal",
+    faits: 4, total: 4, statut: "Terminé", echeance: "terminé le 25 juillet",
+  },
+  {
+    initiales: "BL", nom: "Bissap Labs", ton: "amber",
+    secteur: "Ag-tech", pays: "Bénin",
+    faits: 4, total: 4, statut: "Terminé", echeance: "terminé le 24 juillet",
+  },
+];
+
+/** Les segments de l'écran 14. Le total dépasse les six lignes affichées. */
+export const SEGMENTS_SUIVI: readonly string[] = [
+  "Toutes · 8", "En retard · 1", "En cours · 2", "À faire · 0", "Terminées · 5",
+];
+
+/**
+ * L'état des quatre critères de CoolBricks — panneau de l'écran 15.
+ *
+ * AUCUN NE MÈNE À UN DOCUMENT, et la note du pied le répète. Un critère
+ * connecté dit « validé automatiquement », un critère manuel dit qui l'a
+ * confirmé et quand — jamais avec quelle pièce.
+ */
+export const CRITERES_SUIVIS: readonly {
+  libelle: string;
+  detail: string;
+  fait: boolean;
+}[] = [
+  { libelle: "Pitch deck finalisé", fait: true,
+    detail: "Manuel · confirmé par l’entreprise le 24 juillet" },
+  { libelle: "KPIs à jour", fait: true,
+    detail: "Connecté à Sanza · validé automatiquement" },
+  { libelle: "Montant recherché renseigné", fait: true,
+    detail: "Connecté à Sanza · validé automatiquement" },
+  { libelle: "Pitch de 5 minutes préparé", fait: false,
+    detail: "Manuel · en attente de confirmation" },
+];
+
+/**
+ * Les entreprises proposées à l'assignation — écran 13.
+ *
+ * ⚠️ CONFLIT ENTRE ÉCRANS, reproduit tel quel. Bissap Labs porte ici 12 % de
+ * préparation ; l'écran 05 l'affiche « Nouvelle », sans opération ni
+ * préparation. Chaque écran garde son chiffre, le conflit est signalé.
+ */
+export const A_ASSIGNER: readonly {
+  initiales: string; nom: string; ton: Ton;
+  secteur: string; pays: string; preparation: number; retenue: boolean;
+}[] = [
+  { initiales: "CB", nom: "CoolBricks", ton: "orange", secteur: "Construction", pays: "Côte d’Ivoire", preparation: 62, retenue: true },
+  { initiales: "KF", nom: "Kalyx Foods", ton: "blue", secteur: "Agroalimentaire", pays: "Sénégal", preparation: 38, retenue: true },
+  { initiales: "NS", nom: "Nimba Solar", ton: "green", secteur: "Énergie", pays: "Guinée", preparation: 81, retenue: false },
+  { initiales: "BL", nom: "Bissap Labs", ton: "amber", secteur: "Ag-tech", pays: "Bénin", preparation: 12, retenue: true },
+];
