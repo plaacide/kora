@@ -623,8 +623,17 @@ alors que les fichiers restent.
 `src/app/v2/(programme)`, `(vitrine)` et `(onboarding)/onboarding/programme`,
 et lesquels importent quoi que ce soit de `features/v2/server`.
 
-**LES TRENTE-HUIT ÉCRANS SONT INTÉGRÉS.** Lots A à I livrés. Ce qui reste est
-le branchement, pas l'intégration.
+**LES QUARANTE-SEPT ÉCRANS SONT INTÉGRÉS.** Lots A à I, plus les neuf écrans
+de complément versés le 6 août à midi — accueil du programme, demandes,
+rapports, cohorte peuplée, dealrooms et rapports de cohorte, demandes et
+activité d'une Dealroom, et la vue entreprise d'un Challenge. **Plus aucun
+écran d'attente dans le parcours.** Ce qui reste est le branchement, pas
+l'intégration.
+
+**Mouvement** : entrées de page branchées sur `TRANSITIONS.md` — tiroir 480 ms,
+modales en fondu montant, cascade de listes à 40 ms, mouvement réduit à 150 ms.
+Ce qui répond sous le doigt (états de pression, chargement, succès) attend le
+branchement : aucun de ces boutons n'écrit encore.
 
 **Un seul fichier de ce parcours lit la base** : `(programme)/layout.tsx`, pour
 savoir qui est connecté. **Aucun écran** ne lit ni n'écrit — tous affichent les
@@ -703,12 +712,22 @@ Nav de cohorte   Vue d'ensemble · Entreprises · Challenges ·
 🔴 06, 07    /v2/portefeuille — vide et rempli
 ```
 
-### Quatre entrées que rien ne dessine
+### Les neuf écrans de complément — versés le 6 août
 
-Rapports (rail global ET nav de cohorte), Demandes et Activité d'une Dealroom,
-et la vue entreprise d'un Challenge. Toutes portent un écran d'attente qui dit
-ce qu'il attend ; aucune n'est un cul-de-sac. Voir
-[INCOHERENCES-MAQUETTES.md](INCOHERENCES-MAQUETTES.md).
+```
+🔴 34  Accueil du programme          /v2/programme
+🔴 35  Demandes, toutes Dealrooms    /v2/demandes
+🔴 36  Rapports                      /v2/rapports
+🔴 37  Cohorte — vue d'ensemble      /v2/cohortes/[id] (état peuplé)
+🔴 38  Cohorte — Dealrooms           /v2/cohortes/[id]/dealrooms
+🔴 39  Cohorte — Rapports            /v2/cohortes/[id]/rapports
+🔴 40  Dealroom — Demandes           /v2/dealrooms/[id]/demandes
+🔴 41  Dealroom — Activité           /v2/dealrooms/[id]/activite
+🔴 42  Challenge — vue entreprise    /v2/challenges/[id] · CÔTÉ FONDATEUR
+```
+
+L'écran 42 est le seul du parcours à se placer du côté de l'entreprise : il a
+sa propre coque, un bandeau et rien d'autre.
 
 ### Ce que la base a déjà, et que rien n'appelle
 
