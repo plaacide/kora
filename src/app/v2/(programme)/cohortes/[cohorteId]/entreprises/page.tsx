@@ -2,9 +2,17 @@ import {
   CHALLENGES_A_PROPOSER,
   cohorte,
   ENTREPRISES,
-  INVITATIONS,
   SEGMENTS,
 } from "@/features/v2/fixtures/programme";
+import {
+  lireCohorte,
+  listerInvitations,
+  type InvitationLue,
+} from "@/features/v2/server/cohortes";
+import { AvisEphemere } from "@/features/v2/ui/AvisEphemere";
+import { BoutonEnvoi } from "@/features/v2/ui/BoutonEnvoi";
+
+import { inviterEntreprise } from "../../actions";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { BarreEtats } from "@/features/v2/ui/BarreEtats";
 import { Icon } from "@/features/v2/ui/Icon";
@@ -22,84 +30,108 @@ function Conseil({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Écran 04 — quatre invitations envoyées, aucune acceptée. */
-function Invitations({ cohorteId }: { cohorteId: string }) {
+/**
+ * Écran 04 — les invitations réellement envoyées. BRANCHÉ.
+ *
+ * Le bloc « Conseil » a disparu : il nommait CoolBricks et son lien ouvert.
+ * Le calculer demande une règle que personne n'a encore arrêtée — la plus
+ * urgente ? la plus prometteuse ? — et l'inventer ici l'aurait figée dans un
+ * écran plutôt que dans le domaine. Il revient quand la règle est décidée.
+ */
+function Invitations({
+  cohorteId,
+  invitations,
+  erreur,
+}: {
+  cohorteId: string;
+  invitations: readonly InvitationLue[];
+  erreur?: string;
+}) {
+  const acceptees = invitations.filter((i) => i.statut === "Acceptée").length;
+
   return (
     <>
       <div className="v2-prog-head">
         <div>
           <h1>Entreprises</h1>
-          <p>{INVITATIONS.length} invitations envoyées · 0 acceptée</p>
+          <p>
+            {invitations.length} invitation{invitations.length > 1 ? "s" : ""}{" "}
+            envoyée{invitations.length > 1 ? "s" : ""} · {acceptees} acceptée
+            {acceptees > 1 ? "s" : ""}
+          </p>
         </div>
-        <span className="v2-spacer" />
-        <nav>
-          <span className="v2-btn" data-variant="secondary">
-            Relancer tout le monde
-          </span>
-          <span className="v2-btn">Inviter une entreprise</span>
-        </nav>
       </div>
 
-      <Conseil>
-        CoolBricks a ouvert le lien sans aller au bout. C’est l’invitation la
-        plus prometteuse de votre liste&nbsp;: un appel court est probablement
-        plus utile qu’un nouvel e-mail.
-      </Conseil>
+      {erreur && (
+        <p className="v2-auth-error" role="alert">
+          <AvisEphemere />
+          {erreur === "email"
+            ? "Donnez l’adresse e-mail de l’entreprise à inviter."
+            : "L’invitation n’a pas pu être envoyée. Réessayez."}
+        </p>
+      )}
 
-      <div className="v2-card" style={{ overflow: "hidden" }}>
-        <table className="v2-tbl">
-          <thead>
-            <tr>
-              <th>Entreprise</th>
-              <th>Envoyée le</th>
-              <th>Dernière activité</th>
-              <th>Statut</th>
-              <th aria-label="Actions" />
-            </tr>
-          </thead>
-          <tbody>
-            {INVITATIONS.map((invitation) => (
-              <tr key={invitation.email}>
-                <td>
-                  <div className="v2-ident">
-                    <span className="v2-pastille" data-ton={invitation.ton}>
-                      {invitation.initiales}
-                    </span>
-                    <div>
-                      <b>{invitation.nom}</b>
-                      <div>{invitation.email}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="v2-muted">{invitation.envoyee}</td>
-                <td className="v2-dim">{invitation.activite}</td>
-                <td>
-                  <span className="v2-badge" data-tone={invitation.statutTon}>
-                    <span className="v2-dot" />
-                    {invitation.statut}
-                  </span>
-                </td>
-                <td data-actions>
-                  <span className="v2-btn" data-variant="text">
-                    {invitation.action}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p
-        style={{
-          color: "var(--text-3)",
-          fontSize: "12.5px",
-          margin: "12px 2px 0",
-        }}
+      <form
+        action={inviterEntreprise}
+        className="v2-card"
+        style={{ display: "flex", gap: 12, marginBottom: 16, padding: "16px 18px" }}
       >
+        <input name="cohorte" type="hidden" value={cohorteId} />
+        <div className="v2-control" style={{ flex: 1, height: 44 }}>
+          <input name="nom" placeholder="Nom de l’entreprise" />
+        </div>
+        <div className="v2-control" style={{ flex: 1, height: 44 }}>
+          <input name="email" placeholder="contact@entreprise.com" required type="email" />
+        </div>
+        <BoutonEnvoi className="v2-btn" enCours="Envoi…">
+          Inviter une entreprise
+        </BoutonEnvoi>
+      </form>
+
+      {invitations.length > 0 && (
+        <div className="v2-card" style={{ overflow: "hidden" }}>
+          <table className="v2-tbl">
+            <thead>
+              <tr>
+                <th>Entreprise</th>
+                <th>Envoyée le</th>
+                <th>Dernière activité</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invitations.map((invitation) => (
+                <tr key={invitation.id}>
+                  <td>
+                    <div className="v2-ident">
+                      <span className="v2-pastille" data-ton="neutral">
+                        {invitation.initiales}
+                      </span>
+                      <div>
+                        <b>{invitation.nom}</b>
+                        <div>{invitation.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="v2-muted">{invitation.envoyee}</td>
+                  <td className="v2-dim">{invitation.activite}</td>
+                  <td>
+                    <span className="v2-badge" data-tone={invitation.ton}>
+                      <span className="v2-dot" />
+                      {invitation.statut}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <p className="v2-dr-note">
         Une invitation expire après 30 jours. Un rappel au maximum toutes les
         48&nbsp;heures par entreprise.
       </p>
-      <Etats cohorteId={cohorteId} courant="04" />
     </>
   );
 }
@@ -331,15 +363,31 @@ export default async function EntreprisesPage({
   searchParams,
 }: {
   params: Promise<{ cohorteId: string }>;
-  searchParams: Promise<{ arrivee?: string }>;
+  searchParams: Promise<{ arrivee?: string; erreur?: string }>;
 }) {
-  const [{ cohorteId }, { arrivee }] = await Promise.all([
+  const [{ cohorteId }, { arrivee, erreur }] = await Promise.all([
     params,
     searchParams,
   ]);
+  const [reelle, invitations] = await Promise.all([
+    lireCohorte(cohorteId),
+    listerInvitations(cohorteId),
+  ]);
+
+  // Tant qu'aucune entreprise n'a accepté, l'écran est celui des invitations.
+  // L'écran 05 attend `sae_portfolio()` : il reste en fixtures, et le dit.
+  if (reelle && reelle.entreprises === 0) {
+    return (
+      <Invitations
+        cohorteId={cohorteId}
+        erreur={erreur}
+        invitations={invitations}
+      />
+    );
+  }
 
   return cohorte(cohorteId).entreprises === 0 ? (
-    <Invitations cohorteId={cohorteId} />
+    <Invitations cohorteId={cohorteId} erreur={erreur} invitations={invitations} />
   ) : (
     <Actives arrivee={arrivee === "1"} cohorteId={cohorteId} />
   );

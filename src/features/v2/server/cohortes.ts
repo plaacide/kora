@@ -101,14 +101,18 @@ export async function lireCohorte(id: string): Promise<CohorteLue | null> {
 export async function listerInvitations(
   cohorteId: string,
 ): Promise<readonly InvitationLue[]> {
-  const { organization } = await requireV2Workspace();
+  await requireV2Workspace();
   const supabase = await createClient();
   const maintenant = new Date();
 
+  // PAS DE FILTRE SUR L'ORGANISATION ICI. La RLS le fait déjà, et le refaire
+  // à la main le faisait DEUX FOIS, avec deux définitions différentes de
+  // « mon organisation » : `requireV2Workspace` prend le premier membership,
+  // la RPC d'invitation prend le premier où l'on est owner ou admin. Quand les
+  // deux divergent, l'invitation part en base et n'apparaît jamais à l'écran.
   const { data } = await supabase
     .from("cohort_links")
     .select("id, email, company_name, status, created_at, opened_at, accepted_at")
-    .eq("sae_org_id", organization.id)
     .eq("cohort_id", cohorteId)
     .order("created_at", { ascending: false });
 

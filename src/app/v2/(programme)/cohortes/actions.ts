@@ -31,7 +31,11 @@ export async function creerCohorte(formData: FormData) {
     p_seats: Number.isSafeInteger(places) && places > 0 ? places : null,
     p_starts_on: valeur(formData, "debut"),
     p_ends_on: valeur(formData, "fin"),
-    p_goal: null,
+    // `p_goals`, au PLURIEL et en tableau : une migration du 30 juillet a
+    // remplacé l'objectif unique. Lire la première migration venue donne une
+    // signature morte — PostgREST répond alors 404 sur une fonction qui
+    // existe, et l'écran croit à une panne.
+    p_goals: null,
   });
 
   if (error) echec(ROUTES.list, "create_cohort", error);
@@ -53,10 +57,13 @@ export async function inviterEntreprise(formData: FormData) {
   if (!email) redirect(`${retour}?erreur=email`);
 
   const supabase = await createClient();
+  // DEUX ARGUMENTS, PAS TROIS. La migration du 31 juillet qui ajoute `p_name`
+  // n'est pas appliquée sur staging : le dépôt est en avance sur la base. On
+  // appelle ce qui EXISTE, et le nom saisi attend que la migration passe —
+  // d'ici là, la liste affiche l'adresse, ce que `listerInvitations` prévoit.
   const { error } = await supabase.rpc("invite_to_cohort", {
     p_email: email,
     p_cohort: cohorteId,
-    p_name: valeur(formData, "nom"),
   });
 
   if (error) echec(retour, "invite_to_cohort", error);
