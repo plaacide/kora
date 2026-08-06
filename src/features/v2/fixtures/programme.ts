@@ -385,3 +385,74 @@ export const MESSAGES: readonly MessageFixture[] = [
       "Pensez à renseigner votre montant recherché avant le Demo Day — les investisseurs filtrent souvent sur ce champ.",
   },
 ];
+
+export interface ChallengeFixture {
+  id: string;
+  titre: string;
+  categorie: string;
+  entreprises: number;
+  echeance: string;
+  /** Terminées, en cours, en retard, à faire — dans cet ordre. */
+  repartition: { terminees: number; enCours: number; enRetard: number; aFaire: number };
+}
+
+/**
+ * Les quatre Challenges actifs de Saison 4 — écran 09b.
+ *
+ * La barre est SEGMENTÉE, pas une jauge : vert ce qui est fait, orange ce qui
+ * avance, rouge ce qui a dépassé. Une jauge unique dirait « 62 % » sans dire
+ * qu'une entreprise est en retard, ce qui est la seule chose à voir ici.
+ */
+export const CHALLENGES: readonly ChallengeFixture[] = [
+  {
+    id: "demo-day",
+    titre: "Préparer votre Demo Day",
+    categorie: "Financement",
+    entreprises: 8,
+    echeance: "15 octobre 2026",
+    repartition: { terminees: 5, enCours: 2, enRetard: 1, aFaire: 0 },
+  },
+  {
+    id: "kpis",
+    titre: "Mettre à jour vos KPIs",
+    categorie: "Reporting",
+    entreprises: 12,
+    echeance: "30 août 2026",
+    repartition: { terminees: 7, enCours: 4, enRetard: 1, aFaire: 0 },
+  },
+  {
+    id: "ohada",
+    titre: "Compléter vos pièces OHADA prioritaires",
+    categorie: "Conformité",
+    entreprises: 12,
+    echeance: "30 novembre 2026",
+    repartition: { terminees: 4, enCours: 6, enRetard: 0, aFaire: 2 },
+  },
+  {
+    id: "dossier-investisseur-savane",
+    titre: "Préparer le dossier investisseur — version Savane",
+    categorie: "Levée de fonds",
+    entreprises: 5,
+    echeance: "30 septembre 2026",
+    repartition: { terminees: 2, enCours: 3, enRetard: 0, aFaire: 0 },
+  },
+];
+
+/** Le Challenge clos de l'écran 09b. */
+export const CHALLENGES_TERMINES = [
+  {
+    titre: "Diagnostic ESG initial",
+    categorie: "ESG",
+    resultat: "12 / 12 terminées",
+    clos: "clôturé le 15 juin",
+  },
+] as const;
+
+/**
+ * « 1 entreprise en retard », écran 09b.
+ *
+ * Ce chiffre ne se déduit PAS des quatre Challenges : deux d'entre eux
+ * comptent un retard, mais la maquette n'annonce qu'une entreprise — deux
+ * retards peuvent porter sur la même. Le compter à partir des lignes donnait 2.
+ */
+export const ENTREPRISES_EN_RETARD = 1;
