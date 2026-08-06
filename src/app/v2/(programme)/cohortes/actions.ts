@@ -57,13 +57,10 @@ export async function inviterEntreprise(formData: FormData) {
   if (!email) redirect(`${retour}?erreur=email`);
 
   const supabase = await createClient();
-  // DEUX ARGUMENTS, PAS TROIS. La migration du 31 juillet qui ajoute `p_name`
-  // n'est pas appliquée sur staging : le dépôt est en avance sur la base. On
-  // appelle ce qui EXISTE, et le nom saisi attend que la migration passe —
-  // d'ici là, la liste affiche l'adresse, ce que `listerInvitations` prévoit.
   const { error } = await supabase.rpc("invite_to_cohort", {
     p_email: email,
     p_cohort: cohorteId,
+    p_name: valeur(formData, "nom"),
   });
 
   if (error) echec(retour, "invite_to_cohort", error);
