@@ -5,10 +5,10 @@ incubateurs, studios. Le parcours fondateur a le sien :
 [ARBRE-CONNEXIONS.md](ARBRE-CONNEXIONS.md). Les deux ne se lisent pas ensemble :
 ils n'ont ni le même rail, ni les mêmes écrans, ni les mêmes règles.
 
-**Dernière vérification : 6 août 2026**, branche `v2/rebuild`. Établie en
-re-dérivant depuis le code — quels fichiers existent sous
-`src/app/v2/(programme)`, `(vitrine)`, `(entreprise)` et le tunnel
-d'inscription, et lesquels importent quoi que ce soit de `features/v2/server`.
+**Dernière vérification : 6 août 2026, en soirée**, branche `v2/rebuild`.
+Re-dérivé depuis le code : quels fichiers existent sous `src/app/v2/(programme)`,
+`(vitrine)`, `(entreprise)` et `(onboarding)/onboarding/programme`, lesquels
+importent de `features/v2/server`, et quelles RPC sont réellement appelées.
 Ce document se périme : le relire avant de s'y fier.
 
 | Marque | Sens |
@@ -17,26 +17,23 @@ Ce document se périme : le relire avant de s'y fier.
 | 🔴 | Fixture — aucune donnée réelle, tout est écrit dans le fichier |
 | 📧 | Gabarit d'e-mail, pas une page |
 
-**Re-dérivé le 6 août 2026, en fin de journée** : quels fichiers existent sous
-`src/app/v2/(programme)`, `(vitrine)` et `(onboarding)/onboarding/programme`,
-et lesquels importent quoi que ce soit de `features/v2/server`.
+**Les quarante-sept écrans sont intégrés.** Lots A à I, plus les neuf écrans de
+complément versés le 6 août à midi. Plus aucun écran d'attente dans le
+parcours. Ce qui reste est le branchement, pas l'intégration.
 
-**LES QUARANTE-SEPT ÉCRANS SONT INTÉGRÉS.** Lots A à I, plus les neuf écrans
-de complément versés le 6 août à midi — accueil du programme, demandes,
-rapports, cohorte peuplée, dealrooms et rapports de cohorte, demandes et
-activité d'une Dealroom, et la vue entreprise d'un Challenge. **Plus aucun
-écran d'attente dans le parcours.** Ce qui reste est le branchement, pas
-l'intégration.
+## Le compte, au fichier près
 
-**Mouvement** : entrées de page branchées sur `TRANSITIONS.md` — tiroir 480 ms,
-modales en fondu montant, cascade de listes à 40 ms, mouvement réduit à 150 ms.
-Ce qui répond sous le doigt (états de pression, chargement, succès) attend le
-branchement : aucun de ces boutons n'écrit encore.
+Le parcours porte **29 fichiers** : 25 pages et 4 coques.
 
-**Un seul fichier de ce parcours lit la base** : `(programme)/layout.tsx`, pour
-savoir qui est connecté. **Aucun écran** ne lit ni n'écrit — tous affichent les
-fixtures des maquettes, conformément à l'ordre de travail du 29 juillet. C'est
-un choix, pas un oubli : ne pas le compter comme une dette.
+| | Nombre |
+|---|---|
+| Pages en fixtures | **23** |
+| Pages branchées | **2** — la liste des cohortes, les entreprises d'une cohorte |
+| Coques branchées | **2** — la coque programme (garde de session), la nav de cohorte |
+| Coques en fixtures | 2 — Dealroom, vitrine investisseur |
+
+S'y ajoute, hors parcours mais branché de bout en bout, le **tunnel
+d'inscription programme** — quatre écrans, quatre RPC.
 
 ```
 Rail programme   Accueil · Portefeuille · Cohortes · Dealrooms · Demandes ·
@@ -52,26 +49,45 @@ Nav de cohorte   Vue d'ensemble · Entreprises · Challenges ·
    └─ un compte `sae` entre par ses cohortes, les autres par l'accueil
 🟢 Sans organisation             → l'onboarding de SON métier, plus celui du
                                    fondateur pour tout le monde
-🔴 Onboarding programme (00a-d)  —                     organisation, façon
-                                   d'accompagner, première cohorte, espace prêt.
-                                   N'ÉCRIT RIEN : « Créer la cohorte » est un
-                                   lien. `save_programme` et `create_cohort`
-                                   existent en base et ne sont pas appelées.
+🟢 Onboarding programme (00a-d)  ÉCRIT. Les quatre écrans appellent, dans
+   organisation → save_programme      l'ordre : save_programme,
+   accompagnement → set_programme_focus  set_programme_focus, create_cohort
+   cohorte → create_cohort            (ou report), finish_programme_onboarding.
+   prêt → finish_programme_onboarding
 ⚠️ Aucun chemin n'y mène          l'inscription propose « Un programme » mais
-                                   ne redirige pas vers ce tunnel.
+                                   ne redirige toujours pas vers ce tunnel.
 ```
 
-### Cohortes — lot B
+### Cohortes — lot B · LE SEUL LOT BRANCHÉ
 
 ```
-🔴 01 Liste vide                 /v2/cohortes?etat=vide
-🔴 02 Liste remplie              /v2/cohortes
+🟢 01 Liste vide                 /v2/cohortes?etat=vide     listerCohortes()
+🟢 02 Liste remplie              /v2/cohortes               listerCohortes()
 🔴 03 Cohorte au premier jour    /v2/cohortes/saison-4-jour-1
-🔴 04 Invitations en attente     /v2/cohortes/saison-4-jour-1/entreprises
-🔴 05 Entreprises actives        /v2/cohortes/saison-4/entreprises
+🟢 04 Invitations en attente     …/entreprises              listerInvitations()
+🟢 05 Entreprises actives        …/entreprises              listerInvitations()
 🔴 17 Une entreprise arrive      …/entreprises?arrivee=1
-⚪ Vue d'ensemble peuplée        aucune maquette ne la montre
+🟢 Nav de cohorte                lireCohorte()  — compteurs du panneau latéral
+🟢 Inviter une entreprise        cohortes/actions.ts → invite_to_cohort
+🔴 37 Vue d'ensemble peuplée     /v2/cohortes/[id]
 ```
+
+Règles pures et testées : `features/v2/domain/cohorte.ts` — état d'une
+invitation, ton du statut, période, effectif. 12 tests.
+
+**Point à traiter au prochain lot :** `server/cohortes.ts` lit les tables en
+direct (`.from("cohorts")`, `.from("cohort_members")`, `.from("cohort_links")`),
+et non par une fonction à colonnes énumérées comme `sae_portfolio()`. Le
+portefeuille, lui, doit suivre le patron — c'est l'objet d'
+[ADR-004](ADR-004-canal-de-lecture-du-programme.md).
+
+### Portefeuille — lot C
+
+```
+🔴 06, 07    /v2/portefeuille — vide et rempli
+```
+
+Dépend d'[ADR-004](ADR-004-canal-de-lecture-du-programme.md), **non tranchée**.
 
 ### Questions & suggestions — lot D
 
@@ -79,7 +95,10 @@ Nav de cohorte   Vue d'ensemble · Entreprises · Challenges ·
 🔴 08 Le fil                     /v2/cohortes/[id]/questions
 ```
 
-### Challenges — lot E
+`program_threads` existe (`20260728100000_dealroom_vitrine_demandes`) ; il lui
+manque un rattachement à la cohorte. Aucune ADR ne bloque.
+
+### Challenges — lots E et F
 
 ```
 🔴 09  Aucun Challenge           /v2/cohortes/saison-4-jour-1/challenges
@@ -88,14 +107,26 @@ Nav de cohorte   Vue d'ensemble · Entreprises · Challenges ·
 🔴 16  Mes modèles               …/challenges/bibliotheque?onglet=miens
 🔴 11  Créer de zéro             …/challenges/nouveau
 🔴 12  Personnaliser un modèle   …/challenges/nouveau?modele=…
+🔴 42  Vue entreprise            /v2/challenges/[id] · CÔTÉ FONDATEUR
 ```
+
+**Rien n'existe en base.** Dépend d'[ADR-003](ADR-003-critere-connecte-a-sanza.md),
+**non tranchée**.
+
+L'écran 42 est le seul du parcours à se placer du côté de l'entreprise : il a
+sa propre coque, un bandeau et rien d'autre.
 
 ### Dealrooms — lots G et H
 
 ```
 🔴 18 à 24   État vide, liste, assistant en quatre étapes, aperçu
 🔴 25 à 28   Vue d'ensemble, entreprises publiées, audience, branding
+🔴 40, 41    /v2/dealrooms/[id]/demandes · /activite
+🔴 38        /v2/cohortes/[id]/dealrooms
 ```
+
+**Le modèle change de forme.** Dépend d'[ADR-002](ADR-002-portee-de-la-dealroom.md),
+**non tranchée**.
 
 ### Investisseur, hors application — lot I
 
@@ -104,37 +135,51 @@ Nav de cohorte   Vue d'ensemble · Entreprises · Challenges ·
 📧 29        docs/emails/dealroom-01-invitation-investisseur.html
 ```
 
-### Portefeuille — lot C
+Dépend d'[ADR-005](ADR-005-investisseur-externe.md), **non tranchée**.
 
-```
-🔴 06, 07    /v2/portefeuille — vide et rempli
-```
-
-### Les neuf écrans de complément — versés le 6 août
+### Le reste du rail
 
 ```
 🔴 34  Accueil du programme          /v2/programme
 🔴 35  Demandes, toutes Dealrooms    /v2/demandes
 🔴 36  Rapports                      /v2/rapports
-🔴 37  Cohorte — vue d'ensemble      /v2/cohortes/[id] (état peuplé)
-🔴 38  Cohorte — Dealrooms           /v2/cohortes/[id]/dealrooms
 🔴 39  Cohorte — Rapports            /v2/cohortes/[id]/rapports
-🔴 40  Dealroom — Demandes           /v2/dealrooms/[id]/demandes
-🔴 41  Dealroom — Activité           /v2/dealrooms/[id]/activite
-🔴 42  Challenge — vue entreprise    /v2/challenges/[id] · CÔTÉ FONDATEUR
 ```
 
-L'écran 42 est le seul du parcours à se placer du côté de l'entreprise : il a
-sa propre coque, un bandeau et rien d'autre.
+## Ce que la base a déjà, et que rien n'appelle encore
 
-### Ce que la base a déjà, et que rien n'appelle
+`sae_portfolio()`, `program_threads`, `program_notes`, `access_requests`,
+`mandates`, `listing_consents`, `showcase_entries`, `showcase_access`.
 
-`cohorts`, `cohort_members`, `cohort_links`, `sae_portfolio()`,
-`program_threads`, `program_notes`, `access_requests`, `mandates`,
-`listing_consents`, `showcase_entries`, `showcase_access`, `save_programme()`,
-`create_cohort()`, `invite_to_cohort()`. Rien de tout cela n'est appelé par le
-parcours V2 : le branchement viendra quand les 38 écrans existeront.
+`cohorts`, `cohort_members`, `cohort_links`, `create_cohort()`,
+`invite_to_cohort()` et `save_programme()` **sont désormais appelées** — c'est
+le lot 1.
 
-**Rien n'existe en base pour les Challenges ni pour la Dealroom en tant
-qu'objet** — voir [ADR-002](ADR-002-portee-de-la-dealroom.md) et
-[ADR-003](ADR-003-critere-connecte-a-sanza.md).
+## L'état de la base de staging
+
+Projet `jourzsgjnutktsrgxkoo` (« Sanza V2 Staging »). L'autre projet,
+`bileqzpguyynkktndazs`, est la **production** — ne pas y toucher.
+
+Onze migrations du dépôt ne figurent pas au registre `schema_migrations`, mais
+leur contenu **est déjà en base**, vérifié par empreinte du corps réel des
+fonctions (`pg_proc.prosrc`) contre les fichiers du dépôt. Les rejouer telles
+quelles serait au mieux inutile, au pire destructeur :
+
+- `exigences_deux_axes` réinstallerait `apply_checklist_template` dans sa
+  version du 1ᵉʳ août et rejouerait des `update` sur `checklist_items.category`,
+  colonne supprimée depuis ;
+- `pipeline_deux_axes` échouerait, sa reprise lisant `raise_investors.statut`,
+  que cette même migration supprime.
+
+`20260731200000_objectif_quatre_valeurs` est écartée pour de bon : elle est
+antérieure à `objectif_six_valeurs`, déjà en place.
+
+Seul `checklist_metadata()` manque vraiment. `src/` ne l'appelle jamais.
+
+**Le dépôt ne savait pas reconstruire le staging** jusqu'au commit `669ec8b` :
+`apply_checklist_template` avait été corrigée à la main sur la base, et la
+migration du dépôt qui prétendait porter le correctif ne l'appliquait pas. Voir
+[20260806170000_appliquer_vraiment_le_secteur_et_l_activation.sql](../../supabase/migrations/20260806170000_appliquer_vraiment_le_secteur_et_l_activation.sql).
+
+Vérification faite le 6 août : `save_raise` n'était pas divergente — normalisée,
+elle est identique au dépôt.
