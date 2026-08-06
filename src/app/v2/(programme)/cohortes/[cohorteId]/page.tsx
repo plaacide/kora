@@ -1,8 +1,13 @@
-import { cohorte } from "@/features/v2/fixtures/programme";
+import {
+  COHORTE_ACTIVITE,
+  COHORTE_CHALLENGES,
+  COHORTE_CHIFFRES,
+  cohorte,
+} from "@/features/v2/fixtures/programme";
 import { v2Routes } from "@/features/v2/navigation/routes";
 import { BarreEtats } from "@/features/v2/ui/BarreEtats";
 import { Icon } from "@/features/v2/ui/Icon";
-import { RoutePlaceholder } from "@/features/v2/ui/RoutePlaceholder";
+
 
 const ROUTES = v2Routes.programme.cohortes;
 
@@ -31,7 +36,7 @@ export default async function CohortePage({
         {
           actif: fixture.entreprises > 0,
           href: ROUTES.root("saison-4"),
-          label: "cohorte peuplée · non maquettée",
+          label: "37 · cohorte peuplée",
         },
       ]}
     />
@@ -40,20 +45,110 @@ export default async function CohortePage({
   if (fixture.entreprises > 0) {
     return (
       <>
-        <RoutePlaceholder
-          contract={[
-            "Le paquet ne montre la vue d’ensemble qu’à l’état vide (écran 03).",
-            "Ce que voit un programme dont la cohorte tourne reste à dessiner.",
-          ]}
-          links={[
-            {
-              href: ROUTES.entreprises(cohorteId),
-              label: "Les entreprises de cette cohorte (écran 05)",
-            },
-          ]}
-          purpose="L’état vide est maquetté, celui-ci ne l’est pas."
-          title="Vue d’ensemble"
-        />
+        <div className="v2-prog-head">
+          <div>
+            <h1>Vue d’ensemble</h1>
+            <p>
+              {fixture.entreprises} / {fixture.places} places · complétude
+              moyenne 62 %
+            </p>
+          </div>
+          <span className="v2-spacer" />
+          <nav>
+            <span className="v2-btn" data-variant="secondary">
+              Modifier la cohorte
+            </span>
+            <a className="v2-btn" href={ROUTES.entreprises(cohorteId)}>
+              Inviter une entreprise
+            </a>
+          </nav>
+        </div>
+
+        <div className="v2-chiffres">
+          {COHORTE_CHIFFRES.map((chiffre) => (
+            <div className="v2-card v2-dr-chiffre" key={chiffre.titre}>
+              <div className="v2-nav-label" style={{ padding: "0 0 6px" }}>
+                {chiffre.titre}
+              </div>
+              <b>{chiffre.valeur}</b>
+              <small>{chiffre.detail}</small>
+            </div>
+          ))}
+        </div>
+
+        <div className="v2-prog-head" style={{ marginBottom: 8 }}>
+          <div className="v2-nav-label" style={{ padding: 0 }}>
+            Challenges en cours
+          </div>
+          <span className="v2-spacer" />
+          <a className="v2-lien-action" href={ROUTES.challenges(cohorteId)}>
+            Tout voir
+          </a>
+        </div>
+        <div className="v2-card" style={{ overflow: "hidden" }}>
+          {COHORTE_CHALLENGES.map((challenge) => (
+            <div className="v2-journal" key={challenge.titre}>
+              <div>
+                <b>{challenge.titre}</b>
+                <div className="v2-muted">
+                  {challenge.echeance} · {challenge.entreprises}
+                </div>
+              </div>
+              <div className="v2-prep" style={{ flex: "0 0 auto" }}>
+                <div className="v2-prep-bar">
+                  <i style={{ width: `${challenge.avancement}%` }} />
+                </div>
+                <span>{challenge.avancement}&nbsp;%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="v2-nav-label" style={{ padding: "22px 0 8px" }}>
+          À traiter
+        </div>
+        <div className="v2-card" style={{ overflow: "hidden" }}>
+          <div className="v2-atraiter">
+            <b>3</b>
+            <div>
+              <span>Questions sans réponse</span>
+            </div>
+            <a
+              className="v2-btn"
+              data-variant="secondary"
+              href={ROUTES.questions(cohorteId)}
+            >
+              Voir
+            </a>
+          </div>
+          <div className="v2-atraiter">
+            <b>2</b>
+            <div>
+              <span>Invitations sans réponse</span>
+              <small>14 j</small>
+            </div>
+            <span className="v2-btn" data-variant="secondary">
+              Relancer
+            </span>
+          </div>
+        </div>
+
+        <div className="v2-nav-label" style={{ padding: "22px 0 8px" }}>
+          Activité récente
+        </div>
+        <div className="v2-card" style={{ overflow: "hidden" }}>
+          {COHORTE_ACTIVITE.map((ligne) => (
+            <div className="v2-journal" key={ligne.acteur}>
+              <span className="v2-pastille" data-ton={ligne.ton}>
+                {ligne.initiales}
+              </span>
+              <div>
+                <b>{ligne.acteur}</b> {ligne.fait}
+              </div>
+              <small>{ligne.quand}</small>
+            </div>
+          ))}
+        </div>
         {etats}
       </>
     );

@@ -907,3 +907,163 @@ export const PRIORITES: readonly {
     detail: "depuis 4 jours",
   },
 ];
+
+/* ══ Les neuf écrans de complément, versés le 6 août ═══════════════════════ */
+
+/** Écran 34 — les quatre chiffres de l'accueil. */
+export const ACCUEIL_CHIFFRES: readonly {
+  titre: string; valeur: string; detail: string;
+}[] = [
+  { titre: "Cohortes actives", valeur: "2", detail: "Saison 4 · Saison 3 en clôture" },
+  { titre: "Entreprises", valeur: "26", detail: "9 préparations actives" },
+  { titre: "Challenges en cours", valeur: "4", detail: "prochaine échéance · 15 octobre" },
+  { titre: "Demandes en attente", valeur: "6", detail: "Demo Day 2026" },
+];
+
+/** Écran 34 — « À traiter », trois lignes avec leur contexte et leur verbe. */
+export const ACCUEIL_A_TRAITER: readonly {
+  nombre: string; quoi: string; ou: string; action: string;
+}[] = [
+  { nombre: "6", quoi: "Demandes d’accès en attente", ou: "Demo Day 2026", action: "Voir" },
+  { nombre: "3", quoi: "Questions sans réponse", ou: "Saison 4 · Agri & Agro", action: "Voir" },
+  { nombre: "2", quoi: "Invitations sans réponse depuis 14 jours", ou: "Saison 4", action: "Relancer" },
+];
+
+/** Écran 34 — l'activité récente, tous périmètres confondus. */
+export const ACCUEIL_ACTIVITE: readonly {
+  initiales: string; ton: Ton; acteur: string; fait: string;
+  cible?: string; quand: string; ou: string;
+}[] = [
+  { initiales: "MD", ton: "neutral", acteur: "Marie Dupont", fait: "(Acme Ventures) a demandé l’accès à la data room de", cible: "CoolBricks", quand: "il y a 2 h", ou: "Demo Day 2026" },
+  { initiales: "KF", ton: "blue", acteur: "Kalyx Foods", fait: "a rempli le critère « Pitch deck à jour »", quand: "hier", ou: "Préparer votre Demo Day" },
+  { initiales: "BA", ton: "amber", acteur: "Banque Atlantique", fait: "a ouvert votre invitation", quand: "hier", ou: "Demo Day 2026" },
+  { initiales: "SA", ton: "orange", acteur: "Rapport T2 2026", fait: "partagé avec l’", cible: "AFD", quand: "3 juillet", ou: "Saison 4" },
+];
+
+/**
+ * Les demandes d'accès — écrans 35 et 40.
+ *
+ * SANZA TRANSMET, L'ENTREPRISE DÉCIDE. Les trois statuts disent la chaîne :
+ * « À transmettre » attend le programme, « Transmise » attend l'entreprise, et
+ * ce que le programme peut faire ensuite n'est plus qu'une relance. Nulle part
+ * il n'ouvre une data room à la place de quelqu'un.
+ */
+export const DEMANDES: readonly {
+  initiales: string; ton: Ton; investisseur: string; fonds: string;
+  entreprise: string; instrument: string; recue: string;
+  statut: "À transmettre" | "Transmise"; actions: readonly string[];
+}[] = [
+  { initiales: "MD", ton: "neutral", investisseur: "Marie Dupont", fonds: "Acme Ventures", entreprise: "CoolBricks", instrument: "Equity", recue: "il y a 2 h", statut: "À transmettre", actions: ["Transmettre", "Refuser"] },
+  { initiales: "AS", ton: "amber", investisseur: "Amadou Sow", fonds: "Banque Atlantique", entreprise: "Baobab Materials", instrument: "Equity", recue: "hier", statut: "Transmise", actions: ["Relancer"] },
+  { initiales: "LM", ton: "green", investisseur: "Lucie Martin", fonds: "Impact Partners", entreprise: "Kalyx Foods", instrument: "Dette", recue: "hier", statut: "Transmise", actions: ["Relancer"] },
+  { initiales: "IB", ton: "blue", investisseur: "Ibrahima Ba", fonds: "Teranga Capital", entreprise: "Moneta Pay", instrument: "Equity", recue: "il y a 3 jours", statut: "À transmettre", actions: ["Transmettre", "Refuser"] },
+  { initiales: "SC", ton: "red", investisseur: "Sarah Cohen", fonds: "Impact Partners", entreprise: "Teranga Health", instrument: "Equity", recue: "il y a 4 jours", statut: "À transmettre", actions: ["Transmettre", "Refuser"] },
+  { initiales: "DM", ton: "orange", investisseur: "David Mensah", fonds: "Banque Atlantique", entreprise: "Wari Logistics", instrument: "Equity", recue: "il y a 5 jours", statut: "Transmise", actions: ["Relancer"] },
+];
+
+/** Écran 36 — l'historique des rapports générés. */
+export const RAPPORTS: readonly {
+  titre: string; perimetre: string; genere: string; partage: string;
+}[] = [
+  { titre: "Reporting bailleur — T2 2026", perimetre: "Saison 4 · Agri & Agro", genere: "3 juillet", partage: "partagé avec AFD" },
+  { titre: "Reporting bailleur — T1 2026", perimetre: "Saison 4 · Agri & Agro", genere: "4 avril", partage: "partagé avec AFD" },
+  { titre: "Rapport de clôture — Saison 3", perimetre: "Saison 3", genere: "12 janvier", partage: "partagé avec Proparco" },
+];
+
+/** Écran 37 — les quatre chiffres d'une cohorte peuplée. */
+export const COHORTE_CHIFFRES: readonly {
+  titre: string; valeur: string; detail: string;
+}[] = [
+  { titre: "Entreprises", valeur: "12", detail: "9 préparations actives" },
+  { titre: "Complétude moyenne", valeur: "62 %", detail: "+8 pts ce mois-ci" },
+  { titre: "Challenges en cours", valeur: "4", detail: "prochaine échéance · 15 octobre" },
+  { titre: "Dealrooms", valeur: "2", detail: "1 publiée · 6 demandes en attente" },
+];
+
+/**
+ * Écran 37 — les Challenges en cours, avec leur avancement.
+ *
+ * ⚠️ Cette liste n'est PAS celle de l'écran 09b : deux titres sur quatre
+ * diffèrent. Reproduit tel quel, voir INCOHERENCES-MAQUETTES.md.
+ */
+export const COHORTE_CHALLENGES: readonly {
+  titre: string; echeance: string; entreprises: string; avancement: number;
+}[] = [
+  { titre: "Préparer votre Demo Day", echeance: "15 octobre", entreprises: "8 entreprises", avancement: 48 },
+  { titre: "Cap table à jour", echeance: "31 août", entreprises: "12 entreprises", avancement: 67 },
+  { titre: "Reporting bailleur — T3", echeance: "30 septembre", entreprises: "12 entreprises", avancement: 25 },
+  { titre: "Dossier de crédit", echeance: "1 décembre", entreprises: "5 entreprises", avancement: 12 },
+];
+
+/** Écran 37 — l'activité récente d'une cohorte. */
+export const COHORTE_ACTIVITE: readonly {
+  initiales: string; ton: Ton; acteur: string; fait: string; quand: string;
+}[] = [
+  { initiales: "KF", ton: "blue", acteur: "Kalyx Foods", fait: "a rempli « Pitch deck à jour »", quand: "hier" },
+  { initiales: "BM", ton: "neutral", acteur: "Baobab Materials", fait: "est passée à 82 % de complétude", quand: "il y a 2 jours" },
+  { initiales: "WL", ton: "neutral", acteur: "Wari Logistics", fait: "a rejoint la cohorte", quand: "il y a 5 jours" },
+];
+
+/** Écran 38 — les deux Dealrooms adossées à la cohorte. */
+export const COHORTE_DEALROOMS: readonly {
+  id: string; nom: string; statut: "Publiée" | "Brouillon";
+  entreprises: string; audience: string; demandes: string;
+  etat: string; actions: readonly string[];
+}[] = [
+  { id: "demo-day-2026", nom: "Demo Day 2026", statut: "Publiée", entreprises: "12 exposées", audience: "28 invités", demandes: "6 en attente", etat: "Publiée le 12 juillet · dernière activité aujourd’hui", actions: ["Prévisualiser", "Ouvrir"] },
+  { id: "afd", nom: "Sélection bailleur — AFD", statut: "Brouillon", entreprises: "5 sélectionnées", audience: "—", demandes: "—", etat: "Non publiée · modifiée le 28 juillet", actions: ["Supprimer", "Reprendre la création"] },
+];
+
+/** Écran 41 — l'activité d'une Dealroom, groupée par jour. */
+export const DEALROOM_JOURNAL: readonly {
+  jour: string;
+  lignes: readonly { initiales: string; ton: Ton; texte: string; cible?: string; heure: string }[];
+}[] = [
+  { jour: "Aujourd’hui", lignes: [
+    { initiales: "MD", ton: "neutral", texte: "Marie Dupont (Acme Ventures) a demandé l’accès à la data room de", cible: "CoolBricks", heure: "09:42" },
+    { initiales: "MD", ton: "neutral", texte: "Marie Dupont a consulté la fiche", cible: "CoolBricks", heure: "09:38" },
+  ]},
+  { jour: "Hier", lignes: [
+    { initiales: "AS", ton: "amber", texte: "Amadou Sow (Banque Atlantique) a consulté 4 fiches — Baobab Materials, Kalyx Foods, Wari Logistics, Moneta Pay", heure: "17:10" },
+    { initiales: "LM", ton: "green", texte: "Lucie Martin (Impact Partners) a ouvert votre invitation", heure: "11:05" },
+  ]},
+  { jour: "Plus tôt", lignes: [
+    { initiales: "SA", ton: "orange", texte: "Invitation envoyée à", cible: "28 investisseurs", heure: "28 juillet" },
+    { initiales: "SA", ton: "orange", texte: "Dealroom", cible: "publiée", heure: "12 juillet" },
+  ]},
+];
+
+/** Écran 41 — le cumul depuis la publication. */
+export const DEALROOM_CUMUL: readonly { k: string; v: string }[] = [
+  { k: "Visites", v: "142" },
+  { k: "Fiches consultées", v: "87" },
+  { k: "Invitations ouvertes", v: "20 / 28" },
+  { k: "Demandes d’accès", v: "6" },
+];
+
+/**
+ * Écran 42 — le Challenge vu par l'entreprise.
+ *
+ * CHAQUE CRITÈRE SE VALIDE DEPUIS LA DATA ROOM, jamais depuis cet écran : le
+ * bouton ouvre la pièce, il ne la dépose pas. C'est la règle que le LISEZ-MOI
+ * du 6 août énonce, et elle confirme le mécanisme retenu par l'ADR-003.
+ *
+ * ⚠️ Ces cinq critères ne sont pas les quatre des écrans 11, 14 et 15 pour le
+ * même Challenge. Reproduit tel quel.
+ */
+export const CRITERES_ENTREPRISE: readonly {
+  titre: string; etat: "Fait" | "En cours" | "À faire"; attendu: string;
+}[] = [
+  { titre: "Pitch deck à jour", etat: "Fait", attendu: "Version datée de moins de 3 mois dans votre data room." },
+  { titre: "États financiers 2024–2025", etat: "Fait", attendu: "Bilan et compte de résultat des deux derniers exercices." },
+  { titre: "Cap table à jour", etat: "Fait", attendu: "Répartition du capital signée par les associés." },
+  { titre: "Projections à 3 ans", etat: "En cours", attendu: "Compte de résultat prévisionnel et hypothèses clés." },
+  { titre: "Vidéo de présentation", etat: "À faire", attendu: "3 minutes maximum, français ou anglais." },
+];
+
+/** L'entreprise qui regarde son Challenge — écran 42. */
+export const ENTREPRISE_CONNECTEE = {
+  personne: "Awa Ndiaye",
+  entreprise: "Kalyx Foods",
+  initiales: "AN",
+} as const;

@@ -1,15 +1,16 @@
-import { RoutePlaceholder } from "@/features/v2/ui/RoutePlaceholder";
+import { ListeDemandes } from "@/features/v2/ui/ListeDemandes";
 
-/** Entrée de la navigation de Dealroom que le paquet ne dessine pas. */
-export default function Page() {
+/** Écran 40 — les demandes d'une Dealroom. Même liste, même grille que le 35. */
+export default function DealroomDemandesPage() {
   return (
-    <RoutePlaceholder
-      contract={[
-        "L’entrée est dans la navigation de la Dealroom.",
-        "Aucun des 38 écrans de référence ne montre cet écran.",
-      ]}
-      purpose="Écran non maquetté."
-      title="Demandes"
-    />
+    <>
+      <div className="v2-prog-head">
+        <div>
+          <h1>Demandes</h1>
+          <p>6 en attente · la décision d’ouvrir reste à chaque entreprise</p>
+        </div>
+      </div>
+      <ListeDemandes />
+    </>
   );
 }

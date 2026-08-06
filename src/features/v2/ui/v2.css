@@ -2273,3 +2273,63 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-priorite b{font:600 13.5px var(--font-v2-head),sans-serif}
 .v2-priorite>div>div:first-of-type{margin-top:2px;color:var(--text-2);font-size:13px}
 .v2-priorite>div>div:last-of-type{margin-top:2px;color:var(--text-3);font-size:12px}
+
+/* ══ Les neuf écrans de complément — 34 à 42 ══════════════════════════════ */
+.v2-salut{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+.v2-salut h1{font-size:26px;letter-spacing:-.02em}
+.v2-salut p{margin:4px 0 0;color:var(--text-2);font-size:13.5px}
+/* « À traiter » : le nombre d'abord, puis ce qu'il est, puis où. On lit le
+   volume avant la nature — c'est ce qui décide par quoi commencer. */
+.v2-atraiter{display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line-soft);padding:14px 18px}
+.v2-atraiter:last-child{border-bottom:0}
+.v2-atraiter>b{min-width:28px;font:600 20px var(--font-v2-head),sans-serif;font-variant-numeric:tabular-nums}
+.v2-atraiter>div{flex:1;min-width:0}
+.v2-atraiter>div>span{display:block;font-size:13.5px}
+.v2-atraiter>div>small{display:block;margin-top:2px;color:var(--text-3);font-size:12px}
+/* Le journal : qui, ce qu'il a fait, où et quand. La cible est en gras parce
+   que c'est elle qu'on cherche en parcourant. */
+.v2-journal{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:12px 18px;font-size:13.5px}
+.v2-journal:last-child{border-bottom:0}
+.v2-journal>div{flex:1;min-width:0}
+.v2-journal b{font-weight:600}
+.v2-journal>small{color:var(--text-3);font-size:12px;white-space:nowrap}
+.v2-journal-ou{margin-left:10px;color:var(--text-4);font-size:11.5px;white-space:nowrap}
+.v2-journal-jour{padding:14px 18px 6px;color:var(--text-4);font:700 10.5px var(--font-v2-sans),sans-serif;letter-spacing:.08em;text-transform:uppercase}
+/* Les listes de demandes des écrans 35 et 40 partagent LA MÊME grille —
+   le LISEZ-MOI du 6 août l'écrit noir sur blanc. Deux grilles voisines pour
+   la même liste se remarquent dès qu'on passe de l'une à l'autre. */
+.v2-demande-tete,.v2-demande{display:grid;grid-template-columns:minmax(240px,1.4fr) 1fr 1fr .9fr 210px;align-items:center;gap:12px;padding:12px 18px}
+.v2-demande-tete{border-bottom:1px solid var(--line);color:var(--text-3);font:500 12px var(--font-v2-sans),sans-serif}
+.v2-demande{border-bottom:1px solid var(--line-soft)}
+.v2-demande:last-child{border-bottom:0}
+.v2-demande:hover{background:var(--band)}
+.v2-demande-actions{display:flex;justify-content:flex-end;gap:8px}
+/* Le générateur de rapport — écran 39. */
+.v2-generateur{display:grid;grid-template-columns:1fr 320px;align-items:start;gap:16px}
+.v2-choix{display:flex;flex-direction:column;gap:8px}
+.v2-choix .v2-radio small{margin-top:0}
+.v2-liste-cochee{display:flex;flex-direction:column;gap:8px;color:var(--text-2);font-size:13px}
+.v2-liste-cochee span{display:flex;align-items:center;gap:8px}
+.v2-liste-cochee .v2-icon{color:var(--green)}
+/* Une carte Dealroom adossée à une cohorte — écran 38. */
+.v2-dr-adossee{display:flex;align-items:center;gap:22px;padding:18px 20px}
+.v2-dr-adossee>div:first-child{min-width:0;flex:1}
+.v2-dr-adossee h3{font-size:15px}
+.v2-dr-adossee-kvs{display:flex;flex-wrap:wrap;gap:22px;margin-top:10px}
+/* Un critère côté ENTREPRISE — écran 42. Le bouton ouvre la pièce, il ne la
+   dépose pas : le Challenge ne sert pas de porte d'entrée à la data room. */
+.v2-crit-fondateur{display:flex;align-items:flex-start;gap:14px;border-bottom:1px solid var(--line-soft);padding:16px 20px}
+.v2-crit-fondateur:last-child{border-bottom:0}
+.v2-crit-fondateur>div{display:flex;flex:1;flex-direction:column;gap:4px}
+.v2-crit-fondateur>div>div{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.v2-crit-fondateur b{font:600 14px var(--font-v2-head),sans-serif}
+.v2-crit-fondateur small{color:var(--text-3);font-size:12.5px}
+.v2-crit-fondateur .v2-btn{flex-shrink:0}
+/* La coque d'un fondateur qui ouvre un Challenge : un bandeau, rien d'autre. */
+.v2-focus{display:flex;min-height:100vh;flex-direction:column;background:var(--band)}
+.v2-focus-nav{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);background:#fff;padding:12px 28px}
+.v2-focus-corps{display:flex;max-width:880px;width:100%;flex-direction:column;gap:16px;margin:0 auto;padding:24px 28px 48px}
+.v2-focus-pied{display:flex;justify-content:space-between;margin-top:auto;border-top:1px solid var(--line);background:#fff;padding:14px 28px;color:var(--text-4);font-size:12px}
+/* Une badge ne casse jamais sur deux lignes — `white-space:nowrap` dans les
+   maquettes. « À transmettre » se lisait « À / transmettre ». */
+.v2-badge{white-space:nowrap}
