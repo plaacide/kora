@@ -6,7 +6,7 @@
 Lots A à I livrés, plus le tunnel d'inscription — versé en cours de route et
 seul morceau branché sur la base. Ce qui reste est le branchement, pas
 l'intégration. L'état re-dérivé depuis le code est dans
-[ARBRE-CONNEXIONS.md](ARBRE-CONNEXIONS.md), section « Le parcours programme ».
+[ARBRE-PROGRAMME.md](ARBRE-PROGRAMME.md).
 **Source :** [GAP-PARCOURS-PROGRAMME.md](GAP-PARCOURS-PROGRAMME.md) et
 [EVALUATION-PARCOURS-PROGRAMME.md](EVALUATION-PARCOURS-PROGRAMME.md).
 
