@@ -268,6 +268,42 @@ Expéditeur correct : `noreply@sanza.africa`.
 `serverExternalPackages` (next.config.ts), sinon « non-ecmascript placeable
 asset ».
 
+## Un champ nommé `focus` casse toute la page
+
+> `Runtime TypeError: domNode.focus is not a function`
+
+Le DOM expose les contrôles nommés d'un formulaire comme **propriétés du
+formulaire**, et la propriété l'emporte sur la méthode héritée. Un
+`<select name="focus">` remplace donc `form.focus` par un élément. React appelle
+`domNode.focus()` en restituant le focus, tombe sur ce `<select>`, et l'écran
+entier meurt.
+
+Constaté sur `/v2/onboarding/programme/cohorte`, où le champ était même
+`disabled` — donc jamais soumis. Le `name` ne servait à rien et coûtait la page.
+
+Les noms à ne jamais donner à un champ : `focus`, `blur`, `submit`, `reset`,
+`requestSubmit`, `checkValidity`, `reportValidity`, `elements`, `length`,
+`action`, `method`, `target`. (`name` est sans danger : c'est une chaîne, pas
+une méthode — d'où `<input name="name">`, courant et inoffensif.)
+
+**Ni TypeScript ni `next build` ne le détectent** : le JSX est valide, le typage
+aussi. Seule l'ouverture de la page le révèle.
+
+## CSP : `img-src` doit lister Supabase pour les images de marque
+
+Le logo d'un programme et le branding d'une Dealroom vivent dans le bucket
+public `branding`. La CSP disait `img-src 'self' blob: data:`, sans l'origine
+Supabase.
+
+Le symptôme trompe : le fichier se télécharge parfaitement — `200 image/png` en
+`curl` comme en `page.request.get()` — la clé est bonne, l'URL est bonne, et le
+navigateur affiche une **image cassée**. Rien dans les journaux du serveur, rien
+côté Node : le refus est dans le navigateur, et il faut un rendu réel pour le
+voir. Une capture d'écran le montre ; une requête HTTP, jamais.
+
+`connect-src` portait déjà l'origine Supabase, ce qui rend l'omission d'autant
+plus facile à manquer en relisant `src/lib/security/headers.ts`.
+
 # Règles produit
 
 - **Aucun lien de navigation vers une page inexistante** (`nav.ts`). Ce qui

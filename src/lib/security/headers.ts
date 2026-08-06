@@ -25,7 +25,16 @@ export function buildCsp(nonce: string): string {
     `default-src 'self'`,
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
     `style-src 'self' 'unsafe-inline'`,
-    `img-src 'self' blob: data:`,
+    // L'origine Supabase est nécessaire aux IMAGES DE MARQUE — logo d'un
+    // programme, bannière et logos partenaires d'une Dealroom — servies depuis
+    // le bucket public `branding`. Sans elle, le fichier se télécharge très
+    // bien (200 image/png) et le navigateur REFUSE de l'afficher : on ne voit
+    // qu'une image cassée, sans rien dans les journaux du serveur. Seul un
+    // rendu réel le révèle.
+    //
+    // Les pièces d'un dossier ne passent PAS par ici : elles sont lues côté
+    // serveur et servies par notre propre origine.
+    `img-src 'self' blob: data: ${supabase}`,
     `font-src 'self' data:`,
     `connect-src 'self' ${supabase}${isDev ? " ws: wss:" : ""}`,
     `object-src 'none'`,
