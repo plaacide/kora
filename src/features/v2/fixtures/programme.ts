@@ -561,3 +561,36 @@ export const MES_MODELES: readonly {
     modifie: "Modifié le 4 juin",
   },
 ];
+
+/** Le Challenge en cours de création — écran 11. */
+export const CHALLENGE_NEUF = {
+  titre: "Préparer votre Demo Day",
+  description:
+    "Présenter une version claire et investissable de votre entreprise.",
+  type: "Financement",
+  echeance: "15 octobre 2026",
+  criteres: [
+    { libelle: "Pitch deck finalisé", source: "manuel", obligatoire: true },
+    { libelle: "KPIs à jour", source: "connecte", obligatoire: true },
+    {
+      libelle: "Montant recherché renseigné",
+      source: "connecte",
+      obligatoire: true,
+    },
+    {
+      libelle: "Pitch de 5 minutes préparé",
+      source: "manuel",
+      obligatoire: false,
+    },
+  ] satisfies CritereFixture[],
+} as const;
+
+/** Le même Challenge, dérivé d'un modèle Sanza — écran 12. */
+export const CHALLENGE_PERSONNALISE = {
+  titre: "Préparer le dossier investisseur — version Savane",
+  description:
+    "Une version claire et investissable de votre entreprise, alignée sur la méthode Savane Accelerator.",
+  type: "Levée de fonds",
+  echeance: "30 septembre 2026",
+  criteres: MODELES_SANZA[0].criteres,
+} as const;

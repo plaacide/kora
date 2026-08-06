@@ -2029,6 +2029,7 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-biblio-detail h2{font-size:18px}
 .v2-biblio-detail>p{margin:0;color:var(--text-2);font-size:13.5px;line-height:1.55}
 .v2-marque-sanza{display:inline-flex;align-items:center;gap:5px;color:var(--text-4);font:500 11px var(--font-v2-sans),sans-serif}
+.v2-bandeau-modele .v2-marque-sanza i{width:22px;height:22px;border-radius:5px;font-size:12px}
 .v2-marque-sanza i{display:inline-flex;width:16px;height:16px;align-items:center;justify-content:center;border-radius:4px;background:var(--orange);color:#fff;font:600 9px var(--font-v2-head),sans-serif;font-style:normal}
 /* Un critère : la pastille creuse dit qu'il reste à faire, sans promettre
    qu'on pourra le cocher soi-même — c'est l'entreprise qui confirme. */
@@ -2053,3 +2054,42 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
    carte propose. En orange, il pesait autant qu'« Utiliser ». */
 .v2-btn[data-variant=text-grey]{border-color:transparent;background:transparent;padding:8px;color:var(--text-2)!important}
 .v2-btn[data-variant=text-grey]:hover{background:var(--line-soft)}
+
+/* Écrans 11 et 12 — l'éditeur d'un Challenge. */
+.v2-editeur{display:grid;grid-template-columns:1fr 320px;align-items:start;gap:16px}
+.v2-editeur-form{display:flex;flex-direction:column;gap:16px;padding:22px 24px}
+.v2-editeur-form>.v2-duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.v2-editeur-form .v2-control>span{font-size:14px}
+.v2-editeur-actions{display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line-soft);padding-top:16px}
+.v2-aside{display:flex;flex-direction:column;gap:14px}
+.v2-aside>div{padding:16px 18px}
+.v2-aside p{margin:0;color:var(--text-2);font-size:13px}
+/* Le choix d'audience : deux cartes radio, pas une liste déroulante — les deux
+   options se comparent d'un coup d'œil. */
+.v2-radios{display:flex;gap:10px}
+.v2-radio{display:flex;flex:1;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;cursor:pointer}
+.v2-radio[data-active=true]{border-color:var(--orange);background:var(--orange-soft)}
+.v2-radio>i{display:grid;width:16px;height:16px;flex-shrink:0;place-items:center;margin-top:2px;border:1.5px solid #d0d5dd;border-radius:50%}
+.v2-radio[data-active=true]>i{border-color:var(--orange)}
+.v2-radio[data-active=true]>i::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.v2-radio b{font:500 13.5px var(--font-v2-sans),sans-serif}
+.v2-radio small{display:block;margin-top:2px;color:var(--text-3);font-size:12.5px}
+/* Une ligne de critère dans l'éditeur : la poignée, le rang, le libellé et ses
+   deux étiquettes, la croix. */
+.v2-criteres{display:flex;flex-direction:column;gap:8px}
+.v2-crit-ligne{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px}
+.v2-crit-ligne>.v2-poignee{color:var(--text-4);cursor:grab}
+.v2-crit-ligne>.v2-rang{color:var(--text-4);font:600 12px var(--font-v2-sans),sans-serif}
+.v2-crit-ligne>div{flex:1;min-width:0}
+.v2-crit-ligne b{font:500 13.5px var(--font-v2-sans),sans-serif}
+.v2-crit-etiquettes{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:4px}
+.v2-crit-verrou{max-width:120px;color:var(--text-3);font-size:12px;line-height:1.35;text-align:right}
+.v2-crit-ligne>.v2-x{display:inline-flex;width:32px;height:32px;flex-shrink:0;align-items:center;justify-content:center;border-radius:var(--r-md);color:var(--text-3);cursor:pointer}
+.v2-crit-ligne>.v2-x:hover{background:var(--line-soft)}
+.v2-crit-ligne>.v2-x[data-verrouille=true]{cursor:not-allowed;opacity:.35}
+/* Le bandeau de l'écran 12 : le modèle d'origine n'est pas modifié. */
+/* BLEU, et au-dessus du titre : le bandeau annonce d'où vient ce Challenge
+   avant qu'on lise son nom. En gris sous le titre, il se lisait comme une note
+   de bas de page sur un écran qu'on croyait vierge. */
+.v2-bandeau-modele{display:flex;align-items:center;gap:12px;margin-bottom:18px;border:1px solid var(--blue);border-radius:var(--r-lg);background:var(--blue-soft);padding:13px 18px;color:var(--text);font-size:13.5px}
+.v2-bandeau-modele b{color:var(--text)}

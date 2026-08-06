@@ -1,4 +1,4 @@
-export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize"|"logout"|"wallet"|"layers"|"presentation"|"chart"|"bulb";
+export type IconName="home"|"briefcase"|"grid"|"inbox"|"mail"|"search"|"users"|"shield"|"shield-check"|"help"|"folder"|"more"|"pulse"|"landmark"|"globe"|"file"|"lock"|"chevron"|"eye"|"plus"|"calendar"|"arrow"|"check"|"columns"|"list"|"clock"|"trend"|"key"|"pencil"|"download"|"upload"|"trash"|"move"|"history"|"star"|"eye-off"|"folder-plus"|"maximize"|"minimize"|"logout"|"wallet"|"layers"|"presentation"|"chart"|"bulb"|"grip"|"close";
 
 const paths:Record<string,string[]>={
 // Rail — tracés repris à l'identique des maquettes du handoff.
@@ -51,12 +51,18 @@ layers:["M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 
 presentation:["M2 3h20","M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3","m7 21 5-5 5 5"],
 chart:["M3 3v18h18","M18 17V9","M13 17V5","M8 17v-3"],
 // L'ampoule du bloc « Conseil » — un conseil n'est ni une alerte ni une erreur.
-bulb:["M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5","M9 18h6","M10 22h4"]};
+bulb:["M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5","M9 18h6","M10 22h4"],
+// La croix des lignes de critères. `trash` promettait une corbeille : ici on
+// retire une ligne d'une liste qu'on est en train d'écrire, on ne supprime rien.
+close:["M18 6 6 18","m6 6 12 12"],
+grip:[]};
 
 /** Cercles des maquettes : `<circle>`, pas un chemin approché. */
 const circles:Record<string,Array<[number,number,number]>>={
 search:[[11,11,8]],help:[[12,12,10]],users:[[9,7,4]],eye:[[12,12,3]],
-clock:[[12,12,10]],globe:[[12,12,10]]};
+clock:[[12,12,10]],globe:[[12,12,10]],
+// La poignée de déplacement : six points, deux colonnes de trois.
+grip:[[9,6,1.4],[15,6,1.4],[9,12,1.4],[15,12,1.4],[9,18,1.4],[15,18,1.4]]};
 
 /**
  * Rectangles des maquettes : `x, y, largeur, hauteur, rayon`.
