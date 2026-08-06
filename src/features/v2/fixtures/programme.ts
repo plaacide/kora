@@ -866,3 +866,44 @@ export const INVESTISSEUR = {
   organisation: "Acme Ventures",
   email: "marie@fund.com",
 } as const;
+
+/** Les quatre indicateurs de l'écran 07, toutes cohortes confondues. */
+export const PORTEFEUILLE_CHIFFRES: readonly {
+  titre: string; valeur: string; detail: string;
+}[] = [
+  { titre: "Entreprises", valeur: "18", detail: "2 cohortes actives" },
+  { titre: "Prêtes", valeur: "5", detail: "préparation ≥ 75 %" },
+  { titre: "Préparation moyenne", valeur: "58 %", detail: "+6 pts sur 30 jours" },
+  { titre: "Volume recherché", valeur: "3,4 M€", detail: "8 opérations renseignées" },
+];
+
+/**
+ * « À traiter aujourd'hui » — TROIS PRIORITÉS, jamais plus.
+ *
+ * L'écran répond à une question et une seule : qui dois-je contacter
+ * aujourd'hui ? Une quatrième ligne ferait de la réponse une liste, et d'une
+ * liste on ne fait rien.
+ *
+ * ⚠️ La première porte l'incohérence n° 2 : ce Challenge s'appelle « Préparer
+ * votre Demo Day » sur les écrans 14 et 15, et compte 4 critères — celui-ci
+ * en nomme un autre. Reproduit tel quel.
+ */
+export const PRIORITES: readonly {
+  initiales: string; nom: string; ton: Ton; objet: string; detail: string;
+}[] = [
+  {
+    initiales: "CB", nom: "CoolBricks", ton: "orange",
+    objet: "Challenge « Préparer le dossier investisseur »",
+    detail: "3 / 4 critères · échéance demain",
+  },
+  {
+    initiales: "KF", nom: "Kalyx Foods", ton: "blue",
+    objet: "Préparation financière",
+    detail: "1 exigence prioritaire en retard",
+  },
+  {
+    initiales: "NS", nom: "Nimba Solar", ton: "green",
+    objet: "Invitation Dealroom en attente de consentement",
+    detail: "depuis 4 jours",
+  },
+];

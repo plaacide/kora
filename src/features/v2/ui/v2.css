@@ -2266,3 +2266,10 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-fiche-equipe{display:flex;flex-wrap:wrap;gap:16px}
 .v2-fiche-equipe>span{display:flex;align-items:center;gap:8px;font-size:13px}
 .v2-accent{border-color:var(--dr-accent)!important;background:var(--dr-accent)!important}
+/* Écran 07 — les trois priorités du portefeuille. */
+.v2-priorite{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line-soft);padding:14px 18px}
+.v2-priorite:last-child{border-bottom:0}
+.v2-priorite>div{flex:1;min-width:0}
+.v2-priorite b{font:600 13.5px var(--font-v2-head),sans-serif}
+.v2-priorite>div>div:first-of-type{margin-top:2px;color:var(--text-2);font-size:13px}
+.v2-priorite>div>div:last-of-type{margin-top:2px;color:var(--text-3);font-size:12px}
