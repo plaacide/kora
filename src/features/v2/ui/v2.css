@@ -2333,3 +2333,49 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 /* Une badge ne casse jamais sur deux lignes — `white-space:nowrap` dans les
    maquettes. « À transmettre » se lisait « À / transmettre ». */
 .v2-badge{white-space:nowrap}
+
+/* ══ Mouvement du parcours programme — TRANSITIONS.md ═════════════════════
+   Les courbes et les durées existaient déjà en tokens ; aucun des composants
+   écrits pour ce parcours ne s'en servait. Rien de neuf ici : on branche.   */
+
+/* §4 — le tiroir entre du bord droit en 480 ms, son voile en fondu. */
+.v2-panneau{animation:v2-drawer var(--motion-push) var(--motion-ease) both}
+.v2-scrim-panneau{animation:v2-fade var(--motion-default) var(--motion-ease) both}
+/* §2 — une modale n'entre pas de côté : elle monte de dix pixels en fondu.
+   Le voile porte déjà son fondu, `.v2-scrim` étant partagé avec le reste. */
+.v2-modale{animation:v2-view var(--motion-view) var(--motion-ease) both}
+
+/* §5 — cascade : chaque carte arrive de la droite, décalée de 40 ms. Cinq
+   rangs suffisent — au-delà, l'attente se voit plus que le mouvement, et une
+   liste de douze lignes finirait par se faire attendre. */
+.v2-chal-liste>*,.v2-dr-grid>*,.v2-prog-grid>*,.v2-modeles>*,.v2-vitrine-grille>*{
+  animation:v2-cascade var(--motion-cascade) var(--motion-ease) both}
+.v2-chal-liste>:nth-child(2),.v2-dr-grid>:nth-child(2),.v2-prog-grid>:nth-child(2),.v2-modeles>:nth-child(2),.v2-vitrine-grille>:nth-child(2){animation-delay:var(--motion-stagger)}
+.v2-chal-liste>:nth-child(3),.v2-dr-grid>:nth-child(3),.v2-prog-grid>:nth-child(3),.v2-modeles>:nth-child(3),.v2-vitrine-grille>:nth-child(3){animation-delay:calc(var(--motion-stagger)*2)}
+.v2-chal-liste>:nth-child(4),.v2-vitrine-grille>:nth-child(4){animation-delay:calc(var(--motion-stagger)*3)}
+.v2-chal-liste>:nth-child(n+5),.v2-vitrine-grille>:nth-child(n+5){animation-delay:calc(var(--motion-stagger)*4)}
+
+/* §2 — un changement de vue interne : les états d'un même écran, les étapes
+   d'un assistant, les onglets d'une bibliothèque. */
+.v2-editeur,.v2-assigner,.v2-dr-assistant,.v2-biblio,.v2-fil,.v2-generateur,
+.v2-chiffres,.v2-fiche-detail{animation:v2-view var(--motion-view) var(--motion-ease) both}
+
+/* Les retours d'état restent COURTS — un survol à 480 ms donne une interface
+   qui traîne. Couleur et bordure seulement : jamais d'échelle, jamais de
+   pulsation. */
+.v2-card,.v2-tbl tr,.v2-crit-ligne,.v2-radio,.v2-tag,.v2-case,.v2-inter,
+.v2-atraiter,.v2-demande,.v2-journal,.v2-priorite,.v2-fil-item{
+  transition:background var(--motion-fast) var(--motion-ease),
+             border-color var(--motion-fast) var(--motion-ease),
+             box-shadow var(--motion-fast) var(--motion-ease)}
+.v2-card:hover{border-color:#dcdad3}
+.v2-fiche:hover,.v2-dr-carte:hover{box-shadow:0 1px 3px rgba(16,24,40,.06)}
+
+/* §2 — mouvement réduit : tout devient un fondu de 150 ms. Ce n'est pas une
+   option de confort, c'est une gêne physique pour qui la règle. */
+@media(prefers-reduced-motion:reduce){
+  .v2-panneau,.v2-modale,.v2-editeur,.v2-assigner,.v2-dr-assistant,.v2-biblio,
+  .v2-fil,.v2-generateur,.v2-chiffres,.v2-fiche-detail,
+  .v2-chal-liste>*,.v2-dr-grid>*,.v2-prog-grid>*,.v2-modeles>*,.v2-vitrine-grille>*{
+    animation:v2-fade 150ms linear both;animation-delay:0s!important}
+}
