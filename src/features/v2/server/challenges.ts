@@ -200,6 +200,102 @@ export async function criteresSuivis(
   });
 }
 
+/** Un modèle de la bibliothèque — écrans 10 et 16. */
+export interface ModeleLu {
+  id: string;
+  sanza: boolean;
+  titre: string;
+  categorie: string | null;
+  duree: string | null;
+  description: string | null;
+  criteres: number;
+  connectes: number;
+  /** Dans combien de VOS cohortes ce modèle a déjà servi. */
+  utilisations: number;
+}
+
+export interface CritereModele {
+  libelle: string;
+  source: "manuel" | "connecte";
+  catalogKey: string | null;
+  requis: boolean;
+  /** Un critère structurel d'un modèle Sanza ne peut pas être retiré. */
+  structurel: boolean;
+}
+
+/**
+ * La bibliothèque — modèles Sanza et modèles du programme, en une lecture.
+ *
+ * Les deux onglets montrent les mêmes cartes ; `sanza` dit lequel est lequel.
+ * Deux fonctions auraient dupliqué la règle de visibilité.
+ */
+export async function lireBibliotheque(): Promise<readonly ModeleLu[]> {
+  await requireV2User();
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("challenge_library");
+  if (error) {
+    console.error("[v2 challenges] bibliothèque", error);
+    return [];
+  }
+
+  return (
+    (data ?? []) as {
+      id: string;
+      sanza: boolean;
+      title: string;
+      category: string | null;
+      duration: string | null;
+      description: string | null;
+      criteres: number | string;
+      connectes: number | string;
+      utilisations: number | string;
+    }[]
+  ).map((m) => ({
+    categorie: m.category,
+    connectes: entier(m.connectes),
+    criteres: entier(m.criteres),
+    description: m.description,
+    duree: m.duration,
+    id: m.id,
+    sanza: m.sanza,
+    titre: m.title,
+    utilisations: entier(m.utilisations),
+  }));
+}
+
+/** Les critères d'un modèle — l'aperçu de l'écran 10, le départ de l'écran 12. */
+export async function criteresModele(
+  templateId: string,
+): Promise<readonly CritereModele[]> {
+  await requireV2User();
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("challenge_template_detail", {
+    p_template: templateId,
+  });
+  if (error) {
+    console.error("[v2 challenges] critères du modèle", error);
+    return [];
+  }
+
+  return (
+    (data ?? []) as {
+      label: string;
+      source: string;
+      catalog_key: string | null;
+      required: boolean;
+      structural: boolean;
+    }[]
+  ).map((c) => ({
+    catalogKey: c.catalog_key,
+    libelle: c.label,
+    requis: c.required,
+    source: c.source as "manuel" | "connecte",
+    structurel: c.structural,
+  }));
+}
+
 /**
  * Remet à jour les critères connectés avant d'afficher.
  *
