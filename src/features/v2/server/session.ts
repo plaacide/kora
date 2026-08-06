@@ -66,3 +66,29 @@ export async function requireV2Workspace(): Promise<V2WorkspaceContext> {
     },
   };
 }
+
+/**
+ * Le métier du compte connecté — `founder`, `investor` ou `sae`.
+ *
+ * POURQUOI ELLE EXISTE. `/v2` envoyait TOUT LE MONDE sur l'accueil fondateur.
+ * Un programme qui se connectait voyait donc les écrans d'une entreprise, et
+ * son propre espace n'était atteignable qu'en tapant l'adresse à la main —
+ * c'est-à-dire, pour celui qui l'utilise, qu'il n'existait pas.
+ *
+ * C'est la seule lecture de base que le parcours programme fait aujourd'hui,
+ * et elle ne sert qu'à ORIENTER : aucun écran n'en dépend, les données restent
+ * en dur jusqu'à ce que les maquettes soient toutes intégrées.
+ */
+export type MetierCompte = "founder" | "investor" | "sae";
+
+export async function metierDuCompte(userId: string): Promise<MetierCompte> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("account_type")
+    .eq("id", userId)
+    .maybeSingle();
+
+  const metier = data?.account_type;
+  return metier === "sae" || metier === "investor" ? metier : "founder";
+}
