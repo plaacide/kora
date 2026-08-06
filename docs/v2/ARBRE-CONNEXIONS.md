@@ -3,7 +3,11 @@
 La boussole du branchement : ce qui lit vraiment la base, ce qui affiche encore
 des données écrites en dur, et ce qui manque côté serveur pour finir.
 
-**Dernière vérification : 1er août 2026**, branche `v2/rebuild`. Établie en
+**Dernière vérification : 6 août 2026**, branche `v2/rebuild` — la branche
+Programme ci-dessous. Le reste de ce document date du **1er août** et n'a pas
+été revérifié depuis.
+
+**Vérification d'origine : 1er août 2026**, branche `v2/rebuild`. Établie en
 re-dérivant depuis le code — quels écrans importent `features/v2/server/*` — et
 en interrogeant la base de staging pour l'état réel des migrations. Ce document
 se périme : le relire avant de s'y fier.
@@ -609,3 +613,95 @@ alors que les fichiers restent.
 - **Les limites n'ont jamais été éprouvées dans un navigateur** : vérifiées en
   SQL sous identité authentifiée, jamais sur l'écran, faute d'un compte
   accessible.
+
+
+---
+
+## Le parcours programme
+
+**Re-dérivé le 6 août 2026** : quels fichiers existent sous
+`src/app/v2/(programme)` et `(onboarding)/onboarding/programme`, et lesquels
+importent quoi que ce soit de `features/v2/server`.
+
+**Un seul fichier de ce parcours lit la base** : `(programme)/layout.tsx`, pour
+savoir qui est connecté. **Aucun écran** ne lit ni n'écrit — tous affichent les
+fixtures des maquettes, conformément à l'ordre de travail du 29 juillet. C'est
+un choix, pas un oubli : ne pas le compter comme une dette.
+
+```
+Rail programme   Accueil · Portefeuille · Cohortes · Dealrooms · Demandes ·
+                 Rapports ⟂ Équipe · Sécurité · Abonnement · Aide
+Nav de cohorte   Vue d'ensemble · Entreprises · Challenges ·
+                 Questions & suggestions · Dealrooms · Rapports
+```
+
+### Entrer
+
+```
+🟢 Porte d'entrée /v2            metierDuCompte()      → profiles.account_type
+   └─ un compte `sae` entre par ses cohortes, les autres par l'accueil
+🟢 Sans organisation             → l'onboarding de SON métier, plus celui du
+                                   fondateur pour tout le monde
+🔴 Onboarding programme (00a-d)  —                     organisation, façon
+                                   d'accompagner, première cohorte, espace prêt.
+                                   N'ÉCRIT RIEN : « Créer la cohorte » est un
+                                   lien. `save_programme` et `create_cohort`
+                                   existent en base et ne sont pas appelées.
+⚠️ Aucun chemin n'y mène          l'inscription propose « Un programme » mais
+                                   ne redirige pas vers ce tunnel.
+```
+
+### Cohortes — lot B
+
+```
+🔴 01 Liste vide                 /v2/cohortes?etat=vide
+🔴 02 Liste remplie              /v2/cohortes
+🔴 03 Cohorte au premier jour    /v2/cohortes/saison-4-jour-1
+🔴 04 Invitations en attente     /v2/cohortes/saison-4-jour-1/entreprises
+🔴 05 Entreprises actives        /v2/cohortes/saison-4/entreprises
+🔴 17 Une entreprise arrive      …/entreprises?arrivee=1
+⚪ Vue d'ensemble peuplée        aucune maquette ne la montre
+```
+
+### Questions & suggestions — lot D
+
+```
+🔴 08 Le fil                     /v2/cohortes/[id]/questions
+```
+
+### Challenges — lot E
+
+```
+🔴 09  Aucun Challenge           /v2/cohortes/saison-4-jour-1/challenges
+🔴 09b Quatre actifs             /v2/cohortes/saison-4/challenges
+🔴 10  Bibliothèque Sanza        …/challenges/bibliotheque
+🔴 16  Mes modèles               …/challenges/bibliotheque?onglet=miens
+🔴 11  Créer de zéro             …/challenges/nouveau
+🔴 12  Personnaliser un modèle   …/challenges/nouveau?modele=…
+```
+
+### Ce qui n'existe pas encore
+
+```
+⚪ 13, 14, 15   Assigner, suivre, détail d'une entreprise      lot F
+⚪ 06, 07       Portefeuille vide et rempli                    lot C
+⚪ 18 à 24      Dealroom — assistant en quatre étapes          lot G
+⚪ 25 à 28      Dealroom — gestion après publication           lot H
+⚪ 29 à 33      Parcours investisseur, hors application        lot I
+⚪ Rapports     aucune maquette                                lot J
+```
+
+Les six adresses non encore intégrées portent un écran d'attente qui dit ce
+qu'il attend. Aucune n'est un cul-de-sac.
+
+### Ce que la base a déjà, et que rien n'appelle
+
+`cohorts`, `cohort_members`, `cohort_links`, `sae_portfolio()`,
+`program_threads`, `program_notes`, `access_requests`, `mandates`,
+`listing_consents`, `showcase_entries`, `showcase_access`, `save_programme()`,
+`create_cohort()`, `invite_to_cohort()`. Rien de tout cela n'est appelé par le
+parcours V2 : le branchement viendra quand les 38 écrans existeront.
+
+**Rien n'existe en base pour les Challenges ni pour la Dealroom en tant
+qu'objet** — voir [ADR-002](ADR-002-portee-de-la-dealroom.md) et
+[ADR-003](ADR-003-critere-connecte-a-sanza.md).

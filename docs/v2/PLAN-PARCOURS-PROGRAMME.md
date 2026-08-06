@@ -1,6 +1,11 @@
 # Plan de travail — Parcours Programme
 
-**Date :** 5 août 2026 · **Branche :** `v2/rebuild`
+**Date :** 5 août 2026, **révisé le 6 août** · **Branche :** `v2/rebuild`
+
+**État au 6 août : lots A, B, D, E livrés, plus le tunnel d'inscription versé
+en cours de route.** Dix-neuf écrans sur trente-huit. L'état re-dérivé depuis
+le code est dans [ARBRE-CONNEXIONS.md](ARBRE-CONNEXIONS.md), section « Le
+parcours programme ».
 **Source :** [GAP-PARCOURS-PROGRAMME.md](GAP-PARCOURS-PROGRAMME.md) et
 [EVALUATION-PARCOURS-PROGRAMME.md](EVALUATION-PARCOURS-PROGRAMME.md).
 
@@ -70,7 +75,7 @@ Q8 (la règle du bloc « Conseil ») ne se pose pas encore : le texte est dans l
 
 ## 3. Les lots
 
-### LOT A — La coque programme 🔴
+### LOT A — ✅ La coque programme
 
 Le socle sans lequel aucun écran ne s'ouvre.
 
@@ -88,7 +93,7 @@ Le socle sans lequel aucun écran ne s'ouvre.
 **Test :** ouvrir `/v2/cohortes` avec un compte programme. Les six destinations
 sont là, le rail se déplie et se replie, l'état tient au rechargement.
 
-### LOT B — Cohortes 🔴 · écrans 01, 02, 03, 04, 05, 17
+### LOT B — ✅ Cohortes · écrans 01, 02, 03, 04, 05, 17
 
 Liste vide et remplie, cohorte vide, invitations en attente, entreprises
 actives, modale « nouvelle entreprise ».
@@ -107,7 +112,7 @@ Dépend de V3 (Q7) pour que la ligne CoolBricks soit cohérente avec les écrans
 **Test :** l'écran vide n'affiche aucun indicateur à zéro. L'écran rempli
 n'affiche jamais plus de trois priorités.
 
-### LOT D — Questions & suggestions 🟠 · écran 08
+### LOT D — ✅ Questions & suggestions · écran 08
 
 Fil par cohorte, trois états (en attente, répondu, suggestion), formulaire de
 nouveau message. Pas de saisie en cours, pas de présence, pas d'accusé de
@@ -116,7 +121,7 @@ lecture — c'est écrit sur l'écran.
 **Test :** une question et une suggestion se distinguent à l'œil sans lire le
 libellé du statut.
 
-### LOT E — Challenges : bibliothèque et création 🟠 · écrans 09, 09b, 10, 11, 12, 16
+### LOT E — ✅ Challenges : bibliothèque et création · écrans 09, 09b, 10, 11, 12, 16
 
 État vide, liste des actifs, bibliothèque en trois volets, création de zéro,
 personnalisation d'un modèle Sanza, mes modèles.
@@ -186,8 +191,28 @@ colonnes les comptent.
 
 ---
 
-## 5. Ce que je commence maintenant
+## 5. Lot ajouté en cours de route — ✅ L'inscription d'un programme
 
-Le lot A, sans attendre aucune réponse — sauf Q2, que je tranche par défaut en
-ajoutant Équipe et Abonnement, et qui se défait en une ligne si vous dites
-l'inverse.
+Écrans 00a à 00d, versés dans le paquet le 6 août : organisation, façon
+d'accompagner, première cohorte, espace prêt. Le tunnel réutilise la coque et
+le fil d'étapes du fondateur ; seules les questions changent.
+
+**Il n'écrit rien** et **aucun chemin n'y mène** : l'inscription V2 propose
+« Un programme » mais ne redirige pas vers lui. À brancher quand vous le
+direz — `save_programme()` et `create_cohort()` existent déjà en base.
+
+---
+
+## 6. Ce qui reste
+
+| Lot | Écrans | État |
+|---|---|---|
+| F | 13, 14, 15 — assigner, suivre, détail | à faire |
+| C | 06, 07 — portefeuille | à faire |
+| G | 18 à 24 — Dealroom, assistant | à faire, dépend d'ADR-002 au branchement |
+| H | 25 à 28 — Dealroom, gestion | à faire |
+| I | 29 à 33 — investisseur hors app | à faire |
+| J | Rapports | attend une maquette |
+
+Aucun de ces lots n'est bloqué pour l'intégration : les quatre ADR ne
+commandent que le branchement.
