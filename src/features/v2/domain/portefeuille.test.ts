@@ -17,7 +17,7 @@ function ligne(
   readiness: number | null,
   amount: number | null = null,
   currency: string | null = null,
-  manques: readonly string[] = [],
+  restants = 0,
 ): LignePortefeuille {
   return {
     startupOrg,
@@ -26,7 +26,7 @@ function ligne(
     amount,
     currency,
     readiness,
-    manques,
+    restants,
   };
 }
 
@@ -167,7 +167,14 @@ describe("volumeRecherche", () => {
 
 describe("priorites", () => {
   const avec = (org: string, prep: number | null, nb: number) =>
-    ligne(org, prep, null, null, Array.from({ length: nb }, (_, i) => `m${i}`));
+    ligne(org, prep, null, null, nb);
+
+  it("compte les exigences restantes, PAS l'aperçu tronqué à cinq", () => {
+    // `sae_portfolio()` ne rend que cinq libellés de `missing`. Les compter
+    // aurait plafonné toute entreprise à « 5 exigences », et une entreprise
+    // à qui il en manque 21 serait passée pour presque à jour.
+    expect(priorites([avec("a", 30, 21)])[0]?.manques).toBe(21);
+  });
 
   it("s'arrête à trois, comme l'écran l'annonce", () => {
     const lignes = [

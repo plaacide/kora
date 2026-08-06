@@ -25,8 +25,12 @@ export interface LigneLue extends LignePortefeuille {
   stage: string | null;
   secteur: string | null;
   pays: string | null;
-  /** Les exigences non fournies, cinq au plus — `sae_portfolio()` les tronque. */
-  manques: readonly string[];
+  /**
+   * Les libellés des exigences non fournies, CINQ AU PLUS — `sae_portfolio()`
+   * tronque ce tableau. C'est un aperçu, jamais un compte : le compte est
+   * `restants`.
+   */
+  apercuManques: readonly string[];
 }
 
 interface RangeeBrute {
@@ -38,6 +42,8 @@ interface RangeeBrute {
   amount: number | string | null;
   currency: string | null;
   readiness: number | null;
+  items_total: number | string | null;
+  items_done: number | string | null;
   missing: string[] | null;
   sector: string | null;
   country: string | null;
@@ -79,6 +85,12 @@ export async function lirePortefeuille(): Promise<readonly LigneLue[]> {
     readiness: r.readiness,
     secteur: r.sector,
     pays: r.country,
-    manques: r.missing ?? [],
+    // `items_total` et `items_done` sont des `bigint` : PostgREST les rend en
+    // chaîne, comme `amount`. D'où la même conversion explicite.
+    restants: Math.max(
+      0,
+      (nombre(r.items_total) ?? 0) - (nombre(r.items_done) ?? 0),
+    ),
+    apercuManques: r.missing ?? [],
   }));
 }

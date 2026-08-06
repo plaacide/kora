@@ -98,10 +98,13 @@ function chiffres(lignes: readonly LigneLue[], cohortes: number): Chiffre[] {
       // JAMAIS DE SOMME ENTRE DEVISES — rien ici ne convertit. La devise
       // dominante est affichée, et les autres annoncées sans être mêlées.
       valeur: `${montantCourt(dominant.montant)} ${dominant.devise}`,
-      detail:
-        autres > 0
-          ? `${dominant.operations} opérations · ${autres} autre${autres > 1 ? "s" : ""} devise${autres > 1 ? "s" : ""}`
-          : `${dominant.operations} opération${dominant.operations > 1 ? "s" : ""} renseignée${dominant.operations > 1 ? "s" : ""}`,
+      detail: (() => {
+        const s = dominant.operations > 1 ? "s" : "";
+        const compte = `${dominant.operations} opération${s} renseignée${s}`;
+        if (autres === 0) return compte;
+        const a = autres > 1 ? "s" : "";
+        return `${compte} · ${autres} autre${a} devise${a}`;
+      })(),
     });
   }
 

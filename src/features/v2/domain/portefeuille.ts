@@ -19,8 +19,15 @@ export interface LignePortefeuille {
   amount: number | null;
   currency: string | null;
   readiness: number | null;
-  /** Les exigences non fournies, cinq au plus. Vide si tout est en ordre. */
-  manques?: readonly string[];
+  /**
+   * Le NOMBRE d'exigences non fournies.
+   *
+   * ⚠️ Ne pas le tirer de `missing` : `sae_portfolio()` tronque ce tableau à
+   * cinq libellés — c'est un échantillon pour l'affichage, pas un compte. Une
+   * entreprise à qui il manque 21 pièces aurait affiché « 5 », et le programme
+   * l'aurait crue presque à jour. Le vrai compte est `items_total - items_done`.
+   */
+  restants?: number;
 }
 
 /**
@@ -165,8 +172,8 @@ export function priorites(
   const parEntreprise = new Map<string, Priorite>();
 
   for (const l of lignes) {
-    const manques = l.manques?.length ?? 0;
-    if (manques === 0) continue;
+    const manques = l.restants ?? 0;
+    if (manques <= 0) continue;
 
     const vue = parEntreprise.get(l.startupOrg);
     const candidate: Priorite = {
