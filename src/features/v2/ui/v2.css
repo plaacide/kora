@@ -2379,3 +2379,50 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
   .v2-chal-liste>*,.v2-dr-grid>*,.v2-prog-grid>*,.v2-modeles>*,.v2-vitrine-grille>*{
     animation:v2-fade 150ms linear both;animation-delay:0s!important}
 }
+
+/* ══ Ce qui manquait encore au mouvement — seconde passe ═══════════════════
+   La première n'a traité que les entrées de page. Ce qui suit est ce qu'on
+   touche : ce qui répond sous le doigt, et ce qui bouge parce qu'une valeur
+   a changé.                                                                */
+
+/* §7.1 — chaque bouton doit dire normal, survol, PRESSION, désactivé. Les
+   variantes du parcours programme n'avaient que le survol : un bouton qui ne
+   s'enfonce pas laisse douter qu'on l'ait cliqué, sur une connexion lente
+   plus encore qu'ailleurs. */
+.v2-btn{transition:background var(--motion-fast) var(--motion-ease),border-color var(--motion-fast) var(--motion-ease),transform var(--motion-instant) var(--motion-ease)}
+.v2-btn[disabled]:active{transform:none}
+.v2-lien-action,.v2-onboard-back,.v2-back{transition:color var(--motion-fast) var(--motion-ease)}
+.v2-icbtn,.v2-x,.v2-poignee{transition:background var(--motion-fast) var(--motion-ease),color var(--motion-fast) var(--motion-ease)}
+.v2-icbtn:active,.v2-x:active{transform:translateY(1px)}
+
+/* Les barres bougent parce qu'une VALEUR a changé, pas parce que la page se
+   charge — d'où une transition et non une animation d'entrée. §7.5 : on
+   n'anime que ce qui a réellement bougé. */
+.v2-prep-bar>i,.v2-segbar i,.v2-apercu-liseré{transition:width var(--motion-slow) var(--motion-ease)}
+
+/* Ce qui se coche : la coche apparaît, elle ne surgit pas. */
+.v2-case{transition:background var(--motion-fast) var(--motion-ease),border-color var(--motion-fast) var(--motion-ease)}
+.v2-case .v2-icon{transition:opacity var(--motion-fast) var(--motion-ease),transform var(--motion-fast) var(--motion-ease)}
+.v2-case[data-cochee=false] .v2-icon{opacity:0;transform:scale(.6)}
+.v2-radio>i::after{transition:transform var(--motion-fast) var(--motion-ease)}
+.v2-objective,.v2-objective-icon,.v2-objective-check{transition:background var(--motion-fast) var(--motion-ease),border-color var(--motion-fast) var(--motion-ease)}
+
+/* Onglets et segments : le fond et le liseré se posent, ils ne clignent pas. */
+.v2-onglets a,.v2-onglets span{transition:color var(--motion-fast) var(--motion-ease),border-color var(--motion-default) var(--motion-ease)}
+.v2-prog-segments .v2-tag,.v2-biblio-cats a,.v2-biblio-liste>a,.v2-nav-item,.v2-rail-link{transition:background var(--motion-fast) var(--motion-ease),color var(--motion-fast) var(--motion-ease),box-shadow var(--motion-fast) var(--motion-ease)}
+
+/* LE FOCUS CLAVIER, que le §4 du handoff exige visible partout — « jamais le
+   focus bleu navigateur ». Les éléments interactifs du parcours qui ne sont
+   pas encore de vrais boutons doivent au moins le montrer quand ils le
+   deviendront. */
+.v2 :where(.v2-case,.v2-inter,.v2-tag,.v2-icbtn,.v2-x):focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+
+/* §7.3 — une ligne qui vient d'être remplie change d'aspect, pas seulement de
+   pastille. Le critère fait s'estompe : il a quitté la liste des choses à
+   faire sans quitter l'écran. */
+.v2-crit-suivi,.v2-crit-fondateur{transition:opacity var(--motion-default) var(--motion-ease)}
+
+@media(prefers-reduced-motion:reduce){
+  .v2-btn:active,.v2-icbtn:active,.v2-x:active{transform:none}
+  .v2-prep-bar>i,.v2-segbar i,.v2-case .v2-icon{transition:none}
+}
