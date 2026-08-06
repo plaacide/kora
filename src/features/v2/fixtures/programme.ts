@@ -331,3 +331,57 @@ export const PROGRAMME = {
   /** Les initiales de l'avatar du rail, écran 01. */
   avatar: "FA",
 } as const;
+
+export interface MessageFixture {
+  initiales: string;
+  nom: string;
+  ton: Ton;
+  statut: string;
+  statutTon: "amber" | "green" | "neutral";
+  quand: string;
+  corps: string;
+  /** La réponse de l'entreprise, quand elle est venue. */
+  reponse?: string;
+}
+
+/**
+ * Le fil de l'écran 08 : une question en attente, une répondue, une suggestion.
+ *
+ * Une SUGGESTION n'attend rien — d'où son ton neutre, quand la question en
+ * attente porte l'ambre. Confondre les deux ferait passer un conseil pour une
+ * relance.
+ */
+export const MESSAGES: readonly MessageFixture[] = [
+  {
+    initiales: "CB",
+    nom: "CoolBricks",
+    ton: "orange",
+    statut: "En attente",
+    statutTon: "amber",
+    quand: "envoyée il y a 2 jours",
+    corps:
+      "Votre montant recherché couvre-t-il le besoin en fonds de roulement 2027 ?",
+  },
+  {
+    initiales: "KF",
+    nom: "Kalyx Foods",
+    ton: "blue",
+    statut: "Répondu",
+    statutTon: "green",
+    quand: "répondu hier",
+    corps:
+      "Quel scénario de dette présentez-vous à la BOAD en priorité ?",
+    reponse:
+      "Le scénario équipement sur 5 ans. Le second passera en comité interne d’abord.",
+  },
+  {
+    initiales: "NS",
+    nom: "Nimba Solar",
+    ton: "green",
+    statut: "Suggestion",
+    statutTon: "neutral",
+    quand: "il y a 4 jours",
+    corps:
+      "Pensez à renseigner votre montant recherché avant le Demo Day — les investisseurs filtrent souvent sur ce champ.",
+  },
+];

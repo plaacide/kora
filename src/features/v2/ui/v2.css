@@ -1955,3 +1955,26 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 /* Le point d'un badge se décolle de son libellé — `gap:6px` dans les
    maquettes. Sans écart, « ●Lien ouvert » se lit comme un seul mot. */
 .v2-badge{gap:6px}
+
+/* Écran 08 — questions & suggestions. Un fil, pas une conversation : ni saisie
+   en cours, ni présence, ni accusé de lecture. La réponse s'imbrique sous la
+   question, décalée sous l'avatar, pour qu'on lise d'un coup qui a parlé. */
+.v2-fil{display:grid;grid-template-columns:1fr 380px;align-items:start;gap:16px}
+.v2-fil-liste{overflow:hidden}
+.v2-fil-item{display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line-soft);padding:16px 18px}
+.v2-fil-item:last-child{border-bottom:0}
+.v2-fil-item>header{display:flex;align-items:center;gap:10px}
+.v2-fil-item>header b{font:600 13.5px var(--font-v2-head),sans-serif}
+.v2-fil-item>header small{color:var(--text-3);font-size:12px}
+.v2-fil-item>p{margin:0 0 0 40px;color:var(--text);font-size:13.5px}
+.v2-fil-reponse{margin-left:40px;border-radius:var(--r-md);background:var(--band);padding:10px 14px;color:var(--text-2);font-size:13px}
+.v2-fil-reponse b{color:var(--text)}
+.v2-fil-envoi{display:flex;flex-direction:column;gap:14px;padding:18px 20px}
+.v2-fil-envoi>b{font:600 14px var(--font-v2-head),sans-serif}
+.v2-fil-envoi>p{margin:0;color:var(--text-3);font-size:12px}
+/* Deux valeurs exclusives, cousues dans un même cadre : le choix se lit comme
+   un seul objet, là où deux boutons séparés se liraient comme deux actions. */
+.v2-bascule{display:inline-flex;overflow:hidden;border:1px solid var(--line);border-radius:var(--r-md)}
+.v2-bascule span{background:#fff;padding:7px 16px;color:var(--text-2);cursor:pointer;font:500 13px var(--font-v2-sans),sans-serif}
+.v2-bascule span[data-active=true]{background:var(--ink);color:#fff}
+.v2-btn[data-bloc=true]{display:flex;width:100%}
