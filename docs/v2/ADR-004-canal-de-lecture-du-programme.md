@@ -42,6 +42,31 @@ opération présentée), `programme_challenges_par_entreprise()`,
 Le segment et la tendance sont **calculés dans le domaine**, à partir de ces
 faits : ce sont des règles produit, elles se testent sans base.
 
+### Ce que valent les quatre segments — retenu le 6 août 2026
+
+Les maquettes affichent « Prêtes · En cours · Décrochent · Nouvelles » et le
+badge rouge « Décroche » sans jamais dire ce qui les déclenche. Seul « Prêtes »
+est chiffré. Voici ce qui a été retenu, à corriger si la lecture est fausse :
+
+| Segment | Règle |
+|---|---|
+| **Prêtes** | préparation ≥ 75 % — c'est écrit sous l'indicateur de l'écran 07 |
+| **Nouvelles** | entrée dans la cohorte depuis moins de 14 jours, ET préparation pas encore commencée |
+| **Décrochent** | aucune activité depuis 14 jours |
+| **En cours** | tout le reste |
+
+L'ordre d'évaluation compte, sans quoi une entreprise tomberait dans deux
+segments : **Prêtes**, puis **Nouvelles**, puis **Décrochent**, puis **En
+cours** en défaut. Une entreprise prête n'est jamais « décroche », même sans
+activité récente : elle n'a plus rien à faire.
+
+⚠️ **« Activité » demande encore une source.** Le canal actuel ne transporte
+aucune date de dernier mouvement : `sae_portfolio()` rend une préparation, pas
+une chronologie. Il faudra soit une colonne de plus, soit une lecture d'
+`audit_log` filtrée — et c'est cette seconde option qui pose la vraie question,
+puisque le journal d'une entreprise n'appartient pas au programme. À trancher au
+moment d'écrire la règle, pas avant.
+
 À la volumétrie visée — 18 entreprises dans les fixtures, paliers 10 / 25 / 50
 au tarif Programme — la question de performance ne se pose pas. La lisibilité de
 la frontière, elle, se pose tous les jours.

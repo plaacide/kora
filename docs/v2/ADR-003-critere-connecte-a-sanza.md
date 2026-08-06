@@ -124,14 +124,42 @@ Bénéfice second, gratuit : le journal du Challenge (« terminé le 24 juillet 
   faits — testable sans base.
 - Devient plus dur : il faut un écran, côté entreprise, pour désigner l'opération
   présentée. Aucun des 34 écrans ne le montre.
-- À revisiter : le sort d'un critère connecté quand l'entreprise **change**
-  d'opération présentée. Le critère redevient-il « à faire » ? Question ouverte.
+### Changer d'opération présentée ne fait rien perdre — tranché le 6 août 2026
+
+Un critère connecté déjà validé **garde son acquis** quand l'entreprise change
+d'opération présentée. Il ne redevient jamais « à faire ».
+
+Le raisonnement tient en une phrase : le travail a été fait. Une entreprise qui
+réoriente sa levée — passe d'une dette d'équipement à une levée en capital —
+n'a pas défait ses états financiers. Les lui retirer punirait un changement
+légitime, et pire : ferait reculer un compteur que le programme lit comme une
+mesure d'effort.
+
+**L'invariant qui en découle, et qui vaut d'être retenu : la progression ne
+recule jamais.** Un critère connecté va de `a_faire` à `fait`, jamais l'inverse.
+La réévaluation ne fait qu'AJOUTER.
+
+Trois bénéfices, gratuits :
+
+- La fonction de réévaluation devient monotone, donc rejouable sans risque : la
+  passer deux fois donne le même résultat que la passer une fois.
+- Le journal du Challenge reste vrai. « Terminé le 24 juillet » ne peut pas se
+  faire démentir par un changement survenu en août.
+- Le gel de sortie de cohorte n'est plus un cas particulier, mais le cas
+  général : figer une progression qui ne recule pas ne fait qu'en arrêter la
+  croissance.
+
+Le seul renoncement est assumé : un critère validé sur une opération abandonnée
+reste coché. Il décrit alors une pièce qui existe bel et bien — elle a
+simplement servi un autre dossier.
 
 ## Suites
 
-1. [ ] Trancher l'option et ses deux clauses.
-2. [ ] Décider où vit la désignation de l'opération présentée, et par quel écran
-       l'entreprise la pose.
+1. [x] Trancher l'option et ses deux clauses — **6 août 2026**.
+2. [x] Où vit la désignation — `startups.presented_deal_id`, posée par la
+       migration `socle_des_challenges`. **L'écran par lequel l'entreprise la
+       pose reste à construire** : aucune des maquettes ne le montre.
 3. [ ] Écrire `startup_requirement_facts()` en énumérant les colonnes, sur le
        modèle de `sae_portfolio()`.
-4. [ ] Trancher le sort d'un critère connecté au changement d'opération.
+4. [x] Sort d'un critère connecté au changement d'opération — **il garde son
+       acquis, 6 août 2026**. La progression ne recule jamais.
