@@ -63,6 +63,12 @@ export const v2Routes = {
    */
   programme: {
     accueil: "/v2/programme",
+    onboarding: {
+      organisation: "/v2/onboarding/programme/organisation",
+      accompagnement: "/v2/onboarding/programme/accompagnement",
+      cohorte: "/v2/onboarding/programme/cohorte",
+      pret: "/v2/onboarding/programme/pret",
+    },
     portefeuille: "/v2/portefeuille",
     demandes: "/v2/demandes",
     rapports: "/v2/rapports",

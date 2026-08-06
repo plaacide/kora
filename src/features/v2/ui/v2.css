@@ -23,8 +23,13 @@
      empruntaient le vert et annonçaient une réussite qui n'a pas eu lieu.
      Les rampes du `parcours.css` nomment ces fonds `-bg` ; le thème les nomme
      `-soft` depuis l'origine, et un second nom pour la même chose se
-     contredit tôt ou tard. */
-  --blue:#175cd3;--blue-soft:#eff8ff;
+     contredit tôt ou tard.
+
+     VALEUR : celle du design system — #185FA5 sur #EAF1F8, comme l'écrit le
+     README du paquet. Le `parcours.css` du parcours programme porte un autre
+     bleu, #175CD3 sur #EFF8FF, du même jeu froid que ses gris et son vert, qui
+     ne sont pas ceux du produit. C'est le design system qui fait foi. */
+  --blue:#185fa5;--blue-soft:#eaf1f8;
   /* Les trois rayons du `parcours.css`. Le thème les écrivait en clair, si
      bien que 4, 6 et 10 px se rencontraient au hasard des composants. */
   --r-sm:4px;--r-md:6px;--r-lg:10px;
@@ -2093,3 +2098,27 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
    de bas de page sur un écran qu'on croyait vierge. */
 .v2-bandeau-modele{display:flex;align-items:center;gap:12px;margin-bottom:18px;border:1px solid var(--blue);border-radius:var(--r-lg);background:var(--blue-soft);padding:13px 18px;color:var(--text);font-size:13.5px}
 .v2-bandeau-modele b{color:var(--text)}
+
+/* Écrans 00a à 00d — l'onboarding d'un programme. Il réutilise la coque, le
+   fil d'étapes et les cartes de l'onboarding fondateur : seules les questions
+   changent. */
+.v2-onb-depot{display:flex;align-items:center;gap:14px;border:1px dashed var(--line);border-radius:var(--r-lg);background:#fff;padding:14px 16px}
+.v2-onb-depot>b{display:inline-flex;width:40px;height:40px;flex-shrink:0;align-items:center;justify-content:center;border-radius:8px;background:var(--orange);color:#fff;font:700 15px var(--font-v2-head),sans-serif}
+.v2-onb-depot>span{flex:1;color:var(--text-2);font-size:13px}
+/* Le récapitulatif de l'écran 00d : des paires clé-valeur cloisonnées, pour
+   qu'on relise ce qu'on vient de déclarer sans avoir à y revenir. */
+.v2-onb-recap{overflow:hidden;padding:0}
+.v2-onb-recap>div{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line-soft)}
+.v2-onb-recap>div:last-child{border-bottom:0;grid-template-columns:1fr}
+.v2-onb-recap .v2-kv{padding:18px 22px}
+.v2-onb-recap>div>.v2-kv:first-child:not(:last-child){border-right:1px solid var(--line-soft)}
+.v2-onb-recap .v2-v{display:flex;flex-wrap:wrap;gap:6px;font:500 14px var(--font-v2-sans),sans-serif}
+/* La promesse répétée à chaque étape : le programme ne verra pas les pièces. */
+.v2-onb-promesse{display:flex;align-items:center;gap:10px;color:var(--text-2);font-size:13.5px}
+.v2-onb-promesse .v2-icon{flex-shrink:0;color:var(--green)}
+.v2-onb-promesse b{color:var(--text)}
+.v2-onb-fin{display:flex;justify-content:center;gap:12px}
+.v2-onb-sceau{display:grid;width:56px;height:56px;place-items:center;border-radius:50%;background:var(--green-bg);color:var(--green)}
+.v2-duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.v2-field-aide{color:var(--text-3);font-size:12.5px}
+.v2-onb-titre-centre{align-items:center;text-align:center}

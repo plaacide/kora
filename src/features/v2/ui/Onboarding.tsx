@@ -16,6 +16,15 @@ import { saveV2Objective } from "@/app/v2/(onboarding)/onboarding/actions";
 
 const steps = ["Compte", "Entreprise", "Objectif", "Détails", "Plan"];
 
+/**
+ * Les cinq étapes du programme — écrans 00a à 00d.
+ *
+ * Un programme ne décrit pas une entreprise et n'a pas d'objectif de levée :
+ * il décrit son organisation, dit comment il accompagne, et ouvre sa première
+ * cohorte. Le tunnel a le même nombre d'étapes, pas les mêmes.
+ */
+export const ETAPES_PROGRAMME = ["Compte", "Organisation", "Suivi", "Cohorte", "Espace"];
+
 export function OnboardingFrame({
   children,
   email,
@@ -79,11 +88,17 @@ export function OnboardingFrame({
 export function Stepper({
   avecDetails = true,
   current,
+  etapes = steps,
 }: {
   avecDetails?: boolean;
   current: number;
+  /** Le tunnel du programme n'a pas les mêmes étapes que celui du fondateur. */
+  etapes?: readonly string[];
 }) {
-  const visibles = avecDetails ? steps : steps.filter((s) => s !== "Détails");
+  const visibles =
+    avecDetails || etapes !== steps
+      ? etapes
+      : etapes.filter((s) => s !== "Détails");
 
   return (
     <ol className="v2-steps" aria-label="Progression de l’onboarding">
