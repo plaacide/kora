@@ -760,3 +760,52 @@ export const APERCU_ENTREPRISES: readonly { nom: string; ligne: string }[] = [
   { nom: "Kalyx Foods", ligne: "Agro · Seed" },
   { nom: "Nimba Solar", ligne: "Énergie · Seed" },
 ];
+
+/** Les quatre indicateurs de l'écran 25. */
+export const DEALROOM_CHIFFRES: readonly {
+  titre: string; valeur: number; detail: string;
+}[] = [
+  { titre: "Entreprises", valeur: 12, detail: "10 fiches publiées" },
+  { titre: "Investisseurs", valeur: 28, detail: "19 ont accepté l’invitation" },
+  { titre: "Demandes d’accès", valeur: 6, detail: "2 à traiter" },
+  { titre: "Consultations", valeur: 18, detail: "cette semaine" },
+];
+
+/** L'activité récente de l'écran 25 — trois lignes, du plus récent au plus ancien. */
+export const DEALROOM_ACTIVITE: readonly { fait: string; quand: string }[] = [
+  { fait: "Acme Ventures a consulté la fiche CoolBricks", quand: "il y a 2 heures" },
+  { fait: "Marie Dupont (Acme Ventures) a demandé l’accès à la data room de CoolBricks", quand: "hier" },
+  { fait: "Kalyx Foods a donné son accord pour cette Dealroom", quand: "il y a 3 jours" },
+];
+
+/**
+ * Les entreprises de la Dealroom publiée — écran 26.
+ *
+ * L'OPÉRATION EST CHOISIE PAR L'ENTREPRISE, jamais par le programme : c'est le
+ * titre même de la colonne. Kalyx Foods est « en attente du choix », donc non
+ * publiée — voir INCOHERENCES-MAQUETTES.md §1, l'écran 30 la montre pourtant.
+ */
+export const DEALROOM_ENTREPRISES: readonly {
+  initiales: string; nom: string; ton: Ton; secteur: string; pays: string;
+  cohorte: string; operation: string; publiee: boolean;
+  consentement: "Accord donné" | "En attente"; demandes: string | null;
+}[] = [
+  { initiales: "CB", nom: "CoolBricks", ton: "orange", secteur: "Construction", pays: "Côte d’Ivoire", cohorte: "Agri & Agro", operation: "Levée Seed 2026", publiee: true, consentement: "Accord donné", demandes: "3 demandes" },
+  { initiales: "NS", nom: "Nimba Solar", ton: "green", secteur: "Énergie", pays: "Guinée", cohorte: "Agri & Agro", operation: "Levée Seed 2026", publiee: true, consentement: "Accord donné", demandes: "2 demandes" },
+  { initiales: "MP", nom: "Moneta Pay", ton: "neutral", secteur: "Fintech", pays: "Togo", cohorte: "Fintech 2026", operation: "Série A 2026", publiee: true, consentement: "Accord donné", demandes: "1 demande" },
+  { initiales: "KF", nom: "Kalyx Foods", ton: "blue", secteur: "Agroalimentaire", pays: "Sénégal", cohorte: "Agri & Agro", operation: "en attente du choix", publiee: false, consentement: "En attente", demandes: null },
+];
+
+/** L'audience de l'écran 27 — cinq états d'invitation, dont un accès retiré. */
+export const DEALROOM_AUDIENCE: readonly {
+  personne: string; organisation: string;
+  statut: "Acceptée" | "Envoyée" | "Expirée" | "Accès retiré";
+  ton: "green" | "neutral" | "red" | undefined;
+  activite: string; action: string; actionGrise?: boolean;
+}[] = [
+  { personne: "Marie Dupont · marie@fund.com", organisation: "Acme Ventures", statut: "Acceptée", ton: "green", activite: "a consulté 3 fiches · hier", action: "Retirer l’accès", actionGrise: true },
+  { personne: "Jean Koffi · j.koffi@dfi.org", organisation: "WestBridge DFI", statut: "Acceptée", ton: "green", activite: "a demandé 1 accès · il y a 2 jours", action: "Retirer l’accès", actionGrise: true },
+  { personne: "sofia@impact.vc", organisation: "Impact Partners", statut: "Envoyée", ton: "neutral", activite: "—", action: "Relancer" },
+  { personne: "t.mensah@axiscap.com", organisation: "Axis Capital", statut: "Expirée", ton: "red", activite: "—", action: "Renvoyer" },
+  { personne: "paul@oldfund.com", organisation: "—", statut: "Accès retiré", ton: undefined, activite: "retiré le 18 juillet", action: "—" },
+];

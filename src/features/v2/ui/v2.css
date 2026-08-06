@@ -2214,3 +2214,11 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-chips{display:flex;flex-wrap:wrap;gap:8px}
 /* Une étiquette qui porte un choix courant — thème clair/sombre, écran 21. */
 .v2-tag[data-active=true]{border-color:var(--ink);background:var(--ink);color:#fff}
+/* Écrans 25 à 28 — la Dealroom publiée. */
+.v2-dr-chiffre{display:flex;flex:1;flex-direction:column;padding:16px 18px}
+.v2-dr-chiffre b{font:600 24px var(--font-v2-head),sans-serif;font-variant-numeric:tabular-nums}
+.v2-dr-chiffre small{margin-top:2px;color:var(--text-3);font-size:12.5px}
+.v2-dr-activite{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line-soft);padding:13px 18px;font-size:13.5px}
+.v2-dr-activite:last-child{border-bottom:0}
+.v2-dr-activite>span:last-child{color:var(--text-3);font-size:12.5px;white-space:nowrap}
+.v2-dr-note{margin:12px 2px 0;color:var(--text-3);font-size:12.5px}

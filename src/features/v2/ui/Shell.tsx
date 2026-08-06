@@ -625,6 +625,96 @@ export function CohorteShell({
   );
 }
 
+/**
+ * La coque d'une Dealroom publiée — écrans 25 à 28.
+ *
+ * Même anatomie que celle d'une cohorte. Le statut vit dans l'en-tête et non
+ * dans une des six entrées : il ne change pas selon l'écran qu'on regarde, et
+ * c'est la première chose qu'on veut savoir en entrant.
+ */
+export function DealroomShell({
+  children,
+  dealroomId,
+  nom,
+  statut,
+  compteurs,
+  titre,
+  search = false,
+  action,
+}: {
+  children: ReactNode;
+  dealroomId: string;
+  nom: string;
+  statut: string;
+  compteurs: { entreprises?: number; audience?: number; demandes?: number };
+  /** Le dernier étage du fil d'Ariane. */
+  titre?: string;
+  search?: string | false;
+  action?: ReactNode;
+}) {
+  const path = usePathname();
+  const routes = v2Routes.programme.dealrooms;
+  const nav: Array<[string, string, number | undefined]> = [
+    [routes.root(dealroomId), "Vue d’ensemble", undefined],
+    [routes.entreprises(dealroomId), "Entreprises", compteurs.entreprises],
+    [routes.audience(dealroomId), "Audience", compteurs.audience],
+    [routes.demandes(dealroomId), "Demandes", compteurs.demandes],
+    [routes.branding(dealroomId), "Branding", undefined],
+    [routes.activite(dealroomId), "Activité", undefined],
+  ];
+
+  return (
+    <>
+      <aside className="v2-ctx">
+        <div className="v2-ctx-head">
+          <PushLink back className="v2-back" href={routes.list}>
+            ← Toutes les Dealrooms
+          </PushLink>
+          <div className="v2-ctx-title">
+            <b>{nom}</b>
+          </div>
+          <div className="v2-ctx-sub">
+            <span className="v2-badge" data-tone="green">
+              <span className="v2-dot" />
+              {statut}
+            </span>
+          </div>
+        </div>
+        <div className="v2-nav-group">
+          <div className="v2-nav-label">Dealroom</div>
+          {nav.map(([href, label, compteur]) => (
+            <Link
+              className="v2-nav-item"
+              data-active={
+                href === routes.root(dealroomId)
+                  ? path === href
+                  : path.startsWith(href)
+              }
+              href={href}
+              key={href}
+            >
+              {label}
+              {compteur !== undefined && <small>{compteur}</small>}
+            </Link>
+          ))}
+        </div>
+      </aside>
+      <div className="v2-main">
+        <header className="v2-top">
+          <span className="v2-crumb-muted">Dealrooms ›</span>
+          <strong>{titre ?? nom}</strong>
+          <span className="v2-spacer" />
+          {search !== false && (
+            <div className="v2-search"><Icon name="search" />{search}</div>
+          )}
+          {action}
+        </header>
+        <main className="v2-work">{children}</main>
+      </div>
+    </>
+  );
+}
+
 export function Standalone({
   action,
   children,
