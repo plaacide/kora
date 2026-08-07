@@ -296,6 +296,58 @@ export async function criteresModele(
   }));
 }
 
+/** Le Challenge vu par l'entreprise — écran 42. */
+export interface ChallengeCoteEntreprise {
+  titre: string;
+  categorie: string | null;
+  echeance: string | null;
+  programme: string;
+  startupOrg: string;
+}
+
+/**
+ * Ce qu'une entreprise voit du Challenge qu'on lui a confié.
+ *
+ * ⚠️ PAR FONCTION ÉNUMÉRÉE, et pour la raison inverse de d'habitude : ici
+ * c'est L'ENTREPRISE qui n'a pas le droit de lire la fiche du programme. Une
+ * jointure vers `organizations` rendrait zéro ligne, sans erreur, et l'écran
+ * afficherait « Proposé par — ».
+ */
+export async function lireChallengeEntreprise(
+  challengeId: string,
+): Promise<ChallengeCoteEntreprise | null> {
+  await requireV2User();
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("challenge_for_startup", {
+    p_challenge: challengeId,
+  });
+
+  if (error) {
+    console.error("[v2 challenges] côté entreprise", error);
+    return null;
+  }
+
+  const ligne = (
+    data as {
+      title: string;
+      category: string | null;
+      due_on: string | null;
+      programme: string | null;
+      startup_org: string;
+    }[]
+  )?.[0];
+  if (!ligne) return null;
+
+  return {
+    categorie: ligne.category,
+    echeance: ligne.due_on,
+    programme: ligne.programme ?? "votre programme",
+    startupOrg: ligne.startup_org,
+    titre: ligne.title,
+  };
+}
+
 /**
  * Remet à jour les critères connectés avant d'afficher.
  *
