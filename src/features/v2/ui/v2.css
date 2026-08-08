@@ -2021,13 +2021,36 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-onglets a,.v2-onglets span{padding:9px 16px;color:var(--text-3);cursor:pointer;font:500 13.5px var(--font-v2-sans),sans-serif}
 .v2-onglets [data-active=true]{border-bottom:2px solid var(--orange);color:var(--orange-text);font-weight:600}
 /* Trois volets : catégories, liste, aperçu complet. */
-.v2-biblio{display:grid;grid-template-columns:190px 330px 1fr;align-items:start;gap:16px}
+/* `minmax(0,1fr)` ET NON `1fr`. Une piste de grille garde `min-width:auto` :
+   elle ne descend jamais sous la largeur minimale de son contenu, et la
+   troisième colonne restait donc bloquée à 440 px quoi qu'il arrive. La page
+   débordait de 196 px à 1280 et de 36 px encore à 1440. `minmax(0,…)` lève ce
+   plancher — c'est le pendant du `min-width:0` qu'on met sur un enfant flex. */
+.v2-biblio{display:grid;grid-template-columns:190px 330px minmax(0,1fr);align-items:start;gap:16px}
 .v2-biblio-cats{display:flex;flex-direction:column;gap:2px}
 .v2-biblio-cats>.v2-search{width:100%;height:32px;margin-bottom:10px;font-size:12.5px}
 .v2-biblio-cats a{display:flex;justify-content:space-between;border-radius:var(--r-md);padding:7px 10px;color:var(--text-2);font-size:13px}
 .v2-biblio-cats a:hover{background:var(--line-soft)}
 .v2-biblio-cats a[data-active=true]{background:#fff;box-shadow:inset 0 0 0 1px var(--line),inset 2.5px 0 0 var(--orange);color:var(--text);font-weight:600}
 .v2-biblio-cats a span{color:var(--text-4);font-size:11.5px}
+/* DEUX PALIERS, ET LES CATÉGORIES CÈDENT EN PREMIER. Garder les trois colonnes
+   jusqu'au bout écrasait le détail à 216 px sur un écran de 1280 — dans la
+   page, mais illisible. Les catégories sont un filtre : elles se relisent en
+   rangée de pastilles, alors que le détail, lui, porte le texte.
+
+   ⚠️ CE BLOC DOIT RESTER APRÈS LES RÈGLES DE BASE ci-dessus. Placé avant, il
+   était réécrit par elles — `flex-direction` retombait à `column`, et le
+   `flex-basis:180px` de la recherche devenait une HAUTEUR de 180 px. Une media
+   query n'a aucune priorité supplémentaire : seul l'ordre les départage. */
+@media(max-width:1400px){
+  .v2-biblio{grid-template-columns:330px minmax(0,1fr)}
+  .v2-biblio-cats{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}
+  .v2-biblio-cats>.v2-search{width:auto;max-width:260px;flex:1 1 180px;height:32px;margin-bottom:0}
+  .v2-biblio-cats a{flex:0 0 auto;justify-content:flex-start;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+}
+@media(max-width:900px){
+  .v2-biblio{grid-template-columns:minmax(0,1fr)}
+}
 .v2-biblio-liste{overflow:hidden}
 .v2-biblio-liste>a{display:block;border-bottom:1px solid var(--line-soft);padding:13px 16px;cursor:pointer}
 .v2-biblio-liste>a:last-child{border-bottom:0}
@@ -2036,10 +2059,13 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-biblio-liste b{font:600 13.5px var(--font-v2-head),sans-serif}
 .v2-biblio-liste small{display:block;margin-top:2px;color:var(--text-3);font-size:12px}
 .v2-biblio-detail{display:flex;flex-direction:column;gap:14px;padding:22px 24px}
-/* Pas de `flex-wrap` : la maquette laisse les éléments se serrer plutôt que
-   passer à la ligne, ce qui casse « Modèle Sanza » en deux mais garde la durée
-   sur la même rangée. Reproduit tel quel. */
-.v2-biblio-detail>header{display:flex;align-items:center;gap:8px}
+/* LA MAQUETTE NE PASSAIT PAS À LA LIGNE, ET C'ÉTAIT REPRODUIT TEL QUEL — mais
+   elle était dessinée sur un canevas fixe de 1440 px. Dans une page qui se
+   redimensionne, refuser le retour à la ligne ne serre pas les éléments : ça
+   fixe une largeur minimale que la colonne ne peut plus descendre, et c'est
+   l'une des trois causes du débordement. On laisse donc passer à la ligne —
+   ce que la maquette aurait fait si elle avait eu à rétrécir. */
+.v2-biblio-detail>header{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .v2-biblio-detail>header>small{color:var(--text-3);font-size:12px}
 .v2-biblio-detail h2{font-size:18px}
 .v2-biblio-detail>p{margin:0;color:var(--text-2);font-size:13.5px;line-height:1.55}
@@ -2048,9 +2074,14 @@ button.v2-avatar:focus-visible{outline:2px solid var(--orange);outline-offset:2p
 .v2-marque-sanza i{display:inline-flex;width:16px;height:16px;align-items:center;justify-content:center;border-radius:4px;background:var(--orange);color:#fff;font:600 9px var(--font-v2-head),sans-serif;font-style:normal}
 /* Un critère : la pastille creuse dit qu'il reste à faire, sans promettre
    qu'on pourra le cocher soi-même — c'est l'entreprise qui confirme. */
-.v2-critere{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:10px 0}
+.v2-critere{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border-bottom:1px solid var(--line-soft);padding:10px 0}
 .v2-critere>i{width:18px;height:18px;flex-shrink:0;border:1.5px dashed #d0d5dd;border-radius:50%}
-.v2-critere b{flex:1;font:500 13px var(--font-v2-sans),sans-serif}
+/* `flex:1 1 160px` plutôt que `flex:1` : le libellé garde une largeur lisible,
+   et ce sont les ÉTIQUETTES qui passent à la ligne quand la place manque. Avec
+   `flex:1`, c'est l'inverse qui se produisait — le libellé se cassait en trois
+   lignes pour garder les badges à côté, ce que la capture montrait sur
+   « États financiers disponibles ». */
+.v2-critere b{min-width:0;flex:1 1 160px;font:500 13px var(--font-v2-sans),sans-serif}
 /* §4 du handoff : le texte AU-DESSUS des deux boutons, jamais sur la même
    ligne — « Déjà utilisé dans 2 de vos cohortes » n'est pas une action. */
 .v2-biblio-pied{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line-soft);padding-top:14px}
